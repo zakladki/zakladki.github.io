@@ -1,0 +1,22 @@
+li {
+  list-style-type: none;
+  /* margin: 3px; */
+}
+
+.nav-container {
+  margin-bottom: 100px;
+}
+
+.icon {
+  width: 16px;
+  margin-right: 5px;
+}
+
+hr {
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+ul {
+  margin-bottom: 2rem;
+}
