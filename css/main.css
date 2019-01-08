@@ -48,3 +48,16 @@ ul {
 .navbar-light .navbar-nav .nav-link.active {
   color: #fff;
 }
+
+.footer {
+  background-color: #daffe5;
+  min-height: 47px;
+  padding-top: 0.5rem !important;
+  padding-bottom: 0.5rem !important;
+  bottom: 0;
+  width: 100%;
+}
+
+.main {
+  margin-bottom: 30px;
+}
