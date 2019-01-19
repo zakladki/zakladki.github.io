@@ -55,9 +55,20 @@ ul {
   padding-top: 0.5rem !important;
   padding-bottom: 0.5rem !important;
   bottom: 0;
+  position: fixed;
   width: 100%;
 }
 
 .main {
   margin-bottom: 50px;
+  height: 100%;
+}
+
+@media (max-width: 767.98px) {
+  .footer {
+    position: static !important;
+  }
+  .main {
+    margin-bottom: 0;
+  }
 }
