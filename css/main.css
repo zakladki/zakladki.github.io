@@ -4,7 +4,7 @@ li {
 }
 
 .nav-container {
-  margin-bottom: 80px;
+  margin-bottom: 50px;
 }
 
 .icon {
@@ -72,3 +72,16 @@ ul {
     margin-bottom: 0;
   }
 }
+
+.nav li {
+  margin: 0;
+}
+
+.nav-link {
+  padding: 0;
+}
+
+ul.nav {
+	text-align: center;
+}
+
