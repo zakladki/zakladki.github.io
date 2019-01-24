@@ -3,8 +3,8 @@ li {
   margin: 6px;
 }
 
-.nav-container {
-  margin-bottom: 50px;
+.main {
+  padding-top: 50px;
 }
 
 .icon {
@@ -71,14 +71,25 @@ ul {
   .main {
     margin-bottom: 0;
   }
+  .navbar-nav {
+    margin-top: 10px;
+  }
+  .nav-link {
+    padding: 4px;
+  }
+  #pills-tabContent {
+    margin-top: 16px;
+  }
+}
+
+@media (min-width: 767.98px) and (max-width: 1304px) {
+  .main {
+    padding-top: 75px;
+  }
 }
 
 .nav li {
   margin: 0;
-}
-
-.nav-link {
-  padding: 0;
 }
 
 ul.nav {
@@ -87,4 +98,20 @@ ul.nav {
 
 html {
   overflow-y: scroll;
+}
+
+.navbar-toggler {
+    margin-bottom: 0;
+}
+
+.navbar-collapse {
+  justify-content: center;
+}
+
+.navbar-nav {
+  justify-content: center;
+}
+
+.nav-link {
+  padding: 0;
 }
