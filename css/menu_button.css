@@ -1,0 +1,16 @@
+.hamburger-inner,
+.hamburger-inner:after,
+.hamburger-inner:before,
+.hamburger.is-active .hamburger-inner,
+.hamburger.is-active .hamburger-inner:after,
+.hamburger.is-active .hamburger-inner:before {
+  background-color: #fff;
+}
+
+.hamburger.is-active:hover, .hamburger:hover {
+    opacity: 1;
+}
+
+.hamburger {
+  padding: 6px 0 0 0;
+}
