@@ -99,6 +99,9 @@ ul {
   .kolobok {
    padding-left: 8px;
   }
+  .fa-lg {
+  margin-right: 10px;
+  }
 }
 
 nav {
@@ -160,11 +163,5 @@ html {
   background-color: #e2e6e9;
   border-radius: 20px;
 }
-
-.fa-lg {
-  margin-right: 10px;
-}
-
-
 
 
