@@ -91,6 +91,9 @@ ul {
   .nav-link {
     padding: 0;
   }
+  .kolobok {
+   padding-left: 8px;
+  }
 }
 
 nav {
@@ -157,8 +160,6 @@ html {
   margin-right: 10px;
 }
 
-.kolobok {
-  padding-left: 8px;
-}
+
 
 
