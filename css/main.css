@@ -9,7 +9,14 @@ li {
 
 .icon {
   width: 16px;
-  margin-right: 4px;
+  margin-right: 2px;
+}
+
+.icontoo {
+  height: 24px;
+  vertical-align: bottom;
+  margin-right: 1px;
+  margin-left: 1px;
 }
 
 .pict-menu {
@@ -31,6 +38,7 @@ ul {
 }
 
 .opisi {
+
   margin-left: 5px;
   color: #ccc;
 }
