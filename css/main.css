@@ -10,13 +10,13 @@ li {
 .icon {
   width: 16px;
   margin-right: 2px;
+  margin-bottom: 2px;
 }
 
 .icontoo {
-  height: 18px;
-  vertical-align: bottom;
-  margin-right: 1px;
-  margin-left: 1px;
+  height: 17px;
+  margin-right: 2px;
+  margin-left: 2px;
   margin-bottom: 2px;
 }
 
