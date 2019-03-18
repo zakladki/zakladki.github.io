@@ -19,6 +19,21 @@
   }
 }
 
+.prog-title {
+  display: flex;
+  flex-direction: column;
+  margin-top: 4px;
+
+  div {
+    width: fit-content;
+    margin-bottom: 8px;
+  }
+
+  span {
+    width: fit-content;
+  }
+}
+
 .a2a_dd {
   display: none;
 }
