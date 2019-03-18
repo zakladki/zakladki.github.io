@@ -1,0 +1,26 @@
+@font-face {
+    font-family: 'Roboto Condensed';
+    src: url('/styles/fonts/subset-RobotoCondensed-Light.woff2') format('woff2'),
+        url('/styles/fonts/subset-RobotoCondensed-Light.woff') format('woff');
+    font-weight: 300;
+    font-style: normal;
+    font-display: auto;
+}
+
+@font-face {
+    font-family: 'Roboto';
+    src: url('/styles/fonts/subset-Roboto-Regular.woff2') format('woff2'),
+        url('/styles/fonts/subset-Roboto-Regular.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: auto;
+}
+
+@font-face {
+    font-family: 'Ubuntu';
+    src: url('/styles/fonts/subset-Ubuntu-Regular.woff2') format('woff2'),
+        url('/styles/fonts/subset-Ubuntu-Regular.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: auto;
+}

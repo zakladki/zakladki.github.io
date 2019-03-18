@@ -1,0 +1,178 @@
+extends _layout.pug
+  
+block title
+  title Комуналка
+
+block menu
+  - var current = 'Комуналка'
+  - var current_iclass = 'communal'
+  include _nav.pug
+
+block content
+  .row.animated.fadeIn
+    .col-sm
+      .group
+        .group-title
+          span.badge.badge-warning *Легкие-оплаты*
+        ul
+          li
+            div.icon.portmone.com.ua
+            a(href='https://www.portmone.com.ua/', target='_blank') portmone
+            span.opisi Платежная система
+      .group
+        .group-title
+          span.badge.badge-success *ГАЗ*
+        ul
+          li
+            div.icon.minfin.com.ua
+            a(href='https://index.minfin.com.ua/tariff/gas/', target='_blank') minfin.com.ua
+            span.opisi офц.цена.газ
+          li
+            div.icon.prostobank.ua
+            a(href='http://www.prostobank.ua/spravochniki/indikatory_rynka/gas_tariff', target='_blank') prostobank.ua
+            span.opisi цена.газ
+          li
+            div.icon.naftogazpostach.com
+            a(href='https://naftogazpostach.com/', target='_blank') naftogaz
+            span.opisi Кабин.Газ.2019
+          li
+            div.icon.gasolina-online.com
+            a(href='https://gasolina-online.com/', target='_blank') gasolina
+            span.opisi Кабинет.Газ.(старый)
+          li
+            div.icon.a104.ua
+            a(href='https://104.ua/ua/', target='_blank') 104.ua
+            span.opisi Поиск компании
+      .group
+        .group-title
+          span.badge.badge-success *Электроэнергия*
+        ul
+          li
+            div.icon.minfin.com.ua
+            a(href='https://index.minfin.com.ua/tariff/electric/', target='_blank') minfin.com.ua
+            span.opisi офц.цена.электр.
+          li
+            div.icon.prostobank.ua
+            a(href='http://www.prostobank.ua/spravochniki/indikatory_rynka/electric_tariff', target='_blank') prostobank.ua
+            span.opisi цена.электр.
+          li
+            div.icon.kresc.com.ua
+            a(href='http://kresc.com.ua/index.html', target='_blank') kresc.com.ua
+            span.opisi Киров.ОЕК
+          li
+            div.icon.kiroe.com.ua
+            a(href='http://kiroe.com.ua/', target='_blank') kiroe.com
+            span.opisi Кабин.Кир.обленерго
+      .group
+        .group-title
+          span.badge.badge-success *Вода*
+          
+        ul
+          li
+            div.icon.maanimo.com
+            a(href='https://maanimo.com/indexes/140162-tarify-na-vodu-dlya-naseleniya-v-ukraine', target='_blank') maanimo.com
+            span.opisi Цена.вода.Укр.
+      .group
+        .group-title
+          span.badge.badge-success *Отопление*
+          
+        ul
+          li
+            div.icon.maanimo.com
+            a(href='https://maanimo.com/indexes/142540-tarify-na-otoplenie-v-ukraine-sezon-2017-2018', target='_blank') maanimo.com
+            span.opisi Цена.отопл.Укр.
+    .col-sm
+      .group
+        .group-title
+          span.badge.badge-success *Интернет-кабельний*
+        ul
+          li
+            div.icon.ukrtelecom.ua
+            a(href='https://new.ukrtelecom.ua/internet/', target='_blank') ukrtelecom
+            span.opisi ТАРИФЫ
+          li
+            div.icon.ukrtelecom.ua
+            a(href='https://new.ukrtelecom.ua/payment/#generate-bill', target='_blank') ukrtelecom
+            span.opisi СЧЕТ
+          li
+            div.icon.ukrtelecom.ua
+            a(href='http://cc.ukrtele.com/', target='_blank') cc.ukrtele.com
+            span.opisi Если Вас заблокировали
+          li
+            div.icon.my.ukrtelecom.ua
+            a(href='http://www.my.ukrtelecom.ua/', target='_blank') my.ukrtelecom
+            span.opisi КАБИНЕТ
+          li
+            div.icon.novom.ulan.in.ua
+            a(href='http://novom.ulan.in.ua/', target='_blank') novom.ulan.in.ua
+            span.opisi Ulan ISP
+          li
+            div.icon.shtorm.net
+            a(href='https://www.shtorm.net/uk', target='_blank') shtorm.net
+            span.opisi Shtorm
+      .group
+        .group-title
+          span.badge.badge-success *Интернет-мобильный*
+          
+        ul
+          li
+            div.icon.kyivstar.ua
+            a(href='https://kyivstar.ua/', target='_blank') kyivstar.ua
+          li
+            div.icon.kyivstar.ua
+            a(href='https://pay.kyivstar.ua/', target='_blank') pay.kyivstar.ua
+            span.opisi Пополнение
+          li
+            div.icon.vodafone.ua
+            a(href='https://www.vodafone.ua/ru', target='_blank') vodafone.ua
+          li
+            div.icon.vodafone.ua
+            a(href='https://pay.vodafone.ua/', target='_blank') pay.vodafone.ua
+            span.opisi Пополнение
+          li
+            div.icon.lifecell.ua
+            a(href='https://www.lifecell.ua/', target='_blank') lifecell.ua
+          li
+            div.icon.lifecell.ua
+            a(href='https://oplata.lifecell.ua/', target='_blank') oplata.lifecell.ua
+            span.opisi Пополнение
+          li
+            div.icon.a3mob.ua
+            a(href='http://3mob.ua/', target='_blank') 3mob.ua
+          li
+            div.icon.intertelecom.ua
+            a(href='http://www.intertelecom.ua/', target='_blank') intertelecom.ua
+          li
+            div.icon.intertelecom.ua
+            a(href='http://www.intertelecom.ua/payments', target='_blank') intertelecom
+            span.opisi Пополнение
+          li
+            div.icon.intertelecom.ua
+            a(href='https://assa.intertelecom.ua/ru/login', target='_blank') assa.intertelecom
+            span.opisi Кабинет
+    .col-sm
+      .group
+        .group-title
+          span.badge.badge-success *ИНФО от minfin.com.ua*
+          
+        ul
+          li
+            div.icon.minfin.com.ua
+            a(href='https://index.minfin.com.ua/labour/salary/min/', target='_blank') Миним.зараб.плата
+          li
+            div.icon.minfin.com.ua
+            a(href='https://index.minfin.com.ua/labour/salary/average/', target='_blank') Средняя заработная плата
+          li
+            div.icon.minfin.com.ua
+            a(href='https://index.minfin.com.ua/labour/wagemin/', target='_blank') Прожит.миним.в.Украине
+          li
+            div.icon.minfin.com.ua
+            a(href='https://index.minfin.com.ua/economy/index/inflation/', target='_blank') Индекс инфляции
+      .group
+        .group-title
+          span.badge.badge-success *ИНФО другое*
+          
+        ul
+          li
+            div.icon.buhoblik.org.ua
+            a(href='http://www.buhoblik.org.ua/kadry-zarplata/pensii/2827-2827-minimalnaya-pensiya.html', target='_blank') Миним.пенсия.в.Украине

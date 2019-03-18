@@ -1,0 +1,278 @@
+extends _layout.pug
+  
+block title
+  title Магазины
+
+block menu
+  - var current = 'Магазины'
+  - var current_iclass = 'shops'
+  include _nav.pug
+
+block content
+  .row.animated.fadeIn
+    .col-sm
+      .group
+        .group-title
+          span.badge.badge-warning *Возврат % с покупок*
+        ul
+          li
+            div.icon.letyshops.com
+            a(href='https://letyshops.com/ua/soc/sh-1?r=2739789', target='_blank') Letyshops`
+            span.opisi 30%дешевле
+          li
+            div.icon.smarty.sale
+            a(href='https://smarty.sale/1197327', target='_blank') Smarty.sale`
+            span.opisi умные покупки
+          li
+            div.icon.payback.ua
+            a(href='https://payback.ua/hMNbS', target='_blank') Payback.ua`
+            span.opisi Вам платят!
+      .group
+        .group-title
+          span.badge.badge-warning *Анализатор покупок*
+        ul
+          li
+            div.icon.hotline.ua
+            a(href='https://hotline.ua/', target='_blank') hotline.ua
+          li
+            div.icon.ek.ua
+            a(href='http://ek.ua/', target='_blank') ek.ua
+          li
+            div.icon.price.ua
+            a(href='https://price.ua/', target='_blank') price.ua
+      .group
+        .group-title
+          span.badge.badge-warning *Отзывник покупок*
+        ul
+          li
+            div.icon.otzyvua.net
+            a(href='https://www.otzyvua.net/', target='_blank') otzyvua.net
+          li
+            div.icon.otzovik.com
+            a(href='https://otzovik.com/', target='_blank') otzovik.com
+          li
+            div.icon.irecommend
+            a(href='https://irecommend.ru/', target='_blank') irecommend.ru
+      .group
+        .group-title
+          span.badge.badge-warning *Помощник покупок ЗАРУБЕЖ*
+        ul
+          li
+            div.icon.pokupayko.com
+            a(href='https://pokupayko.com/', target='_blank') pokupayko.com
+          li
+            div.icon.ecb.bz
+            a(href='https://ecb.bz/', target='_blank') ecb.bz
+    .col-sm
+      .group
+        .group-title
+          span.badge.badge-success *Зарубежные*
+        ul
+          li
+            div.icon.best.aliexpress.com
+            a(href='https://letyshops.com/r/aliexpress-4qh7st5csx0k4c', target='_blank') best.aliexpress.com`
+          li
+            div.icon.ebay.com
+            a(href='https://letyshops.com/r/ebay-4qh7st5csx6og0', target='_blank') ebay.com`
+      .group
+        .group-title
+          span.badge.badge-success *Любые ТОВАРЫ!*
+        ul
+          li
+            div.icon.rozetka.com.ua
+            a(href='https://letyshops.com/r/rozetka-4qh7st5csxa88w', target='_blank') rozetka.com.ua`
+          li
+            div.icon.allo.ua
+            a(href='https://letyshops.com/r/allo-4qh7st5csxicso', target='_blank') allo.ua`
+          li
+            div.icon.eldorado.ua
+            a(href='https://letyshops.com/r/eldorado-ua-4qh7st5csxicso', target='_blank') eldorado.ua`
+          li
+            div.icon.moyo.ua
+            a(href='https://letyshops.com/r/moyo-ua-4qh7st5csxogcc', target='_blank') moyo.ua`
+          li
+            div.icon.stylus.ua
+            a(href='https://letyshops.com/r/stylus-4qh7st5csxogcc', target='_blank') stylus.ua`
+          li
+            div.icon.skidka.ua
+            a(href='https://letyshops.com/r/skidka-ua-4qh7st5csxs048', target='_blank') skidka.ua`
+          // <li><img class="icon" src="img/privatmarket.ua.ico" alt="privatmarket"><a href="https://letyshops.com/r/privatmarket-4qh7st5csxwko0" target="_blank">privatmarket.ua</a></li>
+          li
+            div.icon.foxtrot.com.ua
+            a(href='https://letyshops.com/r/fokstrot-ua-4qh7st5csxwko0', target='_blank') foxtrot.com.ua`
+          li
+            div.icon.f.ua
+            a(href='https://letyshops.com/r/f-ua-tot-samyi-magazin-4qh7st5csy04gw', target='_blank') f.ua`
+          li
+            div.icon.comfy.ua
+            a(href='https://letyshops.com/r/comfy-ua-4qh7st5csy2o8s', target='_blank') comfy.ua`
+          li
+            div.icon.xiaomi.ua
+            a(href='https://letyshops.com/r/xiaomi-ua-4qh7st5csy680o', target='_blank') xiaomi.ua`
+          li
+            div.icon.shop.kyivstar.ua
+            a(href='https://letyshops.com/r/kyivstar-4qh7st5ct12cog', target='_blank') shop.kyivstar.ua`
+          li
+            div.icon.coffeeok.com.ua
+            a(href='https://letyshops.com/r/kofeyok-ua-4qh7st5csy680o', target='_blank') coffeeok.com.ua`
+      .group
+        .group-title
+          span.badge.badge-success *Автотовары*
+        ul
+          li
+            div.icon.avtozvuk.ua
+            a(href='https://letyshops.com/r/baza-avtozvuka-4qh7st5csyassk', target='_blank') avtozvuk.ua`
+          li
+            div.icon.autoklad.ua
+            a(href='https://letyshops.com/r/avtoklad-ua-4qh7st5csyassk', target='_blank') autoklad.ua`
+          li
+            div.icon.avtoopt.in.ua
+            a(href='https://letyshops.com/r/avtoopt-ua-4qh7st5csyeckc', target='_blank') avtoopt.in.ua`
+          li
+            div.icon.avtodiski.net.ua
+            a(href='https://letyshops.com/r/avtodiski-ua-4qh7st5csygwc8', target='_blank') avtodiski.net.ua`
+          li
+            div.icon.master-plus.com.ua
+            a(href='https://letyshops.com/r/master-plius-ua-4qh7st5ocjk0w4', target='_blank') master-plus.com.ua`
+    .col-sm
+      .group
+        .group-title
+          span.badge.badge-success *Одежда/Обувь/Аксессуары*
+        ul
+          li
+            div.icon.bonprix.ua
+            a(href='https://letyshops.com/r/bonprix-ua-4qh7st5csygwc8', target='_blank') bonprix.ua`
+          li
+            div.icon.intertop.ua
+            a(href='https://letyshops.com/r/intertop-ua-4qh7st5csykg44', target='_blank') intertop.ua`
+          li
+            div.icon.answear.ua
+            a(href='https://letyshops.com/r/answear-ua-4qh7st5csyo0ow', target='_blank') answear.ua`
+          li
+            div.icon.otto-trade.com.ua
+            a(href='https://letyshops.com/r/otto-trade-4qh7st5csyskgs', target='_blank') otto-trade.com.ua`
+          li
+            div.icon.asos.com
+            a(href='https://letyshops.com/r/asos-4qh7st5csyw48o', target='_blank') asos.com`
+      .group
+        .group-title
+          span.badge.badge-success *Детские товары*
+        ul
+          li
+            div.icon.spok.ua
+            a(href='https://letyshops.com/r/spok-ua-4qh7st5cszk0go', target='_blank') spok.ua`
+          li
+            div.icon.pampik.com
+            a(href='https://letyshops.com/r/pampik-4qh7st5cszok8k', target='_blank') pampik.com`
+          li
+            div.icon.chicco.com.ua
+            a(href='https://letyshops.com/r/chicco-4qh7st5cszok8k', target='_blank') chicco.com.ua`
+          li
+            div.icon.bi.ua
+            a(href='https://letyshops.com/r/budinok-igrashok-4qh7st5cszy8k4', target='_blank') bi.ua`
+          li
+            div.icon.berni.com.ua
+            a(href='https://letyshops.com/r/berni-4qh7st5cszy8k4', target='_blank') berni.com.ua`
+      .group
+        .group-title
+          span.badge.badge-success *Косметика/Парфюмерия/Ювелир*
+        ul
+          li
+            div.icon.yves-rocher.ua
+            a(href='https://letyshops.com/r/yves-rocher-ua-4qh7st5csyyo0k', target='_blank') yves-rocher.ua`
+          li
+            div.icon.bomond.com.ua
+            a(href='https://letyshops.com/r/bomond-4qh7st5csyyo0k', target='_blank') bomond.com.ua`
+          li
+            div.icon.ostrivkrasy.com
+            a(href='https://letyshops.com/r/ostriv-krasi-4qh7st5csyyo0g', target='_blank') ostrivkrasy.com`
+          li
+            div.icon.edp.ua
+            a(href='https://letyshops.com/r/eau-de-parfum-ua-4qh7st5csz6sk8', target='_blank') edp.ua`
+          li
+            div.icon.nyxcosmetic.com.ua
+            a(href='https://letyshops.com/r/nyx-professional-makeup-ua-4qh7st5cszacc4', target='_blank') nyxcosmetic.com.ua`
+          li
+            div.icon.gold.ua
+            a(href='https://letyshops.com/r/gold-ua-4qh7st5cszacc4', target='_blank') gold.ua`
+          li
+            div.icon.eurogold.ua
+            a(href='https://letyshops.com/r/eurogold-ua-4qh7st5cszcw40', target='_blank') eurogold.ua`
+          li
+            div.icon.bagland.com.ua
+            a(href='https://letyshops.com/r/bagland-ua-4qh7st5cszggos', target='_blank') bagland.com.ua`
+          li
+            div.icon.a925.ua
+            a(href='https://letyshops.com/r/925deg-4qh7st5cszggos', target='_blank') 925.ua`
+    .col-sm
+      .group
+        .group-title
+          span.badge.badge-success *Здоровье*
+        ul
+          li
+            div.icon.apteka911.com.ua
+            a(href='https://letyshops.com/r/apteka-911-4qh7st5ct08woo', target='_blank') apteka911.com.ua`
+          li
+            div.icon.apteka24.ua
+            a(href='https://letyshops.com/r/apteka24-4qh7st5ct0cggg', target='_blank') apteka24.ua`
+          li
+            div.icon.doc.ua
+            a(href='https://letyshops.com/r/doc-ua-4qh7st5ct0cggg', target='_blank') doc.ua`
+          li
+            div.icon.med-magazin.ua
+            a(href='https://letyshops.com/r/med-magazin-ua-4qh7st5oclk40c', target='_blank') med-magazin.ua`
+      .group
+        .group-title
+          span.badge.badge-success *Сад/Огород*
+        ul
+          li
+            div.icon.florium.ua
+            a(href='https://letyshops.com/r/florium-ua-4qh7st5ocnmsoc', target='_blank') florium.ua`
+      .group
+        .group-title
+          span.badge.badge-success *Образование (изучение языков)*
+        ul
+          li
+            div.icon.lingualeo.com
+            a(href='https://letyshops.com/r/lingualeo-4qh7st5ct0u8cw', target='_blank') lingualeo.com`
+          li
+            div.icon.englishdom.com
+            a(href='https://letyshops.com/r/englishdom-4qh7st5ct0u8cw', target='_blank') englishdom.com`
+      .group
+        .group-title
+          span.badge.badge-success *Книги*
+        ul
+          li
+            div.icon.yakaboo.ua
+            a(href='https://letyshops.com/r/yakaboo-4qh7st5cszy8k4', target='_blank') yakaboo.ua`
+          li
+            div.icon.grenka.ua
+            a(href='https://letyshops.com/r/grenka-ua-4qh7st5ct02sc0', target='_blank') grenka.ua`
+          li
+            div.icon.bambook.com
+            a(href='https://letyshops.com/r/bambook-ua-4qh7st5ct06c4w', target='_blank') bambook.com`
+          li
+            div.icon.booklya.ua
+            a(href='https://letyshops.com/r/booklya-ua-4qh7st5ct06c4w', target='_blank') booklya.ua`
+          li
+            div.icon.book24.ua
+            a(href='https://letyshops.com/r/book24-ua-4qh7st5ct08woo', target='_blank') book24.ua`
+      .group
+        .group-title
+          span.badge.badge-success *Путешествие/Отдых*
+        ul
+          li
+            div.icon.aviasales.ru
+            a(href='https://letyshops.com/r/aviasalesru-4qh7st5ct0g08c', target='_blank') aviasales.ru`
+          li
+            div.icon.booking.com
+            a(href='https://letyshops.com/r/bookingcom-4qh7st5ct0kk08', target='_blank') booking.com`
+          li
+            div.icon.tickets.ua
+            a(href='https://letyshops.com/r/tickets-ua-4qh7st5ct0kk08', target='_blank') tickets.ua`
+          li
+            div.icon.hotels24.ua
+            a(href='https://letyshops.com/r/hotels24-4qh7st5ct0kk08', target='_blank') hotels24.ua`
+          li
+            div.icon.rentalcars.com
+            a(href='https://letyshops.com/r/rentalcars-4qh7st5ct0qok0', target='_blank') rentalcars.com`

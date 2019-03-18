@@ -1,0 +1,124 @@
+doctype html
+html(lang="ru")
+  head
+    // Global site tag (gtag.js) - Google Analytics
+    script(async='', src='https://www.googletagmanager.com/gtag/js?id=UA-55202239-3')
+    script.
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+      dataLayer.push(arguments);
+      }
+      gtag('js', new Date());
+      gtag('config', 'UA-55202239-3');
+    // Global site tag (gtag.js) - Google Analytics
+    script(async='', src='https://www.googletagmanager.com/gtag/js?id=UA-55202239-3')
+    script.
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+      dataLayer.push(arguments);
+      }
+      gtag('js', new Date());
+      gtag('config', 'UA-55202239-3');
+    // Required meta tags
+    meta(charset='utf-8')
+    meta(name='viewport', content='width=device-width, initial-scale=1, shrink-to-fit=no')
+    meta(name='author', content='WebSIS & Company')
+    block meta
+      meta(name='keywords', content='лучшие сайты, популярные сайты, каталог сайтов, быстрые ссылки, cписок найпопулярніших веб-сайтів, топ сайтів, speeddial, новости, соцсети, видео, погода')
+      meta(name='description', content='Полный список самых популярных сайтов интернета. Удобный каталог сайтов с сортировкой по тематике. Все топ сайты в одном месте. Все для удобства в интернете.')
+    link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.0/animate.min.css')
+    script(src='https://code.jquery.com/jquery-3.3.1.slim.min.js', integrity='sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo', crossorigin='anonymous')
+
+    // Bootstrap CSS
+    link(href='styles/all.css', rel='stylesheet')
+    link(href='styles/base64.css', rel='stylesheet')
+    link(href='styles/bootstrap.min.css', rel='stylesheet')
+    link(href='styles/main.css', rel='stylesheet')
+    link(href='styles/hamburgers.min.css', rel='stylesheet')
+    link(href='styles/animation.css', rel='stylesheet')
+    link(href='styles/menu_button.css', rel='stylesheet')
+
+    block title
+      title ZAKLADKI - Список популярных сайтов (ТОП ЗАКЛАДКИ)
+  body
+    .container.nav-container
+      nav.navbar.navbar-expand-md.fixed-top.navbar-dark.d-flex.justify-content-center
+        .hamburger.hamburger--spring.navbar-toggler(data-toggle='collapse', data-target='#navbarCollapse', aria-controls='navbarCollapse', aria-expanded='false', aria-label='Toggle navigation')
+          .hamburger-box
+            .hamburger-inner
+        .container-fluid
+          .collapse.navbar-collapse.text-center#navbarCollapse
+            block menu
+
+    .container-fluid.main
+      .row
+        .tab-content.container
+          block content
+    footer.footer.mt-auto.py-3.fixed-bottom
+      .container
+        .row
+          .col-sm.footer-col
+            .kolobok
+              a.btn.btn-primary.btn-sm(href='https://www.ipay.ua/ru/p2p/default/constructor/01e03758f825e60c5dc13b12941f5ddf', title='Переслать немного денег на содержание сайта (заранее СПАСИБО Всем кто перекинет деньжат)', role='button', target='_blank') Поддержать сайт
+          .col-sm.footer-col
+            .kolobok
+              ul.share-buttons
+                // AddToAny BEGIN
+                .a2a_kit.a2a_kit_size_32.a2a_default_style(data-a2a-url='https://zakladki.github.io', data-a2a-title='Топ Закладки')
+                  a.a2a_dd(href='https://www.addtoany.com/share')
+                  a.a2a_button_facebook
+                  a.a2a_button_vk
+                  a.a2a_button_telegram
+                  a.a2a_button_viber
+                  a.a2a_button_odnoklassniki
+                  a.a2a_button_skype
+                script.
+                  var a2a_config = a2a_config || {};
+                  a2a_config.onclick = 1;
+                  a2a_config.locale = "ru";
+                  a2a_config.num_services = 6;
+                script(async='', src='https://static.addtoany.com/menu/page.js')
+                // AddToAny END
+
+          .col-sm.footer-col
+            .kolobok
+              a(href='skype:webersis?chat', target='_blank', title='SKYPE: webersis')
+                i.fab.fa-skype.fa-lg(aria-hidden='true')
+              a(href='mailto:weber515sis@gmail.com', target='_blank', title='E-mail: weber515sis@gmail.com')
+                i.far.fa-envelope.fa-lg(aria-hidden='true')
+              a(href='https://telegram.me/zakladki_top', target='_blank', title='Telegram: https://t.me/zakladki_top')
+                i.fab.fa-telegram.fa-lg(aria-hidden='true')
+          .col-sm.footer-col
+            .kolobok
+              //- LiveInternet counter
+              script(type='text/javascript').
+                document.write("<a href='//www.liveinternet.ru/click' " +
+                "target=_blank><img src='//counter.yadro.ru/hit?t52.10;r" +
+                escape(document.referrer) + ((typeof(screen) == "undefined") ? "" :
+                ";s" + screen.width + "*" + screen.height + "*" + (screen.colorDepth ?
+                screen.colorDepth : screen.pixelDepth)) + ";u" + escape(document.URL) +
+                ";h" + escape(document.title.substring(0, 150)) + ";" + Math.random() +
+                "' alt='' title='LiveInternet: показано число просмотров и" +
+                " посетителей за 24 часа' " +
+                "border='0' width='88' height='31'>")
+              //- MyCounter v.2.0
+              script(type='text/javascript').
+                <!--
+                my_id = 168151;
+                my_width = 88;
+                my_height = 31;
+                my_alt = "MyCounter - счётчик и статистика";
+                //-->
+              script(type='text/javascript', src='https://get.mycounter.ua/counter2.0.js')
+              noscript
+                a(target='_blank', href='https://mycounter.ua/')
+                  img(src='https://get.mycounter.ua/counter.php?id=168151', title='MyCounter - счётчик и статистика', alt='', width='88', height='31', border='0')
+              //- MyCounter
+          .col-sm.footer-col
+            .kolobok
+              a(href='http://zakladki.at.ua/', target='_blank') Беседка
+              |  / 
+              a(href='http://zakladki.at.ua/index/0-3', target='_blank') Задать вопрос
+    script(src='https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js', integrity='sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut', crossorigin='anonymous')
+    script(src='https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js', integrity='sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k', crossorigin='anonymous')
+    script(src='js/main.js')

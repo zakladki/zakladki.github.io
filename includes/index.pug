@@ -1,0 +1,385 @@
+extends _layout.pug
+  
+block title
+  title Главная
+
+block menu
+  - var current = 'Главная'
+  - var current_iclass = 'fas fa-home'
+  include _nav.pug
+  
+block meta
+  meta(name='keywords', content='лучшие сайты, популярные сайты, каталог сайтов, быстрые ссылки, cписок найпопулярніших веб-сайтів, топ сайтів, speeddial, новости, соцсети, видео, погода')
+  //- meta(name='description', content='Полный список самых популярных сайтов интернета. Удобный каталог сайтов с сортировкой по тематике. Все топ сайты в одном месте. Все для удобства в интернете.')
+  
+block content
+  .row.animated.fadeIn
+    .col-sm
+      .group
+        .group-title
+          span.badge.badge-dark *Поиск/Перевод/Граматика*
+        ul
+          li
+            div.google.icon
+            a(href='https://www.google.com.ua/', target='_blank') Поиск Google
+          li
+            div.yandex.icon
+            a(href='https://yandex.ua/', target='_blank') Поиск Yandex
+            div.icontoo.a0VPN1(title='Для работы нужен VPN', alt='')
+          li
+            div.icon.translate.google.com.ua
+            a(href='https://translate.google.com.ua/', target='_blank') Переводчик Google
+          li
+            div.icon.translate.ru
+            a(href='https://www.translate.ru/', target='_blank') Переводчик PROMT
+          li
+            div.icon.languagetool.org
+            a(href='https://languagetool.org/uk/', target='_blank') Граматика от languagetool
+      .group
+        .group-title
+          span.badge.badge-dark *Социум*
+        ul
+          li
+            div.icon.facebook.com
+            a(href='https://www.facebook.com/', target='_blank') Facebook.com
+          li
+            div.icon.vk.com
+            a(href='https://vk.com/', target='_blank') ВКонтакте
+            div.icontoo.a0VPN1(title='Для работы нужен VPN', alt='')
+          li
+            div.icon.ok.ru
+            a(href='https://ok.ru/', target='_blank') Однокласники
+            div.icontoo.a0VPN1(title='Для работы нужен VPN', alt='')
+          li
+            div.icon.gmail
+            a(href='https://mail.google.com', target='_blank') почта_gmail
+          li
+            div.icon.mail.ukr.net
+            a(href='https://accounts.ukr.net/login', target='_blank') почта_ukr.net
+          li
+            div.icon.webmail.meta.ua
+            a(href='https://webmail.meta.ua/', target='_blank') почта_meta.ua
+          li
+            div.icon.e.mail.ru
+            a(href='https://e.mail.ru/login', target='_blank') почта_mail.ru
+            div.icontoo.a0VPN1(title='Для работы нужен VPN', alt='')
+      .group
+        .group-title
+          span.badge.badge-dark *Новости*
+        ul
+          li
+            div.icon.ukr.net
+            a(href='https://www.ukr.net/', target='_blank') Ukr.net
+          li
+            div.icon.unian.net
+            a(href='https://www.unian.net/', target='_blank') Unian.net
+          li
+            div.icon.sis.at.ua
+            a(href='http://sis.at.ua/', target='_blank') Нужные ШТУЧКИ!
+          li
+            div.icon.myscore.com.ua
+            a(href='https://www.myscore.com.ua/', target='_blank') myscore.com.ua
+          li
+            div.icon.youtube
+            a(href='https://www.youtube.com/user/tsnukraine/videos', target='_blank') Youtube_ТСН
+          li
+            div.icon.youtube
+            a(href='https://www.youtube.com/channel/UC9oI0Du20oMOlzsLDTQGfug', target='_blank') online_NEWSONE
+          li
+            div.icon.rada.gov.ua
+            a(href='https://rada.gov.ua/', target='_blank') Верховная Рада Украины
+      .group
+        .group-title
+          span.badge.badge-dark *Медиа*
+        ul
+          li
+            div.icon.youtube
+            a(href='https://www.youtube.com/', target='_blank') Youtube
+          li
+            div.icon.viks.tv
+            a(href='http://viks.tv/', target='_blank') viks.tv
+          li
+            div.icon.a1serial.club
+            a(href='https://1serial.club/', target='_blank') 1serial.club
+          li
+            div.icon.kinokrad.co
+            a(href='http://kinokrad.co/', target='_blank') kinokrad.co
+          li
+            div.icon.onlineradiobox.com
+            a(href='https://onlineradiobox.com/ua/', target='_blank') onlineradiobox.com
+          li
+            div.icon.a101.ru
+            a(href='http://101.ru/', target='_blank') 101.ru
+          li
+            div.icon.zaycev.fm
+            a(href='https://www.zaycev.fm/', target='_blank') zaycev.fm
+          //- script(async='', src='//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js')
+          //- ins.adsbygoogle(style='display:inline-block;width:234px;height:60px', data-ad-client='ca-pub-3065705668384801', data-ad-slot='4257475217')
+          //- script.
+            (adsbygoogle = window.adsbygoogle || []).push({});
+    .col-sm
+      .group
+        .group-title
+          span.badge.badge-dark *Игры*
+        ul
+          li
+            div.icon.playset.ru
+            a(href='http://www.playset.ru/', target='_blank') playset.ru
+          li
+            div.icon.luckforfree.com
+            a(href='https://luckforfree.com/', target='_blank') luckforfree.com
+          li
+            div.icon.zumagames.ru
+            a(href='http://www.zumagames.ru/', target='_blank') zumagames.ru
+          li
+            div.icon.wargaming.net
+            a(href='https://ru.wargaming.net/', target='_blank') wargaming.net
+          li
+            div.icon.poki.com
+            a(href='https://poki.com/ru', target='_blank') poki.com
+          li
+            div.icon.vseigru.net
+            a(href='http://vseigru.net/', target='_blank') vseigru.net
+      .group
+        .group-title
+          span.badge.badge-dark *Игры/Букмек.конторы*
+        ul
+          li
+            div.icon.fan-sport.com.ua
+            a(href='https://fan-sport.com.ua?bf=5c6990af5f28e_515561215', target='_blank') fan-sport.com.ua`
+          li
+            div.icon.a1xbetua.com
+            a(href='https://1xbetua.com/?bf=5c6ae4a19a325_515575637', target='_blank') 1xbetua.com`
+      .group
+        .group-title
+          span.badge.badge-dark *Комуналка*
+        ul
+          li
+            div.icon.minfin.com.ua
+            a(href='https://index.minfin.com.ua/tariff/gas/', target='_blank') minfin.com
+            span.opisi оф.цена.газ
+          li
+            div.icon.naftogazpostach.com
+            a(href='https://naftogazpostach.com/', target='_blank') naftogaz
+            span.opisi Кабин.Газ.2019
+          li
+            div.icon.minfin.com.ua
+            a(href='https://index.minfin.com.ua/tariff/electric/', target='_blank') minfin.com
+            span.opisi оф.цена.электр.
+          li
+            div.icon.kiroe.com.ua
+            a(href='http://kiroe.com.ua/', target='_blank') kiroe
+            span.opisi Кабин.Кир.обленерго
+          li
+            div.icon.ukrtelecom.ua
+            a(href='https://new.ukrtelecom.ua/payment/#generate-bill', target='_blank') ukrtelecom
+            span.opisi Укртел.СЧЕТ
+          li
+            div.icon.kyivstar.ua
+            a(href='https://kyivstar.ua/', target='_blank') kyivstar.ua
+          li
+            div.icon.vodafone.ua
+            a(href='https://www.vodafone.ua/ru', target='_blank') vodafone.ua
+          li
+            div.icon.lifecell.ua
+            a(href='https://www.lifecell.ua/', target='_blank') lifecell.ua
+      .group
+        .group-title
+          span.badge.badge-dark *Банкинг*
+        ul
+          li
+            div.icon.privat24.ua
+            a(href='https://www.privat24.ua/', target='_blank') privat24.ua
+            span.opisi Онлайн
+          li
+            div.icon.online.oschadbank.ua
+            a(href='https://online.oschadbank.ua/wb/', target='_blank') online.oschadbank
+            span.opisi Онлайн
+          li
+            div.icon.online.aval.ua
+            a(href='https://online.aval.ua/ibank/home?0', target='_blank') online.aval.ua
+            span.opisi Онлайн
+          li
+            div.icon.payoneer.com
+            a(href='https://www.payoneer.com/raf/?rid=0FA0C022-2289-43EC-8770-3B4409BD83AF', target='_blank') payoneer`
+            span.opisi Интерн.кошелек
+          li
+            div.icon.payeer.com
+            a(href='https://payeer.com/?partner=1687223', target='_blank') payeer`
+            span.opisi Интерн.кошелек
+          li
+            div.icon.minfin.com.ua
+            a(href='https://minfin.com.ua/currency/', target='_blank') minfin.com.ua
+            span.opisi Курс валют
+          li
+            div.icon.kurs.com.ua
+            a(href='https://kurs.com.ua/', target='_blank') kurs
+            span.opisi Курс/конверт валют
+          li
+            div.icon.bestchange.ru
+            a(href='https://www.bestchange.ru/', target='_blank') bestchange.ru
+            span.opisi Обмен валют
+          //- script(async='', src='//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js')
+          //- ins.adsbygoogle(style='display:inline-block;width:234px;height:60px', data-ad-client='ca-pub-3065705668384801', data-ad-slot='4257475217')
+          //- script.
+            (adsbygoogle = window.adsbygoogle || []).push({});
+    .col-sm
+      .group
+        .group-title
+          span.badge.badge-dark *Отследить посылку*
+        ul
+          li
+            div.icon.novaposhta.ua
+            a(href='https://novaposhta.ua/ru/tracking', target='_blank') novaposhta.ua
+          li
+            div.icon.intime.ua
+            a(href='https://intime.ua/', target='_blank') intime.ua
+      .group
+        .group-title
+          span.badge.badge-dark *Рынок*
+        ul
+          li
+            div.icon.olx.ua
+            a(href='https://www.olx.ua/', target='_blank') olx.ua
+          li
+            div.icon.besplatka.ua
+            a(href='https://besplatka.ua/', target='_blank') besplatka.ua
+          li
+            div.icon.obyava.ua
+            a(href='https://obyava.ua/', target='_blank') obyava.ua
+          li
+            div.icon.shafa.ua
+            a(href='https://shafa.ua/', target='_blank') shafa.ua
+          li
+            div.icon.auto.ria.com
+            a(href='https://auto.ria.com/', target='_blank') auto.ria.com
+      .group
+        .group-title
+          span.badge.badge-dark *Магазины*
+        ul
+          li
+            div.icon.letyshops.com
+            a(href='https://letyshops.com/ua/soc/sh-1?r=2739789', target='_blank') Letyshops`
+            span.opisi Все дешевле
+          li
+            div.icon.smarty.sale
+            a(href='https://smarty.sale/1197327', target='_blank') Smarty.sale`
+            span.opisi Умные покупки
+          li
+            div.icon.rozetka.com.ua
+            a(href='https://letyshops.com/r/rozetka-4qh7st5csxa88w', target='_blank') rozetka.com.ua`
+          li
+            div.icon.allo.ua
+            a(href='https://letyshops.com/r/allo-4qh7st5csxicso', target='_blank') allo.ua`
+          li
+            div.icon.eldorado.ua
+            a(href='https://letyshops.com/r/eldorado-ua-4qh7st5csxicso', target='_blank') eldorado.ua`
+          li
+            div.icon.moyo.ua
+            a(href='https://letyshops.com/r/moyo-ua-4qh7st5csxogcc', target='_blank') moyo.ua`
+          li
+            div.icon.xiaomi.ua
+            a(href='https://letyshops.com/r/xiaomi-ua-4qh7st5csy680o', target='_blank') xiaomi.ua`
+          li
+            div.icon.bonprix.ua
+            a(href='https://letyshops.com/r/bonprix-ua-4qh7st5csygwc8', target='_blank') bonprix.ua`
+          li
+            div.icon.apteka911.com.ua
+            a(href='https://letyshops.com/r/apteka-911-4qh7st5ct08woo', target='_blank') apteka911.com.ua`
+      .group
+        .group-title
+          span.badge.badge-dark *Другое*
+        ul
+          li
+            div.icon.speed2
+            a(href='http://speedtest.ukrtelecom.ua/', target='_blank') speedtest.ukrtelecom.ua
+          li
+            div.icon.rutracker.org
+            a(href='https://rutracker.org/', target='_blank') rutracker.org
+            div.icontooinfo.a0Torrent1(title='Для скачивания нужна программа TORRENT', alt='')
+          li
+            div.icon.nnmclub.to
+            a(href='http://nnmclub.to/', target='_blank') nnmclub.to
+            div.icontoo.a0VPN1(title='Для работы нужен VPN', alt='')
+            div.icontooinfo.a0Torrent1(title='Для скачивания нужна программа TORRENT', alt='')
+          li
+            div.icon.filmitorrent
+            a(href='http://filmitorrent.xyz/', target='_blank') filmitorrent_TOP
+            div.icontooinfo.a0Torrent1(title='Для скачивания нужна программа TORRENT', alt='')
+          li
+            div.icon.bible-teka.com
+            a(href='https://bible-teka.com/', target='_blank') bible-teka
+            span.opisi Библия онлайн
+          li
+            div.icon.slovohrista.org
+            a(href='http://slovohrista.org/', target='_blank') slovohrista.org
+          li
+            div.icon.vshkole.com
+            a(href='https://vshkole.com/', target='_blank') vshkole
+            span.opisi ГДЗ/учебники
+          //- script(async='', src='//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js')
+          //- ins.adsbygoogle(style='display:inline-block;width:234px;height:60px', data-ad-client='ca-pub-3065705668384801', data-ad-slot='4257475217')
+          //- script.
+            (adsbygoogle = window.adsbygoogle || []).push({});
+    .col-sm
+      .group
+        .group-title
+          span.badge.badge-dark *Городок/Новомиргород*
+        ul
+          li
+            div.icon.google.maps
+            a(href='https://www.google.com/maps/place/%D0%9D%D0%BE%D0%B2%D0%BE%D0%BC%D0%B8%D1%80%D0%B3%D0%BE%D1%80%D0%BE%D0%B4,+%D0%9A%D1%96%D1%80%D0%BE%D0%B2%D0%BE%D0%B3%D1%80%D0%B0%D0%B4%D1%81%D1%8C%D0%BA%D0%B0+%D0%BE%D0%B1%D0%BB%D0%B0%D1%81%D1%82%D1%8C/@48.7981251,31.5591162,12z/data=!3m1!4b1!4m5!3m4!1s0x40d1a5b80c2c8cdf:0x27e2a212ccc7175c!8m2!3d48.7907203!4d31.6582633', target='_blank') Карта Новомиргорода
+          li
+            div.icon.sinoptik
+            a(href='https://sinoptik.ua/%D0%BF%D0%BE%D0%B3%D0%BE%D0%B4%D0%B0-%D0%BD%D0%BE%D0%B2%D0%BE%D0%BC%D0%B8%D1%80%D0%B3%D0%BE%D1%80%D0%BE%D0%B4', target='_blank') Погода_Sinoptik
+          li
+            div.icon.rp5.ua
+            a(href='http://rp5.ua/%D0%9F%D0%BE%D0%B3%D0%BE%D0%B4%D0%B0_%D0%B2_%D0%9D%D0%BE%D0%B2%D0%BE%D0%BC%D0%B8%D1%80%D0%B3%D0%BE%D1%80%D0%BE%D0%B4%D0%B5', target='_blank') Погода_Rp5.ua
+          li
+            div.icon.meteoprog
+            a(href='https://www.meteoprog.ua/ru/review/Novomirgorod/', target='_blank') Погода_Meteoprog
+          li
+            div.icon.vk.com
+            a(href='https://vk.com/novomyrhorod_baraholka', target='_blank') рынок.БАРАХОЛКА
+            div.icontoo.a0VPN1(title='Для работы нужен VPN', alt='')
+          li
+            div.icon.youtube
+            a(href='https://www.youtube.com/channel/UCKjCg071hg21YxymgDfz5TA', target='_blank') Youtube_г.Новомиргород
+          li
+            div.icon.youtube
+            a(href='https://www.youtube.com/channel/UCpx67qi-50ZnWOUlDqBhSNQ', target='_blank') Youtube_Новом-ка ЗШ2
+          li
+            div.icon.novomirgorod.com
+            a(href='http://novomirgorod.com', target='_blank') Новини та події
+          li
+            div.icon.facebook.com
+            a(href='https://www.facebook.com/groups/369041380158080/', target='_blank') Novom.News (facebook)
+          li
+            div.icon.nmrda.kr-admin.gov.ua
+            a(href='http://nmrda.kr-admin.gov.ua/', target='_blank') Районна держ.адміністр.
+          li
+            div.icon.rada-novomirgorod.gov.ua
+            a(href='http://rada-novomirgorod.gov.ua/', target='_blank') Новом-ка міська рада
+      .group
+        .group-title
+          span.badge.badge-danger Обнова в закладках: v.2019-03-13
+        ul
+          li
+            div.icon.florium.ua
+            a(href='https://letyshops.com/r/florium-ua-4qh7st5ocnmsoc', target='_blank') florium.ua`
+            div.icontooinfo.a0info-add2(title='Добавлен в ZAKLADKI', alt='')
+            div.icontooinfo.a0info-opis1(title='Раздел-Магазины. Флориум - Интернет магазин семян, саженцев садовых, комнатных растений и цветов в Украине.', alt='')
+          li
+            div.icon.med-magazin.ua
+            a(href='https://letyshops.com/r/med-magazin-ua-4qh7st5oclk40c', target='_blank') med-magazin.ua`
+            div.icontooinfo.a0info-add2(title='Добавлен в ZAKLADKI', alt='')
+            div.icontooinfo.a0info-opis6(title='Раздел-Магазины. Med-Magazin - сеть магазинов медтехники, медоборудования и товаров для здоровья в Украине', alt='')
+          li
+            div.icon.master-plus.com.ua
+            a(href='https://letyshops.com/r/master-plius-ua-4qh7st5ocjk0w4', target='_blank') master-plus.com.ua`
+            div.icontooinfo.a0info-add2(title='Добавлен в ZAKLADKI', alt='')
+            div.icontooinfo.a0repa3(title='Раздел-Магазины. Интернет магазин запчастей для стиральных машин, холодильников и другой бытовой техники. ТМ Мастер-Плюс', alt='')
+          //- script(async='', src='//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js')
+          //- ins.adsbygoogle(style='display:inline-block;width:250px;height:360px', data-ad-client='ca-pub-3065705668384801', data-ad-slot='8204636692')
+          //- script.
+            (adsbygoogle = window.adsbygoogle || []).push({});

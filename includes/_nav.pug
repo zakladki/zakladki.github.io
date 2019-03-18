@@ -1,0 +1,23 @@
+mixin navLink(link, name, iclass)
+  li.nav-item
+    a.nav-link(
+      href=link
+      class={active: (name === current | iclass === current_iclass)}
+    ) #{name}
+      i(
+        class=iclass
+      )
+
+ul.nav.nav-pills.mb-3.navbar-nav
+  +navLink('/', '', 'fas fa-home')
+  +navLink('./social.html', 'Социум')
+  +navLink('./news.html', 'Новости')
+  +navLink('./media.html', 'Медиа')
+  +navLink('./games.html', 'Игры')
+  +navLink('./communal.html', 'Комуналка')
+  +navLink('./bank.html', 'Банкинг')
+  +navLink('./market.html', 'Рынок')
+  +navLink('./shops.html', 'Магазины')
+  +navLink('./others.html', 'Другое')
+  +navLink('./city.html', 'Городок')
+  +navLink('./programs.html', '', 'fas fa-microchip')

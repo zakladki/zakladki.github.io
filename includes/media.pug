@@ -1,0 +1,148 @@
+extends _layout.pug
+  
+block title
+  title Медиа
+
+block menu
+  - var current = 'Медиа'
+  - var current_iclass = 'media'
+  include _nav.pug
+
+block content
+  .row.animated.fadeIn
+    .col-sm
+      .group
+        .group-title
+          span.badge.badge-success *Ваше любимое видео!*
+        ul
+          li
+            div.icon.youtube
+            a(href='https://www.youtube.com/', target='_blank') youtube.com
+      .group
+        .group-title
+          span.badge.badge-success *ТВ онлайн*
+        ul
+          li
+            div.icon.viks.tv
+            a(href='http://viks.tv/', target='_blank') viks.tv
+          li
+            div.icon.ok-tv.org
+            a(href='http://ok-tv.org/', target='_blank') ok-tv.org
+          li
+            div.icon.tivix.co
+            a(href='http://tivix.co/', target='_blank') tivix.co
+          li
+            div.icon.usetv.pp.ua
+            a(href='http://usetv.pp.ua/tv/', target='_blank') usetv.pp.ua
+      .group
+        .group-title
+          span.badge.badge-success *Кинотеатры*
+        ul
+          li
+            div.icon.megogo.net
+            a(href='https://megogo.net/ru', target='_blank') megogo.net
+          li
+            div.icon.ivi.ru
+            a(href='https://www.ivi.ru/', target='_blank') ivi.ru
+    .col-sm
+      .group
+        .group-title
+          span.badge.badge-success *Все о Кино*
+        ul
+          li
+            div.icon.kinopoisk.ru
+            a(href='https://www.kinopoisk.ru/', target='_blank') kinopoisk.ru
+            div.icontoo.a0VPN1(title='Для работы нужен VPN', alt='')
+        .group
+          .group-title
+            span.badge.badge-success *Сериалы онлайн*
+        ul
+          li
+            div.icon.seasonvar.ru
+            a(href='http://seasonvar.ru/', target='_blank') seasonvar.ru
+          li
+            div.icon.a1serial.club
+            a(href='https://1serial.club/', target='_blank') 1serial.club
+      .group
+        .group-title
+          span.badge.badge-success *Фильмы онлайн*
+        ul
+          li
+            div.icon.kinokrad.co
+            a(href='http://kinokrad.co/', target='_blank') kinokrad.co
+          li
+            div.icon.kinotochka.club
+            a(href='http://kinotochka.club/', target='_blank') kinotochka.club
+          li
+            div.icon.kinogo.cc
+            a(href='http://kinogo.cc/', target='_blank') kinogo.cc
+          li
+            div.icon.filmix.co
+            a(href='https://filmix.co/', target='_blank') filmix.co
+          li
+            div.icon.kinonix.net
+            a(href='https://kinonix.net/', target='_blank') kinonix.net
+          li
+            div.icon.smotri-filmi.cc
+            a(href='http://smotri-filmi.cc/', target='_blank') smotri-filmi.cc
+    .col-sm
+      .group
+        .group-title
+          span.badge.badge-success *Радио онлайн*
+        ul
+          li
+            div.icon.onlineradiobox.com
+            a(href='https://onlineradiobox.com/ua/', target='_blank') onlineradiobox.com
+          li
+            div.icon.hitfm.ua
+            a(href='https://www.hitfm.ua/', target='_blank') hitfm.ua
+          li
+            div.icon.a101.ru
+            a(href='http://101.ru/', target='_blank') 101.ru
+      .group
+        .group-title
+          span.badge.badge-success *Музыка онлайн*
+        ul
+          li
+            div.icon.zaycev.fm
+            a(href='https://www.zaycev.fm/', target='_blank') zaycev.fm
+          li
+            div.icon.stopmusic.net
+            a(href='https://stopmusic.net/', target='_blank') stopmusic.net
+          li
+            div.icon.muzofon.com
+            a(href='http://muzofon.com/', target='_blank') muzofon.com
+          li
+            div.icon.vk.com
+            a(href='https://vk.com/mzk', target='_blank') vk.com/mzk
+            div.icontoo.a0VPN1(title='Для работы нужен VPN', alt='')
+          li
+            div.icon.vk.com
+            a(href='https://vk.com/exclusive_muzic', target='_blank') vk/exclusive_muzic
+            div.icontoo.a0VPN1(title='Для работы нужен VPN', alt='')
+          li
+            div.icon.vk.com
+            a(href='https://vk.com/hit_bit', target='_blank') vk/hit_bit
+            div.icontoo.a0VPN1(title='Для работы нужен VPN', alt='')
+          li
+            div.icon.web.telegram.org
+            a(href='https://t.me/hit_beat', target='_blank') t/hit_bit
+            i.fainfo.fab.fa-telegram
+      .group
+        .group-title
+          span.badge.badge-success *Музыка СКАЧАТЬ*
+        ul
+          li
+            div.icon.xtremex3.com
+            a(href='http://xtremex3.com/', target='_blank') xtremex3.com
+          li
+            div.icon.z1.fm
+            a(href='https://z1.fm/', target='_blank') z1.fm
+          li
+            div.icon.nnmclub.to
+            a(href='http://nnmclub.to/forum/portal.php?c=25', target='_blank') nnm.Сборники
+            div.icontooinfo.a0Torrent1(title='Для скачивания нужна программа TORRENT', alt='')
+          li
+            div.icon.nnmclub.to
+            a(href='http://nnmclub.to/forum/index.php?c=16', target='_blank') nnm.Вся.Муз.
+            div.icontooinfo.a0Torrent1(title='Для скачивания нужна программа TORRENT', alt='')

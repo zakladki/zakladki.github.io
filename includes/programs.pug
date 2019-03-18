@@ -1,0 +1,74 @@
+extends _layout.pug
+  
+block title
+  title Программы
+
+block menu
+  - var current = 'Программы'
+  - var current_iclass = 'fas fa-microchip'
+  include _nav.pug
+
+block content
+  .row.animated.fadeIn
+    .col-sm
+      .group
+        .group-title
+          div.badge.badge-danger Пароль на архивы: zakladki2019
+          span.badge.badge-warning *Торрент-программы*
+      ul
+        li
+          div.icon.utorrent.com
+          a(href='https://www.utorrent.com/intl/ru/desktop/', target='_blank') Скачать utorrent
+        li
+          div.icon.acestream.org
+          a(href='http://www.acestream.org/', target='_blank') Скачать Acestream плеер
+      .group
+        .group-title
+          span.badge.badge-warning *Загрузить мессенджеры*
+      ul
+        li
+          div.icon.telegram
+          a(href='https://tlgrm.ru/apps', target='_blank') Скачать TELEGRAM
+        li
+          div.icon.viber
+          a(href='https://www.viber.com/ru/download/', target='_blank') Скачать VIBER
+        li
+          div.icon.skype
+          a(href='https://www.skype.com/ru/get-skype/', target='_blank') Скачать SKYPE
+    .col-sm
+      .group
+        .group-title
+          span.badge.badge-warning *Удаленное управление компютером*
+      ul
+        li
+          div.icon.ammyy_admin
+          a(href='https://drive.google.com/open?id=1PT7hUXJg_lgWEpWcTVEc9cKqAOQ6TiY1', target='_blank') Ammyy_admin3.8
+          div.icontooinfo.a0zippass(title='заархивировано/пароль: zakladki2019')
+        li
+          div.icon.ammyy_admin
+          a(href='https://drive.google.com/open?id=1aUH68RhLyTjEuOl3CyqJryJJnOmZPb5C', target='_blank') Ammyy_admin3.7
+          div.icontooinfo.a0zippass(title='заархивировано/пароль: zakladki2019')
+        li
+          div.icon.TeamViewer
+          a(href='https://drive.google.com/open?id=1MxHlp7JFKIZy-w5tgbD_5IWkpwGQBp6O', target='_blank') TeamViewer 14.1.3399 Portable
+          div.icontooinfo.a0zippass(title='заархивировано/пароль: zakladki2019')
+    .col-sm
+      .group
+        .group-title
+          span.badge.badge-warning *Для N.O.D.32 продление лицензии*
+      ul
+        li
+          div.icon.prog.tnod32
+          a(href='https://drive.google.com/open?id=1W-VCgsxRUvFafF_oXWoPhPwZ1pMt-dLT', target='_blank') TNod1.6.4.0Final+Portable
+          div.icontooinfo.a0zippass(title='заархивировано/пароль: zakladki2019')
+        li
+          div.icon.prog.tnod32
+          a(href='https://drive.google.com/open?id=1FXzFYfft3nsMDDjE4R1l4eLIb9nJj3Yw', target='_blank') TNod1.6.5.0Beta
+          div.icontooinfo.a0zippass(title='заархивировано/пароль: zakladki2019')
+        li
+          div.icon.prog.tnod32
+          a(href='https://drive.google.com/open?id=1X1cmktodjyPf80bbpuekVcmJXMys73Gq', target='_blank') TNod1.6.6.0Beta+Portable
+          div.icontooinfo.a0zippass(title='заархивировано/пароль: zakladki2019')
+        li
+          div.icon.prog.tnod32.info
+          a(href='https://drive.google.com/open?id=1XHGmrAC9EnDg1I7SJ9xP1STImwE6UKd7', target='_blank') Инструкции для N.O.D.32 ESET

@@ -1,0 +1,128 @@
+extends _layout.pug
+  
+block title
+  title Рынок
+
+block menu
+  - var current = 'Рынок'
+  - var current_iclass = 'market'
+  include _nav.pug
+
+block content
+  .row.animated.fadeIn
+    .col-sm
+      .group
+        .group-title
+          span.badge.badge-warning *Отследить посылку (по почте)*
+        ul
+          li
+            div.icon.novaposhta.ua
+            a(href='https://novaposhta.ua/ru/tracking', target='_blank') novaposhta.ua
+          li
+            div.icon.intime.ua
+            a(href='https://intime.ua/', target='_blank') intime.ua
+          li
+            div.icon.ukrposhta.ua
+            a(href='http://ukrposhta.ua/vidslidkuvati-forma-poshuku', target='_blank') ukrposhta
+          li
+            div.icon.meest-express.com.ua
+            a(href='https://www.meest-express.com.ua/ua/', target='_blank') meest-express.com.ua
+      .group
+        .group-title
+          span.badge.badge-warning *Безопасность-база мошенников*
+        ul
+          li
+            div.icon.bazaukraferistov.com
+            a(href='http://bazaukraferistov.com/', target='_blank') bazaukraferistov.com
+          li
+            div.icon.ukrblacklist.com.ua
+            a(href='http://www.ukrblacklist.com.ua/', target='_blank') ukrblacklist.com.ua
+          li
+            div.icon.cyberpolice.gov.ua
+            a(href='https://cyberpolice.gov.ua/', target='_blank') cyberpolice.gov.ua
+          li
+            div.icon.kidala-net.in.ua
+            a(href='http://kidala-net.in.ua/', target='_blank') kidala-net.in.ua
+          li
+            div.icon.kidalo.net.ua
+            a(href='https://kidalo.net.ua/', target='_blank') kidalo.net.ua
+          li
+            div.icon.mocheniki.ukr
+            a(href='http://xn--e1agahhhaf4g.xn--j1amh/', target='_blank') мошенники.укр
+    .col-sm
+      .group
+        .group-title
+          span.badge.badge-success *Доска объявлений-ВСЯКОЕ*
+        ul
+          li
+            div.icon.olx.ua
+            a(href='https://www.olx.ua/', target='_blank') olx.ua
+          li
+            div.icon.besplatka.ua
+            a(href='https://besplatka.ua/', target='_blank') besplatka.ua
+          li
+            div.icon.obyava.ua
+            a(href='https://obyava.ua/', target='_blank') obyava.ua
+          li
+            div.icon.ogolosha.ua
+            a(href='https://ogolosha.ua/', target='_blank') ogolosha.ua
+          li
+            div.icon.ria.com
+            a(href='https://www.ria.com/', target='_blank') ria.com
+      .group
+        .group-title
+          span.badge.badge-success *Доска объявлений-ОДЕЖДА/ОБУВЬ*
+        ul
+          li
+            div.icon.shafa.ua
+            a(href='https://shafa.ua/', target='_blank') shafa.ua
+          li
+            div.icon.kidstaff.com.ua
+            a(href='https://www.kidstaff.com.ua/', target='_blank') kidstaff.com.ua
+      .group
+        .group-title
+          span.badge.badge-success *Доска объявлений-АВТО/МОТО*
+        ul
+          li
+            div.icon.auto.ria.com
+            a(href='https://auto.ria.com/', target='_blank') auto.ria.com
+          li
+            div.icon.rst.ua
+            a(href='http://rst.ua/', target='_blank') rst.ua
+    .col-sm
+      .group
+        .group-title
+          span.badge.badge-success *Работа в Украине*
+        ul
+          li
+            div.icon.work.ua
+            a(href='https://www.work.ua/', target='_blank') work.ua
+          li
+            div.icon.rabota.ua
+            a(href='https://rabota.ua/', target='_blank') rabota.ua
+      .group
+        .group-title
+          span.badge.badge-success *Торговые площадки*
+        ul
+          li
+            div.icon.prom.ua
+            a(href='https://prom.ua/', target='_blank') prom.ua
+          li
+            div.icon.bigl.ua
+            a(href='https://bigl.ua/', target='_blank') bigl.ua
+      .group
+        .group-title
+          span.badge.badge-success *Аукционы*
+        ul
+          li
+            div.icon.skylots.org
+            a(href='https://skylots.org/', target='_blank') skylots.org
+          li
+            div.icon.auction.violity.com
+            a(href='https://auction.violity.com/', target='_blank') auction.violity.com
+          li
+            div.icon.newauction.com.ua
+            a(href='https://newauction.com.ua/', target='_blank') newauction.com.ua
+          li
+            div.icon.livemaster.ru
+            a(href='https://www.livemaster.ru/', target='_blank') livemaster.ru

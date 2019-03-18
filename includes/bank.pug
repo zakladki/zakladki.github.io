@@ -1,0 +1,148 @@
+extends _layout.pug
+  
+block title
+  title Банкинг
+
+block menu
+  - var current = 'Банкинг'
+  - var current_iclass = 'bank'
+  include _nav.pug
+
+block content
+  .row.animated.fadeIn
+    .col-sm
+      .group
+        .group-title
+          span.badge.badge-success *Курс/Конвертер валют*
+        ul
+          li
+            div.icon.finance.i.ua
+            a(href='https://finance.i.ua/', target='_blank') finance.i.ua
+          li
+            div.icon.kurs.com.ua
+            a(href='https://kurs.com.ua/', target='_blank') kurs.com.ua
+          li
+            div.icon.minfin.com.ua
+            a(href='https://minfin.com.ua/currency/', target='_blank') minfin.com.ua
+      .group
+        .group-title
+          span.badge.badge-success *Обмен валют*
+        ul
+          li
+            div.icon.bestchange.ru
+            a(href='https://www.bestchange.ru/', target='_blank') bestchange.ru
+          li
+            div.icon.kurses.com.ua
+            a(href='http://kurses.com.ua/', target='_blank') kurses.com.ua
+          li
+            div.icon.old.kurs.com.ua
+            a(href='https://old.kurs.com.ua/webmoney', target='_blank') old.kurs.com.ua
+          li
+            div.icon.bitfinex.com
+            a(href='https://www.bitfinex.com/?locale=ru', target='_blank') bitfinex.com
+      .group
+        .group-title
+          span.badge.badge-success *Рейтинг банков Украины*
+        ul
+          li
+            div.icon.minfin.com.ua
+            a(href='https://minfin.com.ua/ua/banks/rating/', target='_blank') minfin.com.ua
+          li
+            div.icon.maanimo.com
+            a(href='https://maanimo.com/rates/banks', target='_blank') maanimo.com
+          li
+            div.icon.banker.ua
+            a(href='https://banker.ua/officialrating/', target='_blank') banker.ua
+    .col-sm
+      .group
+        .group-title
+          span.badge.badge-success *Банк/Банк ОНЛАЙН*
+        ul
+          li
+            div.icon.privatbank.ua
+            a(href='https://privatbank.ua/ru', target='_blank') privatbank.ua
+          li
+            div.icon.privat24.ua
+            a(href='https://www.privat24.ua/', target='_blank') privat24.ua
+            span.opisi Онлайн
+          li
+            div.icon.oschadbank.ua
+            a(href='https://oschadbank.ua/ua', target='_blank') oschadbank.ua
+          li
+            div.icon.online.oschadbank.ua
+            a(href='https://online.oschadbank.ua/wb/', target='_blank') online.oschadbank.ua
+            span.opisi Онлайн
+          li
+            div.icon.aval.ua
+            a(href='https://www.aval.ua/', target='_blank') aval.ua
+          li
+            div.icon.online.aval.ua
+            a(href='https://online.aval.ua/ibank/home?0', target='_blank') online.aval.ua
+            span.opisi Онлайн
+          li
+            div.icon.alfabank.ua
+            a(href='https://alfabank.ua/', target='_blank') alfabank.ua
+          li
+            div.icon.my.alfabank.com.ua
+            a(href='https://my.alfabank.com.ua/login', target='_blank') my.alfabank.com.ua
+            span.opisi Онлайн
+          li
+            div.icon.my.ukrsibbank.com
+            a(href='https://my.ukrsibbank.com/ua/personal/', target='_blank') my.ukrsibbank.com
+          li
+            div.icon.my.ukrsibbank.com
+            a(href='https://online.ukrsibbank.com/ibank/', target='_blank') online.ukrsibbank.com
+            span.opisi Онлайн
+      .group
+        .group-title
+          span.badge.badge-success *Страхование/Кредит/Финансы*
+        ul
+          li
+            div.icon.alfabank.ua
+            a(href='https://letyshops.com/r/alfa-bank-ukraina-4qh7st5ct0ys4s', target='_blank') alfabank.ua`
+          li
+            div.icon.globalcredit.ua
+            a(href='https://letyshops.com/r/global-credit-ua-4qh7st5ct0ys4s', target='_blank') globalcredit.ua`
+          li
+            div.icon.ideabank.ua
+            a(href='https://letyshops.com/r/idea-bank-ua-4qh7st5ct0ys4s', target='_blank') ideabank.ua`
+          li
+            div.icon.hotline.finance
+            a(href='https://letyshops.com/r/hotline-4qh7st5ct12cok', target='_blank') hotline.finance`
+          li
+            div.icon.vuso.ua
+            a(href='https://letyshops.com/r/vuso-ua-4qh7st5ct12cog', target='_blank') vuso.ua`
+    .col-sm
+      .group
+        .group-title
+          span.badge.badge-success *Интернет КОШЕЛЕК*
+        ul
+          li
+            div.icon.payoneer.com
+            a(href='https://www.payoneer.com/raf/?rid=0FA0C022-2289-43EC-8770-3B4409BD83AF', target='_blank') payoneer.com`
+          li
+            div.icon.payeer.com
+            a(href='https://payeer.com/?partner=1687223', target='_blank') payeer.com`
+          li
+            div.icon.skrill.com
+            a(href='https://account.skrill.com/signup?rid=94770593', target='_blank') skrill.com`
+          li
+            div.icon.neteller.com
+            a(href='https://www.neteller.com/ru', target='_blank') neteller.com
+          li
+            div.icon.webmoney.ru
+            a(href='https://www.webmoney.ru/', target='_blank') webmoney.ru
+            div.icontoo.a0VPN1(title='Для работы нужен VPN', alt='')
+          li
+            div.icon.money.yandex.ru
+            a(href='https://money.yandex.ru/', target='_blank') money.yandex.ru
+            div.icontoo.a0VPN1(title='Для работы нужен VPN', alt='')
+          li
+            div.icon.qiwi.com
+            a(href='https://qiwi.com/', target='_blank') qiwi.com
+          li
+            div.icon.paypal.com
+            a(href='https://www.paypal.com/ua/webapps/mpp/home', target='_blank') paypal.com
+          li
+            div.icon.payza.eu
+            a(href='https://www.payza.eu/', target='_blank') payza.eu

@@ -1,0 +1,137 @@
+extends _layout.pug
+  
+block title
+  title Игры
+
+block menu
+  - var current = 'Игры'
+  - var current_iclass = 'games'
+  include _nav.pug
+  
+block content
+  .row.animated.fadeIn
+    .col-sm
+      .group
+        .group-title
+          span.badge.badge-success *Азартные*
+        ul
+          li
+            div.icon.playset.ru
+            a(href='http://www.playset.ru/', target='_blank') playset.ru
+          li
+            div.icon.luckforfree.com
+            a(href='https://luckforfree.com/', target='_blank') luckforfree.com
+          li
+            div.icon.onlineigry.com
+            a(href='http://onlineigry.com/', target='_blank') onlineigry.com
+          li
+            div.icon.min2win.ru
+            a(href='http://www.min2win.ru/', target='_blank') min2win.ru
+      .group
+        .group-title
+          span.badge.badge-success *Логические*
+        ul
+          li
+            div.icon.zumagames.ru
+            a(href='http://www.zumagames.ru/', target='_blank') zumagames.ru
+          li
+            div.icon.logic-games.spb.ru
+            a(href='https://logic-games.spb.ru/', target='_blank') logic-games.spb.ru
+          li
+            div.icon.a2048game.com
+            a(href='http://2048game.com/ru/', target='_blank') 2048game.com
+      .group
+        .group-title
+          span.badge.badge-success *Для КОМПА*
+        ul
+          li
+            div.icon.wargaming.net
+            a(href='https://ru.wargaming.net/', target='_blank') wargaming.net
+          li
+            div.icon.warthunder.ru
+            a(href='https://warthunder.ru/', target='_blank') warthunder.ru
+          li
+            div.icon.torrent-igruha.org
+            a(href='https://torrent-igruha.org/top10-online.html', target='_blank') torrent-igruha
+            span.opisi нужен TORRENT
+      .group
+        .group-title
+          span.badge.badge-success *Инфо ТОП*
+        ul
+          li
+            div.icon.onlimegames.ru
+            a(href='https://onlimegames.ru/games/top100', target='_blank') onlimegames.ru=top100
+          li
+            div.icon.igrofania.ru
+            a(href='https://igrofania.ru/katalog/brauzernye/', target='_blank') igrofania.ru=katalog
+          li
+            div.icon.mmo13.ru
+            a(href='http://mmo13.ru/rating/top100', target='_blank') mmo13.ru=top100
+          li
+            div.icon.mmoglobus.ru
+            a(href='https://mmoglobus.ru/top-10-luchshih-onlayn-igr-na-pk', target='_blank') mmoglobus.ru=top-10
+    .col-sm
+      .group
+        .group-title
+          span.badge.badge-success *Онлайн для детей*
+        ul
+          li
+            div.icon.poki.com
+            a(href='https://poki.com/ru', target='_blank') poki.com
+          li
+            div.icon.vseigru.net
+            a(href='http://vseigru.net/', target='_blank') vseigru.net
+          li
+            div.icon.igroutka.net
+            a(href='https://igroutka.net/', target='_blank') igroutka.net
+          li
+            div.icon.igrixl.ru
+            a(href='https://www.igrixl.ru/', target='_blank') igrixl.ru
+          li
+            div.icon.game-game.com.ua
+            a(href='http://www.game-game.com.ua/', target='_blank') game-game.com.ua
+          li
+            div.icon.ru.obfog.com
+            a(href='http://www.ru.obfog.com/', target='_blank') ru.obfog.com
+          li
+            div.icon.girlsgogames.ru
+            a(href='http://www.girlsgogames.ru/', target='_blank') girlsgogames.ru
+          li
+            div.icon.onlineguru.ru
+            a(href='http://onlineguru.ru/', target='_blank') onlineguru.ru
+    .col-sm
+      .group
+        .group-title
+          span.badge.badge-success *Букмекерская контора - СНГ*
+        ul
+          li
+            div.icon.fan-sport.com.ua
+            a(href='https://fan-sport.com.ua?bf=5c6990af5f28e_515561215', target='_blank') fan-sport.com.ua`
+          li
+            div.icon.a1xbetua.com
+            a(href='https://1xbetua.com/?bf=5c6ae4a19a325_515575637', target='_blank') 1xbetua.com`
+          li
+            div.icon.parimatch.com
+            a(href='https://classic.parimatch.com/', target='_blank') classic.parimatch.com`
+          li
+            div.icon.parimatch.com
+            a(href='https://air.parimatch.com/ru/', target='_blank') air.parimatch.com`
+          li
+            div.icon.marathonbetweb.win
+            a(href='https://www.marathonbetweb.win/su/', target='_blank') marathonbetweb
+          li
+            div.icon.favbet.com
+            a(href='https://www.favbet.com/', target='_blank') favbet.com
+      .group
+        .group-title
+          span.badge.badge-success *Букмекерская контора - Европа*
+        ul
+          li
+            div.icon.pinnacle.com
+            a(href='https://www.pinnacle.com/ru/', target='_blank') pinnacle.com
+          li
+            div.icon.betfair.com
+            a(href='https://www.betfair.com/ua/', target='_blank') betfair.com
+          li
+            div.icon.sbobet.com
+            a(href='https://www.sbobet.com/', target='_blank') sbobet.com
