@@ -1,3 +1,10 @@
+a span.badge.badge-danger:hover {
+  background-color: #007bff;
+  -webkit-transition: 0.2s;
+  -o-transition: 0.2s;
+  transition: 0.2s;
+}
+
 a span.badge.badge-dark:hover {
   background-color: #007bff;
   -webkit-transition: 0.2s;
