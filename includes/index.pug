@@ -384,6 +384,11 @@ block content
           a(href='http://zakladki.at.ua/', target='_blank')
             span.badge.badge-danger Обнова в закладках: v.2019-03-20
         ul
+          //- li
+          //-   div.icon.a0info-opis5(title='Полезная информация', alt='')
+          //-   div.icon.a0youtubeinform(title='Видео информация', alt='')
+          //-   a(href='https://www.youtube.com/', target='_blank') Настройка ZAKLADOK
+          //-   div.icontooinfo.a0repa3(title='Как быстро настроить ZAKLADKI на компьютере, ноутбуке, смартфоне', alt='')
           li
             div.icon.a0info-opis5(title='Полезная информация', alt='')
             div.icon.a0pencil-1(title='Текстовая информация', alt='')
@@ -409,6 +414,10 @@ block content
             div.icon.a0info-add2(title='Добавлен в ZAKLADKI', alt='')
             a(href='https://letyshops.com/r/master-plius-ua-4qh7st5ocjk0w4', target='_blank') master-plus.com.ua`
             div.icontooinfo.a0repa3(title='Раздел-Магазины. Интернет магазин запчастей для стиральных машин, холодильников и другой бытовой техники. ТМ Мастер-Плюс', alt='')
+          // тут код плеера
+            #player
+            script.
+              var player = new Playerjs({id:"player", file:"video.mp4"});
           // тут реклама от ГУГЛ
           //- script(async='', src='//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js')
           //- ins.adsbygoogle(style='display:inline-block;width:250px;height:360px', data-ad-client='ca-pub-3065705668384801', data-ad-slot='8204636692')
