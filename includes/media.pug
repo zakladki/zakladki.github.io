@@ -13,6 +13,11 @@ block content
     .col-sm
       .group
         .group-title
+          // тут код плеера
+          #player(style='height:70px;width:240px')
+            script.
+              var player = new Playerjs({id:"player", file:"https://zakladki.github.io/playlist.txt"});
+          // тут код плеера
           span.badge.badge-success Ваше любимое видео!
         ul
           li
