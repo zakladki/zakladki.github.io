@@ -74,13 +74,18 @@
           <div class="row animated fadeIn">
             <div class="col-sm">
               <div class="group">
-                <div class="group-title">
+                <div class="group-title"><span class="badge badge-warning">Плеер, ТОП-100 лучших музыкальных треков</span></div>
+                <ul>
+                  <li></li>
                   <!-- тут код плеера-->
                   <div id="player" style="height:70px;width:240px">
                     <script>var player = new Playerjs({id:"player", file:"https://zakladki.github.io/playlist.txt"});</script>
                   </div>
-                  <!-- тут код плеера--><span class="badge badge-success">Ваше любимое видео!</span>
-                </div>
+                  <!-- тут код плеера-->
+                </ul>
+              </div>
+              <div class="group">
+                <div class="group-title"><span class="badge badge-success">Ваше любимое видео!</span></div>
                 <ul>
                   <li>
                     <div class="icon youtube"></div><a href="https://www.youtube.com/" target="_blank">youtube.com</a>

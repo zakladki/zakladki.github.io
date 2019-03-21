@@ -13,11 +13,16 @@ block content
     .col-sm
       .group
         .group-title
+          span.badge.badge-warning Плеер, ТОП-100 лучших музыкальных треков
+        ul
+          li
           // тут код плеера
           #player(style='height:70px;width:240px')
             script.
               var player = new Playerjs({id:"player", file:"https://zakladki.github.io/playlist.txt"});
           // тут код плеера
+      .group
+        .group-title
           span.badge.badge-success Ваше любимое видео!
         ul
           li
