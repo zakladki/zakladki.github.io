@@ -13,14 +13,27 @@ block content
     .col-sm
       .group
         .group-title
-          span.badge.badge-warning Плеер.ТОП.зарубежная (playlist.2019-04)
+          span.badge.badge-warning Плеер.ТОП.зарубежная playlist.2019-04
         ul
           li
           // тут код плеера
           #player(style='height:60px;width:240px')
             script.
               var player = new Playerjs({id:"player", file:"https://zakladki.github.io/playlist1zap.txt"});
-          // тут код плеера
+
+          li
+            div.icon.a0download
+            a(href='https://turbo.to/gu3ln64vy8ua.html', target='_blank') Скачать_сборник_часть-1
+            a(href='https://www.youtube.com/', target='_blank')
+              div.icontooinfo.a0youtubeinform(title='Видеоинструкция. Как скачать', alt='')
+            div.icontooinfo.a0zippass(title='заархивировано/пароль: zakladki')
+          li
+            div.icon.a0download
+            a(href='https://turbo.to/8epffn7os44f.html', target='_blank') Скачать_сборник_часть-2
+            a(href='https://www.youtube.com/', target='_blank')
+              div.icontooinfo.a0youtubeinform(title='Видеоинструкция. Как скачать', alt='')
+            div.icontooinfo.a0zippass(title='заархивировано/пароль: zakladki')
+
       .group
         .group-title
           span.badge.badge-success Ваше любимое видео!
