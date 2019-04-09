@@ -15,26 +15,28 @@ block content
         .group-title
           span.badge.badge-warning Плеер.ТОП.зарубежная playlist.2019.04
         ul
+          
+          li
+            div.icon.a0download 
+            a() Скачать:
+            a(href='https://turbo.to/m8kdm5toer7h.html', target='_blank')
+              div.icontooinfo.a-1_cifra(title='Скачать 1-ю часть', alt='')
+            a(href='https://turbo.to/lfpz10mc11cz.html', target='_blank')
+              div.icontooinfo.a-2_cifra(title='Скачать 2-ю часть', alt='')
+            a(href='https://turbo.to/7trgjc8n6q8u.html', target='_blank')
+              div.icontooinfo.a-3_cifra(title='Скачать 3-ю часть', alt='')
+            a(href='https://turbo.to/83ms14po83fu.html', target='_blank')
+              div.icontooinfo.a-4_cifra(title='Скачать 4-ю часть', alt='')
+            div.icontooinfo.a0zippass(title='заархивировано/пароль: zakladki')
+            a(href='https://youtu.be/A4TSFq5P4O8', target='_blank')
+              div.icontooinfo.a0youtubeinform(title='Видеоинструкция. Как скачать', alt='')
+          
           li
             // тут код плеера
             #player(style='height:60px;width:240px')
               script.
                 var player = new Playerjs({id:"player", file:"https://zakladki.github.io/playlist1zap.txt"});
 
-          li
-            div.icon.a0download
-            a(href='https://turbo.to/m8kdm5toer7h.html', target='_blank') Скачать_часть-1
-            div.icontooinfo.a0zippass(title='заархивировано/пароль: zakladki')
-            a(href='https://turbo.to/lfpz10mc11cz.html', target='_blank') Скачать_часть-2
-            a(href='https://youtu.be/A4TSFq5P4O8', target='_blank')
-              div.icontooinfo.a0youtubeinform(title='Видеоинструкция. Как скачать', alt='')
-          li
-            div.icon.a0download
-            a(href='https://turbo.to/7trgjc8n6q8u.html', target='_blank') Скачать_часть-3
-            div.icontooinfo.a0zippass(title='заархивировано/пароль: zakladki')
-            a(href='https://turbo.to/83ms14po83fu.html', target='_blank') Скачать_часть-4
-            a(href='https://youtu.be/A4TSFq5P4O8', target='_blank')
-              div.icontooinfo.a0youtubeinform(title='Видеоинструкция. Как скачать', alt='')
 
       .group
         .group-title
