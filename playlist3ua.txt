@@ -67,4 +67,5 @@
 {"title":"ua067","file":"http://babki.ucoz.org/mrt/ua067.mrt"},
 {"title":"ua068","file":"http://babki.ucoz.org/mrt/ua068.mrt"},
 {"title":"ua069","file":"http://babki.ucoz.org/mrt/ua069.mrt"},
-{"title":"ua070","file":"http://babki.ucoz.org/mrt/ua070.mrt"}]
+{"title":"ua070","file":"http://babki.ucoz.org/mrt/ua070.mrt"},
+{"title":"ua070","file":"http://babki.ucoz.org/mrt/ua071.mrt"}]
