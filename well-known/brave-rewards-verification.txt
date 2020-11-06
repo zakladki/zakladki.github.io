@@ -1,4 +1,0 @@
-This is a Brave Rewards publisher verification file.
-
-Domain: zakladki.github.io
-Token: 6c54484d7815cbcdb9961d4c5c3b818423f10c1a905b95bbb72f9bc75e7a6be6
