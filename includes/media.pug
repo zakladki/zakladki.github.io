@@ -95,10 +95,8 @@ block content
           
           li
             // тут код плеера
-            #player_ua(style='height:60px;width:240px')
-              script.
-                var player_ua = new Playerjs({id:"player_ua", file:"https://zakladki.github.io/playlist3ua.txt"});
-        
+            iframe(width='240', height='60', src='https://www.youtube.com/playlist?list=PLkF1vM_kexQA-dC1jsQfgM8VFHdWabcGl', frameborder='0', allow='autoplay; encrypted-media', allowfullscreen='')
+
           li
             div.icon.web.telegram.org
             a() Ще музика:  
@@ -158,9 +156,7 @@ block content
           
           li
             // тут код плеера
-            #player_ru(style='height:60px;width:240px')
-              script.
-                var player_ru = new Playerjs({id:"player_ru", file:"https://zakladki.github.io/playlist2ru.txt"});
+            iframe(width='240', height='60', src='https://www.youtube.com/playlist?list=PLkF1vM_kexQA-dC1jsQfgM8VFHdWabcGl', frameborder='0', allow='autoplay; encrypted-media', allowfullscreen='')
 
           li
             div.icon.web.telegram.org
