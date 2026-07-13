@@ -1,3 +1,14 @@
+// Playerjs global fallback stub to prevent 'emit' and 'addListener' undefined errors
+window.playerjs = window.playerjs || {
+  emit: function() { return this; },
+  addListener: function() { return this; },
+  on: function() { return this; },
+  api: function() { return this; }
+};
+window.Playerjs = window.Playerjs || function() {
+  return window.playerjs;
+};
+
 // $('.navbar-nav>li>a').on('click', function() {
 //   $('.navbar-collapse').collapse('hide');
 //   $(".hamburger").removeClass("is-active");
