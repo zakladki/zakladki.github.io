@@ -1,0 +1,63 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+		<urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+<url>
+	<loc>https://zakladki.github.io/</loc>
+	<lastmod>2019-03-20T16:51:33+01:00</lastmod>
+	<priority>1.0</priority>
+</url>
+<url>
+	<loc>https://zakladki.github.io/social.html</loc>
+	<lastmod>2019-03-20T16:51:33+01:00</lastmod>
+	<priority>1.0</priority>
+</url>
+<url>
+	<loc>https://zakladki.github.io/news.html</loc>
+	<lastmod>2019-03-20T16:51:33+01:00</lastmod>
+	<priority>1.0</priority>
+</url>
+<url>
+	<loc>https://zakladki.github.io/media.html</loc>
+	<lastmod>2019-03-20T16:51:34+01:00</lastmod>
+	<priority>1.0</priority>
+</url>
+<url>
+	<loc>https://zakladki.github.io/games.html</loc>
+	<lastmod>2019-03-20T16:51:35+01:00</lastmod>
+	<priority>1.0</priority>
+</url>
+<url>
+	<loc>https://zakladki.github.io/communal.html</loc>
+	<lastmod>2019-03-20T16:51:35+01:00</lastmod>
+	<priority>1.0</priority>
+</url>
+<url>
+	<loc>https://zakladki.github.io/bank.html</loc>
+	<lastmod>2019-03-20T16:51:36+01:00</lastmod>
+	<priority>1.0</priority>
+</url>
+<url>
+	<loc>https://zakladki.github.io/market.html</loc>
+	<lastmod>2019-03-20T16:51:36+01:00</lastmod>
+	<priority>1.0</priority>
+</url>
+<url>
+	<loc>https://zakladki.github.io/shops.html</loc>
+	<lastmod>2019-03-20T16:51:37+01:00</lastmod>
+	<priority>1.0</priority>
+</url>
+<url>
+	<loc>https://zakladki.github.io/others.html</loc>
+	<lastmod>2019-03-20T16:51:38+01:00</lastmod>
+	<priority>1.0</priority>
+</url>
+<url>
+	<loc>https://zakladki.github.io/city.html</loc>
+	<lastmod>2019-03-20T16:51:38+01:00</lastmod>
+	<priority>1.0</priority>
+</url>
+<url>
+	<loc>https://zakladki.github.io/programs.html</loc>
+	<lastmod>2019-03-20T16:51:39+01:00</lastmod>
+	<priority>1.0</priority>
+</url>
+</urlset>

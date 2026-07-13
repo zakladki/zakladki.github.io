@@ -1,0 +1,408 @@
+extends _layout.pug
+  
+block title
+  title ЗАКЛАДКИ - Список популярних сайтів (ТОП ЗАКЛАДКИ)
+
+block menu
+  - var current = 'Главная'
+  - var current_iclass = 'fas fa-home'
+  include _nav.pug
+  
+block meta
+  meta(name='keywords', content='best sait, лучшие сайты, популярные сайты, каталог сайтов, быстрые ссылки, cписок найпопулярніших веб-сайтів, zakladki, top, топ сайтів, speeddial, новости, соцсети, видео, погода')
+  meta(name='description', content='Повний перелік найпопулярніших веб-сайтів вебу. Зручний каталог сайтів із сортуванням за тематикою. Усі топ сайти в одному місці. Все для зручності в Інтернеті.')
+  
+block content
+  .row.animated.fadeIn
+    .col-sm
+      .group
+        .group-title
+          a(href="./others.html")
+            span.badge.badge-dark Пошук і мови
+        ul
+          li
+            div.google.icon
+            a(href='https://www.google.com.ua/', target='_blank') Пошук Google
+          //li
+            div.icontoo.a0VPN1(title='Для роботи потрібний VPN', alt='')
+          li
+            div.icon.translate.google.com.ua
+            a(href='https://translate.google.com.ua/', target='_blank') Перекладач Google
+          li
+          li
+            div.icon.languagetool.org
+            a(href='https://languagetool.org/uk/', target='_blank') Граматика от languagetool
+      .group
+        .group-title
+          a(href="./social.html")
+            span.badge.badge-dark Соціум
+        ul
+          li
+            div.icon.facebook.com
+            a(href='https://www.facebook.com/', target='_blank') Facebook.com
+          li
+            div.icon.instagram.com
+            a(href='https://www.instagram.com/', target='_blank') Instagram.com
+          li
+            div.icon.twitter.com
+            a(href='https://twitter.com/', target='_blank') Twitter.com
+          //li
+            div.icontoo.a0VPN1(title='Для роботи потрібний VPN', alt='')
+          //li
+            div.icontoo.a0VPN1(title='Для роботи потрібний VPN', alt='')
+          li
+            div.icon.gmail
+            a(href='https://mail.google.com', target='_blank') пошта_gmail
+          li
+            div.icon.mail.ukr.net
+            a(href='https://accounts.ukr.net/login', target='_blank') пошта_ukr.net
+          li
+            div.icon.webmail.meta.ua
+            a(href='https://webmail.meta.ua/', target='_blank') пошта_meta.ua
+
+      .group
+        .group-title
+          a(href="./news.html")
+            span.badge.badge-dark Новини
+        ul
+          li
+            div.icon.ukr.net
+            a(href='https://www.ukr.net/', target='_blank') Ukr.net
+          li
+            div.icon.unian.net
+            a(href='https://www.unian.net/', target='_blank') Unian.net
+          li
+            div.icon.myscore.com.ua
+            a(href='https://www.myscore.com.ua/', target='_blank') myscore.com.ua
+          li
+            div.icon.youtube
+            a(href='https://www.youtube.com/user/tsnukraine/videos', target='_blank') Youtube_ТСН
+          li
+            div.icon.rada.gov.ua
+            a(href='https://rada.gov.ua/', target='_blank') Верховная Рада Украины
+      .group
+        .group-title
+          a(href="./media.html")
+            span.badge.badge-dark Медіа
+        ul
+          li
+            div.icon.youtube
+            a(href='https://www.youtube.com/', target='_blank') Youtube
+          li
+            div.icon.viks.tv
+            a(href='http://viks.tv/', target='_blank') viks.tv
+          li
+          li
+          li
+            div.icon.onlineradiobox.com
+            a(href='https://onlineradiobox.com/ua/', target='_blank') onlineradiobox.com
+          li
+          // тут реклама от ГУГЛ
+          //- script(async='', src='//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js')
+          //- ins.adsbygoogle(style='display:inline-block;width:234px;height:60px', data-ad-client='ca-pub-3065705668384801', data-ad-slot='4257475217')
+          //- script.
+          //-   (adsbygoogle = window.adsbygoogle || []).push({});
+          // тут реклама от ГУГЛ
+    .col-sm
+      .group
+        .group-title
+          a(href="./games.html")
+            span.badge.badge-dark Ігри
+        ul
+          li
+          li
+          li
+          li
+            div.icon.wargaming.net
+            a(href='https://ru.wargaming.net/', target='_blank') wargaming.net
+          li
+            div.icon.poki.com
+            a(href='https://poki.com/ru', target='_blank') poki.com
+          li
+      .group
+        .group-title
+          a(href="./games.html")
+            span.badge.badge-dark Ігри та ставки
+        ul
+          li
+            div.icon.fan-sport.com.ua
+            a(href='https://fan-sport.com.ua?bf=5c6990af5f28e_515561215', target='_blank') fan-sport.com.ua`
+          li
+            div.icon.a1xbetua.com
+            a(href='https://1xbetua.com/?bf=5c6ae4a19a325_515575637', target='_blank') 1xbetua.com`
+      .group
+        .group-title
+          a(href="./communal.html")
+            span.badge.badge-dark Комуналка
+        ul
+          li
+            div.icon.minfin.com.ua
+            a(href='https://index.minfin.com.ua/tariff/gas/', target='_blank') minfin.com
+            
+          li
+            div.icon.naftogazpostach.com
+            a(href='https://gas.ua/', target='_blank') naftogaz
+            
+          li
+            div.icon.gasolina-online.com
+            a(href='https://gasolina-online.com/', target='_blank') Gasolina
+            
+          li
+            div.icon.minfin.com.ua
+            a(href='https://index.minfin.com.ua/tariff/electric/', target='_blank') minfin.com
+            
+          li
+            div.icon.kresc.com.ua
+            a(href='https://www.kresc.com.ua/', target='_blank') kresc.com.ua
+            
+            a(href='https://youtu.be/qIJYbNR_l6g', target='_blank')
+              div.icontooinfo.a0youtubeinform(title='Відеоінструкція. Процес реєстрації та огляд особистого кабінету на офіційному сайті компанії ТОВ Кіровоградська обласна ЕК', alt='')
+          li
+            div.icon.a0pencil-1(title='Текстова інформація', alt='')
+            a(href='https://ok.kiroe.com.ua/home', target='_blank', title='Особистий кабінет побутового споживача ПрАТ Кіровоградобленерго') Кабінет електро 2022, alt='')
+          li
+            div.icon.ukrtelecom.ua
+            a(href='https://ukrtelecom.ua/', target='_blank') ukrtelecom
+            
+            a(href='https://youtu.be/WYhA_JFRVik', target='_blank')
+              div.icontooinfo.a0youtubeinform(title='Відеоінструкція. Як дізнатися суму заборгованості та її сплатити', alt='')
+          li
+            div.icon.my.vega.ua
+            a(href='https://my.vega.ua/', target='_blank') Vega Telecom
+            a(href='https://youtu.be/4accV-xUU30', target='_blank', title='Відеоінструкція. Як дізнатися суму заборгованості та її сплатити') a(href='https://youtu.be/nsknyxq9alo', target='_blank', title='Відеоінструкція. Перехід абонентів Укртелеком ОПТИКИ (FTTB) на ВЕГА Телеком'), alt='')
+          li
+            div.icon.optonet.com.ua
+            a(href='https://optonet.com.ua/', target='_blank') optonet.com.ua
+            
+          li
+            div.icon.shtorm.net
+            a(href='https://www.shtorm.net/uk', target='_blank') shtorm.net
+            
+          li
+            div.icon.kyivstar.ua
+            a(href='https://kyivstar.ua/', target='_blank') kyivstar.ua
+          li
+            div.icon.vodafone.ua
+            a(href='https://www.vodafone.ua/ru', target='_blank') vodafone.ua
+          li
+            div.icon.lifecell.ua
+            a(href='https://www.lifecell.ua/', target='_blank') lifecell.ua
+      .group
+        .group-title
+          a(href="./bank.html")
+            span.badge.badge-dark Банкінг
+        ul
+          li
+            div.icon.privat24.ua
+            a(href='https://www.privat24.ua/', target='_blank') privat24.ua
+            
+          li
+            div.icon.online.oschadbank.ua
+            a(href='https://online.oschadbank.ua/wb/', target='_blank') online.oschadbank
+            
+          li
+            div.icon.online.aval.ua
+            a(href='https://online.aval.ua/ibank/home?0', target='_blank') online.aval.ua
+            
+          li
+            div.icon.payoneer.com
+            a(href='https://www.payoneer.com/', target='_blank') payoneer
+            
+          li
+            div.icon.payeer.com
+            a(href='https://payeer.com/', target='_blank') payeer
+            
+          li
+            div.icon.minfin.com.ua
+            a(href='https://minfin.com.ua/currency/', target='_blank') minfin.com.ua
+            
+          li
+            
+          // тут реклама от ГУГЛ
+          //- script(async='', src='//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js')
+          //- ins.adsbygoogle(style='display:inline-block;width:234px;height:60px', data-ad-client='ca-pub-3065705668384801', data-ad-slot='4257475217')
+          //- script.
+          //-   (adsbygoogle = window.adsbygoogle || []).push({});
+          // тут реклама от ГУГЛ
+    .col-sm
+      .group
+        .group-title
+          a(href="./market.html")
+            span.badge.badge-dark Відслідкувати посилку
+        ul
+          li
+            div.icon.novaposhta.ua
+            a(href='https://novaposhta.ua/ru/tracking', target='_blank') novaposhta.ua
+          li
+            div.icon.meest-express.com.ua
+            a(href='https://meest.com', target='_blank') meest.com
+      .group
+        .group-title
+          a(href="./market.html")
+            span.badge.badge-dark Ринок
+        ul
+          li
+            div.icon.olx.ua
+            a(href='https://www.olx.ua/', target='_blank') olx.ua
+          li
+            div.icon.obyava.ua
+            a(href='https://obyava.ua/', target='_blank') obyava.ua
+          li
+            div.icon.shafa.ua
+            a(href='https://shafa.ua/', target='_blank') shafa.ua
+          li
+            div.icon.auto.ria.com
+            a(href='https://auto.ria.com/', target='_blank') auto.ria.com
+      .group
+        .group-title
+          a(href="./shops.html")
+            span.badge.badge-dark Магазини
+        ul
+          li
+            div.icon.letyshops.com
+            a(href='https://letyshops.com/ua/soc/sh-1?r=2739789', target='_blank') Letyshops`
+            
+          li
+            div.icon.best.aliexpress.com
+            a(href='https://best.aliexpress.com', target='_blank') best.aliexpress.com`
+          li
+            div.icon.rozetka.com.ua
+            a(href='https://rozetka.com.ua', target='_blank') rozetka.com.ua`
+          li
+            div.icon.allo.ua
+            a(href='https://allo.ua', target='_blank') allo.ua`
+          li
+            div.icon.moyo.ua
+            a(href='https://moyo.ua', target='_blank') moyo.ua`
+          li
+            div.icon.stylus.ua
+            a(href='https://stylus.ua', target='_blank') stylus.ua`
+          li
+            div.icon.skidka.ua
+            a(href='https://skidka.ua', target='_blank') skidka.ua`
+          li
+            div.icon.f.ua
+            a(href='https://f.ua', target='_blank') f.ua`
+          li
+            div.icon.xiaomi.ua
+            a(href='https://xiaomi.ua', target='_blank') xiaomi.ua`
+          li
+            div.icon.intertop.ua
+            a(href='https://intertop.ua', target='_blank') intertop.ua`
+          li
+            div.icon.med-magazin.ua
+            a(href='https://med-magazin.ua', target='_blank', title='Med-Magazin - мережа магазинів медтехніки, медобладнання та товарів для здоровя в Україні') med-magazin.ua`, alt='')
+          li
+            div.icon.apteka24.ua
+            a(href='https://www.apteka24.ua/', target='_blank') apteka24.ua
+      .group
+        .group-title
+          a(href="./others.html")
+            span.badge.badge-dark Інше
+        ul
+          li
+            div.icon.speed2
+            a(href='https://speed.inetpro.com.ua/ua', target='_blank') Перевірка Інтернету
+          li
+            div.icon.rutracker.org
+            a(href='https://rutracker.org/', target='_blank', title='Для завантаження потрібна програма TORRENT') rutracker.org, alt='')
+          li
+            div.icon.nnmclub.to
+            a(href='http://nnmclub.to/', target='_blank') nnmclub.to
+            div.icontoo.a0VPN1(title='Для роботи потрібний VPN', alt='')
+            div.icontooinfo.a0_Group_m(title='Для завантаження потрібна програма TORRENT', alt='')
+          li
+            div.icon.filmitorrent
+            a(href='http://filmitorrent.net/', target='_blank', title='Для завантаження потрібна програма TORRENT') filmitorrent_TOP, alt='')
+          li
+            div.icon.bible-teka.com
+            a(href='https://bible-teka.com/synodal/', target='_blank') bible-teka
+            
+
+          li
+            div.icon.vshkole.com
+            a(href='https://vshkole.com/', target='_blank') vshkole
+            
+          // тут реклама от ГУГЛ
+          //- script(async='', src='//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js')
+          //- ins.adsbygoogle(style='display:inline-block;width:234px;height:60px', data-ad-client='ca-pub-3065705668384801', data-ad-slot='4257475217')
+          //- script.
+          //-   (adsbygoogle = window.adsbygoogle || []).push({});
+          // тут реклама от ГУГЛ
+    .col-sm
+      .group
+        .group-title
+          a(href="./city.html")
+            span.badge.badge-dark Городок/Новомиргород
+        ul        
+          li
+            div.icon.forum.zakladki
+            a(href='https://drive.google.com/open?id=1vQHnYGF3VZda2UW38R4xG-pVTk3ggB1FuOoUTpKKCfk', target='_blank', title='Ваш Форум по комунальним розрахункам. Ціни, тарифи, рахунки куди оплачувати і т.п.') НАША КОМУНАЛКА, alt='')
+          li
+            div.icon.forum.zakladki
+            a(href='https://docs.google.com/document/d/1PAe-w_ffriHwYjxYcRd5ZM_JuBw_HEG-jXDwHA0tjpY/edit?usp=sharing', target='_blank', title='Розклад автобусів та маршрутних авто по городу Новомиргород') Розклад автомаршрутів, alt='')
+          li
+            div.icon.google.maps
+            a(href='https://www.google.com/maps/place/%D0%9D%D0%BE%D0%B2%D0%BE%D0%BC%D0%B8%D1%80%D0%B3%D0%BE%D1%80%D0%BE%D0%B4,+%D0%9A%D1%96%D1%80%D0%BE%D0%B2%D0%BE%D0%B3%D1%80%D0%B0%D0%B4%D1%81%D1%8C%D0%BA%D0%B0+%D0%BE%D0%B1%D0%BB%D0%B0%D1%81%D1%82%D1%8C/@48.7981251,31.5591162,12z/data=!3m1!4b1!4m5!3m4!1s0x40d1a5b80c2c8cdf:0x27e2a212ccc7175c!8m2!3d48.7907203!4d31.6582633', target='_blank') Карта Новомиргорода
+          li
+            div.icon.sinoptik
+            a(href='https://sinoptik.ua/%D0%BF%D0%BE%D0%B3%D0%BE%D0%B4%D0%B0-%D0%BD%D0%BE%D0%B2%D0%BE%D0%BC%D0%B8%D1%80%D0%B3%D0%BE%D1%80%D0%BE%D0%B4', target='_blank') Погода_Sinoptik
+          li
+            div.icon.weather.com
+            a(href='https://weather.com/uk-UA/weather/hourbyhour/l/UPXX0695:1:UP', target='_blank') Погода_Weather.com
+          li
+            div.icon.meteoprog
+            a(href='https://www.meteoprog.ua/ru/review/Novomirgorod/', target='_blank') Погода_Meteoprog
+          li
+            div.icontoo.a0VPN1(title='Для роботи потрібний VPN', alt='')
+          li
+            div.icon.youtube
+            a(href='https://www.youtube.com/channel/UCKjCg071hg21YxymgDfz5TA', target='_blank') Youtube_г.Новомиргород
+          li
+            div.icon.youtube
+            a(href='https://www.youtube.com/channel/UCpx67qi-50ZnWOUlDqBhSNQ', target='_blank') Youtube_Новом-ка ЗШ2
+          li
+            div.icon.facebook.com
+            a(href='https://www.facebook.com/groups/369041380158080/', target='_blank') Novom.News (facebook)
+          li
+            div.icon.nmrda.kr-admin.gov.ua
+            a(href='http://nmrda.kr-admin.gov.ua/', target='_blank') Районна держ.адміністр.
+          li
+            div.icon.rada-novomirgorod.gov.ua
+            a(href='http://rada-novomirgorod.gov.ua/', target='_blank') Новом-ка міська рада
+      .group.cat-updates
+        .group-title
+          a(href='http://zakladki.at.ua/', target='_blank')
+            span.badge.badge-danger Архів оновлень
+        ul
+          li
+            div.icon.a0pencil-1(title='Текстова інформація', alt='')
+            a(href='https://war.ukrzen.in.ua/alerts/', target='_blank', title='Візуалізація, - онлайн карта повітряних тривог в Україні') Карта повітряних тривог, alt='')        
+          li
+            div.icon.a0pencil-1(title='Текстова інформація', alt='')
+            a(href='https://liveuamap.com/', target='_blank', title='Візуалізація, - онлайн карта бойових дій в Україні') Карта війни в Україні, alt='')
+          li
+            div.icon.repka.ua
+            a(href='https://repka.ua', target='_blank', title='Repka.UA - Кращий сервіс та умови доставки по всій Україні. Ноутбуки Смартфони Побутова техніка Наручний годинник Товари для відпочинку') repka.ua`, alt='')
+          li
+            div.icon.a0pencil-1(title='Текстова інформація', alt='')
+            a(href='https://covid19.who.int/', target='_blank', title='Вся статистика з коронавірусу, по всій землі') Карта коронавіруса MIR, alt='')
+          li
+            div.icon.silvergames
+            a(href='https://www.silvergames.com/ru/', target='_blank', title='Грати в класні безкоштовні онлайн ігри на Silvergames.com') silvergames.com, alt='')
+          li
+            div.icon.a0youtubeinform(title='Відео інформація', alt='')
+            a(href='https://zakladki.github.io/media.html', target='_blank', title='Розділ-Медіа. Оновлено плеєр для прослуховування української/російської/зарубіжної музики') Обновка.MP3.UA+ZAP, alt='')
+          li
+            div.icon.a0youtubeinform(title='Відео інформація', alt='')
+            a(href='https://youtu.be/BdZQy6upWFc', target='_blank', title='Як швидко налаштувати ЗАКЛАДКИ на компютері, ноутбуці, смартфоні') Настройка ЗАКЛАДОК, alt='')
+          li
+            div.icon.costaction.com
+            a(href='http://costaction.com/partner/?PHPSESUD=CEADEE4DA51FAECA3ED6C17C6A9191A5', target='_blank', title='Розділ-програми. Ви отримуватимете гроші за кожне скачування Вашого файлу. Просто завантажте файли на Turbobit.net та Hitfile.net, обмінюйтеся ними зі своїми друзями та незнайомцями через блоги, соціальні мережі, форуми або свої сайти!') Зберігання файлів`, alt='')
+
+          // тут реклама от ГУГЛ
+          //- script(async='', src='//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js')
+          //- ins.adsbygoogle(style='display:inline-block;width:250px;height:360px', data-ad-client='ca-pub-3065705668384801', data-ad-slot='8204636692')
+          //- script.
+          //-   (adsbygoogle = window.adsbygoogle || []).push({});
+          // тут реклама от ГУГЛ
