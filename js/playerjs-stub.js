@@ -1,40 +1,45 @@
 (function() {
-  const dummy = function() { return dummy; };
-  dummy.emit = function() { return dummy; };
-  dummy.addListener = function() { return dummy; };
-  dummy.on = function() { return dummy; };
-  dummy.off = function() { return dummy; };
-  dummy.api = function() { return dummy; };
-  dummy.play = function() { return dummy; };
-  dummy.pause = function() { return dummy; };
-  dummy.getVolume = function() { return 1; };
-  dummy.setVolume = function() { return dummy; };
-  dummy.getCurrentTime = function() { return 0; };
-  dummy.getDuration = function() { return 0; };
-  dummy.setCurrentTime = function() { return dummy; };
-  dummy.Playerjs = dummy;
-  dummy.Emitter = dummy;
+  const dummyFunc = function() { return dummyFunc; };
+  dummyFunc.emit = function() { return dummyFunc; };
+  dummyFunc.addListener = function() { return dummyFunc; };
+  dummyFunc.on = function() { return dummyFunc; };
+  dummyFunc.off = function() { return dummyFunc; };
+  dummyFunc.api = function() { return dummyFunc; };
+  dummyFunc.play = function() { return dummyFunc; };
+  dummyFunc.pause = function() { return dummyFunc; };
+  dummyFunc.getVolume = function() { return 1; };
+  dummyFunc.setVolume = function() { return dummyFunc; };
+  dummyFunc.getCurrentTime = function() { return 0; };
+  dummyFunc.getDuration = function() { return 0; };
+  dummyFunc.setCurrentTime = function() { return dummyFunc; };
+  dummyFunc.Playerjs = dummyFunc;
+  dummyFunc.Emitter = dummyFunc;
 
-  let proxy = dummy;
+  let proxyObj = dummyFunc;
   if (typeof Proxy !== 'undefined') {
-    proxy = new Proxy(dummy, {
+    proxyObj = new Proxy(dummyFunc, {
       get: function(target, prop) {
-        if (prop in target) return target[prop];
-        return dummy;
+        if (prop in target) {
+          return target[prop];
+        }
+        return dummyFunc;
       },
-      apply: function(target, thisArg, argList) {
-        return dummy;
+      apply: function(target, thisArg, argumentsList) {
+        return dummyFunc;
       },
-      construct: function(target, argList) {
-        return dummy;
+      construct: function(target, argumentsList) {
+        return dummyFunc;
       }
     });
   }
 
-  window.playerjs = proxy;
-  window.Playerjs = proxy;
+  window.playerjs = proxyObj;
+  window.Playerjs = proxyObj;
+  window.emit = proxyObj.emit;
+  window.addListener = proxyObj.addListener;
+
   try {
-    globalThis.playerjs = proxy;
-    globalThis.Playerjs = proxy;
-  } catch(e) {}
+    globalThis.playerjs = proxyObj;
+    globalThis.Playerjs = proxyObj;
+  } catch (e) {}
 })();
