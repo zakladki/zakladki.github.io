@@ -1,23 +1,21 @@
-mixin navLink(link, name, iclass)
+mixin navLink(link, name, isSoft)
   li.nav-item
     a.nav-link(
       href=link
-      class={active: (name === current | iclass === current_iclass)}
-    ) #{name}
-      i(
-        class=iclass
-      )
+      class={active: (link === "/" ? current_iclass === "fas fa-home" : name === current), "soft-link": isSoft}
+    )
+      | #{name}
 
 ul.nav.nav-pills.mb-3.navbar-nav
-  +navLink('/', '', 'fas fa-home')
-  +navLink('./social.html', 'Соціум')
-  +navLink('./news.html', 'Новини')
-  +navLink('./media.html', 'Медіа')
-  +navLink('./games.html', 'Ігри')
-  +navLink('./communal.html', 'Комуналка')
-  +navLink('./bank.html', 'Банкінг')
-  +navLink('./market.html', 'Ринок')
-  +navLink('./shops.html', 'Магазини')
-  +navLink('./others.html', 'Інше')
-  +navLink('./city.html', 'Городок')
-  +navLink('./programs.html', '', 'fas fa-microchip')
+  +navLink("/", "Головна", false)
+  +navLink("./social.html", "Соціум", false)
+  +navLink("./news.html", "Новини", false)
+  +navLink("./media.html", "Медіа", false)
+  +navLink("./games.html", "Ігри", false)
+  +navLink("./communal.html", "Комуналка", false)
+  +navLink("./bank.html", "Банкінг", false)
+  +navLink("./market.html", "Ринок", false)
+  +navLink("./shops.html", "Магазини", false)
+  +navLink("./others.html", "Інше", false)
+  +navLink("./city.html", "Городок", false)
+  +navLink("./programs.html", "Soft", true)

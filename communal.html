@@ -29,7 +29,7 @@
     <meta name="description" content="Повний перелік найпопулярніших веб-сайтів вебу. Зручний каталог сайтів із сортуванням за тематикою. Усі топ сайти в одному місці. Все для зручності в Інтернеті.">
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
     <!-- Player-top-->
-    <script src="//zakladki.github.io/playerjs.js" type="text/javascript"></script>
+    <script src="playerjs.js" type="text/javascript"></script>
     <!-- Bootstrap CSS-->
     <link href="styles/bootstrap.min.css" rel="stylesheet">
     <link href="styles/all.css" rel="stylesheet">
@@ -42,16 +42,15 @@
   </head>
   <body>
     <div class="container nav-container">
-      <nav class="navbar navbar-expand-md fixed-top navbar-dark d-flex justify-content-center">
+      <nav class="navbar navbar-expand-md fixed-top navbar-dark d-flex justify-content-between px-3">
         <div class="hamburger hamburger--spring navbar-toggler" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
           <div class="hamburger-box">
             <div class="hamburger-inner"></div>
           </div>
         </div>
-        <div class="container-fluid">
-          <div class="collapse navbar-collapse text-center" id="navbarCollapse">
-            <ul class="nav nav-pills mb-3 navbar-nav">
-                          <li class="nav-item"><a class="nav-link" href="/"><i class="fas fa-home"></i></a></li>
+        <div class="collapse navbar-collapse text-center justify-content-center flex-grow-1" id="navbarCollapse">
+          <ul class="nav nav-pills mb-0 navbar-nav mx-auto justify-content-center">
+                          <li class="nav-item"><a class="nav-link " href="./">Головна</a></li>
                           <li class="nav-item"><a class="nav-link" href="./social.html">Соціум<i></i></a></li>
                           <li class="nav-item"><a class="nav-link" href="./news.html">Новини<i></i></a></li>
                           <li class="nav-item"><a class="nav-link" href="./media.html">Медіа<i></i></a></li>
@@ -62,10 +61,10 @@
                           <li class="nav-item"><a class="nav-link" href="./shops.html">Магазини<i></i></a></li>
                           <li class="nav-item"><a class="nav-link" href="./others.html">Інше<i></i></a></li>
                           <li class="nav-item"><a class="nav-link" href="./city.html">Городок<i></i></a></li>
-                          <li class="nav-item"><a class="nav-link" href="./programs.html"><i class="fas fa-microchip"></i></a></li>
+                          <li class="nav-item"><a class="nav-link" href="./programs.html">Soft</a></li>
             </ul>
-          </div>
         </div>
+        <button id="themeToggle" class="theme-toggle-btn d-flex align-items-center gap-2 ml-auto"><i class="fas fa-moon"></i> <span class="d-none d-sm-inline">Тема</span></button>
       </nav>
     </div>
     <div class="container-fluid main">
@@ -73,147 +72,135 @@
         <div class="tab-content container">
           <div class="row animated fadeIn">
             <div class="col-sm">
-              <div class="group">
+              <div class="group cat-orange">
                 <div class="group-title"><span class="badge badge-warning">Легкі-оплати</span></div>
                 <ul>
                   <li>
-                    <div class="icon portmone com ua"></div><a href="https://www.portmone.com.ua/" target="_blank">portmone</a><span class="opisi">Платіжна система</span>
+                    <div class="icon portmone com ua"></div><a href="https://www.portmone.com.ua/" target="_blank">Portmone</a>
                   </li>
                 </ul>
               </div>
-              <div class="group">
+              <div class="group cat-communal">
                 <div class="group-title"><span class="badge badge-success">ГАЗ</span></div>
                 <ul>
                   <li>
-                    <div class="icon minfin com ua"></div><a href="https://index.minfin.com.ua/tariff/gas/" target="_blank">minfin.com.ua</a><span class="opisi">офц.ціна.газ</span>
+                    <div class="icon minfin com ua"></div><a href="https://index.minfin.com.ua/tariff/gas/" target="_blank">Minfin.com.ua</a>
                   </li>
                   <li>
-                    <div class="icon prostobank ua"></div><a href="http://www.prostobank.ua/spravochniki/indikatory_rynka/gas_tariff" target="_blank">prostobank.ua</a><span class="opisi">ціна.газ</span>
+                    <div class="icon prostobank ua"></div><a href="http://www.prostobank.ua/spravochniki/indikatory_rynka/gas_tariff" target="_blank">Prostobank.ua</a>
                   </li>
                   <li>
-                    <div class="icon naftogazpostach com"></div><a href="https://gas.ua/" target="_blank">naftogaz</a><span class="opisi">Каб.Газ.(!!!)</span>
+                    <div class="icon naftogazpostach com"></div><a href="https://gas.ua/" target="_blank">Naftogaz</a>
                   </li>
                   <li>
-                    <div class="icon gasolina-online com"></div><a href="https://gasolina-online.com/" target="_blank">gasolina</a><span class="opisi">Каб.Газ.(доставка)</span>
+                    <div class="icon gasolina-online com"></div><a href="https://gasolina-online.com/" target="_blank">Gasolina</a>
                   </li>
                   <li>
-                    <div class="icon a104 ua"></div><a href="https://104.ua/ua/" target="_blank">104.ua</a><span class="opisi">Пошук компанії</span>
+                    <div class="icon a104 ua"></div><a href="https://104.ua/ua/" target="_blank">104.ua</a>
                   </li>
                 </ul>
               </div>
-              <div class="group">
+              <div class="group cat-communal">
                 <div class="group-title"><span class="badge badge-success">Електроенергія</span></div>
                 <ul>
                   <li>
-                    <div class="icon minfin com ua"></div><a href="https://index.minfin.com.ua/tariff/electric/" target="_blank">minfin.com.ua</a><span class="opisi">офц.ціна.електр.</span>
+                    <div class="icon minfin com ua"></div><a href="https://index.minfin.com.ua/tariff/electric/" target="_blank">Minfin.com.ua</a>
                   </li>
                   <li>
-                    <div class="icon prostobank ua"></div><a href="http://www.prostobank.ua/spravochniki/indikatory_rynka/electric_tariff" target="_blank">prostobank.ua</a><span class="opisi">ціна.електр.</span>
+                    <div class="icon prostobank ua"></div><a href="http://www.prostobank.ua/spravochniki/indikatory_rynka/electric_tariff" target="_blank">Prostobank.ua</a>
                   </li>
                   <li>
-                    <div class="icon kresc com ua"></div><a href="https://www.kresc.com.ua/" target="_blank">kresc.com.ua</a><span class="opisi">КОЕК</span><a href="https://youtu.be/qIJYbNR_l6g" target="_blank">
-                      <div class="icontooinfo a0youtubeinform" title="Відеоінструкція. Процес реєстрації та огляд особистого кабінету на офіційному сайті компанії ТОВ Кіровоградська обласна ЕК" alt=""></div></a>
+                    <div class="icon kresc com ua"></div><a href="https://www.kresc.com.ua/" target="_blank">Kresc.com.ua</a></li>
+                  <li>
+                    <div class="icon a0pencil-1"></div><a href="https://ok.kiroe.com.ua/home" target="_blank" title="Особистий кабінет побутового споживача ПрАТ Кіровоградобленерго">Кабінет електро 2022</a>
                   </li>
                   <li>
-                    <div class="icon a0pencil-1" title="Текстова інформація" alt=""></div><a href="https://ok.kiroe.com.ua/home" target="_blank">Кабінет електро 2022</a>
-                    <div class="icontooinfo a0repa3" title="Особистий кабінет побутового споживача ПрАТ Кіровоградобленерго" alt=""></div>
-                  </li>
+                    <div class="icon a0pencil-1"></div><a href="https://koek.billing.city/login" target="_blank" title="Огляд листівки від КОЕК">Кабінет електро 2020</a></li>
                   <li>
-                    <div class="icon a0pencil-1" title="Текстова інформація" alt=""></div><a href="https://koek.billing.city/login" target="_blank">Кабінет електро 2020</a>
-                    <div class="icontooinfo a0repa3" title="Огляд листівки від КОЕК" alt=""></div><a href="https://youtu.be/qIJYbNR_l6g" target="_blank">
-                      <div class="icontooinfo a0youtubeinform" title="Відеоінструкція. Процес реєстрації та огляд особистого кабінету на офіційному сайті компанії ТОВ Кіровоградська обласна ЕК" alt=""></div></a>
-                  </li>
-                  <li>
-                    <div class="icon kiroe com ua"></div><a href="http://kiroe.com.ua/" target="_blank">kiroe.com</a><span class="opisi">Кір-д.обленерго</span>
+                    <div class="icon kiroe com ua"></div><a href="http://kiroe.com.ua/" target="_blank">Kiroe.com</a>
                   </li>
                 </ul>
               </div>
-              <div class="group">
+              <div class="group cat-communal">
                 <div class="group-title"><span class="badge badge-success">Вода</span></div>
                 <ul>
                   <li>
-                    <div class="icon maanimo com"></div><a href="https://maanimo.com/indexes/140162-tarify-na-vodu-dlya-naseleniya-v-ukraine" target="_blank">maanimo.com</a><span class="opisi">ціна.вода.Укр.</span>
+                    <div class="icon maanimo com"></div><a href="https://maanimo.com/indexes/140162-tarify-na-vodu-dlya-naseleniya-v-ukraine" target="_blank">Maanimo.com</a>
                   </li>
                 </ul>
               </div>
-              <div class="group">
+              <div class="group cat-communal">
                 <div class="group-title"><span class="badge badge-success">Опалення</span></div>
                 <ul>
                   <li>
-                    <div class="icon maanimo com"></div><a href="https://maanimo.com/indexes/142540-tarify-na-otoplenie-v-ukraine-sezon-2017-2018" target="_blank">maanimo.com</a><span class="opisi">ціна.опал.Укр.</span>
+                    <div class="icon maanimo com"></div><a href="https://maanimo.com/indexes/142540-tarify-na-otoplenie-v-ukraine-sezon-2017-2018" target="_blank">Maanimo.com</a>
                   </li>
                 </ul>
               </div>
             </div>
             <div class="col-sm">
-              <div class="group">
+              <div class="group cat-communal">
                 <div class="group-title"><span class="badge badge-success">Інтернет-кабельний</span></div>
                 <ul>
                   <li>
-                    <div class="icon ukrtelecom ua"></div><a href="https://ukrtelecom.ua/" target="_blank">ukrtelecom</a><span class="opisi">РАХУНОК/ТАРИФИ</span><a href="https://youtu.be/WYhA_JFRVik" target="_blank">
-                      <div class="icontooinfo a0youtubeinform" title="Видеоинструкция. Как узнать суму задолженности и ее оплатить" alt=""></div></a>
+                    <div class="icon ukrtelecom ua"></div><a href="https://ukrtelecom.ua/" target="_blank">Ukrtelecom</a></li>
+                  <li>
+                    <div class="icon ukrtelecom ua"></div><a href="http://cc.ukrtele.com/" target="_blank">Cc.ukrtele.com</a>
                   </li>
                   <li>
-                    <div class="icon ukrtelecom ua"></div><a href="http://cc.ukrtele.com/" target="_blank">cc.ukrtele.com</a><span class="opisi">Якщо Вас заблокували</span>
+                    <div class="icon my ukrtelecom ua"></div><a href="http://www.my.ukrtelecom.ua/" target="_blank">My.ukrtelecom</a>
                   </li>
                   <li>
-                    <div class="icon my ukrtelecom ua"></div><a href="http://www.my.ukrtelecom.ua/" target="_blank">my.ukrtelecom</a><span class="opisi">КАБІНЕТ</span>
+                    <div class="icon my vega ua"></div><a href="https://my.vega.ua/" target="_blank" title="Розділ-Комуналка. Vega Telecom - Національний телеком-оператор в Україні">Vega Telecom</a></li>
+                  <li>
+                    <div class="icon optonet com ua"></div><a href="https://optonet.com.ua/" target="_blank">Optonet.com.ua</a>
                   </li>
                   <li>
-                    <div class="icon my vega ua"></div><a href="https://my.vega.ua/" target="_blank">Vega Telecom</a>
-                    <div class="icontooinfo a0repa3" title="Розділ-Комуналка. Vega Telecom - Національний телеком-оператор в Україні" alt=""></div><a href="https://youtu.be/4accV-xUU30" target="_blank">
-                      <div class="icontooinfo a0youtubeinform" title="Відеоінструкція. Перехід абонентів Укртелеком ОПТИКИ (FTTB) на ВЕГА Телеком" alt=""></div></a><a href="https://youtu.be/nsknyxq9alo" target="_blank">
-                      <div class="icontooinfo a0youtubeinform" title="Відеоінструкція. Як дізнатися суму заборгованості та її сплатити" alt=""></div></a>
+                    <div class="icon shtorm net"></div><a href="https://www.shtorm.net/uk" target="_blank">Shtorm.net</a>
                   </li>
                   <li>
-                    <div class="icon optonet com ua"></div><a href="https://optonet.com.ua/" target="_blank">optonet.com.ua</a><span class="opisi">Optonet</span>
-                  </li>
-                  <li>
-                    <div class="icon shtorm net"></div><a href="https://www.shtorm.net/uk" target="_blank">shtorm.net</a><span class="opisi">Shtorm</span>
-                  </li>
-                  <li>
-                    <div class="icon skylink_vk"></div><a href="http://sky-link.com.ua/" target="_blank">sky-link.com.ua</a><span class="opisi">Sky-link</span>
+                    <div class="icon skylink_vk"></div><a href="http://sky-link.com.ua/" target="_blank">Sky-link.com.ua</a>
                   </li>
                 </ul>
               </div>
-              <div class="group">
+              <div class="group cat-communal">
                 <div class="group-title"><span class="badge badge-success">Інтернет-мобільний</span></div>
                 <ul>
                   <li>
-                    <div class="icon kyivstar ua"></div><a href="https://kyivstar.ua/" target="_blank">kyivstar.ua</a>
+                    <div class="icon kyivstar ua"></div><a href="https://kyivstar.ua/" target="_blank">Kyivstar.ua</a>
                   </li>
                   <li>
-                    <div class="icon kyivstar ua"></div><a href="https://pay.kyivstar.ua/" target="_blank">pay.kyivstar.ua</a><span class="opisi">Поповнення</span>
+                    <div class="icon kyivstar ua"></div><a href="https://pay.kyivstar.ua/" target="_blank">Pay.kyivstar.ua</a>
                   </li>
                   <li>
-                    <div class="icon vodafone ua"></div><a href="https://www.vodafone.ua/ru" target="_blank">vodafone.ua</a>
+                    <div class="icon vodafone ua"></div><a href="https://www.vodafone.ua/ru" target="_blank">Vodafone.ua</a>
                   </li>
                   <li>
-                    <div class="icon vodafone ua"></div><a href="https://pay.vodafone.ua/" target="_blank">pay.vodafone.ua</a><span class="opisi">Поповнення</span>
+                    <div class="icon vodafone ua"></div><a href="https://pay.vodafone.ua/" target="_blank">Pay.vodafone.ua</a>
                   </li>
                   <li>
-                    <div class="icon lifecell ua"></div><a href="https://www.lifecell.ua/" target="_blank">lifecell.ua</a>
+                    <div class="icon lifecell ua"></div><a href="https://www.lifecell.ua/" target="_blank">Lifecell.ua</a>
                   </li>
                   <li>
-                    <div class="icon lifecell ua"></div><a href="https://oplata.lifecell.ua/" target="_blank">oplata.lifecell.ua</a><span class="opisi">Поповнення</span>
+                    <div class="icon lifecell ua"></div><a href="https://oplata.lifecell.ua/" target="_blank">Oplata.lifecell.ua</a>
                   </li>
                   <li>
                     <div class="icon a3mob ua"></div><a href="http://3mob.ua/" target="_blank">3mob.ua</a>
                   </li>
                   <li>
-                    <div class="icon intertelecom ua"></div><a href="http://www.intertelecom.ua/" target="_blank">intertelecom.ua</a>
+                    <div class="icon intertelecom ua"></div><a href="http://www.intertelecom.ua/" target="_blank">Intertelecom.ua</a>
                   </li>
                   <li>
-                    <div class="icon intertelecom ua"></div><a href="http://www.intertelecom.ua/payments" target="_blank">intertelecom</a><span class="opisi">Поповнення</span>
+                    <div class="icon intertelecom ua"></div><a href="http://www.intertelecom.ua/payments" target="_blank">Intertelecom</a>
                   </li>
                   <li>
-                    <div class="icon intertelecom ua"></div><a href="https://assa.intertelecom.ua/ru/login" target="_blank">assa.intertelecom</a><span class="opisi">Кабінет</span>
+                    <div class="icon intertelecom ua"></div><a href="https://assa.intertelecom.ua/ru/login" target="_blank">Assa.intertelecom</a>
                   </li>
                 </ul>
               </div>
             </div>
             <div class="col-sm">
-              <div class="group">
+              <div class="group cat-communal">
                 <div class="group-title"><span class="badge badge-success">ІНФО от minfin.com.ua</span></div>
                 <ul>
                   <li>
@@ -230,7 +217,7 @@
                   </li>
                 </ul>
               </div>
-              <div class="group">
+              <div class="group cat-communal">
                 <div class="group-title"><span class="badge badge-success">ІНФО інше</span></div>
                 <ul>
                   <li>
@@ -243,62 +230,42 @@
         </div>
       </div>
     </div>
-    <footer class="footer mt-auto py-3 fixed-bottom">
+        <footer class="footer mt-auto py-2 ">
       <div class="container">
-        <div class="row">
-          <div class="col-sm footer-col">
-            <div class="kolobok"><a class="btn btn-primary btn-sm" href="https://docs.google.com/document/d/15VLtvFvXNxhkXU_ZH74387e289Rx6If2Zmrp4m8KFAc" title="Переслати кошти на утримання сайта (зарані ДЯКУЄМО Всім хто перекине грошенят)" role="button" target="_blank">Підтримати сайт</a></div>
-          </div>
-          <div class="col-sm footer-col">
-            <div class="kolobok">
-              <ul class="share-buttons">
-                <!-- AddToAny BEGIN-->
-                <div class="a2a_kit a2a_kit_size_32 a2a_default_style" data-a2a-url="https://zakladki.github.io" data-a2a-title="Топ Закладки"><a class="a2a_dd" href="https://www.addtoany.com/share"></a><a class="a2a_button_facebook"></a>
-                  <!-- a.a2a_button_vk-->
-                  <!-- a.a2a_button_odnoklassniki--><a class="a2a_button_telegram"></a><a class="a2a_button_viber"></a><a class="a2a_button_skype"></a>
-                </div>
-                <script>
-                  var a2a_config = a2a_config || {};
-                  a2a_config.onclick = 1;
-                  a2a_config.locale = "ru";
-                  a2a_config.num_services = 6;
-                </script>
-                <script async="" src="https://static.addtoany.com/menu/page.js"></script>
-                <!-- AddToAny END-->
-              </ul>
+        <div class="row align-items-center justify-content-between">
+          <div class="col-sm footer-col d-flex justify-content-center">
+            <div class="kolobok d-flex align-items-center gap-3">
+              <a href="https://t.me/zakladki_top_one" target="_blank" title="Telegram: КАНАЛ в ТЕЛЕГРАМ"><i class="fab fa-telegram fa-lg" aria-hidden="true"></i> Telegram</a>
+              <a href="https://t.me/zakladki_top" target="_blank"><i class="fas fa-comments"></i> ЧАТ</a>
+              <a href="https://youtu.be/BdZQy6upWFc" target="_blank" title="Відеоінструкція: автозапуск ЗАКЛАДОК"><i class="fas fa-play-circle fa-lg coloriconfuter" aria-hidden="true"></i> Help</a>
             </div>
           </div>
-          <div class="col-sm footer-col">
-            <div class="kolobok"><a href="skype:webersis?chat" target="_blank" title="SKYPE: webersis"><i class="fab fa-skype fa-lg" aria-hidden="true"></i></a><a href="mailto:weber515sis@gmail.com" target="_blank" title="E-mail: weber515sis@gmail.com"><i class="far fa-envelope fa-lg" aria-hidden="true"></i></a><a href="https://t.me/zakladki_top_one" target="_blank" title="Telegram: КАНАЛ в ТЕЛЕГРАМ"><i class="fab fa-telegram fa-lg" aria-hidden="true"></i></a><a href="https://youtu.be/BdZQy6upWFc" target="_blank" title="Відеоінструкція: автозапуск ЗАКЛАДОК"><i class="fas fa-medkit fa-lg coloriconfuter" aria-hidden="true"></i></a></div>
-          </div>
-          <div class="col-sm footer-col">
-            <div class="kolobok">
-              <script type="text/javascript">
-                <!--
-                my_id = 168151;
-                my_width = 88;
-                my_height = 31;
-                my_alt = "MyCounter - счётчик и статистика";
-                //-->
-              </script>
-              <script type="text/javascript" src="https://get.mycounter.ua/counter2.0.js"></script>
-              <noscript><a target="_blank" href="https://mycounter.ua/"><img src="https://get.mycounter.ua/counter.php?id=168151" title="MyCounter - счётчик и статистика" alt="" width="88" height="31" border="0"></a></noscript>
-              <!-- HotLog невидимка
-              span#hotlog_counter
-              span#hotlog_dyn
-              -->
-              <script type="text/javascript">
-                var hot_s = document.createElement('script');
-                hot_s.type = 'text/javascript'; hot_s.async = true;
-                hot_s.src = 'http://js.hotlog.ru/dcounter/2575836.js';
-                hot_d = document.getElementById('hotlog_dyn');
-                hot_d.appendChild(hot_s);
-              </script>
-              <noscript></noscript><a href="http://click.hotlog.ru/?2575836" target="_blank"><img src="http://hit20.hotlog.ru/cgi-bin/hotlog/count?s=2575836&amp;im=605" border="0" width="1" height="1" alt=""></a>
+          <div class="col-sm footer-col d-flex justify-content-center">
+            <div class="kolobok d-flex align-items-center gap-3">
+              <a class="btn btn-primary btn-sm" href="https://docs.google.com/document/d/15VLtvFvXNxhkXU_ZH74387e289Rx6If2Zmrp4m8KFAc" title="Переслати кошти на утримання сайта (зарані ДЯКУЄМО Всім хто перекине грошенят)" role="button" target="_blank">Підтримати сайт</a>
+              <!-- MyCounter v.2.0 -->
+              <script type="text/javascript"><!--
+              my_id = 168151;
+              my_width = 88;
+              my_height = 31;
+              my_alt = "MyCounter - счётчик и статистика";
+              //--></script>
+              <script type="text/javascript"
+                src="https://get.mycounter.ua/counter2.0.js">
+              </script><noscript>
+              <a target="_blank" href="https://mycounter.ua/"><img
+              src="https://get.mycounter.ua/counter.php?id=168151"
+              title="MyCounter - счётчик и статистика"
+              alt="MyCounter - счётчик и статистика"
+              width="88" height="31" border="0" /></a></noscript>
+              <!--/ MyCounter -->
             </div>
           </div>
-          <div class="col-sm footer-col">
-            <div class="kolobok"><a href="https://t.me/zakladki_top" target="_blank">ЧАТ</a> / <a href="https://t.me/zakladki_top" target="_blank">Задати питання</a></div>
+          <div class="col-sm footer-col d-flex justify-content-center">
+            <div class="kolobok d-flex align-items-center gap-3">
+              <a href="mailto:weber515sis@gmail.com" target="_blank" title="E-mail: weber515sis@gmail.com"><i class="far fa-envelope fa-lg" aria-hidden="true"></i> E-mail</a>
+              <a href="https://t.me/zakladki_top" target="_blank"><i class="fas fa-question-circle"></i> Питання</a>
+            </div>
           </div>
         </div>
       </div>
@@ -306,5 +273,29 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
     <script src="js/main.js"></script>
-  </body>
+  
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        document.querySelectorAll(".group li").forEach(li => {
+          const a = li.querySelector("a");
+          if (a && a.href && a.href.startsWith("http")) {
+            try {
+              const url = new URL(a.href);
+              const domain = url.hostname;
+              if (!li.querySelector(".link-favicon")) {
+                const img = document.createElement("img");
+                img.src = `https://www.google.com/s2/favicons?domain=${domain}&sz=32`;
+                img.className = "link-favicon";
+                img.alt = "";
+                img.width = 16;
+                img.height = 16;
+                a.prepend(img);
+              }
+            } catch (e) {}
+          }
+        });
+      });
+    </script>
+  
+</body>
 </html>

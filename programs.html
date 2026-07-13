@@ -29,7 +29,7 @@
     <meta name="description" content="Повний перелік найпопулярніших веб-сайтів вебу. Зручний каталог сайтів із сортуванням за тематикою. Усі топ сайти в одному місці. Все для зручності в Інтернеті.">
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
     <!-- Player-top-->
-    <script src="//zakladki.github.io/playerjs.js" type="text/javascript"></script>
+    <script src="playerjs.js" type="text/javascript"></script>
     <!-- Bootstrap CSS-->
     <link href="styles/bootstrap.min.css" rel="stylesheet">
     <link href="styles/all.css" rel="stylesheet">
@@ -42,16 +42,15 @@
   </head>
   <body>
     <div class="container nav-container">
-      <nav class="navbar navbar-expand-md fixed-top navbar-dark d-flex justify-content-center">
+      <nav class="navbar navbar-expand-md fixed-top navbar-dark d-flex justify-content-between px-3">
         <div class="hamburger hamburger--spring navbar-toggler" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
           <div class="hamburger-box">
             <div class="hamburger-inner"></div>
           </div>
         </div>
-        <div class="container-fluid">
-          <div class="collapse navbar-collapse text-center" id="navbarCollapse">
-            <ul class="nav nav-pills mb-3 navbar-nav">
-                          <li class="nav-item"><a class="nav-link" href="/"><i class="fas fa-home"></i></a></li>
+        <div class="collapse navbar-collapse text-center justify-content-center flex-grow-1" id="navbarCollapse">
+          <ul class="nav nav-pills mb-0 navbar-nav mx-auto justify-content-center">
+                          <li class="nav-item"><a class="nav-link " href="./">Головна</a></li>
                           <li class="nav-item"><a class="nav-link" href="./social.html">Соціум<i></i></a></li>
                           <li class="nav-item"><a class="nav-link" href="./news.html">Новини<i></i></a></li>
                           <li class="nav-item"><a class="nav-link" href="./media.html">Медіа<i></i></a></li>
@@ -62,10 +61,10 @@
                           <li class="nav-item"><a class="nav-link" href="./shops.html">Магазини<i></i></a></li>
                           <li class="nav-item"><a class="nav-link" href="./others.html">Інше<i></i></a></li>
                           <li class="nav-item"><a class="nav-link" href="./city.html">Городок<i></i></a></li>
-                          <li class="nav-item"><a class="nav-link active" href="./programs.html"><i class="fas fa-microchip"></i></a></li>
+                          <li class="nav-item"><a class="nav-link active" href="./programs.html">Soft</a></li>
             </ul>
-          </div>
         </div>
+        <button id="themeToggle" class="theme-toggle-btn d-flex align-items-center gap-2 ml-auto"><i class="fas fa-moon"></i> <span class="d-none d-sm-inline">Тема</span></button>
       </nav>
     </div>
     <div class="container-fluid main">
@@ -73,38 +72,36 @@
         <div class="tab-content container">
           <div class="row animated fadeIn">
             <div class="col-sm">
-              <div class="group">
+              <div class="group cat-updates">
                 <div class="group-title prog-title">
                   <div class="badge badge-danger">Пароль на архіви: zakladki</div><span class="badge badge-warning">Інтернет-сховище файлів</span>
                 </div>
                 <ul>
                   <li>
                     <div class="icon costaction com"></div><a href="http://costaction.com/partner/?PHPSESUD=CEADEE4DA51FAECA3ED6C17C6A9191A5" target="_blank">Сховище файлів`</a>
-                    <div class="icontooinfo a0repa3" title="Розділ-програми. Ви отримуватимете гроші за кожне скачування Вашого файлу. Просто завантажте файли на Turbobit.net та Hitfile.net, обмінюйтеся ними зі своїми друзями та незнайомцями через блоги, соціальні мережі, форуми або свої сайти!" alt=""></div>
                   </li>
                 </ul>
               </div>
-              <div class="group">
+              <div class="group cat-programs">
                 <div class="group-title"><span class="badge badge-warning">Всілякі налаштування</span></div>
                 <ul>
                   <li>
-                    <div class="icon a0youtubeinform" title="Відео інформація" alt=""></div><a href="https://youtu.be/BdZQy6upWFc" target="_blank">Настройка сайта ЗАКЛАДОК</a>
-                    <div class="icontooinfo a0repa3" title="Як швидко налаштувати ЗАКЛАДКИ на компютері, ноутбуці, смартфоні" alt=""></div>
+                    <div class="icon a0youtubeinform" title="Відео інформація" alt=""></div><a href="https://youtu.be/BdZQy6upWFc" target="_blank" title="Як швидко налаштувати ЗАКЛАДКИ на компютері, ноутбуці, смартфоні">Настройка сайта ЗАКЛАДОК</a>
                   </li>
                 </ul>
               </div>
-              <div class="group">
+              <div class="group cat-programs">
                 <div class="group-title"><span class="badge badge-warning">Торрент-програми</span></div>
                 <ul>
                   <li>
-                    <div class="icon utorrent com"></div><a href="https://www.utorrent.com/intl/ru/desktop/" target="_blank">Завантажити utorrent</a>
+                    <div class="icon utorrent com"></div><a href="https://www.utorrent.com/intl/ru/desktop/" target="_blank" title="Це браузер для роботи та паралельного майнінгу біткоїнів. Ви в інтернеті і Вам потроху капає Bitcoin">Завантажити utorrent</a>
                   </li>
                   <li>
                     <div class="icon acestream org"></div><a href="http://www.acestream.org/" target="_blank">Завантажити Acestream плеер</a>
                   </li>
                 </ul>
               </div>
-              <div class="group">
+              <div class="group cat-orange">
                 <div class="group-title"><span class="badge badge-warning">Завантажити месенджери</span></div>
                 <ul>
                   <li>
@@ -118,15 +115,14 @@
                   </li>
                 </ul>
               </div>
-              <div class="group">
+              <div class="group cat-programs">
                 <div class="group-title"><span class="badge badge-warning">Завантажити браузери</span></div>
                 <ul>
                   <li>
-                    <div class="icon CryptoTab"></div><a href="https://cryptotabbrowser.com/17032365" target="_blank">CryptoTab`</a>
-                    <div class="icontooinfo a0repa3" title="Це браузер для роботи та паралельного майнінгу біткоїнів. Ви в інтернеті і Вам потроху капає Bitcoin" alt=""></div>
+                    <div class="icon CryptoTab"></div><a href="https://cryptotabbrowser.com/17032365" target="_blank">CryptoTab</a>
                   </li>
                   <li>
-                    <div class="icon prog_GoogleChrome"></div><a href="https://www.google.com/intl/ru_ALL/chrome/" target="_blank">Google Chrome</a>
+                    <div class="icon prog_GoogleChrome"></div><a href="https://www.google.com/intl/ru_ALL/chrome/" target="_blank" title="заархівовано/пароль: zakladki">Google Chrome</a>
                   </li>
                   <li>
                     <div class="icon prog_Opera"></div><a href="https://www.opera.com/ru/download" target="_blank">Opera</a>
@@ -136,7 +132,7 @@
                   </li>
                 </ul>
               </div>
-              <div class="group">
+              <div class="group cat-programs">
                 <div class="group-title"><span class="badge badge-warning">Для браузерів веб-плеєр</span></div>
                 <ul>
                   <li>
@@ -146,7 +142,7 @@
               </div>
             </div>
             <div class="col-sm">
-              <div class="group">
+              <div class="group cat-programs">
                 <div class="group-title"><span class="badge badge-warning">Архіватори</span></div>
                 <ul>
                   <li>
@@ -157,113 +153,94 @@
                   </li>
                   <li>
                     <div class="icon prog_winrar"></div><a href="https://drive.google.com/open?id=1vDBqhWCzqkNTlfd8IKr1i9QX7fATYTuU" target="_blank">WinRAR 5.70</a>
-                    <div class="icontooinfo a0zippass" title="заархівовано/пароль: zakladki"></div>
                   </li>
                 </ul>
               </div>
-              <div class="group">
+              <div class="group cat-programs">
                 <div class="group-title"><span class="badge badge-warning">Програвач</span></div>
                 <ul>
                   <li>
-                    <div class="icon prog_Aimp"></div><a href="https://drive.google.com/open?id=1OqFi7OJjL5FZKjSC_FC3gRbOqsE3sNV-" target="_blank">Aimp (+radio+skin)</a>
-                    <div class="icontooinfo a0zippass" title="заархівовано/пароль: zakladki"></div>
+                    <div class="icon prog_Aimp"></div><a href="https://drive.google.com/open?id=1OqFi7OJjL5FZKjSC_FC3gRbOqsE3sNV-" target="_blank" title="заархівовано/пароль: zakladki">Aimp (+radio+skin)</a>
                   </li>
                 </ul>
               </div>
-              <div class="group">
+              <div class="group cat-programs">
                 <div class="group-title"><span class="badge badge-warning">Скріншотер</span></div>
                 <ul>
                   <li>
-                    <div class="icon prog_FastStone"></div><a href="https://drive.google.com/open?id=1isVYJIBqRhk3ON5CIlUVBb1SO1wyepv7" target="_blank">FastStone.Capture_portable</a>
-                    <div class="icontooinfo a0zippass" title="заархівовано/пароль: zakladki"></div>
+                    <div class="icon prog_FastStone"></div><a href="https://drive.google.com/open?id=1isVYJIBqRhk3ON5CIlUVBb1SO1wyepv7" target="_blank" title="заархівовано/пароль: zakladki">FastStone.Capture_portable</a>
                   </li>
                 </ul>
               </div>
             </div>
             <div class="col-sm">
-              <div class="group">
+              <div class="group cat-programs">
                 <div class="group-title"><span class="badge badge-warning">Віддалене керування компютером</span></div>
                 <ul>
                   <li>
-                    <div class="icon ammyy_admin"></div><a href="https://drive.google.com/open?id=1BEIar3Ge5aw_uDY5isKTNZ5l_4BWD2Nj" target="_blank">Ammyy_admin3.8</a>
-                    <div class="icontooinfo a0zippass" title="заархівовано/пароль: zakladki"></div>
+                    <div class="icon ammyy_admin"></div><a href="https://drive.google.com/open?id=1BEIar3Ge5aw_uDY5isKTNZ5l_4BWD2Nj" target="_blank" title="заархівовано/пароль: zakladki">Ammyy_admin3.8</a>
                   </li>
                   <li>
-                    <div class="icon ammyy_admin"></div><a href="https://drive.google.com/open?id=1Yp0_ko_FNcsMm6gMd0vffeMIchArFWD6" target="_blank">Ammyy_admin3.7</a>
-                    <div class="icontooinfo a0zippass" title="заархівовано/пароль: zakladki"></div>
+                    <div class="icon ammyy_admin"></div><a href="https://drive.google.com/open?id=1Yp0_ko_FNcsMm6gMd0vffeMIchArFWD6" target="_blank" title="заархівовано/пароль: zakladki">Ammyy_admin3.7</a>
                   </li>
                   <li>
-                    <div class="icon TeamViewer"></div><a href="https://drive.google.com/open?id=1ZTJCd2kIU_HOxJe_wQ8nMOxVbytjNnVJ" target="_blank">TeamViewer.14.Portable</a>
-                    <div class="icontooinfo a0zippass" title="заархівовано/пароль: zakladki"></div>
+                    <div class="icon TeamViewer"></div><a href="https://drive.google.com/open?id=1ZTJCd2kIU_HOxJe_wQ8nMOxVbytjNnVJ" target="_blank" title="заархівовано/пароль: zakladki">TeamViewer.14.Portable</a>
                   </li>
                 </ul>
               </div>
-              <div class="group">
+              <div class="group cat-programs">
                 <div class="group-title"><span class="badge badge-warning">Очищення комп'ютера (автозапуск)</span></div>
                 <ul>
                   <li>
-                    <div class="icon prog_ccleaner"></div><a href="https://drive.google.com/open?id=1SRFx7hNjMrxysVsD2PSFeXjI7XEn7GLe" target="_blank">CCleaner_5.55.7108</a>
-                    <div class="icontooinfo a0zippass" title="заархівовано/пароль: zakladki"></div>
+                    <div class="icon prog_ccleaner"></div><a href="https://drive.google.com/open?id=1SRFx7hNjMrxysVsD2PSFeXjI7XEn7GLe" target="_blank" title="заархівовано/пароль: zakladki">CCleaner_5.55.7108</a>
                   </li>
                   <li>
-                    <div class="icon prog_regorganizer"></div><a href="https://drive.google.com/open?id=1JL9K_7YX73tGfGFaUMP-1cxG-RmDubHg" target="_blank">RegOrganizer_8.26</a>
-                    <div class="icontooinfo a0zippass" title="заархівовано/пароль: zakladki"></div>
+                    <div class="icon prog_regorganizer"></div><a href="https://drive.google.com/open?id=1JL9K_7YX73tGfGFaUMP-1cxG-RmDubHg" target="_blank" title="заархівовано/пароль: zakladki">RegOrganizer_8.26</a>
                   </li>
                 </ul>
               </div>
-              <div class="group">
+              <div class="group cat-programs">
                 <div class="group-title"><span class="badge badge-warning">Аналіз, тест та моніторинг комп'ютера</span></div>
                 <ul>
                   <li>
-                    <div class="icon prog_AIDA64"></div><a href="https://drive.google.com/open?id=11pfy__qDlI79InKldhfoDBCLFo0kHDN-" target="_blank">AIDA64</a>
-                    <div class="icontooinfo a0zippass" title="заархівовано/пароль: zakladki"></div>
+                    <div class="icon prog_AIDA64"></div><a href="https://drive.google.com/open?id=11pfy__qDlI79InKldhfoDBCLFo0kHDN-" target="_blank" title="заархівовано/пароль: zakladki">AIDA64</a>
                   </li>
                   <li>
-                    <div class="icon prog_hwmonitor"></div><a href="https://drive.google.com/open?id=1tyknLqKcjkOZvMix-MWBfxDJOkrIkMfU" target="_blank">HWMonitor</a>
-                    <div class="icontooinfo a0zippass" title="заархівовано/пароль: zakladki"></div>
+                    <div class="icon prog_hwmonitor"></div><a href="https://drive.google.com/open?id=1tyknLqKcjkOZvMix-MWBfxDJOkrIkMfU" target="_blank" title="заархівовано/пароль: zakladki">HWMonitor</a>
                   </li>
                 </ul>
               </div>
-              <div class="group">
+              <div class="group cat-programs">
                 <div class="group-title"><span class="badge badge-warning">Антивірусні програми</span></div>
                 <ul>
                   <li>
-                    <div class="icon prog tnod32 info"></div><a href="https://drive.google.com/open?id=18kmNLxOR2ywf7gBrjvNXZDj9kyHJ_Pgr" target="_blank">NOD32_8.0.319.1_RePack</a>
-                    <div class="icontooinfo a0zippass" title="заархівовано/пароль: zakladki"></div>
-                    <div class="icontooinfo a0repa3" title="Антивірус для СЛАБИХ ПК з оперативкою менше 1Гб і одноядерним процом ESET NOD32 Antivirus _ Smart Security 8.0.319.1 RePack by KpoJIuK (21.12.2018)" alt=""></div>
+                    <div class="icon prog tnod32 info"></div><a href="https://drive.google.com/open?id=18kmNLxOR2ywf7gBrjvNXZDj9kyHJ_Pgr" target="_blank" title="заархівовано/пароль: zakladki">NOD32_8.0.319.1_RePack</a>
                   </li>
                   <li>
-                    <div class="icon prog_Avast"></div><a href="https://drive.google.com/open?id=16b8dyNNdl1K6sqlm-LrEQyljQQqGA2JK" target="_blank">Avast (онлайн інсталятор)</a>
-                    <div class="icontooinfo a0repa3" title="Антивірус" alt=""></div>
+                    <div class="icon prog_Avast"></div><a href="https://drive.google.com/open?id=16b8dyNNdl1K6sqlm-LrEQyljQQqGA2JK" target="_blank" title="Антивірус">Avast (онлайн інсталятор)</a>
                   </li>
                   <li>
-                    <div class="icon prog_Avira"></div><a href="https://drive.google.com/open?id=19tidcXcvgfebelkOiYyzpuYgLdeBnBVD" target="_blank">Avira (онлайн інсталятор)</a>
-                    <div class="icontooinfo a0repa3" title="Антивірус" alt=""></div>
+                    <div class="icon prog_Avira"></div><a href="https://drive.google.com/open?id=19tidcXcvgfebelkOiYyzpuYgLdeBnBVD" target="_blank" title="Антивірус">Avira (онлайн інсталятор)</a>
                   </li>
                   <li>
-                    <div class="icon prog_360TS"></div><a href="https://drive.google.com/open?id=1YPrQwzphC1AM4TQT5shTsT8sXjYlLImC" target="_blank">360TS (онлайн інсталятор)</a>
-                    <div class="icontooinfo a0repa3" title="Антивірус" alt=""></div>
+                    <div class="icon prog_360TS"></div><a href="https://drive.google.com/open?id=1YPrQwzphC1AM4TQT5shTsT8sXjYlLImC" target="_blank" title="Антивірус">360TS (онлайн інсталятор)</a>
                   </li>
                   <li>
-                    <div class="icon prog_DrWeb"></div><a href="https://drive.google.com/open?id=1HGiSm0B7IovrJi8s7RN_36MpL36U81W0" target="_blank">Dr.Web_CureIt</a>
-                    <div class="icontooinfo a0repa3" title="Одноразова/портативна утиліта для перевірки ПК" alt=""></div>
+                    <div class="icon prog_DrWeb"></div><a href="https://drive.google.com/open?id=1HGiSm0B7IovrJi8s7RN_36MpL36U81W0" target="_blank" title="Одноразова/портативна утиліта для перевірки ПК">Dr.Web_CureIt</a>
                   </li>
                 </ul>
               </div>
-              <div class="group">
+              <div class="group cat-programs">
                 <div class="group-title"><span class="badge badge-warning">Для N.O.D.32 продовження ліцензії</span></div>
                 <ul>
                   <li>
-                    <div class="icon prog tnod32"></div><a href="https://drive.google.com/open?id=1_n2xbV1wT7c0g-oxDLwTx3wS_RlnXB-2" target="_blank">TNod_СТАРІ_версії</a>
-                    <div class="icontooinfo a0zippass" title="заархівовано/пароль: zakladki"></div>
+                    <div class="icon prog tnod32"></div><a href="https://drive.google.com/open?id=1_n2xbV1wT7c0g-oxDLwTx3wS_RlnXB-2" target="_blank" title="заархівовано/пароль: zakladki">TNod_СТАРІ_версії</a>
                   </li>
                   <li>
-                    <div class="icon prog tnod32"></div><a href="https://drive.google.com/open?id=1AodVQ5PclVVuKgKfW7tSNTsfV--jpvOR" target="_blank">TNod_1.6.7.0</a>
-                    <div class="icontooinfo a0zippass" title="заархівовано/пароль: zakladki"></div>
+                    <div class="icon prog tnod32"></div><a href="https://drive.google.com/open?id=1AodVQ5PclVVuKgKfW7tSNTsfV--jpvOR" target="_blank" title="заархівовано/пароль: zakladki">TNod_1.6.7.0</a>
                   </li>
                   <li>
-                    <div class="icon prog tnod32 info"></div><a href="https://drive.google.com/open?id=1Kr8mzGBbQ5w62JhPid9t2jSprhH1BZ6W" target="_blank">Інструкції для N.O.D.32 ESET</a>
-                    <div class="icontooinfo a0zippass" title="заархівовано/пароль: zakladki"></div>
+                    <div class="icon prog tnod32 info"></div><a href="https://drive.google.com/open?id=1Kr8mzGBbQ5w62JhPid9t2jSprhH1BZ6W" target="_blank" title="заархівовано/пароль: zakladki">Інструкції для N.O.D.32 ESET</a>
                   </li>
                 </ul>
               </div>
@@ -272,62 +249,42 @@
         </div>
       </div>
     </div>
-    <footer class="footer mt-auto py-3 fixed-bottom">
+        <footer class="footer mt-auto py-2 ">
       <div class="container">
-        <div class="row">
-          <div class="col-sm footer-col">
-            <div class="kolobok"><a class="btn btn-primary btn-sm" href="https://docs.google.com/document/d/15VLtvFvXNxhkXU_ZH74387e289Rx6If2Zmrp4m8KFAc" title="Переслати кошти на утримання сайта (зарані ДЯКУЄМО Всім хто перекине грошенят)" role="button" target="_blank">Підтримати сайт</a></div>
-          </div>
-          <div class="col-sm footer-col">
-            <div class="kolobok">
-              <ul class="share-buttons">
-                <!-- AddToAny BEGIN-->
-                <div class="a2a_kit a2a_kit_size_32 a2a_default_style" data-a2a-url="https://zakladki.github.io" data-a2a-title="Топ Закладки"><a class="a2a_dd" href="https://www.addtoany.com/share"></a><a class="a2a_button_facebook"></a>
-                  <!-- a.a2a_button_vk-->
-                  <!-- a.a2a_button_odnoklassniki--><a class="a2a_button_telegram"></a><a class="a2a_button_viber"></a><a class="a2a_button_skype"></a>
-                </div>
-                <script>
-                  var a2a_config = a2a_config || {};
-                  a2a_config.onclick = 1;
-                  a2a_config.locale = "ru";
-                  a2a_config.num_services = 6;
-                </script>
-                <script async="" src="https://static.addtoany.com/menu/page.js"></script>
-                <!-- AddToAny END-->
-              </ul>
+        <div class="row align-items-center justify-content-between">
+          <div class="col-sm footer-col d-flex justify-content-center">
+            <div class="kolobok d-flex align-items-center gap-3">
+              <a href="https://t.me/zakladki_top_one" target="_blank" title="Telegram: КАНАЛ в ТЕЛЕГРАМ"><i class="fab fa-telegram fa-lg" aria-hidden="true"></i> Telegram</a>
+              <a href="https://t.me/zakladki_top" target="_blank"><i class="fas fa-comments"></i> ЧАТ</a>
+              <a href="https://youtu.be/BdZQy6upWFc" target="_blank" title="Відеоінструкція: автозапуск ЗАКЛАДОК"><i class="fas fa-play-circle fa-lg coloriconfuter" aria-hidden="true"></i> Help</a>
             </div>
           </div>
-          <div class="col-sm footer-col">
-            <div class="kolobok"><a href="skype:webersis?chat" target="_blank" title="SKYPE: webersis"><i class="fab fa-skype fa-lg" aria-hidden="true"></i></a><a href="mailto:weber515sis@gmail.com" target="_blank" title="E-mail: weber515sis@gmail.com"><i class="far fa-envelope fa-lg" aria-hidden="true"></i></a><a href="https://t.me/zakladki_top_one" target="_blank" title="Telegram: КАНАЛ в ТЕЛЕГРАМ"><i class="fab fa-telegram fa-lg" aria-hidden="true"></i></a><a href="https://youtu.be/BdZQy6upWFc" target="_blank" title="Відеоінструкція: автозапуск ЗАКЛАДОК"><i class="fas fa-medkit fa-lg coloriconfuter" aria-hidden="true"></i></a></div>
-          </div>
-          <div class="col-sm footer-col">
-            <div class="kolobok">
-              <script type="text/javascript">
-                <!--
-                my_id = 168151;
-                my_width = 88;
-                my_height = 31;
-                my_alt = "MyCounter - счётчик и статистика";
-                //-->
-              </script>
-              <script type="text/javascript" src="https://get.mycounter.ua/counter2.0.js"></script>
-              <noscript><a target="_blank" href="https://mycounter.ua/"><img src="https://get.mycounter.ua/counter.php?id=168151" title="MyCounter - счётчик и статистика" alt="" width="88" height="31" border="0"></a></noscript>
-              <!-- HotLog невидимка
-              span#hotlog_counter
-              span#hotlog_dyn
-              -->
-              <script type="text/javascript">
-                var hot_s = document.createElement('script');
-                hot_s.type = 'text/javascript'; hot_s.async = true;
-                hot_s.src = 'http://js.hotlog.ru/dcounter/2575836.js';
-                hot_d = document.getElementById('hotlog_dyn');
-                hot_d.appendChild(hot_s);
-              </script>
-              <noscript></noscript><a href="http://click.hotlog.ru/?2575836" target="_blank"><img src="http://hit20.hotlog.ru/cgi-bin/hotlog/count?s=2575836&amp;im=605" border="0" width="1" height="1" alt=""></a>
+          <div class="col-sm footer-col d-flex justify-content-center">
+            <div class="kolobok d-flex align-items-center gap-3">
+              <a class="btn btn-primary btn-sm" href="https://docs.google.com/document/d/15VLtvFvXNxhkXU_ZH74387e289Rx6If2Zmrp4m8KFAc" title="Переслати кошти на утримання сайта (зарані ДЯКУЄМО Всім хто перекине грошенят)" role="button" target="_blank">Підтримати сайт</a>
+              <!-- MyCounter v.2.0 -->
+              <script type="text/javascript"><!--
+              my_id = 168151;
+              my_width = 88;
+              my_height = 31;
+              my_alt = "MyCounter - счётчик и статистика";
+              //--></script>
+              <script type="text/javascript"
+                src="https://get.mycounter.ua/counter2.0.js">
+              </script><noscript>
+              <a target="_blank" href="https://mycounter.ua/"><img
+              src="https://get.mycounter.ua/counter.php?id=168151"
+              title="MyCounter - счётчик и статистика"
+              alt="MyCounter - счётчик и статистика"
+              width="88" height="31" border="0" /></a></noscript>
+              <!--/ MyCounter -->
             </div>
           </div>
-          <div class="col-sm footer-col">
-            <div class="kolobok"><a href="https://t.me/zakladki_top" target="_blank">ЧАТ</a> / <a href="https://t.me/zakladki_top" target="_blank">Задати питання</a></div>
+          <div class="col-sm footer-col d-flex justify-content-center">
+            <div class="kolobok d-flex align-items-center gap-3">
+              <a href="mailto:weber515sis@gmail.com" target="_blank" title="E-mail: weber515sis@gmail.com"><i class="far fa-envelope fa-lg" aria-hidden="true"></i> E-mail</a>
+              <a href="https://t.me/zakladki_top" target="_blank"><i class="fas fa-question-circle"></i> Питання</a>
+            </div>
           </div>
         </div>
       </div>
@@ -335,5 +292,29 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
     <script src="js/main.js"></script>
-  </body>
+  
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        document.querySelectorAll(".group li").forEach(li => {
+          const a = li.querySelector("a");
+          if (a && a.href && a.href.startsWith("http")) {
+            try {
+              const url = new URL(a.href);
+              const domain = url.hostname;
+              if (!li.querySelector(".link-favicon")) {
+                const img = document.createElement("img");
+                img.src = `https://www.google.com/s2/favicons?domain=${domain}&sz=32`;
+                img.className = "link-favicon";
+                img.alt = "";
+                img.width = 16;
+                img.height = 16;
+                a.prepend(img);
+              }
+            } catch (e) {}
+          }
+        });
+      });
+    </script>
+  
+</body>
 </html>

@@ -29,7 +29,7 @@
     <meta name="description" content="Повний перелік найпопулярніших веб-сайтів вебу. Зручний каталог сайтів із сортуванням за тематикою. Усі топ сайти в одному місці. Все для зручності в Інтернеті.">
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
     <!-- Player-top-->
-    <script src="//zakladki.github.io/playerjs.js" type="text/javascript"></script>
+    <script src="playerjs.js" type="text/javascript"></script>
     <!-- Bootstrap CSS-->
     <link href="styles/bootstrap.min.css" rel="stylesheet">
     <link href="styles/all.css" rel="stylesheet">
@@ -42,16 +42,15 @@
   </head>
   <body>
     <div class="container nav-container">
-      <nav class="navbar navbar-expand-md fixed-top navbar-dark d-flex justify-content-center">
+      <nav class="navbar navbar-expand-md fixed-top navbar-dark d-flex justify-content-between px-3">
         <div class="hamburger hamburger--spring navbar-toggler" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
           <div class="hamburger-box">
             <div class="hamburger-inner"></div>
           </div>
         </div>
-        <div class="container-fluid">
-          <div class="collapse navbar-collapse text-center" id="navbarCollapse">
-            <ul class="nav nav-pills mb-3 navbar-nav">
-                          <li class="nav-item"><a class="nav-link" href="/"><i class="fas fa-home"></i></a></li>
+        <div class="collapse navbar-collapse text-center justify-content-center flex-grow-1" id="navbarCollapse">
+          <ul class="nav nav-pills mb-0 navbar-nav mx-auto justify-content-center">
+                          <li class="nav-item"><a class="nav-link " href="./">Головна</a></li>
                           <li class="nav-item"><a class="nav-link" href="./social.html">Соціум<i></i></a></li>
                           <li class="nav-item"><a class="nav-link" href="./news.html">Новини<i></i></a></li>
                           <li class="nav-item"><a class="nav-link" href="./media.html">Медіа<i></i></a></li>
@@ -62,10 +61,10 @@
                           <li class="nav-item"><a class="nav-link" href="./shops.html">Магазини<i></i></a></li>
                           <li class="nav-item"><a class="nav-link" href="./others.html">Інше<i></i></a></li>
                           <li class="nav-item"><a class="nav-link" href="./city.html">Городок<i></i></a></li>
-                          <li class="nav-item"><a class="nav-link" href="./programs.html"><i class="fas fa-microchip"></i></a></li>
+                          <li class="nav-item"><a class="nav-link" href="./programs.html">Soft</a></li>
             </ul>
-          </div>
         </div>
+        <button id="themeToggle" class="theme-toggle-btn d-flex align-items-center gap-2 ml-auto"><i class="fas fa-moon"></i> <span class="d-none d-sm-inline">Тема</span></button>
       </nav>
     </div>
     <div class="container-fluid main">
@@ -73,136 +72,105 @@
         <div class="tab-content container">
           <div class="row animated fadeIn">
             <div class="col-sm">
-              <div class="group">
+              <div class="group cat-games">
                 <div class="group-title"><span class="badge badge-success">Азартні</span></div>
                 <ul>
+                  
+                  
                   <li>
-                    <div class="icon playset ru"></div><a href="http://www.playset.ru/" target="_blank">playset.ru</a>
+                    <div class="icon onlineigry com"></div><a href="http://onlineigry.com/" target="_blank">Onlineigry.com</a>
                   </li>
-                  <li>
-                    <div class="icon luckforfree com"></div><a href="https://luckforfree.com/" target="_blank">luckforfree.com</a>
-                  </li>
-                  <li>
-                    <div class="icon onlineigry com"></div><a href="http://onlineigry.com/" target="_blank">onlineigry.com</a>
-                  </li>
-                  <li>
-                    <div class="icon min2win ru"></div><a href="http://www.min2win.ru/" target="_blank">min2win.ru</a>
-                  </li>
+                  
                 </ul>
               </div>
-              <div class="group">
+              <div class="group cat-games">
                 <div class="group-title"><span class="badge badge-success">Логічні</span></div>
                 <ul>
-                  <li>
-                    <div class="icon zumagames ru"></div><a href="http://www.zumagames.ru/" target="_blank">zumagames.ru</a>
-                  </li>
-                  <li>
-                    <div class="icon logic-games spb ru"></div><a href="https://logic-games.spb.ru/" target="_blank">logic-games.spb.ru</a>
-                  </li>
+                  
+                  
                   <li>
                     <div class="icon a2048game com"></div><a href="http://2048game.com/ru/" target="_blank">2048game.com</a>
                   </li>
                 </ul>
               </div>
-              <div class="group">
+              <div class="group cat-games">
                 <div class="group-title"><span class="badge badge-success">Для КОМПА</span></div>
                 <ul>
                   <li>
-                    <div class="icon wargaming net"></div><a href="https://ru.wargaming.net/" target="_blank">wargaming.net</a>
+                    <div class="icon wargaming net"></div><a href="https://ru.wargaming.net/" target="_blank">Wargaming.net</a>
                   </li>
+                  
                   <li>
-                    <div class="icon warthunder ru"></div><a href="https://warthunder.ru/" target="_blank">warthunder.ru</a>
-                  </li>
-                  <li>
-                    <div class="icon torrent-igruha org"></div><a href="https://torrent-igruha.org/top10-online.html" target="_blank">torrent-igruha</a><span class="opisi">нужен TORRENT</span>
+                    <div class="icon torrent-igruha org"></div><a href="https://torrent-igruha.org/top10-online.html" target="_blank">Torrent-igruha</a>
                   </li>
                 </ul>
               </div>
-              <div class="group">
+              <div class="group cat-games">
                 <div class="group-title"><span class="badge badge-success">Інфо ТОП</span></div>
                 <ul>
-                  <li>
-                    <div class="icon onlimegames ru"></div><a href="https://onlimegames.ru/games/top100" target="_blank">onlimegames.ru=top100</a>
-                  </li>
-                  <li>
-                    <div class="icon igrofania ru"></div><a href="https://igrofania.ru/katalog/brauzernye/" target="_blank">igrofania.ru=katalog</a>
-                  </li>
-                  <li>
-                    <div class="icon mmo13 ru"></div><a href="http://mmo13.ru/rating/top100" target="_blank">mmo13.ru=top100</a>
-                  </li>
-                  <li>
-                    <div class="icon mmoglobus ru"></div><a href="https://mmoglobus.ru/top-10-luchshih-onlayn-igr-na-pk" target="_blank">mmoglobus.ru=top-10</a>
-                  </li>
+                  
+                  
+                  
+                  
                 </ul>
               </div>
             </div>
             <div class="col-sm">
-              <div class="group">
+              <div class="group cat-games">
                 <div class="group-title"><span class="badge badge-success">Онлайн</span></div>
                 <ul>
                   <li>
-                    <div class="icon poki com"></div><a href="https://poki.com/ru" target="_blank">poki.com</a>
+                    <div class="icon poki com"></div><a href="https://poki.com/ru" target="_blank">Poki.com</a>
                   </li>
+                  
                   <li>
-                    <div class="icon vseigru net"></div><a href="http://vseigru.net/" target="_blank">vseigru.net</a>
+                    <div class="icon igroutka net"></div><a href="https://igroutka.net/" target="_blank">Igroutka.net</a>
                   </li>
+                  
                   <li>
-                    <div class="icon igroutka net"></div><a href="https://igroutka.net/" target="_blank">igroutka.net</a>
+                    <div class="icon game-game com ua"></div><a href="http://www.game-game.com.ua/" target="_blank">Game-game.com.ua</a>
                   </li>
+                  
+                  
+                  
                   <li>
-                    <div class="icon igrixl ru"></div><a href="https://www.igrixl.ru/" target="_blank">igrixl.ru</a>
-                  </li>
-                  <li>
-                    <div class="icon game-game com ua"></div><a href="http://www.game-game.com.ua/" target="_blank">game-game.com.ua</a>
-                  </li>
-                  <li>
-                    <div class="icon ru obfog com"></div><a href="http://www.ru.obfog.com/" target="_blank">ru.obfog.com</a>
-                  </li>
-                  <li>
-                    <div class="icon girlsgogames ru"></div><a href="http://www.girlsgogames.ru/" target="_blank">girlsgogames.ru</a>
-                  </li>
-                  <li>
-                    <div class="icon onlineguru ru"></div><a href="http://onlineguru.ru/" target="_blank">onlineguru.ru</a>
-                  </li>
-                  <li>
-                    <div class="icon silvergames"></div><a href="https://www.silvergames.com/ru/" target="_blank">silvergames.com</a>
-                    <div class="icontooinfo a0repa7" title="Грати в класні безкоштовні онлайн ігри на Silvergames.com" alt=""></div>
+                    <div class="icon silvergames"></div><a href="https://www.silvergames.com/ru/" target="_blank">Silvergames.com</a>
                   </li>
                 </ul>
               </div>
             </div>
             <div class="col-sm">
-              <div class="group">
+              <div class="group cat-games">
                 <div class="group-title"><span class="badge badge-success">Букмекерська контора - СНД</span></div>
                 <ul>
                   <li>
-                    <div class="icon fan-sport com ua"></div><a href="https://fan-sport.com.ua?bf=5c6990af5f28e_515561215" target="_blank">fan-sport.com.ua`</a>
+                    <div class="icon fan-sport com ua"></div><a href="https://fan-sport.com.ua?bf=5c6990af5f28e_515561215" target="_blank">Fan-sport.com.ua</a>
                   </li>
                   <li>
-                    <div class="icon a1xbetua com"></div><a href="https://1xbetua.com/?bf=5c6ae4a19a325_515575637" target="_blank">1xbetua.com`</a>
+                    <div class="icon a1xbetua com"></div><a href="https://1xbetua.com/?bf=5c6ae4a19a325_515575637" target="_blank">1xbetua.com</a>
                   </li>
                   <li>
-                    <div class="icon parimatch com"></div><a href="https://air.parimatch.com/ru/" target="_blank">air.parimatch.com`</a>
+                    <div class="icon parimatch com"></div><a href="https://air.parimatch.com/ru/" target="_blank">Air.parimatch.com</a>
                   </li>
                   <li>
-                    <div class="icon marathonbetweb win"></div><a href="https://www.marathonbetweb.win/su/" target="_blank">marathonbetweb</a>
+                    <div class="icon marathonbetweb win"></div><a href="https://www.marathonbetweb.win/su/" target="_blank">Marathonbetweb</a>
                   </li>
                   <li>
-                    <div class="icon favbet com"></div><a href="https://www.favbet.com/" target="_blank">favbet.com</a>
+                    <div class="icon favbet com"></div><a href="https://www.favbet.com/" target="_blank">Favbet.com</a>
                   </li>
                 </ul>
               </div>
-              <div class="group">
+              <div class="group cat-games">
                 <div class="group-title"><span class="badge badge-success">Букмекерська контора - Європа</span></div>
                 <ul>
                   <li>
-                    <div class="icon pinnacle com"></div><a href="https://www.pinnacle.com/ru/" target="_blank">pinnacle.com</a>
+                    <div class="icon pinnacle com"></div><a href="https://www.pinnacle.com/ru/" target="_blank">Pinnacle.com</a>
                   </li>
                   <li>
-                    <div class="icon betfair com"></div><a href="https://www.betfair.com/ua/" target="_blank">betfair.com</a>
+                    <div class="icon betfair com"></div><a href="https://www.betfair.com/ua/" target="_blank">Betfair.com</a>
                   </li>
                   <li>
-                    <div class="icon sbobet com"></div><a href="https://www.sbobet.com/" target="_blank">sbobet.com</a>
+                    <div class="icon sbobet com"></div><a href="https://www.sbobet.com/" target="_blank">Sbobet.com</a>
                   </li>
                 </ul>
               </div>
@@ -211,62 +179,42 @@
         </div>
       </div>
     </div>
-    <footer class="footer mt-auto py-3 fixed-bottom">
+        <footer class="footer mt-auto py-2 ">
       <div class="container">
-        <div class="row">
-          <div class="col-sm footer-col">
-            <div class="kolobok"><a class="btn btn-primary btn-sm" href="https://docs.google.com/document/d/15VLtvFvXNxhkXU_ZH74387e289Rx6If2Zmrp4m8KFAc" title="Переслати кошти на утримання сайта (зарані ДЯКУЄМО Всім хто перекине грошенят)" role="button" target="_blank">Підтримати сайт</a></div>
-          </div>
-          <div class="col-sm footer-col">
-            <div class="kolobok">
-              <ul class="share-buttons">
-                <!-- AddToAny BEGIN-->
-                <div class="a2a_kit a2a_kit_size_32 a2a_default_style" data-a2a-url="https://zakladki.github.io" data-a2a-title="Топ Закладки"><a class="a2a_dd" href="https://www.addtoany.com/share"></a><a class="a2a_button_facebook"></a>
-                  <!-- a.a2a_button_vk-->
-                  <!-- a.a2a_button_odnoklassniki--><a class="a2a_button_telegram"></a><a class="a2a_button_viber"></a><a class="a2a_button_skype"></a>
-                </div>
-                <script>
-                  var a2a_config = a2a_config || {};
-                  a2a_config.onclick = 1;
-                  a2a_config.locale = "ru";
-                  a2a_config.num_services = 6;
-                </script>
-                <script async="" src="https://static.addtoany.com/menu/page.js"></script>
-                <!-- AddToAny END-->
-              </ul>
+        <div class="row align-items-center justify-content-between">
+          <div class="col-sm footer-col d-flex justify-content-center">
+            <div class="kolobok d-flex align-items-center gap-3">
+              <a href="https://t.me/zakladki_top_one" target="_blank" title="Telegram: КАНАЛ в ТЕЛЕГРАМ"><i class="fab fa-telegram fa-lg" aria-hidden="true"></i> Telegram</a>
+              <a href="https://t.me/zakladki_top" target="_blank"><i class="fas fa-comments"></i> ЧАТ</a>
+              <a href="https://youtu.be/BdZQy6upWFc" target="_blank" title="Відеоінструкція: автозапуск ЗАКЛАДОК"><i class="fas fa-play-circle fa-lg coloriconfuter" aria-hidden="true"></i> Help</a>
             </div>
           </div>
-          <div class="col-sm footer-col">
-            <div class="kolobok"><a href="skype:webersis?chat" target="_blank" title="SKYPE: webersis"><i class="fab fa-skype fa-lg" aria-hidden="true"></i></a><a href="mailto:weber515sis@gmail.com" target="_blank" title="E-mail: weber515sis@gmail.com"><i class="far fa-envelope fa-lg" aria-hidden="true"></i></a><a href="https://t.me/zakladki_top_one" target="_blank" title="Telegram: КАНАЛ в ТЕЛЕГРАМ"><i class="fab fa-telegram fa-lg" aria-hidden="true"></i></a><a href="https://youtu.be/BdZQy6upWFc" target="_blank" title="Відеоінструкція: автозапуск ЗАКЛАДОК"><i class="fas fa-medkit fa-lg coloriconfuter" aria-hidden="true"></i></a></div>
-          </div>
-          <div class="col-sm footer-col">
-            <div class="kolobok">
-              <script type="text/javascript">
-                <!--
-                my_id = 168151;
-                my_width = 88;
-                my_height = 31;
-                my_alt = "MyCounter - счётчик и статистика";
-                //-->
-              </script>
-              <script type="text/javascript" src="https://get.mycounter.ua/counter2.0.js"></script>
-              <noscript><a target="_blank" href="https://mycounter.ua/"><img src="https://get.mycounter.ua/counter.php?id=168151" title="MyCounter - счётчик и статистика" alt="" width="88" height="31" border="0"></a></noscript>
-              <!-- HotLog невидимка
-              span#hotlog_counter
-              span#hotlog_dyn
-              -->
-              <script type="text/javascript">
-                var hot_s = document.createElement('script');
-                hot_s.type = 'text/javascript'; hot_s.async = true;
-                hot_s.src = 'http://js.hotlog.ru/dcounter/2575836.js';
-                hot_d = document.getElementById('hotlog_dyn');
-                hot_d.appendChild(hot_s);
-              </script>
-              <noscript></noscript><a href="http://click.hotlog.ru/?2575836" target="_blank"><img src="http://hit20.hotlog.ru/cgi-bin/hotlog/count?s=2575836&amp;im=605" border="0" width="1" height="1" alt=""></a>
+          <div class="col-sm footer-col d-flex justify-content-center">
+            <div class="kolobok d-flex align-items-center gap-3">
+              <a class="btn btn-primary btn-sm" href="https://docs.google.com/document/d/15VLtvFvXNxhkXU_ZH74387e289Rx6If2Zmrp4m8KFAc" title="Переслати кошти на утримання сайта (зарані ДЯКУЄМО Всім хто перекине грошенят)" role="button" target="_blank">Підтримати сайт</a>
+              <!-- MyCounter v.2.0 -->
+              <script type="text/javascript"><!--
+              my_id = 168151;
+              my_width = 88;
+              my_height = 31;
+              my_alt = "MyCounter - счётчик и статистика";
+              //--></script>
+              <script type="text/javascript"
+                src="https://get.mycounter.ua/counter2.0.js">
+              </script><noscript>
+              <a target="_blank" href="https://mycounter.ua/"><img
+              src="https://get.mycounter.ua/counter.php?id=168151"
+              title="MyCounter - счётчик и статистика"
+              alt="MyCounter - счётчик и статистика"
+              width="88" height="31" border="0" /></a></noscript>
+              <!--/ MyCounter -->
             </div>
           </div>
-          <div class="col-sm footer-col">
-            <div class="kolobok"><a href="https://t.me/zakladki_top" target="_blank">ЧАТ</a> / <a href="https://t.me/zakladki_top" target="_blank">Задати питання</a></div>
+          <div class="col-sm footer-col d-flex justify-content-center">
+            <div class="kolobok d-flex align-items-center gap-3">
+              <a href="mailto:weber515sis@gmail.com" target="_blank" title="E-mail: weber515sis@gmail.com"><i class="far fa-envelope fa-lg" aria-hidden="true"></i> E-mail</a>
+              <a href="https://t.me/zakladki_top" target="_blank"><i class="fas fa-question-circle"></i> Питання</a>
+            </div>
           </div>
         </div>
       </div>
@@ -274,5 +222,29 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
     <script src="js/main.js"></script>
-  </body>
+  
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        document.querySelectorAll(".group li").forEach(li => {
+          const a = li.querySelector("a");
+          if (a && a.href && a.href.startsWith("http")) {
+            try {
+              const url = new URL(a.href);
+              const domain = url.hostname;
+              if (!li.querySelector(".link-favicon")) {
+                const img = document.createElement("img");
+                img.src = `https://www.google.com/s2/favicons?domain=${domain}&sz=32`;
+                img.className = "link-favicon";
+                img.alt = "";
+                img.width = 16;
+                img.height = 16;
+                a.prepend(img);
+              }
+            } catch (e) {}
+          }
+        });
+      });
+    </script>
+  
+</body>
 </html>
