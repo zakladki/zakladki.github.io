@@ -65,9 +65,11 @@ body {
   background-color: var(--card-bg);
   border: 1px solid var(--card-border);
   border-radius: 1rem;
-  padding: 0.85rem 0.5rem;
+  padding: 0.25rem 0.5rem 0.5rem 0.5rem;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
   transition: all 0.2s ease-in-out;
+  align-self: flex-start;
+  width: 100%;
 }
 
 .group:hover {
@@ -78,9 +80,11 @@ body {
 .group-title {
   font-weight: 600;
   font-size: 1rem;
-  margin-bottom: 0.75rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 1px solid var(--card-border);
+  margin-top: 0 !important;
+  margin-bottom: 0.25rem;
+  padding-bottom: 0.35rem;
+  border-bottom: none;
+  position: relative;
   margin-left: 0 !important;
   text-align: center;
   word-break: break-word;
@@ -90,6 +94,17 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+}
+
+.group-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent 0%, var(--cat-color, var(--text-color)) 50%, transparent 100%);
+  opacity: 0.75;
 }
 
 .group-title a {
@@ -111,11 +126,11 @@ body {
 }
 
 .group-title .badge {
-  background: linear-gradient(135deg, #3b82f6, #2563eb);
-  color: white;
-  padding: 0.45rem 1rem;
+  background: linear-gradient(135deg, #64748b, #475569);
+  color: #ffffff;
+  padding: 0.25rem 0.6rem;
   border-radius: 9999px;
-  font-size: 0.9rem;
+  font-size: 0.875rem;
   font-weight: 600;
   letter-spacing: 0.025em;
   text-align: center;
@@ -125,6 +140,8 @@ body {
   overflow-wrap: break-word;
   max-width: 100%;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  line-height: 1.4;
+  margin-top: 0 !important;
 }
 
 .group ul {
@@ -296,21 +313,21 @@ footer.footer a:hover {
 
 
 /* Category color schemes */
-.group.cat-social { background: linear-gradient(135deg, var(--card-bg) 0%, rgba(59, 130, 246, 0.16) 100%); border-top: 3.5px solid rgba(59, 130, 246, 0.9); }
-.group.cat-news { background: linear-gradient(135deg, var(--card-bg) 0%, rgba(16, 185, 129, 0.16) 100%); border-top: 3.5px solid rgba(16, 185, 129, 0.9); }
-.group.cat-media { background: linear-gradient(135deg, var(--card-bg) 0%, rgba(245, 158, 11, 0.16) 100%); border-top: 3.5px solid rgba(245, 158, 11, 0.9); }
-.group.cat-games { background: linear-gradient(135deg, var(--card-bg) 0%, rgba(139, 92, 246, 0.16) 100%); border-top: 3.5px solid rgba(139, 92, 246, 0.9); }
-.group.cat-communal { background: linear-gradient(135deg, var(--card-bg) 0%, rgba(6, 182, 212, 0.16) 100%); border-top: 3.5px solid rgba(6, 182, 212, 0.9); }
-.group.cat-bank { background: linear-gradient(135deg, var(--card-bg) 0%, rgba(236, 72, 153, 0.16) 100%); border-top: 3.5px solid rgba(236, 72, 153, 0.9); }
-.group.cat-market { background: linear-gradient(135deg, var(--card-bg) 0%, rgba(99, 102, 241, 0.16) 100%); border-top: 3.5px solid rgba(99, 102, 241, 0.9); }
-.group.cat-shops { background: linear-gradient(135deg, var(--card-bg) 0%, rgba(20, 184, 166, 0.16) 100%); border-top: 3.5px solid rgba(20, 184, 166, 0.9); }
-.group.cat-others { background: linear-gradient(135deg, var(--card-bg) 0%, rgba(100, 116, 139, 0.16) 100%); border-top: 3.5px solid rgba(100, 116, 139, 0.9); }
-.group.cat-city { background: linear-gradient(135deg, var(--card-bg) 0%, rgba(234, 179, 8, 0.16) 100%); border-top: 3.5px solid rgba(234, 179, 8, 0.9); }
-.group.cat-programs { background: linear-gradient(135deg, var(--card-bg) 0%, rgba(249, 115, 22, 0.16) 100%); border-top: 3.5px solid rgba(249, 115, 22, 0.9); }
-.group.cat-search { background: linear-gradient(135deg, var(--card-bg) 0%, rgba(14, 165, 233, 0.16) 100%); border-top: 3.5px solid rgba(14, 165, 233, 0.9); }
-.group.cat-orange { background: linear-gradient(135deg, var(--card-bg) 0%, rgba(249, 115, 22, 0.16) 100%); border-top: 3.5px solid rgba(249, 115, 22, 0.9); }
+.group.cat-social { background: linear-gradient(135deg, var(--card-bg) 0%, rgba(59, 130, 246, 0.16) 100%); border-top: 3.5px solid rgba(59, 130, 246, 0.9); --cat-color: rgba(59, 130, 246, 0.9); }
+.group.cat-news { background: linear-gradient(135deg, var(--card-bg) 0%, rgba(16, 185, 129, 0.16) 100%); border-top: 3.5px solid rgba(16, 185, 129, 0.9); --cat-color: rgba(16, 185, 129, 0.9); }
+.group.cat-media { background: linear-gradient(135deg, var(--card-bg) 0%, rgba(245, 158, 11, 0.16) 100%); border-top: 3.5px solid rgba(245, 158, 11, 0.9); --cat-color: rgba(245, 158, 11, 0.9); }
+.group.cat-games { background: linear-gradient(135deg, var(--card-bg) 0%, rgba(139, 92, 246, 0.16) 100%); border-top: 3.5px solid rgba(139, 92, 246, 0.9); --cat-color: rgba(139, 92, 246, 0.9); }
+.group.cat-communal { background: linear-gradient(135deg, var(--card-bg) 0%, rgba(6, 182, 212, 0.16) 100%); border-top: 3.5px solid rgba(6, 182, 212, 0.9); --cat-color: rgba(6, 182, 212, 0.9); }
+.group.cat-bank { background: linear-gradient(135deg, var(--card-bg) 0%, rgba(236, 72, 153, 0.16) 100%); border-top: 3.5px solid rgba(236, 72, 153, 0.9); --cat-color: rgba(236, 72, 153, 0.9); }
+.group.cat-market { background: linear-gradient(135deg, var(--card-bg) 0%, rgba(99, 102, 241, 0.16) 100%); border-top: 3.5px solid rgba(99, 102, 241, 0.9); --cat-color: rgba(99, 102, 241, 0.9); }
+.group.cat-shops { background: linear-gradient(135deg, var(--card-bg) 0%, rgba(20, 184, 166, 0.16) 100%); border-top: 3.5px solid rgba(20, 184, 166, 0.9); --cat-color: rgba(20, 184, 166, 0.9); }
+.group.cat-others { background: linear-gradient(135deg, var(--card-bg) 0%, rgba(100, 116, 139, 0.16) 100%); border-top: 3.5px solid rgba(100, 116, 139, 0.9); --cat-color: rgba(100, 116, 139, 0.9); }
+.group.cat-city { background: linear-gradient(135deg, var(--card-bg) 0%, rgba(234, 179, 8, 0.16) 100%); border-top: 3.5px solid rgba(234, 179, 8, 0.9); --cat-color: rgba(234, 179, 8, 0.9); }
+.group.cat-programs { background: linear-gradient(135deg, var(--card-bg) 0%, rgba(249, 115, 22, 0.16) 100%); border-top: 3.5px solid rgba(249, 115, 22, 0.9); --cat-color: rgba(249, 115, 22, 0.9); }
+.group.cat-search { background: linear-gradient(135deg, var(--card-bg) 0%, rgba(14, 165, 233, 0.16) 100%); border-top: 3.5px solid rgba(14, 165, 233, 0.9); --cat-color: rgba(14, 165, 233, 0.9); }
+.group.cat-orange { background: linear-gradient(135deg, var(--card-bg) 0%, rgba(249, 115, 22, 0.16) 100%); border-top: 3.5px solid rgba(249, 115, 22, 0.9); --cat-color: rgba(249, 115, 22, 0.9); }
 .group.cat-orange .group-title .badge, .group.cat-orange .badge { background: linear-gradient(135deg, #f97316, #ea580c) !important; color: white !important; }
-.group.cat-updates { background: linear-gradient(135deg, var(--card-bg) 0%, rgba(239, 68, 68, 0.18) 100%); border-top: 3.5px solid rgba(239, 68, 68, 0.95); }
+.group.cat-updates { background: linear-gradient(135deg, var(--card-bg) 0%, rgba(239, 68, 68, 0.18) 100%); border-top: 3.5px solid rgba(239, 68, 68, 0.95); --cat-color: rgba(239, 68, 68, 0.95); }
 .group li { padding-left: 0.25rem !important; }
 
 

@@ -1,15 +1,12 @@
 {
   "name": "zakladki",
   "version": "1.0.0",
-  "description": "Zakladki portal static site with express server",
+  "description": "Zakladki portal static site",
   "main": "server.js",
   "type": "module",
   "scripts": {
-    "dev": "node server.js",
     "start": "node server.js",
-    "build": "echo 'No build step required for static site'"
+    "build": "echo 'No build step required'"
   },
-  "dependencies": {
-    "express": "^4.19.2"
-  }
+  "dependencies": {}
 }

@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="ru">
   <head>
+    <script src="js/playerjs-stub.js"></script>
     <!-- Global site tag (gtag.js) - Google Analytics-->
     <script async="" src="https://www.googletagmanager.com/gtag/js?id=UA-55202239-3"></script>
     <script>
@@ -29,7 +30,6 @@
     <meta name="description" content="Повний перелік найпопулярніших веб-сайтів вебу. Зручний каталог сайтів із сортуванням за тематикою. Усі топ сайти в одному місці. Все для зручності в Інтернеті.">
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
     <!-- Player-top-->
-    <script src="playerjs.js" type="text/javascript"></script>
     <!-- Bootstrap CSS-->
     <link href="styles/bootstrap.min.css" rel="stylesheet">
     <link href="styles/all.css" rel="stylesheet">
@@ -74,14 +74,29 @@
           <div class="row animated fadeIn">
             <div class="col-sm">
               <div class="group cat-orange">
-                <div class="group-title"><span class="badge badge-warning">Плеєр.ТОП.УКРАЇНСЬКА<br>(playlist.2025.01)</span></div>
+                <div class="group-title"><span class="badge badge-warning">ТОП-Українські</span></div>
                 <ul>
                   <li>
                     <!-- тут код плеера-->
                     <iframe width="320" height="180" src="https://www.youtube.com/embed/videoseries?list=PLCbt8rNMaiwHl9brI0ggRrnvir9q8kSmA" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen=""></iframe>
                   </li>
+                </ul>
+              </div>
+              <div class="group cat-orange">
+                <div class="group-title"><span class="badge badge-warning">ТОП-Патріотичні</span></div>
+                <ul>
                   <li>
-                    <div class="icon youtube"></div><a>Ще музика:  </a><br><a href="https://www.youtube.com/@musik-hitok-ua" target="_blank">_music_HitOK_UA</a>
+                    <!-- тут код плеера-->
+                    <iframe width="320" height="180" src="https://www.youtube.com/embed/videoseries?list=PLCbt8rNMaiwH0crotsDppzWMkODGmAl2n" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen=""></iframe>
+                  </li>
+                </ul>
+              </div>
+              <div class="group cat-orange">
+                <div class="group-title"><span class="badge badge-warning">ТОП-Музика</span></div>
+                <ul>
+                  <li>
+                    <!-- тут код плеера-->
+                    <iframe width="320" height="180" src="https://www.youtube.com/embed/videoseries?list=PLkF1vM_kexQCgisbwlVnGa4zdE4gtMNxD" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen=""></iframe>
                   </li>
                 </ul>
               </div>
@@ -121,28 +136,18 @@
               </div>
             </div>
             <div class="col-sm">
-              <div class="group cat-orange">
-                <div class="group-title"><span class="badge badge-warning">Плеєр.ТОП.ПАТРІОТИЧНІ<br>(playlist.2025.01)</span></div>
+              <div class="group cat-media">
+                <div class="group-title"><span class="badge badge-success">Все про Кіно</span></div>
                 <ul>
                   <li>
-                    <!-- тут код плеера-->
-                    <iframe width="320" height="180" src="https://www.youtube.com/embed/videoseries?list=PLCbt8rNMaiwH0crotsDppzWMkODGmAl2n" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen=""></iframe>
-                  </li>
-                  <li>
-                    <div class="icon youtube"></div><a>Ще музика:  </a><br><a href="https://www.youtube.com/@musik-hitok-ua" target="_blank">_music_HitOK_UA</a>
+                    <div class="icontoo a0VPN1" title="Для роботи потрібний VPN" alt=""></div>
                   </li>
                 </ul>
               </div>
               <div class="group cat-media">
-                <div class="group-title"><span class="badge badge-success">Все про Кіно</span></div>
+                <div class="group-title"><span class="badge badge-success">Серіали онлайн</span></div>
                 <ul>
-                  
-                </ul>
-                <div class="group cat-media">
-                  <div class="group-title"><span class="badge badge-success">Серіали онлайн</span></div>
-                </div>
-                <ul>
-                  
+                  <li></li>
                 </ul>
               </div>
               <div class="group cat-media">
@@ -165,18 +170,6 @@
               </div>
             </div>
             <div class="col-sm">
-              <div class="group cat-orange">
-                <div class="group-title"><span class="badge badge-warning">Плеєр.ТОП.ІНШІ<br>(playlist.2025.01)</span></div>
-                <ul>
-                  <li>
-                    <!-- тут код плеера-->
-                    <iframe width="320" height="180" src="https://www.youtube.com/embed/videoseries?list=PLkF1vM_kexQCgisbwlVnGa4zdE4gtMNxD" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen=""></iframe>
-                  </li>
-                  <li>
-                    <div class="icon web telegram org"></div><a>Ще музика:  </a><br><a href="https://www.youtube.com/@WebSIS_music" target="_blank">_music_WebSIS_</a>
-                  </li>
-                </ul>
-              </div>
               <div class="group cat-media">
                 <div class="group-title"> <span class="badge badge-success">Радіо онлайн</span></div>
                 <ul>
@@ -203,10 +196,10 @@
                   
                   
                   <li>
-                    <div class="icon web telegram org"></div><a href="https://t.me/music_breakbeat" target="_blank">Music_breakbeat (hit_bit)</a><i class="fainfo fab fa-telegram"></i>
+                    <div class="icon web telegram org"></div><a href="https://t.me/music_breakbeat" target="_blank">Music_breakbeat (hit_bit)</a>
                   </li>
                   <li>
-                    <div class="icon web telegram org"></div><a href="https://t.me/music_hitok" target="_blank">Music_HitOK (hit_bit)</a><i class="fainfo fab fa-telegram"></i>
+                    <div class="icon web telegram org"></div><a href="https://t.me/music_hitok" target="_blank">Music_HitOK (hit_bit)</a>
                   </li>
                 </ul>
               </div>
