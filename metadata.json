@@ -1,6 +1,6 @@
 {
   "name": "Zakladki Portal",
-  "description": "Popular web directory and speed dial portal with categories for social, news, media, games, banking, and utilities.",
+  "description": "Популярний веб-каталог, швидкий набір з категоріями: соцмережі, новини, медіа, ігри, банкінг, комунальні послуги.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+/* ==========================================================================
+   1. VARIABLES & BASE THEMES
+   ========================================================================== */
 :root {
   --bg-color: #f8fafc;
   --text-color: #0f172a;
@@ -8,14 +11,13 @@
   --nav-bg: #1e293b;
 }
 
+/* Dark mode variables override */
 body.dark-mode, .dark {
   --bg-color: #0f172a;
   --text-color: #f8fafc;
   --card-bg: #1e293b;
   --card-border: #334155;
   --nav-bg: #090d16;
-  background-color: var(--bg-color) !important;
-  color: var(--text-color) !important;
 }
 
 body {
@@ -23,34 +25,50 @@ body {
   color: var(--text-color);
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
   transition: background-color 0.3s ease, color 0.3s ease;
+  padding-bottom: 70px; /* Space for fixed footer on desktop */
 }
 
-/* Modern grid layout for bookmark groups */
-.tab-content .row.animated.fadeIn {
-  display: grid;
-  grid-template-columns: repeat(1, minmax(0, 1fr));
-  gap: 1.5rem;
+/* ==========================================================================
+   2. LAYOUT & MASONRY GRID (CSS Columns)
+   ========================================================================== */
+.tab-content.container > .row {
+  justify-content: center;
+}
+
+/* Default mobile column layout */
+.row.animated.fadeIn {
+  display: block !important;
+  column-count: 1;
+  column-gap: 20px;
   padding: 1rem;
 }
 
-@media (min-width: 640px) {
-  .tab-content .row.animated.fadeIn {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+.row.animated.fadeIn > .col-sm {
+  display: contents;
+}
+
+.row.animated.fadeIn .group {
+  break-inside: avoid;
+  -webkit-column-break-inside: avoid;
+  page-break-inside: avoid;
+  margin-bottom: 20px;
+}
+
+/* Tablet screen columns */
+@media (min-width: 768px) and (max-width: 1199.98px) {
+  .row.animated.fadeIn {
+    column-count: 2;
   }
 }
 
-@media (min-width: 1024px) {
-  .tab-content .row.animated.fadeIn {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+/* Large screen columns */
+@media (min-width: 1200px) {
+  .row.animated.fadeIn {
+    column-count: 4;
   }
 }
 
-@media (min-width: 1280px) {
-  .tab-content .row.animated.fadeIn {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-}
-
+/* Legacy helper override */
 .col-sm {
   width: 100% !important;
   max-width: none !important;
@@ -60,7 +78,9 @@ body {
   gap: 1.5rem;
 }
 
-/* Modern Card styling */
+/* ==========================================================================
+   3. MODERN CARD STYLING
+   ========================================================================== */
 .group {
   background-color: var(--card-bg);
   border: 1px solid var(--card-border);
@@ -120,11 +140,6 @@ body {
   overflow-wrap: break-word;
 }
 
-.group.cat-updates .group-title .badge,
-.group.cat-updates .badge {
-  background: linear-gradient(135deg, #ef4444, #dc2626) !important;
-}
-
 .group-title .badge {
   background: linear-gradient(135deg, #3b82f6, #2563eb);
   color: white;
@@ -144,8 +159,9 @@ body {
   margin-top: 0 !important;
 }
 
+/* Bookmark List items */
 .group ul {
-  padding-left: 0 !important;
+  padding-left: 0.25rem !important;
   margin-left: 0 !important;
   margin-bottom: 0 !important;
   display: flex;
@@ -225,7 +241,9 @@ body {
   border-radius: 0.5rem;
 }
 
-/* Navbar Modernization */
+/* ==========================================================================
+   4. NAVIGATION & HEADER
+   ========================================================================== */
 nav.navbar {
   background-color: var(--nav-bg) !important;
   backdrop-filter: blur(8px);
@@ -246,12 +264,17 @@ nav.navbar {
   background-color: rgba(59, 130, 246, 0.2);
 }
 
+.navbar-nav .nav-link.home-highlight:hover {
+  background: rgba(59, 130, 246, 0.25);
+  border-color: rgba(59, 130, 246, 0.9);
+}
+
 .main {
   padding-top: 48px !important;
   margin-top: 0px !important;
 }
 
-/* Dark mode toggle button style */
+/* Theme Toggle Button */
 .theme-toggle-btn {
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
@@ -270,7 +293,9 @@ nav.navbar {
   background: rgba(255, 255, 255, 0.2);
 }
 
-/* Footer Modernization */
+/* ==========================================================================
+   5. FOOTER
+   ========================================================================== */
 footer.footer {
   background-color: var(--nav-bg) !important;
   color: #f8fafc !important;
@@ -302,17 +327,9 @@ footer.footer a:hover {
   color: #ffffff !important;
 }
 
-/* Reduced left padding for group lists */
-.group ul {
-  padding-left: 0.25rem !important;
-  margin-left: 0 !important;
-}
-.group li {
-  padding-left: 0.25rem !important;
-}
-
-
-/* Category color schemes */
+/* ==========================================================================
+   6. CATEGORY COLOR SCHEMES
+   ========================================================================== */
 .group.cat-social { background: linear-gradient(135deg, var(--card-bg) 0%, rgba(59, 130, 246, 0.16) 100%); border-top: 3.5px solid rgba(59, 130, 246, 0.9); --cat-color: rgba(59, 130, 246, 0.9); }
 .group.cat-news { background: linear-gradient(135deg, var(--card-bg) 0%, rgba(16, 185, 129, 0.16) 100%); border-top: 3.5px solid rgba(16, 185, 129, 0.9); --cat-color: rgba(16, 185, 129, 0.9); }
 .group.cat-media { background: linear-gradient(135deg, var(--card-bg) 0%, rgba(245, 158, 11, 0.16) 100%); border-top: 3.5px solid rgba(245, 158, 11, 0.9); --cat-color: rgba(245, 158, 11, 0.9); }
@@ -328,61 +345,13 @@ footer.footer a:hover {
 .group.cat-orange { background: linear-gradient(135deg, var(--card-bg) 0%, rgba(249, 115, 22, 0.16) 100%); border-top: 3.5px solid rgba(249, 115, 22, 0.9); --cat-color: rgba(249, 115, 22, 0.9); }
 .group.cat-orange .group-title .badge, .group.cat-orange .badge { background: linear-gradient(135deg, #f97316, #ea580c) !important; color: white !important; }
 .group.cat-updates { background: linear-gradient(135deg, var(--card-bg) 0%, rgba(239, 68, 68, 0.18) 100%); border-top: 3.5px solid rgba(239, 68, 68, 0.95); --cat-color: rgba(239, 68, 68, 0.95); }
-.group li { padding-left: 0.25rem !important; }
+.group.cat-updates .group-title .badge, .group.cat-updates .badge { background: linear-gradient(135deg, #ef4444, #dc2626) !important; }
 
-
-
-.navbar-nav .nav-link.home-highlight:hover {
-  background: rgba(59, 130, 246, 0.25);
-  border-color: rgba(59, 130, 246, 0.9);
-}
-
-body {
-  padding-bottom: 70px;
-}
-
-
-
-.tab-content.container > .row {
-  justify-content: center;
-}
-
-@media (min-width: 1200px) {
-  .row.animated.fadeIn {
-    display: block !important;
-    column-count: 4;
-    column-gap: 20px;
-  }
-  .row.animated.fadeIn > .col-sm {
-    display: contents;
-  }
-  .row.animated.fadeIn .group {
-    break-inside: avoid;
-    -webkit-column-break-inside: avoid;
-    page-break-inside: avoid;
-    margin-bottom: 20px;
-  }
-}
-
-@media (min-width: 768px) and (max-width: 1199.98px) {
-  .row.animated.fadeIn {
-    display: block !important;
-    column-count: 2;
-    column-gap: 20px;
-  }
-  .row.animated.fadeIn > .col-sm {
-    display: contents;
-  }
-  .row.animated.fadeIn .group {
-    break-inside: avoid;
-    -webkit-column-break-inside: avoid;
-    page-break-inside: avoid;
-    margin-bottom: 20px;
-  }
-}
-
+/* ==========================================================================
+   7. MOBILE AND RESPONSIVE OVERRIDES
+   ========================================================================== */
 @media (max-width: 767.98px) {
-  .footer, footer.footer {
+  footer.footer {
     position: static !important;
     bottom: auto !important;
   }
@@ -395,15 +364,4 @@ body {
   .navbar-nav .nav-link {
     padding: 2px 8px !important;
   }
-  .row.animated.fadeIn {
-    display: block !important;
-    column-count: 1;
-  }
-  .row.animated.fadeIn > .col-sm {
-    display: contents;
-  }
-  .row.animated.fadeIn .group {
-    margin-bottom: 20px;
-  }
 }
-

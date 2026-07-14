@@ -2,7 +2,7 @@ mixin navLink(link, name, isSoft)
   li.nav-item
     a.nav-link(
       href=link
-      class={active: (link === "/" ? current_iclass === "fas fa-home" : name === current), "soft-link": isSoft}
+      class={active: (name === current || (name === "Головна" && current === "Главная")), "soft-link": isSoft}
     )
       | #{name}
 

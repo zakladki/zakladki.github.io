@@ -1,54 +1,43 @@
-// Playerjs global fallback stub to prevent 'emit' and 'addListener' undefined errors
-window.playerjs = window.playerjs || {
-  emit: function() { return this; },
-  addListener: function() { return this; },
-  on: function() { return this; },
-  api: function() { return this; }
-};
-window.Playerjs = window.Playerjs || function() {
-  return window.playerjs;
-};
-
-// $('.navbar-nav>li>a').on('click', function() {
-//   $('.navbar-collapse').collapse('hide');
-//   $(".hamburger").removeClass("is-active");
-//   $(".hamburger").addClass("collapsed");
-// });
-
-var forEach = function(t, o, r) {
-  if ("[object Object]" === Object.prototype.toString.call(t))
-    for (var c in t) Object.prototype.hasOwnProperty.call(t, c) && o.call(r, t[c], c, t);
-  else
-    for (var e = 0, l = t.length; l > e; e++) o.call(r, t[e], e, t)
-};
-
-var hamburgers = document.querySelectorAll(".hamburger");
-if (hamburgers.length > 0) {
-  forEach(hamburgers, function(hamburger) {
-    hamburger.addEventListener("click", function() {
-      this.classList.toggle("is-active");
-    }, false);
-  });
-}
-
-function topFunction() {
-  document.body.scrollTop = 0;
-  document.documentElement.scrollTop = 0;
+// 1. Швидке застосування темної теми (застосовується до html, запобігає білому спалаху)
+if (localStorage.getItem("theme") === "dark") {
+  document.documentElement.classList.add("dark-mode");
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+  
+  // 2. Логіка перемикання теми
   const themeToggle = document.getElementById("themeToggle");
   if (themeToggle) {
+    // Синхронізація візуального стану елемента (наприклад, якщо це чекбокс)
     if (localStorage.getItem("theme") === "dark") {
-      document.body.classList.add("dark-mode");
+      themeToggle.checked = true;
     }
+
     themeToggle.addEventListener("click", () => {
-      document.body.classList.toggle("dark-mode");
-      if (document.body.classList.contains("dark-mode")) {
+      document.documentElement.classList.toggle("dark-mode");
+      
+      if (document.documentElement.classList.contains("dark-mode")) {
         localStorage.setItem("theme", "dark");
       } else {
         localStorage.setItem("theme", "light");
       }
     });
   }
+
+  // 3. Анімація кнопки меню (гамбургера) - легкий варіант
+  const hamburgers = document.querySelectorAll(".hamburger");
+  hampers.forEach(hamburger => {
+    hamburger.addEventListener("click", function() {
+      this.classList.toggle("is-active");
+    });
+  });
+
 });
+
+// 4. Функція швидкого плавного прокручування вгору
+function topFunction() {
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
+  });
+}
