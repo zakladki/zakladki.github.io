@@ -141,21 +141,23 @@ body {
 }
 
 .group-title .badge {
-  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  background: linear-gradient(135deg, #64748b, #475569);
   color: white;
-  padding: 0.25rem 0.6rem;
+  padding: 0.15rem 0.65rem;
   border-radius: 9999px;
-  font-size: 0.8rem;
+  font-size: 0.92rem;
   font-weight: 600;
   letter-spacing: 0.025em;
   text-align: center;
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   white-space: normal;
   word-break: break-word;
   overflow-wrap: break-word;
   max-width: 100%;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  line-height: 1.4;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+  line-height: 1.3;
   margin-top: 0 !important;
 }
 
