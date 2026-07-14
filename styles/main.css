@@ -365,3 +365,72 @@ footer.footer a:hover {
     padding: 2px 8px !important;
   }
 }
+
+/* ==========================================
+   Мобільна оптимізація та вирівнювання шапки
+   ========================================== */
+@media (max-width: 768px) {
+  
+  /* 1. Повертаємо видимість та фіксовану висоту для шапки */
+  .navbar, .nav-container, .header { 
+      position: relative;
+      display: block;
+      height: 50px;                 /* Задаємо чітку висоту шапки */
+      background-color: #1e293b;    /* Повертаємо темний фон шапки */
+      z-index: 1000;
+  }
+
+  /* 2. Кнопка теми: вирівнювання всередині шапки */
+  #themeToggle {
+      position: absolute;
+      top: 50%;                     /* Центрування по вертикалі */
+      transform: translateY(-50%) scale(0.8); 
+      right: 15px;                  
+      z-index: 1050;                
+      margin: 0;                    
+  }
+
+  /* 3. Кнопка гамбургера: вирівнювання всередині шапки */
+  .hamburger {
+      position: absolute;
+      top: 50%;                     /* Центрування по vertical */
+      transform: translateY(-50%) scale(0.75); 
+      left: 10px;                   
+      z-index: 1050;                
+      transform-origin: left center;
+      padding: 8px !important;      
+      margin: 0;                    
+  }
+
+  /* 4. Випадаюче меню: зміщуємо його вниз, робимо фон та заокруглюємо нижні кути */
+  .nav-menu-links, .navbar-collapse { 
+      position: absolute;
+      top: 50px !important;         /* Починається чітко під шапкою */
+      left: 0;
+      width: 100%;
+      z-index: 999;                 
+      background-color: #1e293b !important; 
+      box-shadow: 0 10px 15px rgba(0, 0, 0, 0.4); 
+      
+      /* Заокруглення нижніх кутів меню */
+      border-radius: 0 0 12px 12px; 
+      overflow: hidden;             
+  }
+
+/* 5. Точкове усунення великої відстані після шапки */
+  .navbar + *, 
+  .nav-container + *, 
+  .header + *,
+  header + * {
+      margin-top: 0 !important;
+      padding-top: 1px !important; /* Регулюйте це значення для ідеального проміжку */
+  }
+
+  /* Прибираємо внутрішні зміщення для першого контейнера після меню */
+  .navbar + * .container,
+  .nav-container + * .container,
+  header + * .container {
+      margin-top: 0 !important;
+      padding-top: 0 !important;
+  }
+}
