@@ -35,14 +35,19 @@ html(lang="uk")
     block title
       title ЗАКЛАДКИ - Список популярних сайтів (ТОП ЗАКЛАДКИ)
   
-  body
+body
+//- Кнопка-меню
+  button.floating-menu-btn(type='button', onclick="document.getElementById('navbarCollapse').classList.toggle('show')")
+    span ☰
+
     .container.nav-container
       nav.navbar.navbar-expand-md.fixed-top.navbar-dark.d-flex.justify-content-center
-        .hamburger.hamburger--spring.navbar-toggler(data-toggle='collapse', data-target='#navbarCollapse', aria-controls='navbarCollapse', aria-expanded='false', aria-label='Toggle navigation')
-          .hamburger-box
-            .hamburger-inner
         .container-fluid
           .collapse.navbar-collapse.text-center#navbarCollapse
+            //- Кнопка теми тепер усередині меню для мобільних
+            .theme-toggle-menu-wrapper
+              //- Тут залиште ваш оригінальний код кнопки теми, наприклад:
+              button#themeToggle.btn.btn-link(type="button") 🌙
             block menu
 
     .container-fluid.main
