@@ -25,7 +25,7 @@ body {
   color: var(--text-color);
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
   transition: background-color 0.3s ease, color 0.3s ease;
-  padding-bottom: 70px; /* Space for fixed footer on desktop */
+  padding-bottom: 48px; /* Space for fixed footer on desktop */
 }
 
 /* ==========================================================================
@@ -39,8 +39,8 @@ body {
 .row.animated.fadeIn {
   display: block !important;
   column-count: 1;
-  column-gap: 10px;
-  padding: 0.5rem;
+  column-gap: 20px;
+  padding: 1rem;
 }
 
 .row.animated.fadeIn > .col-sm {
@@ -51,7 +51,7 @@ body {
   break-inside: avoid;
   -webkit-column-break-inside: avoid;
   page-break-inside: avoid;
-  margin-bottom: 10px;
+  margin-bottom: 20px;
 }
 
 /* Tablet screen columns */
@@ -68,6 +68,23 @@ body {
   }
 }
 
+/* Reduced spacing for PC / Tablet (>= 768px) */
+@media (min-width: 768px) {
+  .main {
+    padding-top: 41px !important;
+  }
+  .row.animated.fadeIn {
+    column-gap: 10px;
+    padding: 0.5rem;
+  }
+  .row.animated.fadeIn .group {
+    margin-bottom: 10px;
+  }
+  .col-sm {
+    gap: 0.75rem;
+  }
+}
+
 /* Legacy helper override */
 .col-sm {
   width: 100% !important;
@@ -75,7 +92,7 @@ body {
   padding: 0 !important;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 1.5rem;
 }
 
 /* ==========================================================================
@@ -272,7 +289,7 @@ nav.navbar {
 }
 
 .main {
-  padding-top: 48px !important;
+  padding-top: 41px !important;
   margin-top: 0px !important;
 }
 
