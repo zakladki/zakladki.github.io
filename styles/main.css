@@ -373,49 +373,49 @@ footer.footer a:hover {
    ========================================== */
 @media (max-width: 768px) {
   
-  /* 1. Повертаємо видимість та фіксовану висоту для шапки */
+  /* 1. Повертаємо видимість та фіксовану висоту для шапки (зменшена до 42px для компактності) */
   .navbar, .nav-container, .header { 
       position: relative;
       display: block;
-      height: 50px;                 /* Задаємо чітку висоту шапки */
-      background-color: #1e293b;    /* Повертаємо темний фон шапки */
+      height: 42px;                 
+      background-color: #1e293b;    
       z-index: 1000;
   }
 
-  /* 2. Кнопка теми: вирівнювання всередині шапки (тепер зліва) */
+  /* 2. Кнопка теми: вирівнювання всередині компактної шапки (зліва) */
   #themeToggle {
       position: absolute;
-      top: 50%;                     /* Центрування по вертикалі */
-      transform: translateY(-50%) scale(0.8); 
-      left: 15px;                  
+      top: 50%;                     
+      transform: translateY(-50%) scale(0.72); 
+      left: 12px;                  
       z-index: 1050;                
       margin: 0;                    
   }
 
-  /* 3. Кнопка гамбургера: вирівнювання всередині шапки (тепер справа) */
+  /* 3. Кнопка гамбургера: вирівнювання всередині компактної шапки (справа) */
   .hamburger {
       position: absolute;
-      top: 50%;                     /* Центрування по вертикалі */
-      transform: translateY(-50%) scale(0.75); 
-      right: 15px;                   
+      top: 50%;                     
+      transform: translateY(-50%) scale(0.7); 
+      right: 12px;                   
       z-index: 1050;                
       transform-origin: right center;
-      padding: 8px !important;      
+      padding: 6px !important;      
       margin: 0;                    
   }
 
-  /* 4. Випадаюче меню: зміщуємо його вниз, робимо фон та заокруглюємо нижні кути */
+  /* 4. Випадаюче меню: зміщуємо його під нову компактну шапку */
   .nav-menu-links, .navbar-collapse { 
       position: absolute;
-      top: 50px !important;         /* Починається чітко під шапкою */
+      top: 42px !important;         
       left: 0;
       width: 100%;
       z-index: 999;                 
       background-color: #1e293b !important; 
-      box-shadow: 0 10px 15px rgba(0, 0, 0, 0.4); 
+      box-shadow: 0 8px 12px rgba(0, 0, 0, 0.4); 
       
       /* Заокруглення нижніх кутів меню */
-      border-radius: 0 0 12px 12px; 
+      border-radius: 0 0 10px 10px; 
       overflow: hidden;             
   }
 
@@ -425,7 +425,7 @@ footer.footer a:hover {
   .header + *,
   header + * {
       margin-top: 0 !important;
-      padding-top: 1px !important; /* Регулюйте це значення для ідеального проміжку */
+      padding-top: 1px !important; 
   }
 
   /* Прибираємо внутрішні зміщення для першого контейнера після меню */
