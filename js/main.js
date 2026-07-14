@@ -1,6 +1,13 @@
-// 1. Швидке застосування темної теми (застосовується до html, запобігає білому спалаху)
+// 1. Швидке застосування темної теми (запобігає білому спалаху)
 if (localStorage.getItem("theme") === "dark") {
   document.documentElement.classList.add("dark-mode");
+  if (document.body) {
+    document.body.classList.add("dark-mode");
+  } else {
+    document.addEventListener("DOMContentLoaded", () => {
+      document.body.classList.add("dark-mode");
+    });
+  }
 }
 
 // Safety stubs for legacy playerjs calls
@@ -26,11 +33,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
     themeToggle.addEventListener("click", () => {
       document.documentElement.classList.toggle("dark-mode");
+      document.body.classList.toggle("dark-mode");
       
-      if (document.documentElement.classList.contains("dark-mode")) {
+      if (document.documentElement.classList.contains("dark-mode") || document.body.classList.contains("dark-mode")) {
         localStorage.setItem("theme", "dark");
+        document.documentElement.classList.add("dark-mode");
+        document.body.classList.add("dark-mode");
       } else {
         localStorage.setItem("theme", "light");
+        document.documentElement.classList.remove("dark-mode");
+        document.body.classList.remove("dark-mode");
       }
     });
   }

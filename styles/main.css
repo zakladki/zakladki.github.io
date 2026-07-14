@@ -12,7 +12,7 @@
 }
 
 /* Dark mode variables override */
-body.dark-mode, .dark {
+body.dark-mode, .dark-mode, html.dark-mode body, .dark {
   --bg-color: #0f172a;
   --text-color: #f8fafc;
   --card-bg: #1e293b;
