@@ -36,9 +36,10 @@ html(lang="uk")
       title ЗАКЛАДКИ - Список популярних сайтів (ТОП ЗАКЛАДКИ)
   
 body
-//- Кнопка-меню
-  button.floating-menu-btn(type='button', onclick="document.getElementById('navbarCollapse').classList.toggle('show')")
-    span ☰
+    //- Плаваюча кнопка гамбургера (винесена окремо для мобільних)
+    .hamburger.hamburger--spring.navbar-toggler.floating-menu-btn(data-toggle='collapse', data-target='#navbarCollapse', aria-controls='navbarCollapse', aria-expanded='false', aria-label='Toggle navigation')
+      .hamburger-box
+        .hamburger-inner
 
     .container.nav-container
       nav.navbar.navbar-expand-md.fixed-top.navbar-dark.d-flex.justify-content-center

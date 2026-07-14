@@ -366,69 +366,71 @@ footer.footer a:hover {
   }
 }
 
-/* =======================================================
-   АДАПТИВНЕ МЕНЮ: Комп'ютерна версія (Десктоп)
-   ======================================================= */
-@media (min-width: 769px) {
-  /* На комп'ютері плаваюча кнопка нам не потрібна — ховаємо її */
-  .floating-menu-btn {
-      display: none !important;
-  }
-  
-  /* Кнопку теми ховаємо всередині меню, бо на десктопі вона у вас, скоріш за все, виведена в іншому місці */
-  .theme-toggle-menu-wrapper {
-      display: none !important;
-  }
-}
-
-/* =======================================================
-   АДАПТИВНЕ МЕНЮ: Мобільна версія (Смартфони та планшети)
-   ======================================================= */
+/* ==========================================
+   Мобільна оптимізація та вирівнювання шапки
+   ========================================== */
 @media (max-width: 768px) {
-  /* 1. Ховаємо стару шапку */
-  .navbar, .nav-container, header {
-      display: none !important;
+  
+  /* 1. Повертаємо видимість та фіксовану висоту для шапки */
+  .navbar, .nav-container, .header { 
+      position: relative;
+      display: block;
+      height: 50px;                 /* Задаємо чітку висоту шапки */
+      background-color: #1e293b;    /* Повертаємо темний фон шапки */
+      z-index: 1000;
   }
 
-  /* 2. Кнопка */
-  .floating-menu-btn {
-      position: fixed !important;
-      right: 15px !important;
-      top: 15px !important;
-      z-index: 99999 !important;
-      width: 45px !important;
-      height: 45px !important;
-      background-color: #ff0000 !important;
-      border: 2px solid white !important;
-      border-radius: 8px !important;
-      color: white !important;
-      font-size: 24px !important;
-      display: flex !important;
-      align-items: center !important;
-      justify-content: center !important;
-      cursor: pointer !important;
-      padding: 0 !important;
+  /* 2. Кнопка теми: вирівнювання всередині шапки */
+  #themeToggle {
+      position: absolute;
+      top: 50%;                     /* Центрування по вертикалі */
+      transform: translateY(-50%) scale(0.8); 
+      right: 15px;                  
+      z-index: 1050;                
+      margin: 0;                    
   }
 
-  /* 3. Відступ */
-  .container-fluid.main, main, .main-content {
-      margin-top: 0 !important; 
-      padding-top: 2px !important;
+  /* 3. Кнопка гамбургера: вирівнювання всередині шапки */
+  .hamburger {
+      position: absolute;
+      top: 50%;                     /* Центрування по vertical */
+      transform: translateY(-50%) scale(0.75); 
+      left: 10px;                   
+      z-index: 1050;                
+      transform-origin: left center;
+      padding: 8px !important;      
+      margin: 0;                    
   }
 
-  /* 4. Шторка меню */
-  #navbarCollapse {
-      display: none;
-      position: fixed !important;
-      top: 70px !important;
-      left: 10px !important;
-      right: 10px !important;
-      background-color: #1e293b !important;
-      z-index: 9998 !important;
-      border-radius: 12px !important;
-      padding: 15px !important;
+  /* 4. Випадаюче меню: зміщуємо його вниз, робимо фон та заокруглюємо нижні кути */
+  .nav-menu-links, .navbar-collapse { 
+      position: absolute;
+      top: 50px !important;         /* Починається чітко під шапкою */
+      left: 0;
+      width: 100%;
+      z-index: 999;                 
+      background-color: #1e293b !important; 
+      box-shadow: 0 10px 15px rgba(0, 0, 0, 0.4); 
+      
+      /* Заокруглення нижніх кутів меню */
+      border-radius: 0 0 12px 12px; 
+      overflow: hidden;             
   }
-  #navbarCollapse.show {
-      display: block !important;
+
+/* 5. Точкове усунення великої відстані після шапки */
+  .navbar + *, 
+  .nav-container + *, 
+  .header + *,
+  header + * {
+      margin-top: 0 !important;
+      padding-top: 1px !important; /* Регулюйте це значення для ідеального проміжку */
+  }
+
+  /* Прибираємо внутрішні зміщення для першого контейнера після меню */
+  .navbar + * .container,
+  .nav-container + * .container,
+  header + * .container {
+      margin-top: 0 !important;
+      padding-top: 0 !important;
   }
 }
