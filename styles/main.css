@@ -13,6 +13,7 @@ html {
   --card-bg: #ffffff;
   --card-border: #e2e8f0;
   --nav-bg: #1e293b;
+  --card-grad-end: rgba(15, 23, 42, 0.04); /* Soft neutral tint for light mode */
 }
 
 /* Dark mode variables override */
@@ -22,6 +23,7 @@ body.dark-mode, .dark-mode, html.dark-mode body, .dark {
   --card-bg: #1e293b;
   --card-border: #334155;
   --nav-bg: #090d16;
+  --card-grad-end: rgba(248, 250, 252, 0.04); /* Soft neutral tint for dark mode */
 }
 
 body {
@@ -449,19 +451,19 @@ footer.footer .btn-primary:active {
 /* ==========================================================================
    6. CATEGORY COLOR SCHEMES
    ========================================================================== */
-.group.cat-social { background: linear-gradient(135deg, var(--card-bg) 0%, rgba(59, 130, 246, 0.16) 100%); border-top: 3.5px solid rgba(59, 130, 246, 0.9); --cat-color: rgba(59, 130, 246, 0.9); }
-.group.cat-news { background: linear-gradient(135deg, var(--card-bg) 0%, rgba(16, 185, 129, 0.16) 100%); border-top: 3.5px solid rgba(16, 185, 129, 0.9); --cat-color: rgba(16, 185, 129, 0.9); }
-.group.cat-media { background: linear-gradient(135deg, var(--card-bg) 0%, rgba(245, 158, 11, 0.16) 100%); border-top: 3.5px solid rgba(245, 158, 11, 0.9); --cat-color: rgba(245, 158, 11, 0.9); }
-.group.cat-games { background: linear-gradient(135deg, var(--card-bg) 0%, rgba(139, 92, 246, 0.16) 100%); border-top: 3.5px solid rgba(139, 92, 246, 0.9); --cat-color: rgba(139, 92, 246, 0.9); }
-.group.cat-communal { background: linear-gradient(135deg, var(--card-bg) 0%, rgba(6, 182, 212, 0.16) 100%); border-top: 3.5px solid rgba(6, 182, 212, 0.9); --cat-color: rgba(6, 182, 212, 0.9); }
-.group.cat-bank { background: linear-gradient(135deg, var(--card-bg) 0%, rgba(236, 72, 153, 0.16) 100%); border-top: 3.5px solid rgba(236, 72, 153, 0.9); --cat-color: rgba(236, 72, 153, 0.9); }
-.group.cat-market { background: linear-gradient(135deg, var(--card-bg) 0%, rgba(99, 102, 241, 0.16) 100%); border-top: 3.5px solid rgba(99, 102, 241, 0.9); --cat-color: rgba(99, 102, 241, 0.9); }
-.group.cat-shops { background: linear-gradient(135deg, var(--card-bg) 0%, rgba(20, 184, 166, 0.16) 100%); border-top: 3.5px solid rgba(20, 184, 166, 0.9); --cat-color: rgba(20, 184, 166, 0.9); }
-.group.cat-others { background: linear-gradient(135deg, var(--card-bg) 0%, rgba(100, 116, 139, 0.16) 100%); border-top: 3.5px solid rgba(100, 116, 139, 0.9); --cat-color: rgba(100, 116, 139, 0.9); }
-.group.cat-city { background: linear-gradient(135deg, var(--card-bg) 0%, rgba(234, 179, 8, 0.16) 100%); border-top: 3.5px solid rgba(234, 179, 8, 0.9); --cat-color: rgba(234, 179, 8, 0.9); }
-.group.cat-programs { background: linear-gradient(135deg, var(--card-bg) 0%, rgba(249, 115, 22, 0.16) 100%); border-top: 3.5px solid rgba(249, 115, 22, 0.9); --cat-color: rgba(249, 115, 22, 0.9); }
-.group.cat-search { background: linear-gradient(135deg, var(--card-bg) 0%, rgba(14, 165, 233, 0.16) 100%); border-top: 3.5px solid rgba(14, 165, 233, 0.9); --cat-color: rgba(14, 165, 233, 0.9); }
-.group.cat-updates { background: linear-gradient(135deg, var(--card-bg) 0%, rgba(239, 68, 68, 0.18) 100%); border-top: 3.5px solid rgba(239, 68, 68, 0.95); --cat-color: rgba(239, 68, 68, 0.95); }
+.group.cat-social { background: linear-gradient(135deg, var(--card-bg) 0%, var(--card-grad-end) 100%); border-top: 3.5px solid rgba(59, 130, 246, 0.9); --cat-color: rgba(59, 130, 246, 0.9); }
+.group.cat-news { background: linear-gradient(135deg, var(--card-bg) 0%, var(--card-grad-end) 100%); border-top: 3.5px solid rgba(16, 185, 129, 0.9); --cat-color: rgba(16, 185, 129, 0.9); }
+.group.cat-media { background: linear-gradient(135deg, var(--card-bg) 0%, var(--card-grad-end) 100%); border-top: 3.5px solid rgba(245, 158, 11, 0.9); --cat-color: rgba(245, 158, 11, 0.9); }
+.group.cat-games { background: linear-gradient(135deg, var(--card-bg) 0%, var(--card-grad-end) 100%); border-top: 3.5px solid rgba(139, 92, 246, 0.9); --cat-color: rgba(139, 92, 246, 0.9); }
+.group.cat-communal { background: linear-gradient(135deg, var(--card-bg) 0%, var(--card-grad-end) 100%); border-top: 3.5px solid rgba(6, 182, 212, 0.9); --cat-color: rgba(6, 182, 212, 0.9); }
+.group.cat-bank { background: linear-gradient(135deg, var(--card-bg) 0%, var(--card-grad-end) 100%); border-top: 3.5px solid rgba(236, 72, 153, 0.9); --cat-color: rgba(236, 72, 153, 0.9); }
+.group.cat-market { background: linear-gradient(135deg, var(--card-bg) 0%, var(--card-grad-end) 100%); border-top: 3.5px solid rgba(99, 102, 241, 0.9); --cat-color: rgba(99, 102, 241, 0.9); }
+.group.cat-shops { background: linear-gradient(135deg, var(--card-bg) 0%, var(--card-grad-end) 100%); border-top: 3.5px solid rgba(20, 184, 166, 0.9); --cat-color: rgba(20, 184, 166, 0.9); }
+.group.cat-others { background: linear-gradient(135deg, var(--card-bg) 0%, var(--card-grad-end) 100%); border-top: 3.5px solid rgba(100, 116, 139, 0.9); --cat-color: rgba(100, 116, 139, 0.9); }
+.group.cat-city { background: linear-gradient(135deg, var(--card-bg) 0%, var(--card-grad-end) 100%); border-top: 3.5px solid rgba(234, 179, 8, 0.9); --cat-color: rgba(234, 179, 8, 0.9); }
+.group.cat-programs { background: linear-gradient(135deg, var(--card-bg) 0%, var(--card-grad-end) 100%); border-top: 3.5px solid rgba(249, 115, 22, 0.9); --cat-color: rgba(249, 115, 22, 0.9); }
+.group.cat-search { background: linear-gradient(135deg, var(--card-bg) 0%, var(--card-grad-end) 100%); border-top: 3.5px solid rgba(14, 165, 233, 0.9); --cat-color: rgba(14, 165, 233, 0.9); }
+.group.cat-updates { background: linear-gradient(135deg, var(--card-bg) 0%, var(--card-grad-end) 100%); border-top: 3.5px solid rgba(239, 68, 68, 0.95); --cat-color: rgba(239, 68, 68, 0.95); }
 
 /* Custom Category Badges styled to match the group's signature theme color */
 .group.cat-social .group-title .badge, .group.cat-social .badge { background: linear-gradient(135deg, #3b82f6, #1d4ed8) !important; color: white !important; }
