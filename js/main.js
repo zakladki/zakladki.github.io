@@ -10,17 +10,6 @@ if (localStorage.getItem("theme") === "dark") {
   }
 }
 
-// Safety stubs for legacy playerjs calls
-window.playerjs = window.playerjs || {
-  emit: function() { return this; },
-  addListener: function() { return this; },
-  on: function() { return this; },
-  api: function() { return this; }
-};
-window.Playerjs = window.Playerjs || function() {
-  return window.playerjs;
-};
-
 document.addEventListener("DOMContentLoaded", () => {
   
   // 2. Логіка перемикання теми
