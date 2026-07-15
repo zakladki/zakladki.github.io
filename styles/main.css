@@ -373,7 +373,7 @@ footer.footer a:hover {
 /* ==========================================================================
    7. MOBILE AND RESPONSIVE OVERRIDES
    ========================================================================== */
-@@media (max-width: 979.98px) {
+@media (max-width: 979.98px) {
   /* 0. Перевизначення поведінки розгортання Bootstrap для екранів < 980px */
   .navbar-expand-md .navbar-toggler {
     display: block !important;
