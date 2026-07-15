@@ -47,12 +47,12 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // 3. Анімація кнопки меню (гамбургера) - легкий варіант
-  const hamburgers = document.querySelectorAll(".hamburger");
-  hamburgers.forEach(hamburger => {
-    hamburger.addEventListener("click", function() {
-      this.classList.toggle("is-active");
-    });
+  // 3. Анімація кнопки меню (гамбургера) - прив'язка до подій розгортання/згортання Bootstrap
+  $('#navbarCollapse').on('show.bs.collapse', function() {
+    $('.hamburger').addClass('is-active');
+  });
+  $('#navbarCollapse').on('hide.bs.collapse', function() {
+    $('.hamburger').removeClass('is-active');
   });
 
 });
@@ -65,8 +65,3 @@ function topFunction() {
   });
 }
 
-$(document).ready(function() {
-  $('.hamburger').on('click', function() {
-    $(this).toggleClass('is-active');
-  });
-});
