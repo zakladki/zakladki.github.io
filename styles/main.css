@@ -93,7 +93,7 @@ body {
   }
   
   .theme-toggle-btn {
-    padding: 0.32rem 0.75rem !important; /* Slightly reduced vertical padding for a sleeker PC layout */
+    padding: 0.22rem 0.75rem !important; /* Slightly reduced vertical padding for a sleeker PC layout */
   }
 
   /* Повністю вертикальне виділення пунктів меню для ПК версії */
@@ -228,8 +228,8 @@ body {
 .group-title .badge {
   background: linear-gradient(135deg, #64748b, #475569);
   color: white;
-  padding: 0.15rem 0.65rem;
-  border-radius: 9999px;
+  padding: 0.2rem 0.75rem;
+  border-radius: 0.5rem;
   font-size: 0.92rem;
   font-weight: 600;
   letter-spacing: 0.025em;
@@ -366,7 +366,7 @@ nav.navbar {
   background: rgba(255, 255, 255, 0.16) !important;
   border: 1px solid rgba(255, 255, 255, 0.3) !important;
   color: white !important;
-  padding: 0.5rem 0.75rem;
+  padding: 0.28rem 0.75rem !important;
   border-radius: 0.5rem;
   cursor: pointer;
   display: flex;
@@ -421,7 +421,7 @@ footer.footer .btn-primary {
   border: 1px solid rgba(255, 255, 255, 0.3) !important;
   color: #ffffff !important;
   font-weight: normal !important;
-  padding: 0.35rem 0.75rem !important;
+  padding: 0.22rem 0.75rem !important;
   border-radius: 0.5rem !important; /* У тон кнопці Тема */
   box-shadow: none !important;
   transition: all 0.20s ease !important;
@@ -461,10 +461,22 @@ footer.footer .btn-primary:active {
 .group.cat-city { background: linear-gradient(135deg, var(--card-bg) 0%, rgba(234, 179, 8, 0.16) 100%); border-top: 3.5px solid rgba(234, 179, 8, 0.9); --cat-color: rgba(234, 179, 8, 0.9); }
 .group.cat-programs { background: linear-gradient(135deg, var(--card-bg) 0%, rgba(249, 115, 22, 0.16) 100%); border-top: 3.5px solid rgba(249, 115, 22, 0.9); --cat-color: rgba(249, 115, 22, 0.9); }
 .group.cat-search { background: linear-gradient(135deg, var(--card-bg) 0%, rgba(14, 165, 233, 0.16) 100%); border-top: 3.5px solid rgba(14, 165, 233, 0.9); --cat-color: rgba(14, 165, 233, 0.9); }
-.group.cat-orange { background: linear-gradient(135deg, var(--card-bg) 0%, rgba(249, 115, 22, 0.16) 100%); border-top: 3.5px solid rgba(249, 115, 22, 0.9); --cat-color: rgba(249, 115, 22, 0.9); }
-.group.cat-orange .group-title .badge, .group.cat-orange .badge { background: linear-gradient(135deg, #f97316, #ea580c) !important; color: white !important; }
 .group.cat-updates { background: linear-gradient(135deg, var(--card-bg) 0%, rgba(239, 68, 68, 0.18) 100%); border-top: 3.5px solid rgba(239, 68, 68, 0.95); --cat-color: rgba(239, 68, 68, 0.95); }
-.group.cat-updates .group-title .badge, .group.cat-updates .badge { background: linear-gradient(135deg, #ef4444, #dc2626) !important; }
+
+/* Custom Category Badges styled to match the group's signature theme color */
+.group.cat-social .group-title .badge, .group.cat-social .badge { background: linear-gradient(135deg, #3b82f6, #1d4ed8) !important; color: white !important; }
+.group.cat-news .group-title .badge, .group.cat-news .badge { background: linear-gradient(135deg, #10b981, #047857) !important; color: white !important; }
+.group.cat-media .group-title .badge, .group.cat-media .badge { background: linear-gradient(135deg, #f59e0b, #b45309) !important; color: white !important; }
+.group.cat-games .group-title .badge, .group.cat-games .badge { background: linear-gradient(135deg, #8b5cf6, #6d28d9) !important; color: white !important; }
+.group.cat-communal .group-title .badge, .group.cat-communal .badge { background: linear-gradient(135deg, #06b6d4, #0e7490) !important; color: white !important; }
+.group.cat-bank .group-title .badge, .group.cat-bank .badge { background: linear-gradient(135deg, #ec4899, #be185d) !important; color: white !important; }
+.group.cat-market .group-title .badge, .group.cat-market .badge { background: linear-gradient(135deg, #6366f1, #4338ca) !important; color: white !important; }
+.group.cat-shops .group-title .badge, .group.cat-shops .badge { background: linear-gradient(135deg, #14b8a6, #0f766e) !important; color: white !important; }
+.group.cat-others .group-title .badge, .group.cat-others .badge { background: linear-gradient(135deg, #64748b, #475569) !important; color: white !important; }
+.group.cat-city .group-title .badge, .group.cat-city .badge { background: linear-gradient(135deg, #eab308, #a16207) !important; color: white !important; }
+.group.cat-programs .group-title .badge, .group.cat-programs .badge { background: linear-gradient(135deg, #f97316, #c2410c) !important; color: white !important; }
+.group.cat-search .group-title .badge, .group.cat-search .badge { background: linear-gradient(135deg, #0ea5e9, #0369a1) !important; color: white !important; }
+.group.cat-updates .group-title .badge, .group.cat-updates .badge { background: linear-gradient(135deg, #ef4444, #dc2626) !important; color: white !important; }
 
 /* ==========================================================================
    7. MOBILE AND RESPONSIVE OVERRIDES
