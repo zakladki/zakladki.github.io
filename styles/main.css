@@ -468,19 +468,19 @@ footer.footer .btn-primary:active {
 .group.cat-updates { background: linear-gradient(135deg, var(--card-bg) 0%, var(--card-grad-end) 100%); border-top: 3.5px solid rgba(239, 68, 68, 0.95); --cat-color: rgba(239, 68, 68, 0.95); }
 
 /* Custom Category Badges styled to match the group's signature theme color with darker center saturation */
-.group.cat-social .group-title .badge, .group.cat-social .badge { background: linear-gradient(to right, #60a5fa 0%, #1d4ed8 50%, #60a5fa 100%) !important; color: white !important; }
-.group.cat-news .group-title .badge, .group.cat-news .badge { background: linear-gradient(to right, #34d399 0%, #047857 50%, #34d399 100%) !important; color: white !important; }
-.group.cat-media .group-title .badge, .group.cat-media .badge { background: linear-gradient(to right, #fbbf24 0%, #b45309 50%, #fbbf24 100%) !important; color: white !important; }
-.group.cat-games .group-title .badge, .group.cat-games .badge { background: linear-gradient(to right, #a78bfa 0%, #6d28d9 50%, #a78bfa 100%) !important; color: white !important; }
-.group.cat-communal .group-title .badge, .group.cat-communal .badge { background: linear-gradient(to right, #22d3ee 0%, #0e7490 50%, #22d3ee 100%) !important; color: white !important; }
-.group.cat-bank .group-title .badge, .group.cat-bank .badge { background: linear-gradient(to right, #f472b6 0%, #be185d 50%, #f472b6 100%) !important; color: white !important; }
-.group.cat-market .group-title .badge, .group.cat-market .badge { background: linear-gradient(to right, #818cf8 0%, #4338ca 50%, #818cf8 100%) !important; color: white !important; }
-.group.cat-shops .group-title .badge, .group.cat-shops .badge { background: linear-gradient(to right, #2dd4bf 0%, #0f766e 50%, #2dd4bf 100%) !important; color: white !important; }
-.group.cat-others .group-title .badge, .group.cat-others .badge { background: linear-gradient(to right, #94a3b8 0%, #475569 50%, #94a3b8 100%) !important; color: white !important; }
-.group.cat-city .group-title .badge, .group.cat-city .badge { background: linear-gradient(to right, #fde047 0%, #a16207 50%, #fde047 100%) !important; color: white !important; }
-.group.cat-programs .group-title .badge, .group.cat-programs .badge { background: linear-gradient(to right, #fb923c 0%, #c2410c 50%, #fb923c 100%) !important; color: white !important; }
-.group.cat-search .group-title .badge, .group.cat-search .badge { background: linear-gradient(to right, #38bdf8 0%, #0369a1 50%, #38bdf8 100%) !important; color: white !important; }
-.group.cat-updates .group-title .badge, .group.cat-updates .badge { background: linear-gradient(to right, #f87171 0%, #dc2626 50%, #f87171 100%) !important; color: white !important; }
+.group.cat-social .group-title .badge, .group.cat-social .badge { background: linear-gradient(to right, #3b82f6 0%, #1d4ed8 50%, #3b82f6 100%) !important; color: white !important; }
+.group.cat-news .group-title .badge, .group.cat-news .badge { background: linear-gradient(to right, #10b981 0%, #047857 50%, #10b981 100%) !important; color: white !important; }
+.group.cat-media .group-title .badge, .group.cat-media .badge { background: linear-gradient(to right, #f59e0b 0%, #b45309 50%, #f59e0b 100%) !important; color: white !important; }
+.group.cat-games .group-title .badge, .group.cat-games .badge { background: linear-gradient(to right, #8b5cf6 0%, #6d28d9 50%, #8b5cf6 100%) !important; color: white !important; }
+.group.cat-communal .group-title .badge, .group.cat-communal .badge { background: linear-gradient(to right, #06b6d4 0%, #0e7490 50%, #06b6d4 100%) !important; color: white !important; }
+.group.cat-bank .group-title .badge, .group.cat-bank .badge { background: linear-gradient(to right, #ec4899 0%, #be185d 50%, #ec4899 100%) !important; color: white !important; }
+.group.cat-market .group-title .badge, .group.cat-market .badge { background: linear-gradient(to right, #6366f1 0%, #4338ca 50%, #6366f1 100%) !important; color: white !important; }
+.group.cat-shops .group-title .badge, .group.cat-shops .badge { background: linear-gradient(to right, #14b8a6 0%, #0f766e 50%, #14b8a6 100%) !important; color: white !important; }
+.group.cat-others .group-title .badge, .group.cat-others .badge { background: linear-gradient(to right, #64748b 0%, #475569 50%, #64748b 100%) !important; color: white !important; }
+.group.cat-city .group-title .badge, .group.cat-city .badge { background: linear-gradient(to right, #eab308 0%, #a16207 50%, #eab308 100%) !important; color: white !important; }
+.group.cat-programs .group-title .badge, .group.cat-programs .badge { background: linear-gradient(to right, #f97316 0%, #c2410c 50%, #f97316 100%) !important; color: white !important; }
+.group.cat-search .group-title .badge, .group.cat-search .badge { background: linear-gradient(to right, #0ea5e9 0%, #0369a1 50%, #0ea5e9 100%) !important; color: white !important; }
+.group.cat-updates .group-title .badge, .group.cat-updates .badge { background: linear-gradient(to right, #ef4444 0%, #dc2626 50%, #ef4444 100%) !important; color: white !important; }
 
 /* ==========================================================================
    7. MOBILE AND RESPONSIVE OVERRIDES
