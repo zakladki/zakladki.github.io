@@ -26,10 +26,23 @@ document.addEventListener("DOMContentLoaded", () => {
   // 2. Логіка перемикання теми
   const themeToggle = document.getElementById("themeToggle");
   if (themeToggle) {
+    const themeIcon = themeToggle.querySelector("i");
+    
+    function updateThemeIcon() {
+      if (themeIcon) {
+        if (document.body.classList.contains("dark-mode") || document.documentElement.classList.contains("dark-mode")) {
+          themeIcon.className = "fas fa-sun";
+        } else {
+          themeIcon.className = "fas fa-moon";
+        }
+      }
+    }
+
     // Синхронізація візуального стану елемента (наприклад, якщо це чекбокс)
     if (localStorage.getItem("theme") === "dark") {
       themeToggle.checked = true;
     }
+    updateThemeIcon();
 
     themeToggle.addEventListener("click", () => {
       document.documentElement.classList.toggle("dark-mode");
@@ -44,6 +57,7 @@ document.addEventListener("DOMContentLoaded", () => {
         document.documentElement.classList.remove("dark-mode");
         document.body.classList.remove("dark-mode");
       }
+      updateThemeIcon();
     });
   }
 
