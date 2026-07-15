@@ -87,6 +87,9 @@ body {
   .main {
     padding-top: 41px !important;
   }
+  .theme-toggle-btn {
+    padding: 0.32rem 0.75rem !important; /* Slightly reduced vertical padding for a sleeker PC layout */
+  }
 }
 
 /* Legacy helper override */
@@ -299,9 +302,9 @@ nav.navbar {
 
 /* Theme Toggle Button */
 .theme-toggle-btn {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: white;
+  background: rgba(255, 255, 255, 0.16) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  color: white !important;
   padding: 0.5rem 0.75rem;
   border-radius: 0.5rem;
   cursor: pointer;
@@ -313,7 +316,8 @@ nav.navbar {
 }
 
 .theme-toggle-btn:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.28) !important;
+  border-color: rgba(255, 255, 255, 0.45) !important;
 }
 
 /* ==========================================================================
@@ -348,6 +352,37 @@ footer.footer a {
 
 footer.footer a:hover {
   color: #ffffff !important;
+}
+
+/* Красива тепла кнопка "Підтримати сайт" у тон кнопки Тема, злегка освітлена */
+footer.footer .btn-primary {
+  background: rgba(255, 255, 255, 0.16) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  color: #ffffff !important;
+  font-weight: normal !important;
+  padding: 0.35rem 0.75rem !important;
+  border-radius: 0.5rem !important; /* У тон кнопці Тема */
+  box-shadow: none !important;
+  transition: all 0.20s ease !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.5rem !important;
+  font-size: 0.875rem !important;
+  text-shadow: none !important;
+}
+
+footer.footer .btn-primary:hover {
+  background: rgba(255, 255, 255, 0.28) !important;
+  border-color: rgba(255, 255, 255, 0.45) !important;
+  color: #ffffff !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+footer.footer .btn-primary:active {
+  background: rgba(255, 255, 255, 0.12) !important;
+  transform: none !important;
 }
 
 /* ==========================================================================
