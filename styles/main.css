@@ -11,7 +11,7 @@ html {
   --bg-color: #f8fafc;
   --text-color: #0f172a;
   --card-bg: #ffffff;
-  --card-border: #e2e8f0;
+  --card-border: #cbd5e1;
   --nav-bg: #1e293b;
   --card-grad-end: rgba(15, 23, 42, 0.04); /* Soft neutral tint for light mode */
 }
@@ -21,7 +21,7 @@ body.dark-mode, .dark-mode, html.dark-mode body, .dark {
   --bg-color: #0f172a;
   --text-color: #f8fafc;
   --card-bg: #1e293b;
-  --card-border: #334155;
+  --card-border: #475569;
   --nav-bg: #090d16;
   --card-grad-end: rgba(248, 250, 252, 0.04); /* Soft neutral tint for dark mode */
 }
