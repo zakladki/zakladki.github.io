@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+html {
+  scrollbar-gutter: stable;
+}
+
 /* ==========================================================================
    1. VARIABLES & BASE THEMES
    ========================================================================== */
@@ -82,13 +86,70 @@ body {
   }
 }
 
-/* Header spacing for desktop */
+/* Header spacing and fully vertical menu styling for desktop */
 @media (min-width: 1200px) {
   .main {
     padding-top: 41px !important;
   }
+  
   .theme-toggle-btn {
     padding: 0.32rem 0.75rem !important; /* Slightly reduced vertical padding for a sleeker PC layout */
+  }
+
+  /* Повністю вертикальне виділення пунктів меню для ПК версії */
+  nav.navbar {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    height: 40px !important;
+  }
+
+  nav.navbar .navbar-collapse {
+    height: 100% !important;
+    align-self: stretch !important;
+    display: flex !important;
+  }
+
+  nav.navbar .navbar-nav {
+    height: 100% !important;
+    align-items: stretch !important;
+    margin: 0 auto !important;
+  }
+
+  nav.navbar .nav-item {
+    height: 100% !important;
+    display: flex !important;
+    align-items: stretch !important;
+  }
+
+  nav.navbar .nav-link {
+    height: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 0 !important; /* Прибираємо закруглення кнопок */
+    margin: 0 !important; /* Прибираємо відступи між ними */
+    padding: 0 16px !important; /* Оптимальна ширина пунктів */
+    border-bottom: 3px solid transparent !important; /* Забезпечує плавний перехід без підстрибувань */
+    transition: all 0.2s ease-in-out !important;
+  }
+
+  /* Активний стан та наведення - помітне вертикальне заповнення з підсвіткою та нижнім індикатором */
+  nav.navbar .nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.08) !important;
+    color: #ffffff !important;
+    border-bottom: 3px solid rgba(59, 130, 246, 0.4) !important;
+  }
+
+  nav.navbar .nav-link.active {
+    background-color: rgba(59, 130, 246, 0.28) !important; /* Помітне напівпрозоре заповнення */
+    color: #ffffff !important;
+    border-bottom: 3px solid #3b82f6 !important; /* Яскрава синя лінія знизу на всю ширину пункту */
+    font-weight: 600 !important;
+    text-shadow: 0 0 1px rgba(255, 255, 255, 0.2) !important;
+  }
+
+  nav.navbar .nav-link.home-highlight:hover {
+    background: rgba(59, 130, 246, 0.25) !important;
   }
 }
 
