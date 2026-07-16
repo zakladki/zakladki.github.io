@@ -74,17 +74,20 @@ document.addEventListener("DOMContentLoaded", () => {
       height: 16px;
       margin-left: auto !important;
       margin-right: 4px;
-      color: #9ca3af;
+      color: #cbd5e1; /* Дуже м'який, ледь помітний сірий колір для світлої теми */
       cursor: pointer;
       transition: transform 0.2s ease, color 0.2s ease;
       vertical-align: middle;
       flex-shrink: 0;
     }
+    .dark-mode .desc-toggle-btn {
+      color: #4b5563; /* Тонкий, стриманий колір для темної теми */
+    }
     .desc-toggle-btn:hover {
-      color: #4b5563;
+      color: #71717a;
     }
     .dark-mode .desc-toggle-btn:hover {
-      color: #e5e7eb;
+      color: #a1a1aa;
     }
     .site-description {
       font-size: 12.5px;
@@ -106,10 +109,10 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     .desc-toggle-btn.active {
       transform: rotate(180deg);
-      color: #4b5563;
+      color: #71717a;
     }
     .dark-mode .desc-toggle-btn.active {
-      color: #f4f4f5;
+      color: #a1a1aa;
     }
   `;
   document.head.appendChild(descStyle);
