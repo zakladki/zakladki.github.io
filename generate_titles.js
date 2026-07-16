@@ -1,179 +1,233 @@
-import fs from "fs";
-import path from "path";
+import fs from 'fs';
+import path from 'path';
+import { GoogleGenAI, Type } from "@google/genai";
 
-const apiKey = process.env.GEMINI_API_KEY || process.env.API_KEY || process.env.GOOGLE_API_KEY;
-if (!apiKey) {
-  console.error("Error: GEMINI_API_KEY is not defined.");
+if (!process.env.GEMINI_API_KEY) {
+  console.error("GEMINI_API_KEY environment variable is missing.");
   process.exit(1);
 }
 
-const files = [
-  "index.html", "bank.html", "city.html", "communal.html", 
-  "games.html", "market.html", "media.html", "news.html", 
-  "others.html", "programs.html", "shops.html", "social.html"
-];
-
-// Step 1: Scan files and find all links missing titles
-console.log("Scanning files for links without titles...");
-const missingMap = new Map(); // url -> { name, files: [] }
-
-files.forEach(f => {
-  if (!fs.existsSync(f)) return;
-  const content = fs.readFileSync(f, "utf8");
-  
-  // Pattern to find standard list items with links
-  const regex = /<li>([\s\S]*?)<a\s+([^>]*?)href=["\x27]([^"\x27]+)["\x27]([^>]*?)>([\s\S]*?)<\/a>([\s\S]*?)<\/li>/gi;
-  let match;
-  while ((match = regex.exec(content)) !== null) {
-    const url = match[3].trim();
-    const linkText = match[5].replace(/<[^>]*>/g, "").trim();
-    const attrs = match[2] + " " + match[4];
-    
-    // Ignore images, buttons, or links that already have title
-    if (!attrs.includes("title=") && !linkText.includes("<img") && linkText !== "" && !url.startsWith("#")) {
-      if (!missingMap.has(url)) {
-        missingMap.set(url, { name: linkText, files: [f] });
-      } else {
-        const item = missingMap.get(url);
-        if (!item.files.includes(f)) {
-          item.files.push(f);
-        }
-      }
+const ai = new GoogleGenAI({
+  apiKey: process.env.GEMINI_API_KEY,
+  httpOptions: {
+    headers: {
+      'User-Agent': 'aistudio-build',
     }
   }
 });
 
-const missingList = [];
-for (const [url, data] of missingMap.entries()) {
-  missingList.push({ url, name: data.name });
-}
+const files = [
+  'index.html',
+  'news.html',
+  'media.html',
+  'social.html',
+  'communal.html',
+  'bank.html',
+  'market.html',
+  'shops.html',
+  'city.html',
+  'programs.html',
+  'games.html',
+  'others.html'
+];
 
-console.log(`Found ${missingList.length} unique URLs missing descriptions.`);
+const CACHE_FILE = 'descriptions_cache.json';
 
-if (missingList.length === 0) {
-  console.log("All links already have descriptions. Nothing to do!");
-  process.exit(0);
-}
-
-// Step 2: Batch generate descriptions using Gemma
-const BATCH_SIZE = 25;
-const descriptions = {}; // url -> description
-
-async function generateBatch(batch, batchNum, totalBatches) {
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemma-4-31b-it:generateContent?key=${apiKey}`;
-  
-  const prompt = `You are an expert on Ukrainian websites and internet portals.
-For each website in the list below, write a very short, helpful description in Ukrainian (maximum 10 words, extremely concise, focused on its utility and main function). Keep descriptions objective, professional, and clear.
-
-Input list:
-${JSON.stringify(batch, null, 2)}
-
-Respond ONLY with a JSON array of objects, containing "url" and "description".
-Format:
-[
-  { "url": "...", "description": "..." }
-]`;
-
-  console.log(`Sending batch ${batchNum}/${totalBatches} (${batch.length} items) to Gemma...`);
-  
-  let attempts = 3;
-  while (attempts > 0) {
-    try {
-      const response = await fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { responseMimeType: "application/json" }
-        })
-      });
-      
-      const data = await response.json();
-      if (data.error) {
-        throw new Error(`API Error: ${data.error.message}`);
-      }
-      
-      // Get correct response part (skip thought parts if present)
-      let txt = "";
-      const parts = data.candidates[0].content.parts;
-      const nonThoughtPart = parts.find(p => !p.thought);
-      if (nonThoughtPart) {
-        txt = nonThoughtPart.text;
-      } else {
-        txt = parts[0].text;
-      }
-      
-      // Extract JSON array from response using regex
-      const jsonMatch = txt.match(/\[\s*\{[\s\S]*\}\s*\]/);
-      if (!jsonMatch) {
-        throw new Error("Could not find JSON array in response text");
-      }
-      
-      const parsed = JSON.parse(jsonMatch[0]);
-      parsed.forEach(item => {
-        if (item.url && item.description) {
-          descriptions[item.url.trim()] = item.description.trim();
-        }
-      });
-      
-      console.log(`Successfully processed batch ${batchNum}.`);
-      break; // Success, exit retry loop
-    } catch (err) {
-      console.warn(`Attempt failed for batch ${batchNum}: ${err.message}. Retrying...`);
-      attempts--;
-      if (attempts === 0) {
-        console.error(`Failed to generate descriptions for batch ${batchNum} after 3 attempts.`);
-      } else {
-        await new Promise(resolve => setTimeout(resolve, 5000)); // wait 5s before retry
-      }
+// Load cache if exists
+let cache = {};
+if (fs.existsSync(CACHE_FILE)) {
+  try {
+    const rawCache = fs.readFileSync(CACHE_FILE, 'utf8');
+    if (rawCache && rawCache.trim() !== '') {
+      cache = JSON.parse(rawCache);
+      console.log(`Loaded ${Object.keys(cache).length} cached descriptions from ${CACHE_FILE}.`);
     }
+  } catch (e) {
+    console.error("Error reading cache file, starting fresh:", e);
   }
+}
+
+// Helper to save cache
+function saveCache() {
+  fs.writeFileSync(CACHE_FILE, JSON.stringify(cache, null, 2), 'utf8');
+}
+
+// Helper to escape HTML attributes
+function escapeHtmlAttr(str) {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
 }
 
 async function run() {
-  const totalBatches = Math.ceil(missingList.length / BATCH_SIZE);
-  for (let i = 0; i < missingList.length; i += BATCH_SIZE) {
-    const batch = missingList.slice(i, i + BATCH_SIZE);
-    const batchNum = Math.floor(i / BATCH_SIZE) + 1;
-    await generateBatch(batch, batchNum, totalBatches);
-    // Be gentle to avoid rate limits
-    await new Promise(resolve => setTimeout(resolve, 2000));
-  }
+  console.log("Analyzing all category files...");
   
-  console.log(`\nGenerated ${Object.keys(descriptions).length} descriptions.`);
+  const missingLinks = [];
   
-  // Step 3: Update HTML files with the generated descriptions
-  console.log("Updating HTML files...");
-  
-  files.forEach(f => {
-    if (!fs.existsSync(f)) return;
-    let content = fs.readFileSync(f, "utf8");
-    let updated = false;
+  files.forEach(file => {
+    const filePath = path.resolve(file);
+    if (!fs.existsSync(filePath)) {
+      console.log(`Skipping file (not found): ${file}`);
+      return;
+    }
     
-    // Pattern to find standard list items with links
-    const regex = /<li>([\s\S]*?)<a\s+([^>]*?)href=["\x27]([^"\x27]+)["\x27]([^>]*?)>([\s\S]*?)<\/a>([\s\S]*?)<\/li>/gi;
+    const content = fs.readFileSync(filePath, 'utf8');
     
-    let newContent = content.replace(regex, (match, prefix, beforeHref, url, afterHref, linkText, suffix) => {
-      const trimmedUrl = url.trim();
-      const attrs = beforeHref + " " + afterHref;
+    // Regex matching individual <li> items in lists
+    const liRegex = /<li>[\s\S]*?<a\s+[^>]*href=["']([^"']+)["'][^>]*>([\s\S]*?)<\/a>[\s\S]*?<\/li>/gi;
+    
+    let match;
+    while ((match = liRegex.exec(content)) !== null) {
+      const fullLi = match[0];
+      const url = match[1];
+      const text = match[2].replace(/<[^>]*>/g, '').trim();
       
-      // If it has no title, and we have a generated description for it
-      if (!attrs.includes("title=") && !linkText.includes("<img") && linkText !== "" && descriptions[trimmedUrl]) {
-        updated = true;
-        const desc = descriptions[trimmedUrl].replace(/"/g, "&quot;");
-        // Insert title="desc" right before href or at the end
-        return `<li>${prefix}<a ${beforeHref}title="${desc}" href="${url}"${afterHref}>${linkText}</a>${suffix}</li>`;
+      // If it contains a title, skip it
+      if (/title=["']/i.test(fullLi)) {
+        continue;
       }
-      return match;
-    });
-    
-    if (updated) {
-      fs.writeFileSync(f, newContent, "utf8");
-      console.log(`Updated ${f}`);
+      
+      // Exclude anchor-only or empty links
+      if (!url || url.startsWith('#') || url.startsWith('javascript:')) {
+        continue;
+      }
+      
+      missingLinks.push({
+        file,
+        url,
+        text,
+        fullLi
+      });
     }
   });
   
-  console.log("Done! All missing descriptions have been added successfully.");
+  console.log(`Found ${missingLinks.length} total missing descriptions.`);
+  
+  // Deduplicate by URL
+  const uniqueUrls = new Map();
+  missingLinks.forEach(item => {
+    if (!uniqueUrls.has(item.url)) {
+      uniqueUrls.set(item.url, { url: item.url, text: item.text });
+    }
+  });
+  
+  // Filter out URLs that are already in cache
+  const uniqueList = Array.from(uniqueUrls.values()).filter(item => !cache[item.url]);
+  console.log(`Deduplicated to ${uniqueList.length} unique URLs that NEED generation (skipping cached).`);
+  
+  if (uniqueList.length === 0) {
+    console.log("All missing links are already in cache or don't need generation. Writing updates directly.");
+  } else {
+    // Batch the unique URLs to ask Gemini
+    // Large batch size (75) to make very few API calls and avoid 20 requests/day limits
+    const batchSize = 75; 
+    
+    for (let i = 0; i < uniqueList.length; i += batchSize) {
+      const batch = uniqueList.slice(i, i + batchSize);
+      console.log(`Processing batch ${Math.floor(i / batchSize) + 1} of ${Math.ceil(uniqueList.length / batchSize)} (${batch.length} items)...`);
+      
+      const prompt = `Ви є професійним копірайтером. Складіть короткі, корисні та лаконічні описи для наступних сайтів українською мовою.
+Кожен опис повинен:
+1. Бути написаний українською мовою.
+2. Складатися максимум з 1-3 речень (до 3-4 коротких рядків).
+3. Бути об'єктивним, інформативним та корисним для користувача (вказувати, чим корисний цей сайт, які послуги надає або що на ньому можна знайти).
+4. НЕ містити зайвої води, реклами або закликів до дії.
+
+Сайт(и) для опису:
+${JSON.stringify(batch, null, 2)}
+
+Поверніть результат у вигляді JSON об'єкта, де ключем є точний URL, а значенням — складений опис сайту українською мовою. Не повертайте нічого іншого, крім валідного JSON об'єкта.`;
+
+      let success = false;
+      let retries = 5;
+      let delay = 65000; // Wait 65s on quota/rate limits to be absolutely safe
+      
+      while (!success && retries > 0) {
+        try {
+          const response = await ai.models.generateContent({
+            model: "gemini-3.5-flash",
+            contents: prompt,
+            config: {
+              responseMimeType: "application/json",
+              responseSchema: {
+                type: Type.OBJECT,
+                description: "JSON object mapping website URLs to their Ukrainian descriptions",
+              }
+            }
+          });
+          
+          const text = response.text.trim();
+          const results = JSON.parse(text);
+          
+          Object.assign(cache, results);
+          saveCache();
+          success = true;
+          console.log(`Batch ${Math.floor(i / batchSize) + 1} successfully completed. Cached: ${Object.keys(results).length} items.`);
+        } catch (err) {
+          retries--;
+          const errMsg = err.message || JSON.stringify(err);
+          console.error(`Error processing batch starting at index ${i}. Retries left: ${retries}\nError message: ${errMsg}`);
+          
+          if (retries > 0) {
+            console.log(`Rate limit or temporary error hit. Waiting 65 seconds before retry...`);
+            await new Promise(r => setTimeout(r, delay));
+          }
+        }
+      }
+      
+      if (!success) {
+        console.warn(`Skipping batch starting at index ${i} after all retries failed.`);
+      }
+      
+      // Add a small delay between batches
+      await new Promise(r => setTimeout(r, 2000));
+    }
+  }
+  
+  // 4. Update the HTML files with the cached descriptions
+  console.log("\nWriting cached descriptions to HTML files...");
+  
+  files.forEach(file => {
+    const filePath = path.resolve(file);
+    if (!fs.existsSync(filePath)) return;
+    
+    let content = fs.readFileSync(filePath, 'utf8');
+    let fileUpdated = false;
+    
+    const liRegex = /(<li>[\s\S]*?<a\s+[^>]*href=["']([^"']+)["'][^>]*>[\s\S]*?<\/a>[\s\S]*?<\/li>)/gi;
+    
+    content = content.replace(liRegex, (fullLi, p1, url) => {
+      if (/title=["']/i.test(fullLi)) {
+        return fullLi;
+      }
+      
+      const desc = cache[url];
+      if (desc) {
+        const aTagRegex = /(<a\s+[^>]*href=["']([^"']+)["'][^>]*)(>)/i;
+        const updatedLi = fullLi.replace(aTagRegex, (aTag, p1_a, url_a, p3_a) => {
+          const cleanDesc = escapeHtmlAttr(desc);
+          return `${p1_a} title="${cleanDesc}"${p3_a}`;
+        });
+        
+        fileUpdated = true;
+        return updatedLi;
+      }
+      
+      return fullLi;
+    });
+    
+    if (fileUpdated) {
+      fs.writeFileSync(filePath, content, 'utf8');
+      console.log(`Updated: ${file}`);
+    }
+  });
+  
+  console.log("\nFinished updating all files!");
 }
 
-run();
+run().catch(err => {
+  console.error("Unhandled error in runner:", err);
+});

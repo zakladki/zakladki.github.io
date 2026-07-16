@@ -64,6 +64,7 @@ document.addEventListener("DOMContentLoaded", () => {
   descStyle.textContent = `
     .group li {
       flex-wrap: wrap !important;
+      row-gap: 0px !important;
     }
     .desc-toggle-btn {
       display: inline-flex;
@@ -88,8 +89,9 @@ document.addEventListener("DOMContentLoaded", () => {
     .site-description {
       font-size: 12.5px;
       color: #6b7280;
-      margin-top: 5px;
+      margin-top: -1px;
       padding-left: 24px;
+      padding-bottom: 2px;
       line-height: 1.45;
       word-break: break-word;
       font-weight: normal;
@@ -145,7 +147,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
           const isActive = toggleBtn.classList.contains('active');
           if (!isActive) {
-            // Показати
+            // Спочатку закриємо всі інші відкриті описи
+            document.querySelectorAll('.desc-toggle-btn.active').forEach(activeBtn => {
+              if (activeBtn !== toggleBtn) {
+                activeBtn.classList.remove('active');
+                const parentLi = activeBtn.closest('li');
+                if (parentLi) {
+                  const otherDesc = parentLi.querySelector('.site-description');
+                  if (otherDesc) {
+                    otherDesc.style.opacity = '0';
+                    otherDesc.style.display = 'none';
+                  }
+                }
+              }
+            });
+
+            // Показати поточний опис
             descDiv.style.display = 'block';
             // Невеликий тайм-аут, щоб спрацював transition opacity
             setTimeout(() => {
@@ -153,7 +170,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }, 20);
             toggleBtn.classList.add('active');
           } else {
-            // Приховати
+            // Приховати поточний опис
             descDiv.style.opacity = '0';
             const onTransitionEnd = () => {
               descDiv.style.display = 'none';
