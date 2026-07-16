@@ -13,17 +13,17 @@ html {
   --card-bg: #ffffff;
   --card-border: #cbd5e1;
   --nav-bg: #1e293b;
-  --card-grad-end: rgba(15, 23, 42, 0.04); /* Soft neutral tint for light mode */
+  --card-grad-end: rgba(15, 23, 42, 0.08); /* Darker soft neutral tint for light mode */
 }
 
 /* Dark mode variables override */
 body.dark-mode, .dark-mode, html.dark-mode body, .dark {
   --bg-color: #0f172a;
   --text-color: #f8fafc;
-  --card-bg: #1e293b;
+  --card-bg: #243143; /* Lighter deep slate for cards to pop in dark mode */
   --card-border: #475569;
   --nav-bg: #090d16;
-  --card-grad-end: rgba(248, 250, 252, 0.04); /* Soft neutral tint for dark mode */
+  --card-grad-end: rgba(248, 250, 252, 0.08); /* Lighter soft neutral tint for dark mode */
 }
 
 body {
