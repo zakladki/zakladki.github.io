@@ -293,7 +293,18 @@ body {
   text-overflow: ellipsis;
 }
 
-.group li .icontooinfo,
+.group li .icontoo {
+  width: 29px;
+  height: 16px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  flex-shrink: 0;
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+}
+
 .group li > a[href*="youtu"] {
   flex-shrink: 0;
   margin-left: auto;

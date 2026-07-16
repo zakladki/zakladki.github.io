@@ -129,8 +129,8 @@ document.addEventListener("DOMContentLoaded", () => {
         toggleBtn.className = 'desc-toggle-btn';
         toggleBtn.innerHTML = '<i class="fas fa-caret-down"></i>';
 
-        // Додаємо його одразу після посилання
-        link.after(toggleBtn);
+        // Додаємо його в кінець елемента списку (після будь-яких іконок чи значків)
+        li.appendChild(toggleBtn);
 
         // Створюємо контейнер для опису
         const descDiv = document.createElement('div');
