@@ -199,6 +199,9 @@ document.addEventListener("DOMContentLoaded", () => {
                      window.location.pathname.endsWith('/index.html') || 
                      !window.location.pathname.includes('.html');
 
+  // Визначаємо, чи є поточна сторінка сторінкою "Соціум" (social.html)
+  const isSocialPage = window.location.pathname.includes('social.html');
+
   const leftAd = document.createElement('div');
   leftAd.className = 'side-ad-left';
   
@@ -232,10 +235,67 @@ document.addEventListener("DOMContentLoaded", () => {
              data-full-width-responsive="true"></ins>
       </div>
     `;
-    totalAdCount = 3; // 1 зліва (вертикальна) + 1 справа (вертикальна) + 1 внизу (Мультиплекс)
+    totalAdCount = 2; // 1 зліва (вертикальна) + 1 справа (вертикальна)
+  } else if (isSocialPage) {
+    // === ШАБЛОН РЕКЛАМИ ДЛЯ СТОРІНКИ "СОЦІУМ" ===
+    // Три рекламні блоки 300х250 зліва з різними кодами
+    leftAd.innerHTML = `
+      <!-- Ліворуч 1 (Соціум) -->
+      <div class="ad-wrapper" style="margin-top: 15px;">
+        <ins class="adsbygoogle"
+             style="display:inline-block;width:300px;height:250px"
+             data-ad-client="ca-pub-3065705668384801"
+             data-ad-slot="5145579105"
+             data-full-width-responsive="false"></ins>
+      </div>
+      <!-- Ліворуч 2 (Соціум) -->
+      <div class="ad-wrapper" style="margin-top: 15px;">
+        <ins class="adsbygoogle"
+             style="display:inline-block;width:300px;height:250px"
+             data-ad-client="ca-pub-3065705668384801"
+             data-ad-slot="9621533245"
+             data-full-width-responsive="false"></ins>
+      </div>
+      <!-- Ліворуч 3 (Соціум) -->
+      <div class="ad-wrapper" style="margin-top: 15px;">
+        <ins class="adsbygoogle"
+             style="display:inline-block;width:300px;height:250px"
+             data-ad-client="ca-pub-3065705668384801"
+             data-ad-slot="1571652834"
+             data-full-width-responsive="false"></ins>
+      </div>
+    `;
+
+    // Три рекламні блоки 300х250 справа з різними кодами
+    rightAd.innerHTML = `
+      <!-- Праворуч 1 (Соціум) -->
+      <div class="ad-wrapper" style="margin-top: 15px;">
+        <ins class="adsbygoogle"
+             style="display:inline-block;width:300px;height:250px"
+             data-ad-client="ca-pub-3065705668384801"
+             data-ad-slot="7980314361"
+             data-full-width-responsive="false"></ins>
+      </div>
+      <!-- Праворуч 2 (Соціум) -->
+      <div class="ad-wrapper" style="margin-top: 15px;">
+        <ins class="adsbygoogle"
+             style="display:inline-block;width:300px;height:250px"
+             data-ad-client="ca-pub-3065705668384801"
+             data-ad-slot="7662418469"
+             data-full-width-responsive="false"></ins>
+      </div>
+      <!-- Праворуч 3 (Соціум) -->
+      <div class="ad-wrapper" style="margin-top: 15px;">
+        <ins class="adsbygoogle"
+             style="display:inline-block;width:300px;height:250px"
+             data-ad-client="ca-pub-3065705668384801"
+             data-ad-slot="8132503392"
+             data-full-width-responsive="false"></ins>
+      </div>
+    `;
+    totalAdCount = 6; // 3 зліва + 3 справа
   } else {
     // === ШАБЛОН РЕКЛАМИ ДЛЯ ВСІХ ІНШИХ СТОРІНОК ===
-    // Тут ми можемо зробити повністю іншу, більш лаконічну розстановку (наприклад, по одному великому/середньому блоку по центру чи зверху)
     leftAd.innerHTML = `
       <!-- Ліворуч-Окремий блок (Інші сторінки) -->
       <div class="ad-wrapper" style="margin-top: 50px;">
