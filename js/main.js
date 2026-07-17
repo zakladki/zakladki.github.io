@@ -193,59 +193,94 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // 5. Динамічне додавання рекламних блоків по боках для широких екранів (по 2 блоки з кожного боку)
+  // 5. Динамічне додавання рекламних блоків по боках з різним розташуванням для головної та інших сторінок
+  // Визначаємо, чи є поточна сторінка головною (index.html, корінь "/" або пустий шлях)
+  const isHomepage = window.location.pathname.endsWith('/') || 
+                     window.location.pathname.endsWith('/index.html') || 
+                     !window.location.pathname.includes('.html');
+
   const leftAd = document.createElement('div');
   leftAd.className = 'side-ad-left';
-  leftAd.innerHTML = `
-    <!-- Ліворуч-Верх -->
-    <div class="ad-wrapper">
-      <ins class="adsbygoogle"
-           style="display:inline-block;width:300px;height:250px"
-           data-ad-client="ca-pub-3065705668384801"
-           data-ad-slot="5145579105"
-           data-full-width-responsive="false"></ins>
-    </div>
-    <!-- Ліворуч-Вертикально -->
-    <div class="ad-wrapper-bottom">
-      <ins class="adsbygoogle"
-           style="display:block"
-           data-ad-client="ca-pub-3065705668384801"
-           data-ad-slot="9621533245"
-           data-ad-format="auto"
-           data-full-width-responsive="true"></ins>
-    </div>
-  `;
-
+  
   const rightAd = document.createElement('div');
   rightAd.className = 'side-ad-right';
-  rightAd.innerHTML = `
-    <!-- Праворуч-Верх -->
-    <div class="ad-wrapper">
-      <ins class="adsbygoogle"
-           style="display:inline-block;width:300px;height:250px"
-           data-ad-client="ca-pub-3065705668384801"
-           data-ad-slot="7980314361"
-           data-full-width-responsive="false"></ins>
-    </div>
-    <!-- Праворуч-Мультиплекс -->
-    <div class="ad-wrapper-bottom">
-      <ins class="adsbygoogle"
-           style="display:block"
-           data-ad-format="autorelaxed"
-           data-ad-client="ca-pub-3065705668384801"
-           data-ad-slot="8132503392"
-           data-matched-content-rows-num="4"
-           data-matched-content-columns-num="1"
-           data-matched-content-ui-type="image_stacked"></ins>
-    </div>
-  `;
+
+  let totalAdCount = 0;
+
+  if (isHomepage) {
+    // === ШАБЛОН РЕКЛАМИ ДЛЯ ГОЛОВНОЇ СТОРІНКИ ===
+    leftAd.innerHTML = `
+      <!-- Ліворуч-Верх (Головна) -->
+      <div class="ad-wrapper">
+        <ins class="adsbygoogle"
+             style="display:inline-block;width:300px;height:250px"
+             data-ad-client="ca-pub-3065705668384801"
+             data-ad-slot="5145579105"
+             data-full-width-responsive="false"></ins>
+      </div>
+      <!-- Ліворуч-Вертикально (Головна) -->
+      <div class="ad-wrapper-bottom">
+        <ins class="adsbygoogle"
+             style="display:block"
+             data-ad-client="ca-pub-3065705668384801"
+             data-ad-slot="9621533245"
+             data-ad-format="auto"
+             data-full-width-responsive="true"></ins>
+      </div>
+    `;
+
+    rightAd.innerHTML = `
+      <!-- Праворуч-Верх (Головна) -->
+      <div class="ad-wrapper">
+        <ins class="adsbygoogle"
+             style="display:inline-block;width:300px;height:250px"
+             data-ad-client="ca-pub-3065705668384801"
+             data-ad-slot="7980314361"
+             data-full-width-responsive="false"></ins>
+      </div>
+      <!-- Праворуч-Мультиплекс (Головна) -->
+      <div class="ad-wrapper-bottom">
+        <ins class="adsbygoogle"
+             style="display:block"
+             data-ad-format="autorelaxed"
+             data-ad-client="ca-pub-3065705668384801"
+             data-ad-slot="8132503392"></ins>
+      </div>
+    `;
+    totalAdCount = 4; // 2 зліва + 2 справа
+  } else {
+    // === ШАБЛОН РЕКЛАМИ ДЛЯ ВСІХ ІНШИХ СТОРІНОК ===
+    // Тут ми можемо зробити повністю іншу, більш лаконічну розстановку (наприклад, по одному великому/середньому блоку по центру чи зверху)
+    leftAd.innerHTML = `
+      <!-- Ліворуч-Окремий блок (Інші сторінки) -->
+      <div class="ad-wrapper" style="margin-top: 50px;">
+        <ins class="adsbygoogle"
+             style="display:inline-block;width:300px;height:250px"
+             data-ad-client="ca-pub-3065705668384801"
+             data-ad-slot="5145579105"
+             data-full-width-responsive="false"></ins>
+      </div>
+    `;
+
+    rightAd.innerHTML = `
+      <!-- Праворуч-Окремий блок (Інші сторінки) -->
+      <div class="ad-wrapper" style="margin-top: 50px;">
+        <ins class="adsbygoogle"
+             style="display:inline-block;width:300px;height:250px"
+             data-ad-client="ca-pub-3065705668384801"
+             data-ad-slot="7980314361"
+             data-full-width-responsive="false"></ins>
+      </div>
+    `;
+    totalAdCount = 2; // 1 зліва + 1 справа
+  }
 
   document.body.appendChild(leftAd);
   document.body.appendChild(rightAd);
 
-  // Ініціалізація рекламних оголошень AdSense (4 оголошення в сумі)
+  // Динамічна ініціалізація рекламних оголошень AdSense (кількість залежить від сторінки)
   try {
-    for (let i = 0; i < 4; i++) {
+    for (let i = 0; i < totalAdCount; i++) {
       (window.adsbygoogle = window.adsbygoogle || []).push({});
     }
   } catch (e) {
