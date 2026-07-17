@@ -230,16 +230,8 @@ document.addEventListener("DOMContentLoaded", () => {
     `;
 
     rightAd.innerHTML = `
-      <!-- Праворуч-Верх (Головна) -->
-      <div class="ad-wrapper">
-        <ins class="adsbygoogle"
-             style="display:inline-block;width:300px;height:250px"
-             data-ad-client="ca-pub-3065705668384801"
-             data-ad-slot="7980314361"
-             data-full-width-responsive="false"></ins>
-      </div>
-      <!-- Праворуч-Мультиплекс (Головна) -->
-      <div class="ad-wrapper-bottom">
+      <!-- Праворуч-Мультиплекс (Головна) - Окремий блок на всю висоту -->
+      <div class="ad-wrapper-bottom" style="margin-top: 0; height: 100%;">
         <ins class="adsbygoogle"
              style="display:block"
              data-ad-format="autorelaxed"
@@ -247,7 +239,7 @@ document.addEventListener("DOMContentLoaded", () => {
              data-ad-slot="8132503392"></ins>
       </div>
     `;
-    totalAdCount = 4; // 2 зліва + 2 справа
+    totalAdCount = 3; // 2 зліва + 1 справа (тільки Мультиплекс)
   } else {
     // === ШАБЛОН РЕКЛАМИ ДЛЯ ВСІХ ІНШИХ СТОРІНОК ===
     // Тут ми можемо зробити повністю іншу, більш лаконічну розстановку (наприклад, по одному великому/середньому блоку по центру чи зверху)
