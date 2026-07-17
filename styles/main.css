@@ -693,8 +693,8 @@ footer.footer .btn-primary:active {
 
 /* Контейнер для нижнього блоку мультиплекс-реклами на Головній сторінці */
 .bottom-multiplex-container {
-  margin-top: 35px !important;
-  margin-bottom: 75px !important; /* Відступ знизу, щоб реклама не заходила за фіксований футер */
+  margin-top: 15px !important;
+  margin-bottom: 30px !important; /* Відступ знизу, щоб реклама виглядала гармонійно та компактно */
   padding: 0 15px;
   overflow: visible;
   clear: both;
