@@ -633,10 +633,12 @@ footer.footer .btn-primary:active {
 .side-ad-left, .side-ad-right {
   display: none; /* Приховуємо на мобільних та середніх екранах за замовчуванням */
   position: fixed;
-  top: 90px; /* Нижче за навігаційне меню */
-  width: 300px; /* Збільшуємо ширину до 300px для ефективних рекламних форматів типу 300x250 або адаптивних блоків */
-  height: 600px;
+  top: 70px; /* Припідняли ближче до навігаційного меню */
+  width: 300px;
+  height: calc(100vh - 85px); /* Робимо висоту динамічною */
   z-index: 99;
+  flex-direction: column;
+  gap: 8px; /* Мінімальний відступ між трьома блоками */
 }
 
 .side-ad-left {
@@ -650,6 +652,6 @@ footer.footer .btn-primary:active {
 /* Відображаємо рекламу тільки на великих моніторах (від 1800px), де є достатньо вільного місця (наприклад, повністю розгорнуте вікно на 1920x1080 і більше, навіть із бічними панелями) */
 @media (min-width: 1800px) {
   .side-ad-left, .side-ad-right {
-    display: block;
+    display: flex;
   }
 }

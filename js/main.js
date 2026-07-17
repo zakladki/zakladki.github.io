@@ -193,39 +193,67 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // 5. Динамічне додавання рекламних блоків по боках для широких екранів
-  // РЕКОМЕНДАЦІЯ: Щоб уникнути показу однакових оголошень ліворуч і праворуч,
-  // ви можете створити два окремі рекламні блоки в кабінеті AdSense (наприклад, "Multiplex Left" та "Multiplex Right")
-  // та вписати їхні унікальні значення data-ad-slot нижче.
+  // 5. Динамічне додавання рекламних блоків по боках для широких екранів (по 3 блоки з кожного боку)
   const leftAd = document.createElement('div');
   leftAd.className = 'side-ad-left';
   leftAd.innerHTML = `
-    <!-- Реклама ліворуч -->
+    <!-- Ліворуч-Верх -->
     <ins class="adsbygoogle"
          style="display:block"
-         data-ad-format="autorelaxed"
          data-ad-client="ca-pub-3065705668384801"
-         data-ad-slot="6946314159"></ins>
+         data-ad-slot="5145579105"
+         data-ad-format="auto"
+         data-full-width-responsive="true"></ins>
+    <!-- Ліворуч-Центр -->
+    <ins class="adsbygoogle"
+         style="display:block"
+         data-ad-client="ca-pub-3065705668384801"
+         data-ad-slot="2519415769"
+         data-ad-format="auto"
+         data-full-width-responsive="true"></ins>
+    <!-- Ліворуч-Низ -->
+    <ins class="adsbygoogle"
+         style="display:block"
+         data-ad-client="ca-pub-3065705668384801"
+         data-ad-slot="4064999941"
+         data-ad-format="auto"
+         data-full-width-responsive="true"></ins>
   `;
 
   const rightAd = document.createElement('div');
   rightAd.className = 'side-ad-right';
   rightAd.innerHTML = `
-    <!-- Реклама праворуч (можна вставити інший slot id, коли згенеруєте його в AdSense) -->
+    <!-- Праворуч-Верх -->
     <ins class="adsbygoogle"
          style="display:block"
-         data-ad-format="autorelaxed"
          data-ad-client="ca-pub-3065705668384801"
-         data-ad-slot="6946314159"></ins>
+         data-ad-slot="7980314361"
+         data-ad-format="auto"
+         data-full-width-responsive="true"></ins>
+    <!-- Праворуч-Центр -->
+    <ins class="adsbygoogle"
+         style="display:block"
+         data-ad-client="ca-pub-3065705668384801"
+         data-ad-slot="2504506263"
+         data-ad-format="auto"
+         data-full-width-responsive="true"></ins>
+    <!-- Праворуч-Низ -->
+    <ins class="adsbygoogle"
+         style="display:block"
+         data-ad-client="ca-pub-3065705668384801"
+         data-ad-slot="5465143303"
+         data-ad-format="auto"
+         data-full-width-responsive="true"></ins>
   `;
 
   document.body.appendChild(leftAd);
   document.body.appendChild(rightAd);
 
-  // Ініціалізація рекламних оголошень AdSense
+  // Ініціалізація рекламних оголошень AdSense (6 оголошень в сумі)
   try {
-    (window.adsbygoogle = window.adsbygoogle || []).push({});
-    (window.adsbygoogle = window.adsbygoogle || []).push({});
+    for (let i = 0; i < 6; i++) {
+      (window.adsbygoogle = window.adsbygoogle || []).push({});
+    }
   } catch (e) {
     console.log("AdSense integration error:", e);
   }
