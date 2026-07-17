@@ -238,62 +238,31 @@ document.addEventListener("DOMContentLoaded", () => {
     totalAdCount = 2; // 1 зліва (вертикальна) + 1 справа (вертикальна)
   } else if (isSocialPage) {
     // === ШАБЛОН РЕКЛАМИ ДЛЯ СТОРІНКИ "СОЦІУМ" ===
-    // Три рекламні блоки 300х250 зліва з різними кодами
+    // По одному великому вертикальному блоку по боках (на всю висоту)
     leftAd.innerHTML = `
-      <!-- Ліворуч 1 (Соціум) -->
-      <div class="ad-wrapper" style="margin-top: 15px;">
+      <!-- Ліворуч-Вертикально (Соціум) - Велика вертикальна реклама на всю висоту -->
+      <div class="ad-wrapper-vertical">
         <ins class="adsbygoogle"
-             style="display:inline-block;width:300px;height:250px"
-             data-ad-client="ca-pub-3065705668384801"
-             data-ad-slot="5145579105"
-             data-full-width-responsive="false"></ins>
-      </div>
-      <!-- Ліворуч 2 (Соціум) -->
-      <div class="ad-wrapper" style="margin-top: 15px;">
-        <ins class="adsbygoogle"
-             style="display:inline-block;width:300px;height:250px"
+             style="display:block;"
              data-ad-client="ca-pub-3065705668384801"
              data-ad-slot="9621533245"
-             data-full-width-responsive="false"></ins>
-      </div>
-      <!-- Ліворуч 3 (Соціум) -->
-      <div class="ad-wrapper" style="margin-top: 15px;">
-        <ins class="adsbygoogle"
-             style="display:inline-block;width:300px;height:250px"
-             data-ad-client="ca-pub-3065705668384801"
-             data-ad-slot="1571652834"
-             data-full-width-responsive="false"></ins>
+             data-ad-format="auto"
+             data-full-width-responsive="true"></ins>
       </div>
     `;
 
-    // Три рекламні блоки 300х250 справа з різними кодами
     rightAd.innerHTML = `
-      <!-- Праворуч 1 (Соціум) -->
-      <div class="ad-wrapper" style="margin-top: 15px;">
+      <!-- Праворуч-Вертикально (Соціум) - Велика вертикальна реклама на всю висоту -->
+      <div class="ad-wrapper-vertical">
         <ins class="adsbygoogle"
-             style="display:inline-block;width:300px;height:250px"
-             data-ad-client="ca-pub-3065705668384801"
-             data-ad-slot="7980314361"
-             data-full-width-responsive="false"></ins>
-      </div>
-      <!-- Праворуч 2 (Соціум) -->
-      <div class="ad-wrapper" style="margin-top: 15px;">
-        <ins class="adsbygoogle"
-             style="display:inline-block;width:300px;height:250px"
+             style="display:block;"
              data-ad-client="ca-pub-3065705668384801"
              data-ad-slot="7662418469"
-             data-full-width-responsive="false"></ins>
-      </div>
-      <!-- Праворуч 3 (Соціум) -->
-      <div class="ad-wrapper" style="margin-top: 15px;">
-        <ins class="adsbygoogle"
-             style="display:inline-block;width:300px;height:250px"
-             data-ad-client="ca-pub-3065705668384801"
-             data-ad-slot="8132503392"
-             data-full-width-responsive="false"></ins>
+             data-ad-format="auto"
+             data-full-width-responsive="true"></ins>
       </div>
     `;
-    totalAdCount = 6; // 3 зліва + 3 справа
+    totalAdCount = 2; // Тільки 2 бічні (нижній мультиплекс має власну ініціалізацію в social.html)
   } else {
     // === ШАБЛОН РЕКЛАМИ ДЛЯ ВСІХ ІНШИХ СТОРІНОК ===
     leftAd.innerHTML = `
