@@ -693,16 +693,16 @@ footer.footer .btn-primary:active {
 
 /* Контейнер для нижнього блоку мультиплекс-реклами на Головній сторінці */
 .bottom-multiplex-container {
-  margin-top: 15px !important;
-  margin-bottom: 30px !important; /* Відступ знизу, щоб реклама виглядала гармонійно та компактно */
+  margin-top: 10px !important;
+  margin-bottom: 25px !important; /* Відступ знизу, щоб реклама виглядала гармонійно та компактно */
   padding: 0 15px;
   overflow: visible;
   clear: both;
 }
 
 .bottom-multiplex-container .adsbygoogle {
-  height: 250px !important;
-  max-height: 250px !important;
+  width: 100% !important;
+  display: block;
 }
 
 .side-ad-left {
