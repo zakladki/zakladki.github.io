@@ -193,6 +193,42 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
+  // 5. Динамічне додавання рекламних блоків по боках для широких екранів
+  const leftAd = document.createElement('div');
+  leftAd.className = 'side-ad-left';
+  leftAd.innerHTML = `
+    <!-- Вертикальний (при 1920) -->
+    <ins class="adsbygoogle"
+         style="display:block"
+         data-ad-client="ca-pub-3065705668384801"
+         data-ad-slot="7883991308"
+         data-ad-format="auto"
+         data-full-width-responsive="true"></ins>
+  `;
+
+  const rightAd = document.createElement('div');
+  rightAd.className = 'side-ad-right';
+  rightAd.innerHTML = `
+    <!-- Вертикальний (при 1920) -->
+    <ins class="adsbygoogle"
+         style="display:block"
+         data-ad-client="ca-pub-3065705668384801"
+         data-ad-slot="7883991308"
+         data-ad-format="auto"
+         data-full-width-responsive="true"></ins>
+  `;
+
+  document.body.appendChild(leftAd);
+  document.body.appendChild(rightAd);
+
+  // Ініціалізація рекламних оголошень AdSense
+  try {
+    (window.adsbygoogle = window.adsbygoogle || []).push({});
+    (window.adsbygoogle = window.adsbygoogle || []).push({});
+  } catch (e) {
+    console.log("AdSense integration error:", e);
+  }
+
 });
 
 // 4. Функція швидкого плавного прокручування вгору
