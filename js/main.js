@@ -238,52 +238,71 @@ document.addEventListener("DOMContentLoaded", () => {
     totalAdCount = 2; // 1 зліва (вертикальна) + 1 справа (вертикальна)
   } else if (isSocialPage) {
     // === ШАБЛОН РЕКЛАМИ ДЛЯ СТОРІНКИ "СОЦІУМ" ===
-    // По одному великому вертикальному блоку по боках (на всю висоту)
+    // Трисекційне розділення, верхній блок під 300x300, решта пустують
     leftAd.innerHTML = `
-      <!-- Ліворуч-Вертикально (Соціум) - Велика вертикальна реклама на всю висоту -->
-      <div class="ad-wrapper-vertical">
-        <ins class="adsbygoogle"
-             style="display:block;"
-             data-ad-client="ca-pub-3065705668384801"
-             data-ad-slot="9621533245"
-             data-ad-format="auto"
-             data-full-width-responsive="true"></ins>
+      <div class="ad-sidebar-three-parts">
+        <div class="ad-sidebar-part ad-part-top">
+          <div class="ad-wrapper-300-300">
+            <ins class="adsbygoogle"
+                 style="display:inline-block;width:300px;height:300px"
+                 data-ad-client="ca-pub-3065705668384801"
+                 data-ad-slot="5145579105"
+                 data-full-width-responsive="false"></ins>
+          </div>
+        </div>
+        <div class="ad-sidebar-part ad-part-middle"></div>
+        <div class="ad-sidebar-part ad-part-bottom"></div>
       </div>
     `;
 
     rightAd.innerHTML = `
-      <!-- Праворуч-Вертикально (Соціум) - Велика вертикальна реклама на всю висоту -->
-      <div class="ad-wrapper-vertical">
-        <ins class="adsbygoogle"
-             style="display:block;"
-             data-ad-client="ca-pub-3065705668384801"
-             data-ad-slot="7662418469"
-             data-ad-format="auto"
-             data-full-width-responsive="true"></ins>
+      <div class="ad-sidebar-three-parts">
+        <div class="ad-sidebar-part ad-part-top">
+          <div class="ad-wrapper-300-300">
+            <ins class="adsbygoogle"
+                 style="display:inline-block;width:300px;height:300px"
+                 data-ad-client="ca-pub-3065705668384801"
+                 data-ad-slot="7980314361"
+                 data-full-width-responsive="false"></ins>
+          </div>
+        </div>
+        <div class="ad-sidebar-part ad-part-middle"></div>
+        <div class="ad-sidebar-part ad-part-bottom"></div>
       </div>
     `;
     totalAdCount = 2; // Тільки 2 бічні (нижній мультиплекс має власну ініціалізацію в social.html)
   } else {
     // === ШАБЛОН РЕКЛАМИ ДЛЯ ВСІХ ІНШИХ СТОРІНОК ===
+    // Трисекційне розділення, верхній блок під 300x300, решта пустують
     leftAd.innerHTML = `
-      <!-- Ліворуч-Окремий блок (Інші сторінки) -->
-      <div class="ad-wrapper" style="margin-top: 50px;">
-        <ins class="adsbygoogle"
-             style="display:inline-block;width:300px;height:250px"
-             data-ad-client="ca-pub-3065705668384801"
-             data-ad-slot="5145579105"
-             data-full-width-responsive="false"></ins>
+      <div class="ad-sidebar-three-parts">
+        <div class="ad-sidebar-part ad-part-top">
+          <div class="ad-wrapper-300-300">
+            <ins class="adsbygoogle"
+                 style="display:inline-block;width:300px;height:300px"
+                 data-ad-client="ca-pub-3065705668384801"
+                 data-ad-slot="5145579105"
+                 data-full-width-responsive="false"></ins>
+          </div>
+        </div>
+        <div class="ad-sidebar-part ad-part-middle"></div>
+        <div class="ad-sidebar-part ad-part-bottom"></div>
       </div>
     `;
 
     rightAd.innerHTML = `
-      <!-- Праворуч-Окремий блок (Інші сторінки) -->
-      <div class="ad-wrapper" style="margin-top: 50px;">
-        <ins class="adsbygoogle"
-             style="display:inline-block;width:300px;height:250px"
-             data-ad-client="ca-pub-3065705668384801"
-             data-ad-slot="7980314361"
-             data-full-width-responsive="false"></ins>
+      <div class="ad-sidebar-three-parts">
+        <div class="ad-sidebar-part ad-part-top">
+          <div class="ad-wrapper-300-300">
+            <ins class="adsbygoogle"
+                 style="display:inline-block;width:300px;height:300px"
+                 data-ad-client="ca-pub-3065705668384801"
+                 data-ad-slot="7980314361"
+                 data-full-width-responsive="false"></ins>
+          </div>
+        </div>
+        <div class="ad-sidebar-part ad-part-middle"></div>
+        <div class="ad-sidebar-part ad-part-bottom"></div>
       </div>
     `;
     totalAdCount = 2; // 1 зліва + 1 справа

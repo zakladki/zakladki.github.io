@@ -709,6 +709,46 @@ footer.footer .btn-primary:active {
   display: block !important;
 }
 
+/* Каркас трисекційного бокового блоку реклами для всіх сторінок, окрім Головної */
+.ad-sidebar-three-parts {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+.ad-sidebar-part {
+  width: 100%;
+  flex: 1; /* Рівномірний розподіл висоти на три секції */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start; /* Вирівнювання по верхньому краю кожної секції */
+  align-items: center;
+  position: relative;
+  box-sizing: border-box;
+}
+
+/* Спеціальний обмежувач для верхньої реклами 300x300 або 300x250 */
+.ad-wrapper-300-300 {
+  width: 300px;
+  height: 300px;
+  max-height: 300px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  position: relative;
+}
+
+.ad-wrapper-300-300 .adsbygoogle {
+  display: inline-block !important;
+  width: 300px !important;
+  height: 300px !important;
+}
+
 .side-ad-left {
   left: calc(50% - 570px - 320px); /* Позиція зліва від центрального контейнера (570px половина контейнера + 300px ширина реклами + 20px відступ) */
 }
