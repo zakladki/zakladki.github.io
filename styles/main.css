@@ -638,7 +638,8 @@ footer.footer .btn-primary:active {
   width: 300px;
   z-index: 99;
   flex-direction: column;
-  justify-content: space-between; /* Рівномірний розподіл: верхній блок вгорі, нижній внизу, середній точно по центру */
+  justify-content: flex-start; /* Вирівнювання по вертикалі під самий верх */
+  overflow: visible; /* Забезпечуємо відображення границь без зрізання */
 }
 
 .ad-wrapper {
@@ -669,6 +670,34 @@ footer.footer .btn-primary:active {
   width: 100% !important;
   height: 100% !important;
   max-height: 100% !important;
+}
+
+/* Новий клас для великих вертикальних оголошень на головній сторінці */
+.ad-wrapper-vertical {
+  width: 300px;
+  height: 100%;
+  max-height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start; /* Починаємо від самого верху */
+  align-items: center;
+  overflow: visible; /* Щоб границі не зрізалися */
+  position: relative;
+}
+
+.ad-wrapper-vertical .adsbygoogle {
+  width: 100% !important;
+  height: 100% !important;
+  max-height: 100% !important;
+}
+
+/* Контейнер для нижнього блоку мультиплекс-реклами на Головній сторінці */
+.bottom-multiplex-container {
+  margin-top: 35px !important;
+  margin-bottom: 75px !important; /* Відступ знизу, щоб реклама не заходила за фіксований футер */
+  padding: 0 15px;
+  overflow: visible;
+  clear: both;
 }
 
 .side-ad-left {

@@ -211,9 +211,9 @@ document.addEventListener("DOMContentLoaded", () => {
     // === ШАБЛОН РЕКЛАМИ ДЛЯ ГОЛОВНОЇ СТОРІНКИ ===
     leftAd.innerHTML = `
       <!-- Ліворуч-Вертикально (Головна) - Велика вертикальна реклама на всю висоту -->
-      <div class="ad-wrapper-bottom" style="margin-top: 0; height: 100%;">
+      <div class="ad-wrapper-vertical">
         <ins class="adsbygoogle"
-             style="display:block;height:100%;"
+             style="display:block;"
              data-ad-client="ca-pub-3065705668384801"
              data-ad-slot="9621533245"
              data-ad-format="auto"
@@ -222,19 +222,17 @@ document.addEventListener("DOMContentLoaded", () => {
     `;
 
     rightAd.innerHTML = `
-      <!-- Праворуч-Мультиплекс (Головна) - Окремий блок на всю висоту -->
-      <div class="ad-wrapper-bottom" style="margin-top: 0; height: 100%;">
+      <!-- Праворуч-Вертикально (Головна) - Велика вертикальна реклама на всю висоту -->
+      <div class="ad-wrapper-vertical">
         <ins class="adsbygoogle"
-             style="display:block;height:100%;"
-             data-ad-format="autorelaxed"
+             style="display:block;"
              data-ad-client="ca-pub-3065705668384801"
-             data-ad-slot="8132503392"
-             data-matched-content-rows-num="3"
-             data-matched-content-columns-num="1"
-             data-matched-content-ui-type="image_stacked"></ins>
+             data-ad-slot="7662418469"
+             data-ad-format="auto"
+             data-full-width-responsive="true"></ins>
       </div>
     `;
-    totalAdCount = 2; // 1 зліва (вертикальна) + 1 справа (тільки Мультиплекс)
+    totalAdCount = 3; // 1 зліва (вертикальна) + 1 справа (вертикальна) + 1 внизу (Мультиплекс)
   } else {
     // === ШАБЛОН РЕКЛАМИ ДЛЯ ВСІХ ІНШИХ СТОРІНОК ===
     // Тут ми можемо зробити повністю іншу, більш лаконічну розстановку (наприклад, по одному великому/середньому блоку по центру чи зверху)
