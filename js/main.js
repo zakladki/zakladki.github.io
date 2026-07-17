@@ -211,7 +211,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let totalAdCount = 0;
 
   if (isHomepage) {
-    // === ШАБЛОН РЕКЛАМИ ДЛЯ ГОЛОВНОЇ СТОРІНКИ ===
+    // === ШАБЛОН РЕКЛАМИ ДЛЯ СТОРІНКИ "ГОЛОВНА" ===
     leftAd.innerHTML = `
       <!-- Ліворуч-Вертикально (Головна) - Велика вертикальна реклама на всю висоту -->
       <div class="ad-wrapper-vertical">
@@ -236,43 +236,8 @@ document.addEventListener("DOMContentLoaded", () => {
       </div>
     `;
     totalAdCount = 2; // 1 зліва (вертикальна) + 1 справа (вертикальна)
-  } else if (isSocialPage) {
-    // === ШАБЛОН РЕКЛАМИ ДЛЯ СТОРІНКИ "СОЦІУМ" ===
-    // Трисекційне розділення, верхній блок під 300x300, решта пустують
-    leftAd.innerHTML = `
-      <div class="ad-sidebar-three-parts">
-        <div class="ad-sidebar-part ad-part-top">
-          <div class="ad-wrapper-300-300">
-            <ins class="adsbygoogle"
-                 style="display:inline-block;width:300px;height:300px"
-                 data-ad-client="ca-pub-3065705668384801"
-                 data-ad-slot="5145579105"
-                 data-full-width-responsive="false"></ins>
-          </div>
-        </div>
-        <div class="ad-sidebar-part ad-part-middle"></div>
-        <div class="ad-sidebar-part ad-part-bottom"></div>
-      </div>
-    `;
-
-    rightAd.innerHTML = `
-      <div class="ad-sidebar-three-parts">
-        <div class="ad-sidebar-part ad-part-top">
-          <div class="ad-wrapper-300-300">
-            <ins class="adsbygoogle"
-                 style="display:inline-block;width:300px;height:300px"
-                 data-ad-client="ca-pub-3065705668384801"
-                 data-ad-slot="7980314361"
-                 data-full-width-responsive="false"></ins>
-          </div>
-        </div>
-        <div class="ad-sidebar-part ad-part-middle"></div>
-        <div class="ad-sidebar-part ad-part-bottom"></div>
-      </div>
-    `;
-    totalAdCount = 2; // Тільки 2 бічні (нижній мультиплекс має власну ініціалізацію в social.html)
   } else {
-    // === ШАБЛОН РЕКЛАМИ ДЛЯ ВСІХ ІНШИХ СТОРІНОК ===
+    // === ШАБЛОН РЕКЛАМИ ДЛЯ ВСІХ ІНШИХ СТОРІНОК (ВКЛЮЧАЮЧИ СОЦІУМ) ===
     // Трисекційне розділення, верхній блок під 300x300, решта пустують
     leftAd.innerHTML = `
       <div class="ad-sidebar-three-parts">
@@ -305,7 +270,23 @@ document.addEventListener("DOMContentLoaded", () => {
         <div class="ad-sidebar-part ad-part-bottom"></div>
       </div>
     `;
-    totalAdCount = 2; // 1 зліва + 1 справа
+    totalAdCount = 2; // 1 лівий бічний + 1 правий бічний
+
+    // Динамічно додаємо нижній горизонтальний МУЛЬТИПЛЕКС перед футером на всіх інших сторінках
+    const footer = document.querySelector('footer.footer');
+    if (footer) {
+      const multiplexContainer = document.createElement('div');
+      multiplexContainer.className = 'container bottom-multiplex-container';
+      multiplexContainer.innerHTML = `
+        <ins class="adsbygoogle"
+             style="display:block;height:250px;"
+             data-ad-format="autorelaxed"
+             data-ad-client="ca-pub-3065705668384801"
+             data-ad-slot="1571652834"></ins>
+      `;
+      footer.parentNode.insertBefore(multiplexContainer, footer);
+      totalAdCount += 1; // Додаємо 1 для ініціалізації мультиплекс-блоку
+    }
   }
 
   document.body.appendChild(leftAd);
