@@ -228,7 +228,10 @@ document.addEventListener("DOMContentLoaded", () => {
              style="display:block;height:100%;"
              data-ad-format="autorelaxed"
              data-ad-client="ca-pub-3065705668384801"
-             data-ad-slot="8132503392"></ins>
+             data-ad-slot="8132503392"
+             data-matched-content-rows-num="3"
+             data-matched-content-columns-num="1"
+             data-matched-content-ui-type="image_stacked"></ins>
       </div>
     `;
     totalAdCount = 2; // 1 зліва (вертикальна) + 1 справа (тільки Мультиплекс)
