@@ -691,21 +691,16 @@ footer.footer .btn-primary:active {
   max-height: 100% !important;
 }
 
-/* Контейнер для нижнього блоку мультиплекс-реклами на Головній сторінці */
+/* Контейнер для нижнього блоку мультиплекс-реклами на всіх сторінках */
 .bottom-multiplex-container {
-  margin-top: 10px !important;
+  margin-top: 15px !important;
   margin-bottom: 25px !important; /* Відступ знизу, щоб реклама виглядала гармонійно та компактно */
   padding: 0 15px;
-  overflow: hidden; /* Обмежуємо будь-який вихід за межі висоти */
   clear: both;
-  height: 250px !important;
-  max-height: 250px !important;
 }
 
 .bottom-multiplex-container .adsbygoogle {
   width: 100% !important;
-  height: 250px !important;
-  max-height: 250px !important;
   display: block !important;
 }
 
