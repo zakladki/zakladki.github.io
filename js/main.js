@@ -233,7 +233,7 @@ document.addEventListener("DOMContentLoaded", () => {
       <!-- Праворуч-Мультиплекс (Головна) - Окремий блок на всю висоту -->
       <div class="ad-wrapper-bottom" style="margin-top: 0; height: 100%;">
         <ins class="adsbygoogle"
-             style="display:block"
+             style="display:block;height:100%;"
              data-ad-format="autorelaxed"
              data-ad-client="ca-pub-3065705668384801"
              data-ad-slot="8132503392"></ins>

@@ -648,7 +648,7 @@ footer.footer .btn-primary:active {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  overflow: hidden;
+  overflow: visible;
   position: relative;
 }
 
@@ -661,13 +661,12 @@ footer.footer .btn-primary:active {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  overflow: hidden;
+  overflow: visible;
   position: relative;
 }
 
 .ad-wrapper-bottom .adsbygoogle {
   width: 100% !important;
-  height: 100% !important;
 }
 
 .side-ad-left {
