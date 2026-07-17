@@ -198,52 +198,64 @@ document.addEventListener("DOMContentLoaded", () => {
   leftAd.className = 'side-ad-left';
   leftAd.innerHTML = `
     <!-- Ліворуч-Верх -->
-    <ins class="adsbygoogle"
-         style="display:block"
-         data-ad-client="ca-pub-3065705668384801"
-         data-ad-slot="5145579105"
-         data-ad-format="auto"
-         data-full-width-responsive="true"></ins>
+    <div class="ad-wrapper">
+      <ins class="adsbygoogle"
+           style="display:block"
+           data-ad-client="ca-pub-3065705668384801"
+           data-ad-slot="5145579105"
+           data-ad-format="auto"
+           data-full-width-responsive="true"></ins>
+    </div>
     <!-- Ліворуч-Центр -->
-    <ins class="adsbygoogle"
-         style="display:block"
-         data-ad-client="ca-pub-3065705668384801"
-         data-ad-slot="2519415769"
-         data-ad-format="auto"
-         data-full-width-responsive="true"></ins>
+    <div class="ad-wrapper">
+      <ins class="adsbygoogle"
+           style="display:block"
+           data-ad-client="ca-pub-3065705668384801"
+           data-ad-slot="2519415769"
+           data-ad-format="auto"
+           data-full-width-responsive="true"></ins>
+    </div>
     <!-- Ліворуч-Низ -->
-    <ins class="adsbygoogle"
-         style="display:block"
-         data-ad-client="ca-pub-3065705668384801"
-         data-ad-slot="4064999941"
-         data-ad-format="auto"
-         data-full-width-responsive="true"></ins>
+    <div class="ad-wrapper">
+      <ins class="adsbygoogle"
+           style="display:block"
+           data-ad-client="ca-pub-3065705668384801"
+           data-ad-slot="4064999941"
+           data-ad-format="auto"
+           data-full-width-responsive="true"></ins>
+    </div>
   `;
 
   const rightAd = document.createElement('div');
   rightAd.className = 'side-ad-right';
   rightAd.innerHTML = `
     <!-- Праворуч-Верх -->
-    <ins class="adsbygoogle"
-         style="display:block"
-         data-ad-client="ca-pub-3065705668384801"
-         data-ad-slot="7980314361"
-         data-ad-format="auto"
-         data-full-width-responsive="true"></ins>
+    <div class="ad-wrapper">
+      <ins class="adsbygoogle"
+           style="display:block"
+           data-ad-client="ca-pub-3065705668384801"
+           data-ad-slot="7980314361"
+           data-ad-format="auto"
+           data-full-width-responsive="true"></ins>
+    </div>
     <!-- Праворуч-Центр -->
-    <ins class="adsbygoogle"
-         style="display:block"
-         data-ad-client="ca-pub-3065705668384801"
-         data-ad-slot="2504506263"
-         data-ad-format="auto"
-         data-full-width-responsive="true"></ins>
+    <div class="ad-wrapper">
+      <ins class="adsbygoogle"
+           style="display:block"
+           data-ad-client="ca-pub-3065705668384801"
+           data-ad-slot="2504506263"
+           data-ad-format="auto"
+           data-full-width-responsive="true"></ins>
+    </div>
     <!-- Праворуч-Низ -->
-    <ins class="adsbygoogle"
-         style="display:block"
-         data-ad-client="ca-pub-3065705668384801"
-         data-ad-slot="5465143303"
-         data-ad-format="auto"
-         data-full-width-responsive="true"></ins>
+    <div class="ad-wrapper">
+      <ins class="adsbygoogle"
+           style="display:block"
+           data-ad-client="ca-pub-3065705668384801"
+           data-ad-slot="5465143303"
+           data-ad-format="auto"
+           data-full-width-responsive="true"></ins>
+    </div>
   `;
 
   document.body.appendChild(leftAd);

@@ -641,6 +641,23 @@ footer.footer .btn-primary:active {
   gap: 8px; /* Мінімальний відступ між трьома блоками */
 }
 
+.ad-wrapper {
+  flex: 1 1 0%; /* Рівномірний розподіл висоти на 3 рівні частини */
+  min-height: 0; /* Дозволяє контенту всередині коректно стискатися */
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  position: relative;
+}
+
+.ad-wrapper .adsbygoogle {
+  width: 100% !important;
+  height: 100% !important;
+}
+
 .side-ad-left {
   left: calc(50% - 570px - 320px); /* Позиція зліва від центрального контейнера (570px половина контейнера + 300px ширина реклами + 20px відступ) */
 }
