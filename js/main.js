@@ -200,29 +200,26 @@ document.addEventListener("DOMContentLoaded", () => {
     <!-- Ліворуч-Верх -->
     <div class="ad-wrapper">
       <ins class="adsbygoogle"
-           style="display:block"
+           style="display:inline-block;width:300px;height:250px"
            data-ad-client="ca-pub-3065705668384801"
            data-ad-slot="5145579105"
-           data-ad-format="auto"
-           data-full-width-responsive="true"></ins>
+           data-full-width-responsive="false"></ins>
     </div>
     <!-- Ліворуч-Центр -->
     <div class="ad-wrapper">
       <ins class="adsbygoogle"
-           style="display:block"
+           style="display:inline-block;width:300px;height:250px"
            data-ad-client="ca-pub-3065705668384801"
            data-ad-slot="2519415769"
-           data-ad-format="auto"
-           data-full-width-responsive="true"></ins>
+           data-full-width-responsive="false"></ins>
     </div>
     <!-- Ліворуч-Низ -->
     <div class="ad-wrapper">
       <ins class="adsbygoogle"
-           style="display:block"
+           style="display:inline-block;width:300px;height:250px"
            data-ad-client="ca-pub-3065705668384801"
            data-ad-slot="4064999941"
-           data-ad-format="auto"
-           data-full-width-responsive="true"></ins>
+           data-full-width-responsive="false"></ins>
     </div>
   `;
 
@@ -232,29 +229,26 @@ document.addEventListener("DOMContentLoaded", () => {
     <!-- Праворуч-Верх -->
     <div class="ad-wrapper">
       <ins class="adsbygoogle"
-           style="display:block"
+           style="display:inline-block;width:300px;height:250px"
            data-ad-client="ca-pub-3065705668384801"
            data-ad-slot="7980314361"
-           data-ad-format="auto"
-           data-full-width-responsive="true"></ins>
+           data-full-width-responsive="false"></ins>
     </div>
     <!-- Праворуч-Центр -->
     <div class="ad-wrapper">
       <ins class="adsbygoogle"
-           style="display:block"
+           style="display:inline-block;width:300px;height:250px"
            data-ad-client="ca-pub-3065705668384801"
            data-ad-slot="2504506263"
-           data-ad-format="auto"
-           data-full-width-responsive="true"></ins>
+           data-full-width-responsive="false"></ins>
     </div>
     <!-- Праворуч-Низ -->
     <div class="ad-wrapper">
       <ins class="adsbygoogle"
-           style="display:block"
+           style="display:inline-block;width:300px;height:250px"
            data-ad-client="ca-pub-3065705668384801"
            data-ad-slot="5465143303"
-           data-ad-format="auto"
-           data-full-width-responsive="true"></ins>
+           data-full-width-responsive="false"></ins>
     </div>
   `;
 
