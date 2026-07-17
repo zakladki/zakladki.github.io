@@ -210,18 +210,10 @@ document.addEventListener("DOMContentLoaded", () => {
   if (isHomepage) {
     // === ШАБЛОН РЕКЛАМИ ДЛЯ ГОЛОВНОЇ СТОРІНКИ ===
     leftAd.innerHTML = `
-      <!-- Ліворуч-Верх (Головна) -->
-      <div class="ad-wrapper">
+      <!-- Ліворуч-Вертикально (Головна) - Велика вертикальна реклама на всю висоту -->
+      <div class="ad-wrapper-bottom" style="margin-top: 0; height: 100%;">
         <ins class="adsbygoogle"
-             style="display:inline-block;width:300px;height:250px"
-             data-ad-client="ca-pub-3065705668384801"
-             data-ad-slot="5145579105"
-             data-full-width-responsive="false"></ins>
-      </div>
-      <!-- Ліворуч-Вертикально (Головна) -->
-      <div class="ad-wrapper-bottom">
-        <ins class="adsbygoogle"
-             style="display:block"
+             style="display:block;height:100%;"
              data-ad-client="ca-pub-3065705668384801"
              data-ad-slot="9621533245"
              data-ad-format="auto"
@@ -239,7 +231,7 @@ document.addEventListener("DOMContentLoaded", () => {
              data-ad-slot="8132503392"></ins>
       </div>
     `;
-    totalAdCount = 3; // 2 зліва + 1 справа (тільки Мультиплекс)
+    totalAdCount = 2; // 1 зліва (вертикальна) + 1 справа (тільки Мультиплекс)
   } else {
     // === ШАБЛОН РЕКЛАМИ ДЛЯ ВСІХ ІНШИХ СТОРІНОК ===
     // Тут ми можемо зробити повністю іншу, більш лаконічну розстановку (наприклад, по одному великому/середньому блоку по центру чи зверху)
