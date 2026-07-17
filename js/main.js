@@ -279,10 +279,13 @@ document.addEventListener("DOMContentLoaded", () => {
       multiplexContainer.className = 'container bottom-multiplex-container';
       multiplexContainer.innerHTML = `
         <ins class="adsbygoogle"
-             style="display:block;height:250px;"
+             style="display:block;"
              data-ad-format="autorelaxed"
              data-ad-client="ca-pub-3065705668384801"
-             data-ad-slot="1571652834"></ins>
+             data-ad-slot="1571652834"
+             data-matched-content-rows-num="2,1"
+             data-matched-content-columns-num="1,4"
+             data-matched-content-ui-type="image_stacked,image_stacked"></ins>
       `;
       footer.parentNode.insertBefore(multiplexContainer, footer);
       totalAdCount += 1; // Додаємо 1 для ініціалізації мультиплекс-блоку
@@ -291,6 +294,55 @@ document.addEventListener("DOMContentLoaded", () => {
 
   document.body.appendChild(leftAd);
   document.body.appendChild(rightAd);
+
+  // === ВПРОВАДЖЕННЯ МОБІЛЬНИХ IN-FEED РЕКЛАМНИХ БЛОКІВ МІЖ КАРТКАМИ ===
+  let inFeedConfig = null;
+  const currentPath = window.location.pathname;
+
+  if (currentPath.includes('social.html')) {
+    inFeedConfig = {
+      slot: '7702092709',
+      layoutKey: '-gw-3+1f-3d+2z'
+    };
+  } else if (currentPath.includes('news.html')) {
+    inFeedConfig = {
+      slot: '5930414256',
+      layoutKey: '-ef+6k-30-ac+ty'
+    };
+  } else if (currentPath.includes('media.html')) {
+    inFeedConfig = {
+      slot: '5495299989',
+      layoutKey: '-fb+5w+4e-db+86'
+    };
+  } else if (currentPath.includes('games.html')) {
+    inFeedConfig = {
+      slot: '4285591871',
+      layoutKey: '-6t+ed+2i-1n-4w'
+    };
+  }
+
+  if (inFeedConfig) {
+    const groups = document.querySelectorAll('.group');
+    groups.forEach((group) => {
+      // Створюємо контейнер для мобільного InFeed-блоку
+      const adContainer = document.createElement('div');
+      adContainer.className = 'infeed-ad-mobile-container';
+      adContainer.innerHTML = `
+        <ins class="adsbygoogle"
+             style="display:block;"
+             data-ad-layout="in-article"
+             data-ad-format="fluid"
+             data-ad-layout-key="${inFeedConfig.layoutKey}"
+             data-ad-client="ca-pub-3065705668384801"
+             data-ad-slot="${inFeedConfig.slot}"></ins>
+      `;
+      // Вставляємо відразу ПІСЛЯ картки (.group)
+      if (group.parentNode) {
+        group.parentNode.insertBefore(adContainer, group.nextSibling);
+        totalAdCount += 1; // Кожен блок потребує виклику (window.adsbygoogle).push({})
+      }
+    });
+  }
 
   // Динамічна ініціалізація рекламних оголошень AdSense (кількість залежить від сторінки)
   try {

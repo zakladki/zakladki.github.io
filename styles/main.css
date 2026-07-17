@@ -752,6 +752,27 @@ footer.footer .btn-primary:active {
   right: calc(50% - 570px - 320px); /* Позиція справа від центрального контейнера (570px половина контейнера + 300px ширина реклами + 20px відступ) */
 }
 
+/* Контейнер для мобільних InFeed-оголошень між картками */
+.infeed-ad-mobile-container {
+  display: none; /* За замовчуванням приховано на ПК */
+  width: 100%;
+}
+
+.infeed-ad-mobile-container .adsbygoogle {
+  display: block !important;
+  width: 100% !important;
+}
+
+@media (max-width: 1199.98px) {
+  .infeed-ad-mobile-container {
+    display: block !important;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    clear: both;
+  }
+}
+
 /* Відображаємо рекламу тільки на великих моніторах (від 1800px), де є достатньо вільного місця (наприклад, повністю розгорнуте вікно на 1920x1080 і більше, навіть із бічними панелями) */
 @media (min-width: 1800px) {
   .side-ad-left, .side-ad-right {
