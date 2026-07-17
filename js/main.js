@@ -197,25 +197,21 @@ document.addEventListener("DOMContentLoaded", () => {
   const leftAd = document.createElement('div');
   leftAd.className = 'side-ad-left';
   leftAd.innerHTML = `
-    <!-- Вертикальний (при 1920) -->
     <ins class="adsbygoogle"
          style="display:block"
+         data-ad-format="autorelaxed"
          data-ad-client="ca-pub-3065705668384801"
-         data-ad-slot="7883991308"
-         data-ad-format="auto"
-         data-full-width-responsive="true"></ins>
+         data-ad-slot="6946314159"></ins>
   `;
 
   const rightAd = document.createElement('div');
   rightAd.className = 'side-ad-right';
   rightAd.innerHTML = `
-    <!-- Вертикальний (при 1920) -->
     <ins class="adsbygoogle"
          style="display:block"
+         data-ad-format="autorelaxed"
          data-ad-client="ca-pub-3065705668384801"
-         data-ad-slot="7883991308"
-         data-ad-format="auto"
-         data-full-width-responsive="true"></ins>
+         data-ad-slot="6946314159"></ins>
   `;
 
   document.body.appendChild(leftAd);
