@@ -194,9 +194,13 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // 5. Динамічне додавання рекламних блоків по боках для широких екранів
+  // РЕКОМЕНДАЦІЯ: Щоб уникнути показу однакових оголошень ліворуч і праворуч,
+  // ви можете створити два окремі рекламні блоки в кабінеті AdSense (наприклад, "Multiplex Left" та "Multiplex Right")
+  // та вписати їхні унікальні значення data-ad-slot нижче.
   const leftAd = document.createElement('div');
   leftAd.className = 'side-ad-left';
   leftAd.innerHTML = `
+    <!-- Реклама ліворуч -->
     <ins class="adsbygoogle"
          style="display:block"
          data-ad-format="autorelaxed"
@@ -207,6 +211,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const rightAd = document.createElement('div');
   rightAd.className = 'side-ad-right';
   rightAd.innerHTML = `
+    <!-- Реклама праворуч (можна вставити інший slot id, коли згенеруєте його в AdSense) -->
     <ins class="adsbygoogle"
          style="display:block"
          data-ad-format="autorelaxed"
