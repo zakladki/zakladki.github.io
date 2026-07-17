@@ -193,7 +193,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // 5. Динамічне додавання рекламних блоків по боках для широких екранів (по 3 блоки з кожного боку)
+  // 5. Динамічне додавання рекламних блоків по боках для широких екранів (по 2 блоки з кожного боку)
   const leftAd = document.createElement('div');
   leftAd.className = 'side-ad-left';
   leftAd.innerHTML = `
@@ -205,21 +205,14 @@ document.addEventListener("DOMContentLoaded", () => {
            data-ad-slot="5145579105"
            data-full-width-responsive="false"></ins>
     </div>
-    <!-- Ліворуч-Центр -->
-    <div class="ad-wrapper">
+    <!-- Ліворуч-Вертикально -->
+    <div class="ad-wrapper-bottom">
       <ins class="adsbygoogle"
-           style="display:inline-block;width:300px;height:250px"
+           style="display:block"
            data-ad-client="ca-pub-3065705668384801"
-           data-ad-slot="2519415769"
-           data-full-width-responsive="false"></ins>
-    </div>
-    <!-- Ліворуч-Низ -->
-    <div class="ad-wrapper">
-      <ins class="adsbygoogle"
-           style="display:inline-block;width:300px;height:250px"
-           data-ad-client="ca-pub-3065705668384801"
-           data-ad-slot="4064999941"
-           data-full-width-responsive="false"></ins>
+           data-ad-slot="9621533245"
+           data-ad-format="auto"
+           data-full-width-responsive="true"></ins>
     </div>
   `;
 
@@ -234,30 +227,22 @@ document.addEventListener("DOMContentLoaded", () => {
            data-ad-slot="7980314361"
            data-full-width-responsive="false"></ins>
     </div>
-    <!-- Праворуч-Центр -->
-    <div class="ad-wrapper">
+    <!-- Праворуч-Мультиплекс -->
+    <div class="ad-wrapper-bottom">
       <ins class="adsbygoogle"
-           style="display:inline-block;width:300px;height:250px"
+           style="display:block"
+           data-ad-format="autorelaxed"
            data-ad-client="ca-pub-3065705668384801"
-           data-ad-slot="2504506263"
-           data-full-width-responsive="false"></ins>
-    </div>
-    <!-- Праворуч-Низ -->
-    <div class="ad-wrapper">
-      <ins class="adsbygoogle"
-           style="display:inline-block;width:300px;height:250px"
-           data-ad-client="ca-pub-3065705668384801"
-           data-ad-slot="5465143303"
-           data-full-width-responsive="false"></ins>
+           data-ad-slot="8132503392"></ins>
     </div>
   `;
 
   document.body.appendChild(leftAd);
   document.body.appendChild(rightAd);
 
-  // Ініціалізація рекламних оголошень AdSense (6 оголошень в сумі)
+  // Ініціалізація рекламних оголошень AdSense (4 оголошення в сумі)
   try {
-    for (let i = 0; i < 6; i++) {
+    for (let i = 0; i < 4; i++) {
       (window.adsbygoogle = window.adsbygoogle || []).push({});
     }
   } catch (e) {

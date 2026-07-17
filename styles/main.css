@@ -652,6 +652,24 @@ footer.footer .btn-primary:active {
   position: relative;
 }
 
+.ad-wrapper-bottom {
+  width: 300px;
+  flex-grow: 1; /* Розтягується на всю висоту, що залишилася до низу */
+  min-height: 250px;
+  margin-top: 20px; /* Відступ між верхнім та нижнім блоками реклами */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  position: relative;
+}
+
+.ad-wrapper-bottom .adsbygoogle {
+  width: 100% !important;
+  height: 100% !important;
+}
+
 .side-ad-left {
   left: calc(50% - 570px - 320px); /* Позиція зліва від центрального контейнера (570px половина контейнера + 300px ширина реклами + 20px відступ) */
 }
