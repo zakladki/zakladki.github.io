@@ -12,6 +12,35 @@ if (localStorage.getItem("theme") === "dark") {
 
 document.addEventListener("DOMContentLoaded", () => {
   
+  // === Fix favicon for speed.inetpro.com.ua ===
+  const fixFavicon = (img) => {
+    if (img.src && img.src.includes('speed.inetpro.com.ua')) {
+      img.src = 'https://www.google.com/s2/favicons?domain=speedtest.net&sz=32';
+    }
+  };
+
+  // Run immediately on existing images
+  document.querySelectorAll('img.link-favicon').forEach(fixFavicon);
+
+  // Watch for newly added images
+  const faviconObserver = new MutationObserver((mutations) => {
+    for (const mutation of mutations) {
+      for (const node of mutation.addedNodes) {
+        if (node.nodeType === Node.ELEMENT_NODE) {
+          if (node.tagName === 'IMG' && node.classList.contains('link-favicon')) {
+            fixFavicon(node);
+          } else {
+            node.querySelectorAll('img.link-favicon').forEach(fixFavicon);
+          }
+        }
+      }
+    }
+  });
+  faviconObserver.observe(document.body || document.documentElement, {
+    childList: true,
+    subtree: true
+  });
+
   // === Оновлення мобільного заголовка відповідно до поточного розділу ===
   const mobileTitleEl = document.querySelector('.mobile-navbar-title');
   if (mobileTitleEl) {
