@@ -168,6 +168,55 @@ document.addEventListener("DOMContentLoaded", () => {
   `;
   document.head.appendChild(descStyle);
 
+  // === Dynamic recommendations cards and list placeholders ===
+  const contentRow = document.querySelector('.tab-content .row.animated.fadeIn');
+  const isHome = window.location.pathname.endsWith('/') || 
+                 window.location.pathname.endsWith('/index.html') || 
+                 !window.location.pathname.includes('.html');
+
+  if (contentRow) {
+    const columns = contentRow.querySelectorAll('.col-sm');
+    if (columns.length > 0) {
+      const firstColumn = columns[0];
+      
+      const recCard = document.createElement('div');
+      recCard.className = 'group cat-recommendations';
+      
+      if (isHome) {
+        recCard.innerHTML = `
+          <div class="group-title"><span class="badge badge-recommend">Рекомендації Сайту</span></div>
+          <ul>
+            <li>
+              <a href="mailto:weber515sis@gmail.com" target="_blank" title="Тут може бути Ваше посилання і опис. Контакти для зв'язку внизу сторінки."><img src="./favicon.ico" class="link-favicon" alt="" width="16" height="16">💎 Вільне Місце</a>
+            </li>
+          </ul>
+        `;
+      } else {
+        recCard.innerHTML = `
+          <div class="group-title"><span class="badge badge-recommend">Рекомендації Розділу</span></div>
+          <ul>
+            <li>
+              <a href="mailto:weber515sis@gmail.com" target="_blank" title="Тут може бути Ваше посилання і опис. Контакти для зв'язку внизу сторінки."><img src="./favicon.ico" class="link-favicon" alt="" width="16" height="16">⚡ Вільне Місце</a>
+            </li>
+          </ul>
+        `;
+      }
+      firstColumn.prepend(recCard);
+    }
+  }
+
+  // === Dynamic inline placeholders at the end of each card ===
+  document.querySelectorAll('.group:not(.cat-recommendations) ul').forEach(ul => {
+    if (!ul.children.length) return;
+    
+    const li = document.createElement('li');
+    li.className = 'placeholder-ad-item';
+    li.innerHTML = `
+      <a href="mailto:weber515sis@gmail.com" target="_blank" title="Тут Ви можете розмістити своє посилання та опис на Ваш сайт, магазин, сервіс, тощо. Контакти для зв'язку внизу сторінки."><img src="./favicon.ico" class="link-favicon" alt="" width="16" height="16">➤ Вільне Місце</a>
+    `;
+    ul.appendChild(li);
+  });
+
   // Налаштовуємо перемикачі для кожного елемента списку, де є опис у тезі `a[title]`
   const listItems = document.querySelectorAll('.group ul li');
   listItems.forEach(li => {
@@ -401,6 +450,21 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     if (totalGroups > 0) {
+      // Визначаємо відповідний рекламний блок для першої карти на основі поточної сторінки
+      const path = window.location.pathname.toLowerCase();
+      let firstAdSlot = '7702092709'; // За замовчуванням (Головна, Медіа, Банкінг, Інше): InFeed-Лише Текст
+      let firstAdLayoutKey = '-gw-3+1f-3d+2z';
+
+      if (path.includes('social.html') || path.includes('games.html') || path.includes('market.html') || path.includes('city.html')) {
+        // Соціум / Ігри / Ринок / Місто: InFeed-Назва Вгорі
+        firstAdSlot = '5930414256';
+        firstAdLayoutKey = '-ef+6k-30-ac+ty';
+      } else if (path.includes('news.html') || path.includes('communal.html') || path.includes('shops.html') || path.includes('programs.html')) {
+        // Новини / Комуналка / Магазини / Soft: InFeed-Зображення збоку
+        firstAdSlot = '5495299989';
+        firstAdLayoutKey = '-fb+5w+4e-db+86';
+      }
+
       groups.forEach((group, index) => {
         let adSlot = null;
         let adLayoutKey = null;
@@ -410,20 +474,17 @@ document.addEventListener("DOMContentLoaded", () => {
           adSlot = '4285591871';
           adLayoutKey = '-6t+ed+2i-1n-4w';
         } else if (index === 0) {
-          // Після 1-ї карти: InFeed-Лише Текст
-          adSlot = '7702092709';
-          adLayoutKey = '-gw-3+1f-3d+2z';
-        } else if (index === 1) {
-          // Після 2-ї карти: InFeed-Назва Вгорі
-          adSlot = '5930414256';
-          adLayoutKey = '-ef+6k-30-ac+ty';
-        } else if (index === 2) {
-          // Після 3-ї карти: InFeed-Зображення збоку
-          adSlot = '5495299989';
-          adLayoutKey = '-fb+5w+4e-db+86';
+          // Після 1-ї карти: відповідний рекламний блок для цього розділу
+          adSlot = firstAdSlot;
+          adLayoutKey = firstAdLayoutKey;
         }
 
         if (adSlot) {
+          // Якщо всього одна карта, покажемо тільки фінальну рекламу, щоб не було дублювання
+          if (index === 0 && index === totalGroups - 1) {
+            adSlot = '4285591871';
+            adLayoutKey = '-6t+ed+2i-1n-4w';
+          }
           insertInFeedAd(group, adSlot, adLayoutKey);
         }
       });
