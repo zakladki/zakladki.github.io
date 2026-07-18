@@ -697,16 +697,17 @@ footer.footer .btn-primary:active {
   margin-bottom: 25px !important; /* Відступ знизу, щоб реклама виглядала гармонійно та компактно */
   padding: 0 15px;
   clear: both;
-  height: 160px !important;
-  max-height: 160px !important;
+  height: 250px !important;
+  max-height: 250px !important;
   overflow: hidden;
+  text-align: center; /* Центрування рекламного блоку */
 }
 
 .bottom-multiplex-container .adsbygoogle {
-  width: 100% !important;
-  height: 160px !important;
-  max-height: 160px !important;
-  display: block !important;
+  width: 1110px !important;
+  height: 250px !important;
+  max-height: 250px !important;
+  display: inline-block !important;
   overflow: hidden;
 }
 
