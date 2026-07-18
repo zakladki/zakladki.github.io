@@ -12,6 +12,28 @@ if (localStorage.getItem("theme") === "dark") {
 
 document.addEventListener("DOMContentLoaded", () => {
   
+  // === Оновлення мобільного заголовка відповідно до поточного розділу ===
+  const mobileTitleEl = document.querySelector('.mobile-navbar-title');
+  if (mobileTitleEl) {
+    const activeLink = document.querySelector('.navbar-nav .nav-link.active');
+    if (activeLink) {
+      let text = activeLink.textContent.trim();
+      mobileTitleEl.textContent = text.toUpperCase();
+    } else {
+      const isHomepage = window.location.pathname === '/' || window.location.pathname === '/index.html' || !window.location.pathname.includes('.html');
+      if (isHomepage) {
+        mobileTitleEl.textContent = 'ГОЛОВНА';
+      } else {
+        const pageTitle = document.title;
+        const parts = pageTitle.split('-');
+        if (parts.length > 0) {
+          const sectionName = parts[0].trim();
+          mobileTitleEl.textContent = sectionName.toUpperCase();
+        }
+      }
+    }
+  }
+
   // 2. Логіка перемикання теми
   const themeToggle = document.getElementById("themeToggle");
   if (themeToggle) {
@@ -276,6 +298,37 @@ document.addEventListener("DOMContentLoaded", () => {
     totalAdCount += 2; // Два бокових блоки
   }
 
+  // Функція для відстеження статусу завантаження реклами (MutationObserver)
+  function observeAdStatus(adContainer) {
+    const ins = adContainer.querySelector('ins.adsbygoogle');
+    if (!ins) return;
+
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.type === 'attributes' && mutation.attributeName === 'data-ad-status') {
+          const status = ins.getAttribute('data-ad-status');
+          if (status === 'filled') {
+            adContainer.classList.add('ad-status-filled');
+            adContainer.classList.remove('ad-status-unfilled');
+          } else if (status === 'unfilled') {
+            adContainer.classList.add('ad-status-unfilled');
+            adContainer.classList.remove('ad-status-filled');
+          }
+        }
+      });
+    });
+
+    observer.observe(ins, { attributes: true });
+
+    // Початкова перевірка
+    const initialStatus = ins.getAttribute('data-ad-status');
+    if (initialStatus === 'filled') {
+      adContainer.classList.add('ad-status-filled');
+    } else if (initialStatus === 'unfilled') {
+      adContainer.classList.add('ad-status-unfilled');
+    }
+  }
+
   // === 2. НИЖНІЙ МУЛЬТИПЛЕКС ПЕРЕД ФУТЕРОМ (На всіх сторінках, окрім Головної, і тільки для ПК екранів >= 1200px) ===
   if (!isHomepage && screenWidth >= 1200) {
     const footer = document.querySelector('footer.footer');
@@ -290,56 +343,59 @@ document.addEventListener("DOMContentLoaded", () => {
       `;
       footer.parentNode.insertBefore(multiplexContainer, footer);
       totalAdCount += 1; // 1 блок нижнього мультиплексу
+      observeAdStatus(multiplexContainer);
     }
   }
 
   // === 3. ВПРОВАДЖЕННЯ МОБІЛЬНИХ IN-FEED РЕКЛАМНИХ БЛОКІВ МІЖ КАРТКАМИ (Тільки для мобільних екранів < 1800px) ===
   if (screenWidth < 1800) {
-    let inFeedConfig = null;
-    const currentPath = window.location.pathname;
+    const groups = document.querySelectorAll('.group');
+    const totalGroups = groups.length;
 
-    if (currentPath.includes('social.html')) {
-      inFeedConfig = {
-        slot: '7702092709',
-        layoutKey: '-gw-3+1f-3d+2z'
-      };
-    } else if (currentPath.includes('news.html')) {
-      inFeedConfig = {
-        slot: '5930414256',
-        layoutKey: '-ef+6k-30-ac+ty'
-      };
-    } else if (currentPath.includes('media.html')) {
-      inFeedConfig = {
-        slot: '5495299989',
-        layoutKey: '-fb+5w+4e-db+86'
-      };
-    } else if (currentPath.includes('games.html')) {
-      inFeedConfig = {
-        slot: '4285591871',
-        layoutKey: '-6t+ed+2i-1n-4w'
-      };
+    function insertInFeedAd(afterElement, slot, layoutKey) {
+      const adContainer = document.createElement('div');
+      adContainer.className = 'infeed-ad-mobile-container';
+      adContainer.innerHTML = `
+        <ins class="adsbygoogle"
+             style="display:block;"
+             data-ad-format="fluid"
+             data-ad-layout-key="${layoutKey}"
+             data-ad-client="ca-pub-3065705668384801"
+             data-ad-slot="${slot}"></ins>
+      `;
+
+      if (afterElement.parentNode) {
+        afterElement.parentNode.insertBefore(adContainer, afterElement.nextSibling);
+        totalAdCount += 1; // Кожен доданий блок потребує окремої ініціалізації
+        observeAdStatus(adContainer);
+      }
     }
 
-    if (inFeedConfig) {
-      const groups = document.querySelectorAll('.group');
+    if (totalGroups > 0) {
       groups.forEach((group, index) => {
-        // На період тестування вставляємо рекламу після кожної картки (групи)
+        let adSlot = null;
+        let adLayoutKey = null;
 
-        // Створюємо контейнер для мобільного InFeed-блоку
-        const adContainer = document.createElement('div');
-        adContainer.className = 'infeed-ad-mobile-container';
-        adContainer.innerHTML = `
-          <ins class="adsbygoogle"
-               style="display:block;"
-               data-ad-format="fluid"
-               data-ad-layout-key="${inFeedConfig.layoutKey}"
-               data-ad-client="ca-pub-3065705668384801"
-               data-ad-slot="${inFeedConfig.slot}"></ins>
-        `;
-        // Вставляємо відразу ПІСЛЯ картки (.group)
-        if (group.parentNode) {
-          group.parentNode.insertBefore(adContainer, group.nextSibling);
-          totalAdCount += 1; // Кожен доданий блок потребує окремої ініціалізації .push({})
+        if (index === totalGroups - 1) {
+          // Після останньої карти: InFeed-Зображення вгорі (завжди розміщувати вкінці списку всіх карт)
+          adSlot = '4285591871';
+          adLayoutKey = '-6t+ed+2i-1n-4w';
+        } else if (index === 0) {
+          // Після 1-ї карти: InFeed-Лише Текст
+          adSlot = '7702092709';
+          adLayoutKey = '-gw-3+1f-3d+2z';
+        } else if (index === 1) {
+          // Після 2-ї карти: InFeed-Назва Вгорі
+          adSlot = '5930414256';
+          adLayoutKey = '-ef+6k-30-ac+ty';
+        } else if (index === 2) {
+          // Після 3-ї карти: InFeed-Зображення збоку
+          adSlot = '5495299989';
+          adLayoutKey = '-fb+5w+4e-db+86';
+        }
+
+        if (adSlot) {
+          insertInFeedAd(group, adSlot, adLayoutKey);
         }
       });
     }

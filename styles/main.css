@@ -705,6 +705,7 @@ footer.footer .btn-primary:active {
 }
 
 /* Коли реклама завантажилась успішно, плавно задаємо її висоту та додаємо компактний відступ */
+.bottom-multiplex-container.ad-status-filled,
 .bottom-multiplex-container:has(ins[data-ad-status="filled"]) {
   margin-top: 5px !important;     /* Мінімальний відступ зверху */
   margin-bottom: 10px !important;  /* Компактний відступ знизу перед фіксованим футером */
@@ -713,6 +714,7 @@ footer.footer .btn-primary:active {
 }
 
 /* Якщо реклама не завантажилась або порожня, примусово повністю ховаємо її */
+.bottom-multiplex-container.ad-status-unfilled,
 .bottom-multiplex-container:has(ins[data-ad-status="unfilled"]) {
   display: none !important;
 }
@@ -788,20 +790,36 @@ footer.footer .btn-primary:active {
 }
 
 @media (max-width: 1799.98px) {
+  /* За замовчуванням робимо контейнер майже невидимим і без відступів, щоб не створювати порожніх дірок під час завантаження */
   .infeed-ad-mobile-container {
-    display: block !important; /* Робимо видимим за замовчуванням, щоб AdSense міг завантажити рекламу */
+    display: block !important;
+    height: 1px;
+    max-height: 1px;
+    overflow: hidden;
+    opacity: 0.01;
     margin: 0 !important;
     padding: 0 !important;
   }
   
-  /* Коли реклама завантажилась успішно, додаємо компактний відступ знизу */
+  /* Коли реклама завантажилась успішно: робимо видимою та додаємо помірні зазори зверху та знизу, щоб уникнути зливання з картками */
+  .infeed-ad-mobile-container.ad-status-filled,
   .infeed-ad-mobile-container:has(ins[data-ad-status="filled"]) {
-    margin-bottom: 20px !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+    opacity: 1 !important;
+    margin-top: 15px !important;    /* Мінімальний зазор над рекламою */
+    margin-bottom: 20px !important; /* Надійний зазор під рекламою */
   }
   
-  /* Якщо реклама не завантажилась або порожня, повністю ховаємо контейнер, щоб не було порожнього місця */
+  /* Якщо реклама не завантажилась або порожня, повністю приховуємо її, щоб не залишалося ніяких порожніх проміжків */
+  .infeed-ad-mobile-container.ad-status-unfilled,
   .infeed-ad-mobile-container:has(ins[data-ad-status="unfilled"]) {
     display: none !important;
+    height: 0 !important;
+    max-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
   }
 }
 
