@@ -2,6 +2,8 @@
 
 html {
   scrollbar-gutter: stable;
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 /* ==========================================================================
@@ -32,6 +34,8 @@ body {
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
   transition: background-color 0.3s ease, color 0.3s ease;
   padding-bottom: 48px; /* Space for fixed footer on desktop */
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 /* ==========================================================================
@@ -172,7 +176,7 @@ body {
   background-color: var(--card-bg);
   border: 1px solid var(--card-border);
   border-radius: 0.3rem;
-  padding: 0.25rem 0.5rem 0.5rem 0.5rem;
+  padding: 0.25rem 0.45rem 0.5rem 0.45rem;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
   transition: all 0.2s ease-in-out;
   align-self: flex-start;
@@ -252,7 +256,7 @@ body {
 
 /* Bookmark List items */
 .group ul {
-  padding-left: 0.25rem !important;
+  padding-left: 0.15rem !important;
   margin-left: 0 !important;
   margin-bottom: 0 !important;
   display: flex;
@@ -265,7 +269,7 @@ body {
   display: flex;
   align-items: center;
   gap: 0.4rem;
-  padding: 0.3rem 0.25rem !important;
+  padding: 0.3rem 0.15rem !important;
   border-radius: 0.5rem;
   transition: background-color 0.15s ease;
   margin: 0 !important;
@@ -779,6 +783,8 @@ footer.footer .btn-primary:active {
 .infeed-ad-mobile-container {
   display: none; /* За замовчуванням приховано на ПК */
   width: 100%;
+  max-width: 100% !important;
+  overflow: hidden !important;
   padding: 0;
   margin: 0 !important;
   clear: both;
@@ -787,6 +793,14 @@ footer.footer .btn-primary:active {
 .infeed-ad-mobile-container .adsbygoogle {
   display: block !important;
   width: 100% !important;
+  max-width: 100% !important;
+  overflow: hidden !important;
+}
+
+.infeed-ad-mobile-container ins,
+.infeed-ad-mobile-container iframe {
+  max-width: 100% !important;
+  overflow: hidden !important;
 }
 
 @media (max-width: 1799.98px) {
@@ -795,7 +809,7 @@ footer.footer .btn-primary:active {
     display: block !important;
     height: 1px;
     max-height: 1px;
-    overflow: hidden;
+    overflow: hidden !important;
     opacity: 0.01;
     margin: 0 !important;
     padding: 0 !important;
@@ -806,7 +820,7 @@ footer.footer .btn-primary:active {
   .infeed-ad-mobile-container:has(ins[data-ad-status="filled"]) {
     height: auto !important;
     max-height: none !important;
-    overflow: visible !important;
+    overflow: hidden !important;
     opacity: 1 !important;
     margin-top: 15px !important;    /* Мінімальний зазор над рекламою */
     margin-bottom: 20px !important; /* Надійний зазор під рекламою */

@@ -124,7 +124,7 @@ document.addEventListener("DOMContentLoaded", () => {
       width: 16px;
       height: 16px;
       margin-left: auto !important;
-      margin-right: 4px;
+      margin-right: 0px;
       color: #cbd5e1; /* Дуже м'який, ледь помітний сірий колір для світлої теми */
       cursor: pointer;
       transition: transform 0.2s ease, color 0.2s ease;
