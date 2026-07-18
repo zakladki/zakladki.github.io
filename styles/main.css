@@ -697,15 +697,15 @@ footer.footer .btn-primary:active {
   margin-bottom: 25px !important; /* Відступ знизу, щоб реклама виглядала гармонійно та компактно */
   padding: 0 15px;
   clear: both;
-  height: 250px !important;
-  max-height: 250px !important;
+  height: 160px !important;
+  max-height: 160px !important;
   overflow: hidden;
 }
 
 .bottom-multiplex-container .adsbygoogle {
   width: 100% !important;
-  height: 250px !important;
-  max-height: 250px !important;
+  height: 160px !important;
+  max-height: 160px !important;
   display: block !important;
   overflow: hidden;
 }
@@ -774,17 +774,18 @@ footer.footer .btn-primary:active {
 
 @media (max-width: 1799.98px) {
   .infeed-ad-mobile-container {
-    display: block !important;
+    display: none !important; /* Ховаємо за замовчуванням, поки не завантажилася */
   }
   
-  /* Коли реклама завантажилась успішно, робимо відступ знизу, 
+  /* Коли реклама завантажилась успішно, робимо видимою та додаємо відступ знизу, 
      щоб наступна картка не зливалася. Зверху відступ не потрібен, 
      бо попередня картка вже має margin-bottom: 20px (або 10px на планшетах). */
   .infeed-ad-mobile-container:has(ins[data-ad-status="filled"]) {
+    display: block !important;
     margin-bottom: 20px !important;
   }
   
-  /* Якщо реклама не завантажилась або пуста, повністю приховуємо контейнер, щоб уникнути зазорів */
+  /* Якщо реклама не завантажилась або порожня, примусово ховаємо контейнер, щоб уникнути будь-яких порожніх проміжків */
   .infeed-ad-mobile-container:has(ins[data-ad-status="unfilled"]) {
     display: none !important;
   }

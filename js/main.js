@@ -284,13 +284,13 @@ document.addEventListener("DOMContentLoaded", () => {
       multiplexContainer.className = 'container bottom-multiplex-container';
       multiplexContainer.innerHTML = `
         <ins class="adsbygoogle"
-             style="display:block; max-height: 250px;"
+             style="display:block; height: 160px; max-height: 160px;"
              data-ad-format="autorelaxed"
              data-ad-client="ca-pub-3065705668384801"
              data-ad-slot="1571652834"
              data-matched-content-rows-num="1"
              data-matched-content-columns-num="4"
-             data-matched-content-ui-type="image_stacked"></ins>
+             data-matched-content-ui-type="image_side"></ins>
       `;
       footer.parentNode.insertBefore(multiplexContainer, footer);
       totalAdCount += 1; // 1 блок нижнього мультиплексу
@@ -326,7 +326,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (inFeedConfig) {
       const groups = document.querySelectorAll('.group');
-      groups.forEach((group) => {
+      groups.forEach((group, index) => {
+        // Дозуємо рекламу: вставляємо лише після кожної 3-ї картки (наприклад, після 3-ї, 6-ї тощо)
+        if ((index + 1) % 3 !== 0) return;
+
         // Створюємо контейнер для мобільного InFeed-блоку
         const adContainer = document.createElement('div');
         adContainer.className = 'infeed-ad-mobile-container';
