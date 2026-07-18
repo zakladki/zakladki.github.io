@@ -693,14 +693,28 @@ footer.footer .btn-primary:active {
 
 /* Контейнер для нижнього блоку мультиплекс-реклами на всіх сторінках */
 .bottom-multiplex-container {
-  margin-top: 15px !important;
-  margin-bottom: 25px !important; /* Відступ знизу, щоб реклама виглядала гармонійно та компактно */
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
   padding: 0 15px;
   clear: both;
-  height: 250px !important;
-  max-height: 250px !important;
+  height: 0;
+  max-height: 0;
   overflow: hidden;
   text-align: center; /* Центрування рекламного блоку */
+  transition: all 0.3s ease;
+}
+
+/* Коли реклама завантажилась успішно, плавно задаємо її висоту та додаємо компактний відступ */
+.bottom-multiplex-container:has(ins[data-ad-status="filled"]) {
+  margin-top: 5px !important;     /* Мінімальний відступ зверху */
+  margin-bottom: 10px !important;  /* Компактний відступ знизу перед фіксованим футером */
+  height: 250px !important;
+  max-height: 250px !important;
+}
+
+/* Якщо реклама не завантажилась або порожня, примусово повністю ховаємо її */
+.bottom-multiplex-container:has(ins[data-ad-status="unfilled"]) {
+  display: none !important;
 }
 
 .bottom-multiplex-container .adsbygoogle {
