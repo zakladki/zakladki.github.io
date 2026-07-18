@@ -323,8 +323,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (inFeedConfig) {
       const groups = document.querySelectorAll('.group');
       groups.forEach((group, index) => {
-        // Дозуємо рекламу: вставляємо лише після кожної 3-ї картки (наприклад, після 3-ї, 6-ї тощо)
-        if ((index + 1) % 3 !== 0) return;
+        // На період тестування вставляємо рекламу після кожної картки (групи)
 
         // Створюємо контейнер для мобільного InFeed-блоку
         const adContainer = document.createElement('div');

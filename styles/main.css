@@ -789,18 +789,17 @@ footer.footer .btn-primary:active {
 
 @media (max-width: 1799.98px) {
   .infeed-ad-mobile-container {
-    display: none !important; /* Ховаємо за замовчуванням, поки не завантажилася */
+    display: block !important; /* Робимо видимим за замовчуванням, щоб AdSense міг завантажити рекламу */
+    margin: 0 !important;
+    padding: 0 !important;
   }
   
-  /* Коли реклама завантажилась успішно, робимо видимою та додаємо відступ знизу, 
-     щоб наступна картка не зливалася. Зверху відступ не потрібен, 
-     бо попередня картка вже має margin-bottom: 20px (або 10px на планшетах). */
+  /* Коли реклама завантажилась успішно, додаємо компактний відступ знизу */
   .infeed-ad-mobile-container:has(ins[data-ad-status="filled"]) {
-    display: block !important;
     margin-bottom: 20px !important;
   }
   
-  /* Якщо реклама не завантажилась або порожня, примусово ховаємо контейнер, щоб уникнути будь-яких порожніх проміжків */
+  /* Якщо реклама не завантажилась або порожня, повністю ховаємо контейнер, щоб не було порожнього місця */
   .infeed-ad-mobile-container:has(ins[data-ad-status="unfilled"]) {
     display: none !important;
   }
