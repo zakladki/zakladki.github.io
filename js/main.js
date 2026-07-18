@@ -171,7 +171,29 @@ document.addEventListener("DOMContentLoaded", () => {
             setTimeout(() => {
               descDiv.style.opacity = '1';
             }, 20);
-         // 5. Динамічне додавання рекламних блоків по боках з різним розташуванням для головної та інших сторінок
+            toggleBtn.classList.add('active');
+          } else {
+            // Приховати поточний опис
+            descDiv.style.opacity = '0';
+            const onTransitionEnd = () => {
+              descDiv.style.display = 'none';
+              descDiv.removeEventListener('transitionend', onTransitionEnd);
+            };
+            descDiv.addEventListener('transitionend', onTransitionEnd);
+            // Запасний варіант, якщо transitionend не спрацював
+            setTimeout(() => {
+              if (descDiv.style.opacity === '0') {
+                descDiv.style.display = 'none';
+              }
+            }, 250);
+            toggleBtn.classList.remove('active');
+          }
+        });
+      }
+    }
+  });
+
+  // 5. Динамічне додавання рекламних блоків по боках з різним розташуванням для головної та інших сторінок
   // Визначаємо, чи є поточна сторінка головною (index.html, корінь "/" або пустий шлях)
   const isHomepage = window.location.pathname.endsWith('/') || 
                      window.location.pathname.endsWith('/index.html') || 
@@ -275,8 +297,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // === 3. ВПРОВАДЖЕННЯ МОБІЛЬНИХ IN-FEED РЕКЛАМНИХ БЛОКІВ МІЖ КАРТКАМИ (Тільки для мобільних екранів < 1200px) ===
-  if (screenWidth < 1200) {
+  // === 3. ВПРОВАДЖЕННЯ МОБІЛЬНИХ IN-FEED РЕКЛАМНИХ БЛОКІВ МІЖ КАРТКАМИ (Тільки для мобільних екранів < 1800px) ===
+  if (screenWidth < 1800) {
     let inFeedConfig = null;
     const currentPath = window.location.pathname;
 
