@@ -187,7 +187,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <div class="group-title"><span class="badge badge-recommend">Рекомендації Сайту</span></div>
           <ul>
             <li>
-              <a href="https://docs.google.com/document/d/15VLtvFvXNxhkXU_ZH74387e289Rx6If2Zmrp4m8KFAc" target="_blank" title="Тут може бути Ваше посилання і опис. Контакти для зв'язку внизу сторінки."><img src="./favicon.ico" class="link-favicon" alt="" width="16" height="16">💎 Вільне Місце</a>
+              <a href="https://docs.google.com/document/d/15S2XrUxYaj1uu68wtfqww3Gkqa-Lq2Ra-P20AHWqKgs" target="_blank" title="Тут може бути Ваше посилання і опис. Контакти для зв'язку внизу сторінки."><img src="./favicon.ico" class="link-favicon" alt="" width="16" height="16">💎 Вільне Місце</a>
             </li>
           </ul>
         `;
@@ -196,7 +196,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <div class="group-title"><span class="badge badge-recommend">Рекомендації Розділу</span></div>
           <ul>
             <li>
-              <a href="https://docs.google.com/document/d/15VLtvFvXNxhkXU_ZH74387e289Rx6If2Zmrp4m8KFAc" target="_blank" title="Тут може бути Ваше посилання і опис. Контакти для зв'язку внизу сторінки."><img src="./favicon.ico" class="link-favicon" alt="" width="16" height="16">⚡ Вільне Місце</a>
+              <a href="https://docs.google.com/document/d/15S2XrUxYaj1uu68wtfqww3Gkqa-Lq2Ra-P20AHWqKgs" target="_blank" title="Тут може бути Ваше посилання і опис. Контакти для зв'язку внизу сторінки."><img src="./favicon.ico" class="link-favicon" alt="" width="16" height="16">⚡ Вільне Місце</a>
             </li>
           </ul>
         `;
@@ -212,7 +212,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const li = document.createElement('li');
     li.className = 'placeholder-ad-item';
     li.innerHTML = `
-      <a href="https://docs.google.com/document/d/15VLtvFvXNxhkXU_ZH74387e289Rx6If2Zmrp4m8KFAc" target="_blank" title="Тут Ви можете розмістити своє посилання та опис на Ваш сайт, магазин, сервіс, тощо. Контакти для зв'язку внизу сторінки."><img src="./favicon.ico" class="link-favicon" alt="" width="16" height="16">➤ Вільне Місце</a>
+      <a href="https://docs.google.com/document/d/15S2XrUxYaj1uu68wtfqww3Gkqa-Lq2Ra-P20AHWqKgs" target="_blank" title="Тут Ви можете розмістити своє посилання та опис на Ваш сайт, магазин, сервіс, тощо. Контакти для зв'язку внизу сторінки."><img src="./favicon.ico" class="link-favicon" alt="" width="16" height="16">➤ Вільне Місце</a>
     `;
     ul.appendChild(li);
   });
