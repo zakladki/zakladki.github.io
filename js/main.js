@@ -171,108 +171,91 @@ document.addEventListener("DOMContentLoaded", () => {
             setTimeout(() => {
               descDiv.style.opacity = '1';
             }, 20);
-            toggleBtn.classList.add('active');
-          } else {
-            // Приховати поточний опис
-            descDiv.style.opacity = '0';
-            const onTransitionEnd = () => {
-              descDiv.style.display = 'none';
-              descDiv.removeEventListener('transitionend', onTransitionEnd);
-            };
-            descDiv.addEventListener('transitionend', onTransitionEnd);
-            // Запасний варіант, якщо transitionend не спрацював
-            setTimeout(() => {
-              if (descDiv.style.opacity === '0') {
-                descDiv.style.display = 'none';
-              }
-            }, 250);
-            toggleBtn.classList.remove('active');
-          }
-        });
-      }
-    }
-  });
-
-  // 5. Динамічне додавання рекламних блоків по боках з різним розташуванням для головної та інших сторінок
+         // 5. Динамічне додавання рекламних блоків по боках з різним розташуванням для головної та інших сторінок
   // Визначаємо, чи є поточна сторінка головною (index.html, корінь "/" або пустий шлях)
   const isHomepage = window.location.pathname.endsWith('/') || 
                      window.location.pathname.endsWith('/index.html') || 
                      !window.location.pathname.includes('.html');
 
-  // Визначаємо, чи є поточна сторінка сторінкою "Соціум" (social.html)
-  const isSocialPage = window.location.pathname.includes('social.html');
-
-  const leftAd = document.createElement('div');
-  leftAd.className = 'side-ad-left';
-  
-  const rightAd = document.createElement('div');
-  rightAd.className = 'side-ad-right';
-
+  const screenWidth = window.innerWidth;
   let totalAdCount = 0;
 
-  if (isHomepage) {
-    // === ШАБЛОН РЕКЛАМИ ДЛЯ СТОРІНКИ "ГОЛОВНА" ===
-    leftAd.innerHTML = `
-      <!-- Ліворуч-Вертикально (Головна) - Велика вертикальна реклама на всю висоту -->
-      <div class="ad-wrapper-vertical">
-        <ins class="adsbygoogle"
-             style="display:block;"
-             data-ad-client="ca-pub-3065705668384801"
-             data-ad-slot="9621533245"
-             data-ad-format="auto"
-             data-full-width-responsive="true"></ins>
-      </div>
-    `;
+  // === 1. БОКОВА РЕКЛАМА (Тільки на великих ПК моніторах від 1800px, де є місце) ===
+  if (screenWidth >= 1800) {
+    const leftAd = document.createElement('div');
+    leftAd.className = 'side-ad-left';
+    
+    const rightAd = document.createElement('div');
+    rightAd.className = 'side-ad-right';
 
-    rightAd.innerHTML = `
-      <!-- Праворуч-Вертикально (Головна) - Велика вертикальна реклама на всю висоту -->
-      <div class="ad-wrapper-vertical">
-        <ins class="adsbygoogle"
-             style="display:block;"
-             data-ad-client="ca-pub-3065705668384801"
-             data-ad-slot="7662418469"
-             data-ad-format="auto"
-             data-full-width-responsive="true"></ins>
-      </div>
-    `;
-    totalAdCount = 2; // 1 зліва (вертикальна) + 1 справа (вертикальна)
-  } else {
-    // === ШАБЛОН РЕКЛАМИ ДЛЯ ВСІХ ІНШИХ СТОРІНОК (ВКЛЮЧАЮЧИ СОЦІУМ) ===
-    // Трисекційне розділення, верхній блок під 300x300, решта пустують
-    leftAd.innerHTML = `
-      <div class="ad-sidebar-three-parts">
-        <div class="ad-sidebar-part ad-part-top">
-          <div class="ad-wrapper-300-300">
-            <ins class="adsbygoogle"
-                 style="display:inline-block;width:300px;height:300px"
-                 data-ad-client="ca-pub-3065705668384801"
-                 data-ad-slot="5145579105"
-                 data-full-width-responsive="false"></ins>
-          </div>
+    if (isHomepage) {
+      // === ШАБЛОН РЕКЛАМИ ДЛЯ СТОРІНКИ "ГОЛОВНА" ===
+      leftAd.innerHTML = `
+        <!-- Ліворуч-Вертикально (Головна) - Велика вертикальна реклама на всю висоту -->
+        <div class="ad-wrapper-vertical">
+          <ins class="adsbygoogle"
+               style="display:block;"
+               data-ad-client="ca-pub-3065705668384801"
+               data-ad-slot="9621533245"
+               data-ad-format="auto"
+               data-full-width-responsive="true"></ins>
         </div>
-        <div class="ad-sidebar-part ad-part-middle"></div>
-        <div class="ad-sidebar-part ad-part-bottom"></div>
-      </div>
-    `;
+      `;
 
-    rightAd.innerHTML = `
-      <div class="ad-sidebar-three-parts">
-        <div class="ad-sidebar-part ad-part-top">
-          <div class="ad-wrapper-300-300">
-            <ins class="adsbygoogle"
-                 style="display:inline-block;width:300px;height:300px"
-                 data-ad-client="ca-pub-3065705668384801"
-                 data-ad-slot="7980314361"
-                 data-full-width-responsive="false"></ins>
-          </div>
+      rightAd.innerHTML = `
+        <!-- Праворуч-Вертикально (Головна) - Велика вертикальна реклама на всю висоту -->
+        <div class="ad-wrapper-vertical">
+          <ins class="adsbygoogle"
+               style="display:block;"
+               data-ad-client="ca-pub-3065705668384801"
+               data-ad-slot="7662418469"
+               data-ad-format="auto"
+               data-full-width-responsive="true"></ins>
         </div>
-        <div class="ad-sidebar-part ad-part-middle"></div>
-        <div class="ad-sidebar-part ad-part-bottom"></div>
-      </div>
-    `;
-    totalAdCount = 2; // 1 лівий бічний + 1 правий бічний
+      `;
+    } else {
+      // === ШАБЛОН РЕКЛАМИ ДЛЯ ВСІХ ІНШИХ СТОРІНОК ===
+      // Трисекційне розділення, верхній блок під 300x300, решта пустують
+      leftAd.innerHTML = `
+        <div class="ad-sidebar-three-parts">
+          <div class="ad-sidebar-part ad-part-top">
+            <div class="ad-wrapper-300-300">
+              <ins class="adsbygoogle"
+                   style="display:inline-block;width:300px;height:300px"
+                   data-ad-client="ca-pub-3065705668384801"
+                   data-ad-slot="5145579105"
+                   data-full-width-responsive="false"></ins>
+            </div>
+          </div>
+          <div class="ad-sidebar-part ad-part-middle"></div>
+          <div class="ad-sidebar-part ad-part-bottom"></div>
+        </div>
+      `;
 
-    // Динамічно додаємо нижній горизонтальний МУЛЬТИПЛЕКС перед футером на всіх інших сторінках
+      rightAd.innerHTML = `
+        <div class="ad-sidebar-three-parts">
+          <div class="ad-sidebar-part ad-part-top">
+            <div class="ad-wrapper-300-300">
+              <ins class="adsbygoogle"
+                   style="display:inline-block;width:300px;height:300px"
+                   data-ad-client="ca-pub-3065705668384801"
+                   data-ad-slot="7980314361"
+                   data-full-width-responsive="false"></ins>
+            </div>
+          </div>
+          <div class="ad-sidebar-part ad-part-middle"></div>
+          <div class="ad-sidebar-part ad-part-bottom"></div>
+        </div>
+      `;
+    }
+
+    document.body.appendChild(leftAd);
+    document.body.appendChild(rightAd);
+    totalAdCount += 2; // Два бокових блоки
+  }
+
+  // === 2. НИЖНІЙ МУЛЬТИПЛЕКС ПЕРЕД ФУТЕРОМ (На всіх сторінках, окрім Головної) ===
+  if (!isHomepage) {
     const footer = document.querySelector('footer.footer');
     if (footer) {
       const multiplexContainer = document.createElement('div');
@@ -288,63 +271,61 @@ document.addEventListener("DOMContentLoaded", () => {
              data-matched-content-ui-type="image_stacked,image_stacked"></ins>
       `;
       footer.parentNode.insertBefore(multiplexContainer, footer);
-      totalAdCount += 1; // Додаємо 1 для ініціалізації мультиплекс-блоку
+      totalAdCount += 1; // 1 блок нижнього мультиплексу
     }
   }
 
-  document.body.appendChild(leftAd);
-  document.body.appendChild(rightAd);
+  // === 3. ВПРОВАДЖЕННЯ МОБІЛЬНИХ IN-FEED РЕКЛАМНИХ БЛОКІВ МІЖ КАРТКАМИ (Тільки для мобільних екранів < 1200px) ===
+  if (screenWidth < 1200) {
+    let inFeedConfig = null;
+    const currentPath = window.location.pathname;
 
-  // === ВПРОВАДЖЕННЯ МОБІЛЬНИХ IN-FEED РЕКЛАМНИХ БЛОКІВ МІЖ КАРТКАМИ ===
-  let inFeedConfig = null;
-  const currentPath = window.location.pathname;
+    if (currentPath.includes('social.html')) {
+      inFeedConfig = {
+        slot: '7702092709',
+        layoutKey: '-gw-3+1f-3d+2z'
+      };
+    } else if (currentPath.includes('news.html')) {
+      inFeedConfig = {
+        slot: '5930414256',
+        layoutKey: '-ef+6k-30-ac+ty'
+      };
+    } else if (currentPath.includes('media.html')) {
+      inFeedConfig = {
+        slot: '5495299989',
+        layoutKey: '-fb+5w+4e-db+86'
+      };
+    } else if (currentPath.includes('games.html')) {
+      inFeedConfig = {
+        slot: '4285591871',
+        layoutKey: '-6t+ed+2i-1n-4w'
+      };
+    }
 
-  if (currentPath.includes('social.html')) {
-    inFeedConfig = {
-      slot: '7702092709',
-      layoutKey: '-gw-3+1f-3d+2z'
-    };
-  } else if (currentPath.includes('news.html')) {
-    inFeedConfig = {
-      slot: '5930414256',
-      layoutKey: '-ef+6k-30-ac+ty'
-    };
-  } else if (currentPath.includes('media.html')) {
-    inFeedConfig = {
-      slot: '5495299989',
-      layoutKey: '-fb+5w+4e-db+86'
-    };
-  } else if (currentPath.includes('games.html')) {
-    inFeedConfig = {
-      slot: '4285591871',
-      layoutKey: '-6t+ed+2i-1n-4w'
-    };
+    if (inFeedConfig) {
+      const groups = document.querySelectorAll('.group');
+      groups.forEach((group) => {
+        // Створюємо контейнер для мобільного InFeed-блоку
+        const adContainer = document.createElement('div');
+        adContainer.className = 'infeed-ad-mobile-container';
+        adContainer.innerHTML = `
+          <ins class="adsbygoogle"
+               style="display:block;"
+               data-ad-format="fluid"
+               data-ad-layout-key="${inFeedConfig.layoutKey}"
+               data-ad-client="ca-pub-3065705668384801"
+               data-ad-slot="${inFeedConfig.slot}"></ins>
+        `;
+        // Вставляємо відразу ПІСЛЯ картки (.group)
+        if (group.parentNode) {
+          group.parentNode.insertBefore(adContainer, group.nextSibling);
+          totalAdCount += 1; // Кожен доданий блок потребує окремої ініціалізації .push({})
+        }
+      });
+    }
   }
 
-  if (inFeedConfig) {
-    const groups = document.querySelectorAll('.group');
-    groups.forEach((group) => {
-      // Створюємо контейнер для мобільного InFeed-блоку
-      const adContainer = document.createElement('div');
-      adContainer.className = 'infeed-ad-mobile-container';
-      adContainer.innerHTML = `
-        <ins class="adsbygoogle"
-             style="display:block;"
-             data-ad-layout="in-article"
-             data-ad-format="fluid"
-             data-ad-layout-key="${inFeedConfig.layoutKey}"
-             data-ad-client="ca-pub-3065705668384801"
-             data-ad-slot="${inFeedConfig.slot}"></ins>
-      `;
-      // Вставляємо відразу ПІСЛЯ картки (.group)
-      if (group.parentNode) {
-        group.parentNode.insertBefore(adContainer, group.nextSibling);
-        totalAdCount += 1; // Кожен блок потребує виклику (window.adsbygoogle).push({})
-      }
-    });
-  }
-
-  // Динамічна ініціалізація рекламних оголошень AdSense (кількість залежить від сторінки)
+  // Динамічна ініціалізація рекламних оголошень AdSense (кількість відповідає лише відображеним блокам)
   try {
     for (let i = 0; i < totalAdCount; i++) {
       (window.adsbygoogle = window.adsbygoogle || []).push({});
