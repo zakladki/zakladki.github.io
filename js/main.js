@@ -276,21 +276,21 @@ document.addEventListener("DOMContentLoaded", () => {
     totalAdCount += 2; // Два бокових блоки
   }
 
-  // === 2. НИЖНІЙ МУЛЬТИПЛЕКС ПЕРЕД ФУТЕРОМ (На всіх сторінках, окрім Головної) ===
-  if (!isHomepage) {
+  // === 2. НИЖНІЙ МУЛЬТИПЛЕКС ПЕРЕД ФУТЕРОМ (На всіх сторінках, окрім Головної, і тільки для ПК екранів >= 1200px) ===
+  if (!isHomepage && screenWidth >= 1200) {
     const footer = document.querySelector('footer.footer');
     if (footer) {
       const multiplexContainer = document.createElement('div');
       multiplexContainer.className = 'container bottom-multiplex-container';
       multiplexContainer.innerHTML = `
         <ins class="adsbygoogle"
-             style="display:block;"
+             style="display:block; max-height: 250px;"
              data-ad-format="autorelaxed"
              data-ad-client="ca-pub-3065705668384801"
              data-ad-slot="1571652834"
-             data-matched-content-rows-num="2,1"
-             data-matched-content-columns-num="1,4"
-             data-matched-content-ui-type="image_stacked,image_stacked"></ins>
+             data-matched-content-rows-num="1"
+             data-matched-content-columns-num="4"
+             data-matched-content-ui-type="image_stacked"></ins>
       `;
       footer.parentNode.insertBefore(multiplexContainer, footer);
       totalAdCount += 1; // 1 блок нижнього мультиплексу
