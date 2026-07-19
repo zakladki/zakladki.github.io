@@ -1,21 +1,31 @@
 @import "tailwindcss";
 
+html {
+  scrollbar-gutter: stable;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+/* ==========================================================================
+   1. VARIABLES & BASE THEMES
+   ========================================================================== */
 :root {
   --bg-color: #f8fafc;
   --text-color: #0f172a;
   --card-bg: #ffffff;
-  --card-border: #e2e8f0;
+  --card-border: #cbd5e1;
   --nav-bg: #1e293b;
+  --card-grad-end: rgba(15, 23, 42, 0.08); /* Darker soft neutral tint for light mode */
 }
 
-body.dark-mode, .dark {
+/* Dark mode variables override */
+body.dark-mode, .dark-mode, html.dark-mode body, .dark {
   --bg-color: #0f172a;
   --text-color: #f8fafc;
-  --card-bg: #1e293b;
-  --card-border: #334155;
+  --card-bg: #243143; /* Lighter deep slate for cards to pop in dark mode */
+  --card-border: #475569;
   --nav-bg: #090d16;
-  background-color: var(--bg-color) !important;
-  color: var(--text-color) !important;
+  --card-grad-end: rgba(248, 250, 252, 0.08); /* Lighter soft neutral tint for dark mode */
 }
 
 body {
@@ -23,34 +33,133 @@ body {
   color: var(--text-color);
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
   transition: background-color 0.3s ease, color 0.3s ease;
+  padding-bottom: 48px; /* Space for fixed footer on desktop */
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
-/* Modern grid layout for bookmark groups */
-.tab-content .row.animated.fadeIn {
-  display: grid;
-  grid-template-columns: repeat(1, minmax(0, 1fr));
-  gap: 1.5rem;
+/* ==========================================================================
+   2. LAYOUT & MASONRY GRID (CSS Columns)
+   ========================================================================== */
+.tab-content.container > .row {
+  justify-content: center;
+}
+
+/* Default mobile column layout */
+.row.animated.fadeIn {
+  display: block !important;
+  column-count: 1;
+  column-gap: 20px;
   padding: 1rem;
 }
 
-@media (min-width: 640px) {
-  .tab-content .row.animated.fadeIn {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+.row.animated.fadeIn > .col-sm {
+  display: contents;
+}
+
+.row.animated.fadeIn .group {
+  break-inside: avoid;
+  -webkit-column-break-inside: avoid;
+  page-break-inside: avoid;
+  margin-bottom: 20px;
+}
+
+/* Tablet screen columns */
+@media (min-width: 768px) and (max-width: 1199.98px) {
+  .row.animated.fadeIn {
+    column-count: 2;
   }
 }
 
-@media (min-width: 1024px) {
-  .tab-content .row.animated.fadeIn {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+/* Large screen columns */
+@media (min-width: 1200px) {
+  .row.animated.fadeIn {
+    column-count: 4;
   }
 }
 
-@media (min-width: 1280px) {
-  .tab-content .row.animated.fadeIn {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+/* Reduced spacing for PC / Tablet (>= 768px) */
+@media (min-width: 768px) {
+  .row.animated.fadeIn {
+    column-gap: 10px;
+    padding: 0.5rem;
+  }
+  .row.animated.fadeIn .group {
+    margin-bottom: 10px;
+  }
+  .col-sm {
+    gap: 0.75rem;
   }
 }
 
+/* Header spacing and fully vertical menu styling for desktop */
+@media (min-width: 1200px) {
+  .main {
+    padding-top: 41px !important;
+  }
+  
+  .theme-toggle-btn {
+    padding: 0.22rem 0.75rem !important; /* Slightly reduced vertical padding for a sleeker PC layout */
+  }
+
+  /* Повністю вертикальне виділення пунктів меню для ПК версії */
+  nav.navbar {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    height: 40px !important;
+  }
+
+  nav.navbar .navbar-collapse {
+    height: 100% !important;
+    align-self: stretch !important;
+    display: flex !important;
+  }
+
+  nav.navbar .navbar-nav {
+    height: 100% !important;
+    align-items: stretch !important;
+    margin: 0 auto !important;
+  }
+
+  nav.navbar .nav-item {
+    height: 100% !important;
+    display: flex !important;
+    align-items: stretch !important;
+  }
+
+  nav.navbar .nav-link {
+    height: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 0 !important; /* Прибираємо закруглення кнопок */
+    margin: 0 !important; /* Прибираємо відступи між ними */
+    padding: 0 16px !important; /* Оптимальна ширина пунктів */
+    border-bottom: 3px solid transparent !important; /* Забезпечує плавний перехід без підстрибувань */
+    transition: all 0.2s ease-in-out !important;
+  }
+
+  /* Активний стан та наведення - помітне вертикальне заповнення з підсвіткою та нижнім індикатором */
+  nav.navbar .nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.08) !important;
+    color: #ffffff !important;
+    border-bottom: 3px solid rgba(59, 130, 246, 0.4) !important;
+  }
+
+  nav.navbar .nav-link.active {
+    background-color: rgba(59, 130, 246, 0.28) !important; /* Помітне напівпрозоре заповнення */
+    color: #ffffff !important;
+    border-bottom: 3px solid #3b82f6 !important; /* Яскрава синя лінія знизу на всю ширину пункту */
+    font-weight: 600 !important;
+    text-shadow: 0 0 1px rgba(255, 255, 255, 0.2) !important;
+  }
+
+  nav.navbar .nav-link.home-highlight:hover {
+    background: rgba(59, 130, 246, 0.25) !important;
+  }
+}
+
+/* Legacy helper override */
 .col-sm {
   width: 100% !important;
   max-width: none !important;
@@ -60,12 +169,14 @@ body {
   gap: 1.5rem;
 }
 
-/* Modern Card styling */
+/* ==========================================================================
+   3. MODERN CARD STYLING
+   ========================================================================== */
 .group {
   background-color: var(--card-bg);
   border: 1px solid var(--card-border);
-  border-radius: 1rem;
-  padding: 0.25rem 0.5rem 0.5rem 0.5rem;
+  border-radius: 0.3rem;
+  padding: 0.25rem 0.45rem 0.5rem 0.45rem;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
   transition: all 0.2s ease-in-out;
   align-self: flex-start;
@@ -120,32 +231,32 @@ body {
   overflow-wrap: break-word;
 }
 
-.group.cat-updates .group-title .badge,
-.group.cat-updates .badge {
-  background: linear-gradient(135deg, #ef4444, #dc2626) !important;
-}
-
 .group-title .badge {
   background: linear-gradient(135deg, #64748b, #475569);
-  color: #ffffff;
-  padding: 0.25rem 0.6rem;
-  border-radius: 9999px;
-  font-size: 0.875rem;
+  color: white;
+  padding: 0.2rem 0.75rem;
+  border-radius: 0.18rem;
+  font-size: 0.92rem;
   font-weight: 600;
   letter-spacing: 0.025em;
   text-align: center;
-  display: inline-block;
+  display: flex;
+  width: 100% !important;
+  align-items: center;
+  justify-content: center;
   white-space: normal;
   word-break: break-word;
   overflow-wrap: break-word;
   max-width: 100%;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  line-height: 1.4;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+  line-height: 1.3;
   margin-top: 0 !important;
+  border: 1px solid rgba(255, 255, 255, 0.12);
 }
 
+/* Bookmark List items */
 .group ul {
-  padding-left: 0 !important;
+  padding-left: 0.15rem !important;
   margin-left: 0 !important;
   margin-bottom: 0 !important;
   display: flex;
@@ -158,7 +269,7 @@ body {
   display: flex;
   align-items: center;
   gap: 0.4rem;
-  padding: 0.3rem 0.25rem !important;
+  padding: 0.3rem 0.15rem !important;
   border-radius: 0.5rem;
   transition: background-color 0.15s ease;
   margin: 0 !important;
@@ -186,7 +297,18 @@ body {
   text-overflow: ellipsis;
 }
 
-.group li .icontooinfo,
+.group li .icontoo {
+  width: 29px;
+  height: 16px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  flex-shrink: 0;
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+}
+
 .group li > a[href*="youtu"] {
   flex-shrink: 0;
   margin-left: auto;
@@ -225,7 +347,9 @@ body {
   border-radius: 0.5rem;
 }
 
-/* Navbar Modernization */
+/* ==========================================================================
+   4. NAVIGATION & HEADER
+   ========================================================================== */
 nav.navbar {
   background-color: var(--nav-bg) !important;
   backdrop-filter: blur(8px);
@@ -246,17 +370,22 @@ nav.navbar {
   background-color: rgba(59, 130, 246, 0.2);
 }
 
+.navbar-nav .nav-link.home-highlight:hover {
+  background: rgba(59, 130, 246, 0.25);
+  border-color: rgba(59, 130, 246, 0.9);
+}
+
 .main {
-  padding-top: 48px !important;
+  padding-top: 41px !important;
   margin-top: 0px !important;
 }
 
-/* Dark mode toggle button style */
+/* Theme Toggle Button */
 .theme-toggle-btn {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: white;
-  padding: 0.5rem 0.75rem;
+  background: rgba(255, 255, 255, 0.16) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  color: white !important;
+  padding: 0.28rem 0.75rem !important;
   border-radius: 0.5rem;
   cursor: pointer;
   display: flex;
@@ -267,10 +396,13 @@ nav.navbar {
 }
 
 .theme-toggle-btn:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.28) !important;
+  border-color: rgba(255, 255, 255, 0.45) !important;
 }
 
-/* Footer Modernization */
+/* ==========================================================================
+   5. FOOTER
+   ========================================================================== */
 footer.footer {
   background-color: var(--nav-bg) !important;
   color: #f8fafc !important;
@@ -302,108 +434,508 @@ footer.footer a:hover {
   color: #ffffff !important;
 }
 
-/* Reduced left padding for group lists */
-.group ul {
-  padding-left: 0.25rem !important;
-  margin-left: 0 !important;
-}
-.group li {
-  padding-left: 0.25rem !important;
-}
-
-
-/* Category color schemes */
-.group.cat-social { background: linear-gradient(135deg, var(--card-bg) 0%, rgba(59, 130, 246, 0.16) 100%); border-top: 3.5px solid rgba(59, 130, 246, 0.9); --cat-color: rgba(59, 130, 246, 0.9); }
-.group.cat-news { background: linear-gradient(135deg, var(--card-bg) 0%, rgba(16, 185, 129, 0.16) 100%); border-top: 3.5px solid rgba(16, 185, 129, 0.9); --cat-color: rgba(16, 185, 129, 0.9); }
-.group.cat-media { background: linear-gradient(135deg, var(--card-bg) 0%, rgba(245, 158, 11, 0.16) 100%); border-top: 3.5px solid rgba(245, 158, 11, 0.9); --cat-color: rgba(245, 158, 11, 0.9); }
-.group.cat-games { background: linear-gradient(135deg, var(--card-bg) 0%, rgba(139, 92, 246, 0.16) 100%); border-top: 3.5px solid rgba(139, 92, 246, 0.9); --cat-color: rgba(139, 92, 246, 0.9); }
-.group.cat-communal { background: linear-gradient(135deg, var(--card-bg) 0%, rgba(6, 182, 212, 0.16) 100%); border-top: 3.5px solid rgba(6, 182, 212, 0.9); --cat-color: rgba(6, 182, 212, 0.9); }
-.group.cat-bank { background: linear-gradient(135deg, var(--card-bg) 0%, rgba(236, 72, 153, 0.16) 100%); border-top: 3.5px solid rgba(236, 72, 153, 0.9); --cat-color: rgba(236, 72, 153, 0.9); }
-.group.cat-market { background: linear-gradient(135deg, var(--card-bg) 0%, rgba(99, 102, 241, 0.16) 100%); border-top: 3.5px solid rgba(99, 102, 241, 0.9); --cat-color: rgba(99, 102, 241, 0.9); }
-.group.cat-shops { background: linear-gradient(135deg, var(--card-bg) 0%, rgba(20, 184, 166, 0.16) 100%); border-top: 3.5px solid rgba(20, 184, 166, 0.9); --cat-color: rgba(20, 184, 166, 0.9); }
-.group.cat-others { background: linear-gradient(135deg, var(--card-bg) 0%, rgba(100, 116, 139, 0.16) 100%); border-top: 3.5px solid rgba(100, 116, 139, 0.9); --cat-color: rgba(100, 116, 139, 0.9); }
-.group.cat-city { background: linear-gradient(135deg, var(--card-bg) 0%, rgba(234, 179, 8, 0.16) 100%); border-top: 3.5px solid rgba(234, 179, 8, 0.9); --cat-color: rgba(234, 179, 8, 0.9); }
-.group.cat-programs { background: linear-gradient(135deg, var(--card-bg) 0%, rgba(249, 115, 22, 0.16) 100%); border-top: 3.5px solid rgba(249, 115, 22, 0.9); --cat-color: rgba(249, 115, 22, 0.9); }
-.group.cat-search { background: linear-gradient(135deg, var(--card-bg) 0%, rgba(14, 165, 233, 0.16) 100%); border-top: 3.5px solid rgba(14, 165, 233, 0.9); --cat-color: rgba(14, 165, 233, 0.9); }
-.group.cat-orange { background: linear-gradient(135deg, var(--card-bg) 0%, rgba(249, 115, 22, 0.16) 100%); border-top: 3.5px solid rgba(249, 115, 22, 0.9); --cat-color: rgba(249, 115, 22, 0.9); }
-.group.cat-orange .group-title .badge, .group.cat-orange .badge { background: linear-gradient(135deg, #f97316, #ea580c) !important; color: white !important; }
-.group.cat-updates { background: linear-gradient(135deg, var(--card-bg) 0%, rgba(239, 68, 68, 0.18) 100%); border-top: 3.5px solid rgba(239, 68, 68, 0.95); --cat-color: rgba(239, 68, 68, 0.95); }
-.group li { padding-left: 0.25rem !important; }
-
-
-
-.navbar-nav .nav-link.home-highlight:hover {
-  background: rgba(59, 130, 246, 0.25);
-  border-color: rgba(59, 130, 246, 0.9);
+/* Красива тепла кнопка "Підтримати сайт" у тон кнопки Тема, злегка освітлена */
+footer.footer .btn-primary {
+  background: rgba(255, 255, 255, 0.16) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  color: #ffffff !important;
+  font-weight: normal !important;
+  padding: 0.22rem 0.75rem !important;
+  border-radius: 0.5rem !important; /* У тон кнопці Тема */
+  box-shadow: none !important;
+  transition: all 0.20s ease !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.5rem !important;
+  font-size: 0.875rem !important;
+  text-shadow: none !important;
 }
 
-body {
-  padding-bottom: 70px;
+footer.footer .btn-primary:hover {
+  background: rgba(255, 255, 255, 0.28) !important;
+  border-color: rgba(255, 255, 255, 0.45) !important;
+  color: #ffffff !important;
+  transform: none !important;
+  box-shadow: none !important;
 }
 
-
-
-.tab-content.container > .row {
-  justify-content: center;
+footer.footer .btn-primary:active {
+  background: rgba(255, 255, 255, 0.12) !important;
+  transform: none !important;
 }
 
-@media (min-width: 1200px) {
-  .row.animated.fadeIn {
+/* ==========================================================================
+   6. CATEGORY COLOR SCHEMES
+   ========================================================================== */
+.group.cat-social { background: linear-gradient(135deg, var(--card-bg) 0%, var(--card-grad-end) 100%); border-top: 3.5px solid rgba(59, 130, 246, 0.9); --cat-color: rgba(59, 130, 246, 0.9); }
+.group.cat-news { background: linear-gradient(135deg, var(--card-bg) 0%, var(--card-grad-end) 100%); border-top: 3.5px solid rgba(16, 185, 129, 0.9); --cat-color: rgba(16, 185, 129, 0.9); }
+.group.cat-media { background: linear-gradient(135deg, var(--card-bg) 0%, var(--card-grad-end) 100%); border-top: 3.5px solid rgba(245, 158, 11, 0.9); --cat-color: rgba(245, 158, 11, 0.9); }
+.group.cat-games { background: linear-gradient(135deg, var(--card-bg) 0%, var(--card-grad-end) 100%); border-top: 3.5px solid rgba(139, 92, 246, 0.9); --cat-color: rgba(139, 92, 246, 0.9); }
+.group.cat-communal { background: linear-gradient(135deg, var(--card-bg) 0%, var(--card-grad-end) 100%); border-top: 3.5px solid rgba(6, 182, 212, 0.9); --cat-color: rgba(6, 182, 212, 0.9); }
+.group.cat-bank { background: linear-gradient(135deg, var(--card-bg) 0%, var(--card-grad-end) 100%); border-top: 3.5px solid rgba(236, 72, 153, 0.9); --cat-color: rgba(236, 72, 153, 0.9); }
+.group.cat-market { background: linear-gradient(135deg, var(--card-bg) 0%, var(--card-grad-end) 100%); border-top: 3.5px solid rgba(99, 102, 241, 0.9); --cat-color: rgba(99, 102, 241, 0.9); }
+.group.cat-shops { background: linear-gradient(135deg, var(--card-bg) 0%, var(--card-grad-end) 100%); border-top: 3.5px solid rgba(20, 184, 166, 0.9); --cat-color: rgba(20, 184, 166, 0.9); }
+.group.cat-others { background: linear-gradient(135deg, var(--card-bg) 0%, var(--card-grad-end) 100%); border-top: 3.5px solid rgba(100, 116, 139, 0.9); --cat-color: rgba(100, 116, 139, 0.9); }
+.group.cat-city { background: linear-gradient(135deg, var(--card-bg) 0%, var(--card-grad-end) 100%); border-top: 3.5px solid rgba(234, 179, 8, 0.9); --cat-color: rgba(234, 179, 8, 0.9); }
+.group.cat-programs { background: linear-gradient(135deg, var(--card-bg) 0%, var(--card-grad-end) 100%); border-top: 3.5px solid rgba(249, 115, 22, 0.9); --cat-color: rgba(249, 115, 22, 0.9); }
+.group.cat-search { background: linear-gradient(135deg, var(--card-bg) 0%, var(--card-grad-end) 100%); border-top: 3.5px solid rgba(14, 165, 233, 0.9); --cat-color: rgba(14, 165, 233, 0.9); }
+.group.cat-updates { background: linear-gradient(135deg, var(--card-bg) 0%, var(--card-grad-end) 100%); border-top: 3.5px solid rgba(239, 68, 68, 0.95); --cat-color: rgba(239, 68, 68, 0.95); }
+
+/* Custom Category Badges styled to match the group's signature theme color with darker center saturation */
+.group.cat-social .group-title .badge, .group.cat-social .badge { background: linear-gradient(to right, #3b82f6 0%, #1d4ed8 50%, #3b82f6 100%) !important; color: white !important; }
+.group.cat-news .group-title .badge, .group.cat-news .badge { background: linear-gradient(to right, #10b981 0%, #047857 50%, #10b981 100%) !important; color: white !important; }
+.group.cat-media .group-title .badge, .group.cat-media .badge { background: linear-gradient(to right, #f59e0b 0%, #b45309 50%, #f59e0b 100%) !important; color: white !important; }
+.group.cat-games .group-title .badge, .group.cat-games .badge { background: linear-gradient(to right, #8b5cf6 0%, #6d28d9 50%, #8b5cf6 100%) !important; color: white !important; }
+.group.cat-communal .group-title .badge, .group.cat-communal .badge { background: linear-gradient(to right, #06b6d4 0%, #0e7490 50%, #06b6d4 100%) !important; color: white !important; }
+.group.cat-bank .group-title .badge, .group.cat-bank .badge { background: linear-gradient(to right, #ec4899 0%, #be185d 50%, #ec4899 100%) !important; color: white !important; }
+.group.cat-market .group-title .badge, .group.cat-market .badge { background: linear-gradient(to right, #6366f1 0%, #4338ca 50%, #6366f1 100%) !important; color: white !important; }
+.group.cat-shops .group-title .badge, .group.cat-shops .badge { background: linear-gradient(to right, #14b8a6 0%, #0f766e 50%, #14b8a6 100%) !important; color: white !important; }
+.group.cat-others .group-title .badge, .group.cat-others .badge { background: linear-gradient(to right, #64748b 0%, #475569 50%, #64748b 100%) !important; color: white !important; }
+.group.cat-city .group-title .badge, .group.cat-city .badge { background: linear-gradient(to right, #eab308 0%, #a16207 50%, #eab308 100%) !important; color: white !important; }
+.group.cat-programs .group-title .badge, .group.cat-programs .badge { background: linear-gradient(to right, #f97316 0%, #c2410c 50%, #f97316 100%) !important; color: white !important; }
+.group.cat-search .group-title .badge, .group.cat-search .badge { background: linear-gradient(to right, #0ea5e9 0%, #0369a1 50%, #0ea5e9 100%) !important; color: white !important; }
+.group.cat-updates .group-title .badge, .group.cat-updates .badge { background: linear-gradient(to right, #ef4444 0%, #dc2626 50%, #ef4444 100%) !important; color: white !important; }
+
+/* ==========================================================================
+   7. MOBILE AND RESPONSIVE OVERRIDES
+   ========================================================================== */
+@media (max-width: 1199.98px) {
+  /* 0. Перевизначення поведінки розгортання Bootstrap для екранів < 1200px */
+  .navbar-expand-md .navbar-toggler {
     display: block !important;
-    column-count: 4;
-    column-gap: 20px;
   }
-  .row.animated.fadeIn > .col-sm {
-    display: contents;
+  .navbar-expand-md .navbar-collapse {
+    display: none !important;
   }
-  .row.animated.fadeIn .group {
-    break-inside: avoid;
-    -webkit-column-break-inside: avoid;
-    page-break-inside: avoid;
-    margin-bottom: 20px;
-  }
-}
-
-@media (min-width: 768px) and (max-width: 1199.98px) {
-  .row.animated.fadeIn {
+  .navbar-expand-md .navbar-collapse.show {
     display: block !important;
-    column-count: 2;
-    column-gap: 20px;
   }
-  .row.animated.fadeIn > .col-sm {
-    display: contents;
+  .navbar-expand-md .navbar-collapse.collapsing {
+    display: block !important;
   }
-  .row.animated.fadeIn .group {
-    break-inside: avoid;
-    -webkit-column-break-inside: avoid;
-    page-break-inside: avoid;
-    margin-bottom: 20px;
+  .mobile-navbar-title {
+    display: block !important;
   }
-}
 
-@media (max-width: 767.98px) {
-  .footer, footer.footer {
+  footer.footer {
     position: static !important;
     bottom: auto !important;
   }
   body {
     padding-bottom: 0 !important;
   }
+  .navbar-nav {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    grid-auto-flow: column !important;
+    grid-template-rows: repeat(6, auto) !important;
+    gap: 12px 14px !important; /* 12px vertical spacing between rows, 14px horizontal spacing */
+    padding: 16px !important;
+    width: 100% !important;
+    margin: 0 auto !important;
+  }
   .navbar-nav .nav-item {
-    margin: 1px 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
   }
   .navbar-nav .nav-link {
-    padding: 2px 8px !important;
-  }
-  .row.animated.fadeIn {
+    padding: 8px 12px !important; /* Increased padding inside links for easier touch targets */
+    font-size: 0.95rem !important;
+    line-height: 1.4 !important; /* Beautifully increased line spacing */
+    border-radius: 8px !important;
     display: block !important;
-    column-count: 1;
+    text-align: center !important;
   }
-  .row.animated.fadeIn > .col-sm {
-    display: contents;
+
+  /* 1. Закріплюємо шапку зверху (fixed) для мобільних */
+  .navbar, .nav-container, .header { 
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      display: block;
+      height: 42px;                 
+      background-color: #1e293b;    
+      z-index: 1000;
   }
-  .row.animated.fadeIn .group {
-    margin-bottom: 20px;
+
+  /* 2. Кнопка теми: вирівнювання всередині компактної шапки (зліва) */
+  #themeToggle {
+      position: absolute;
+      top: 50%;                     
+      transform: translateY(-50%) scale(0.72); 
+      left: 12px;                  
+      z-index: 1050;                
+      margin: 0;                    
+  }
+
+  /* 3. Кнопка гамбургера: вирівнювання всередині компактної шапки (справа) */
+  .hamburger {
+      position: absolute;
+      top: 50%;                     
+      transform: translateY(-50%) scale(0.7); 
+      right: 12px;                   
+      z-index: 1050;                
+      transform-origin: right center;
+      padding: 6px !important;      
+      margin: 0;                    
+  }
+
+  /* 4. Випадаюче меню: зміщуємо його під нову компактну шапку */
+  .nav-menu-links, .navbar-collapse { 
+      position: absolute;
+      top: 42px !important;         
+      left: 0;
+      width: 100%;
+      z-index: 999;                 
+      background-color: #1e293b !important; 
+      box-shadow: 0 8px 12px rgba(0, 0, 0, 0.4); 
+      
+      /* Заокруглення нижніх кутів меню */
+      border-radius: 0 0 10px 10px; 
+      overflow: hidden;             
+  }
+
+  /* Заголовок "ТОП-ЗАКЛАДКИ" посередині мобільної шапки */
+  .mobile-navbar-title {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #ffffff;
+      font-weight: 600;
+      font-size: 0.9rem;
+      background-color: rgba(255, 255, 255, 0.08);
+      padding: 3px 10px;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+      white-space: nowrap;
+      z-index: 1040;
+      letter-spacing: 0.02em;
+  }
+
+  /* 5. Точкове усунення великої відстані після шапки та додавання безпечного відступу */
+  .navbar + *, 
+  .nav-container + *, 
+  .header + *,
+  header + * {
+      margin-top: 40px !important;
+      padding-top: 2px !important; 
+  }
+
+  /* Прибираємо внутрішні зміщення для першого контейнера після меню */
+  .navbar + * .container,
+  .nav-container + * .container,
+  header + * .container {
+      margin-top: 0 !important;
+      padding-top: 0 !important;
   }
 }
 
+/* Вертикальна реклама по боках для широких екранів (наприклад, 1920px) */
+.side-ad-left, .side-ad-right {
+  display: none; /* Приховуємо на мобільних та середніх екранах за замовчуванням */
+  position: fixed;
+  top: 50px; /* Припідняли максимально близько до навігаційного меню (40px висота меню + 10px відступ) */
+  bottom: 52px; /* Опускаємо донизу, залишаючи такий самий симетричний відступ над футером (~10-12px) */
+  width: 300px;
+  z-index: 99;
+  flex-direction: column;
+  justify-content: flex-start; /* Вирівнювання по вертикалі під самий верх */
+  overflow: visible; /* Забезпечуємо відображення границь без зрізання */
+}
+
+.ad-wrapper {
+  width: 300px;
+  height: 250px; /* Фіксований розмір блоку під стандартну рекламу 300x250 */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  position: relative;
+}
+
+.ad-wrapper-bottom {
+  width: 300px;
+  flex-grow: 1; /* Розтягується на всю висоту, що залишилася до низу */
+  min-height: 250px;
+  margin-top: 20px; /* Відступ між верхнім та нижнім блоками реклами */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  position: relative;
+}
+
+.ad-wrapper-bottom .adsbygoogle {
+  width: 100% !important;
+  height: 100% !important;
+  max-height: 100% !important;
+}
+
+/* Новий клас для великих вертикальних оголошень на головній сторінці */
+.ad-wrapper-vertical {
+  width: 300px;
+  height: 100%;
+  max-height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start; /* Починаємо від самого верху */
+  align-items: center;
+  overflow: visible; /* Щоб границі не зрізалися */
+  position: relative;
+}
+
+.ad-wrapper-vertical .adsbygoogle {
+  width: 100% !important;
+  height: 100% !important;
+  max-height: 100% !important;
+}
+
+/* Контейнер для нижнього блоку мультиплекс-реклами на всіх сторінках */
+.bottom-multiplex-container {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  padding: 0 15px;
+  clear: both;
+  height: 0;
+  max-height: 0;
+  overflow: hidden;
+  text-align: center; /* Центрування рекламного блоку */
+  transition: all 0.3s ease;
+}
+
+/* Коли реклама завантажилась успішно, плавно задаємо її висоту та додаємо компактний відступ */
+.bottom-multiplex-container.ad-status-filled,
+.bottom-multiplex-container:has(ins[data-ad-status="filled"]) {
+  margin-top: 5px !important;     /* Мінімальний відступ зверху */
+  margin-bottom: 10px !important;  /* Компактний відступ знизу перед фіксованим футером */
+  height: 250px !important;
+  max-height: 250px !important;
+}
+
+/* Якщо реклама не завантажилась або порожня, примусово повністю ховаємо її */
+.bottom-multiplex-container.ad-status-unfilled,
+.bottom-multiplex-container:has(ins[data-ad-status="unfilled"]) {
+  display: none !important;
+}
+
+.bottom-multiplex-container .adsbygoogle {
+  width: 1110px !important;
+  height: 250px !important;
+  max-height: 250px !important;
+  display: inline-block !important;
+  overflow: hidden;
+}
+
+/* Каркас трисекційного бокового блоку реклами для всіх сторінок, окрім Головної */
+.ad-sidebar-three-parts {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+.ad-sidebar-part {
+  width: 100%;
+  flex: 1; /* Рівномірний розподіл висоти на три секції */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start; /* Вирівнювання по верхньому краю кожної секції */
+  align-items: center;
+  position: relative;
+  box-sizing: border-box;
+}
+
+/* Спеціальний обмежувач для верхньої реклами 300x300 або 300x250 */
+.ad-wrapper-300-300 {
+  width: 300px;
+  height: 300px;
+  max-height: 300px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  position: relative;
+}
+
+.ad-wrapper-300-300 .adsbygoogle {
+  display: inline-block !important;
+  width: 300px !important;
+  height: 300px !important;
+}
+
+.side-ad-left {
+  left: calc(50% - 570px - 320px); /* Позиція зліва від центрального контейнера (570px половина контейнера + 300px ширина реклами + 20px відступ) */
+}
+
+.side-ad-right {
+  right: calc(50% - 570px - 320px); /* Позиція справа від центрального контейнера (570px половина контейнера + 300px ширина реклами + 20px відступ) */
+}
+
+/* Контейнер для мобільних InFeed-оголошень між картками */
+.infeed-ad-mobile-container {
+  display: none; /* За замовчуванням приховано на ПК */
+  width: 100%;
+  max-width: 100% !important;
+  overflow: hidden !important;
+  padding: 0;
+  margin: 0 !important;
+  clear: both;
+}
+
+.infeed-ad-mobile-container .adsbygoogle {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow: hidden !important;
+}
+
+.infeed-ad-mobile-container ins,
+.infeed-ad-mobile-container iframe {
+  max-width: 100% !important;
+  overflow: hidden !important;
+}
+
+@media (max-width: 1799.98px) {
+  /* За замовчуванням робимо контейнер майже невидимим і без відступів, щоб не створювати порожніх дірок під час завантаження */
+  .infeed-ad-mobile-container {
+    display: block !important;
+    height: 1px;
+    max-height: 1px;
+    overflow: hidden !important;
+    opacity: 0.01;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  
+  /* Коли реклама завантажилась успішно: робимо видимою та додаємо помірні зазори зверху та знизу, щоб уникнути зливання з картками */
+  .infeed-ad-mobile-container.ad-status-filled,
+  .infeed-ad-mobile-container:has(ins[data-ad-status="filled"]) {
+    height: auto !important;
+    max-height: none !important;
+    overflow: hidden !important;
+    opacity: 1 !important;
+    margin-top: 15px !important;    /* Мінімальний зазор над рекламою */
+    margin-bottom: 20px !important; /* Надійний зазор під рекламою */
+  }
+  
+  /* Якщо реклама не завантажилась або порожня, повністю приховуємо її, щоб не залишалося ніяких порожніх проміжків */
+  .infeed-ad-mobile-container.ad-status-unfilled,
+  .infeed-ad-mobile-container:has(ins[data-ad-status="unfilled"]) {
+    display: none !important;
+    height: 0 !important;
+    max-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+}
+
+/* Відображаємо рекламу тільки на великих моніторах (від 1800px), де є достатньо вільного місця (наприклад, повністю розгорнуте вікно на 1920x1080 і більше, навіть із бічними панелями) */
+@media (min-width: 1800px) {
+  .side-ad-left, .side-ad-right {
+    display: flex;
+  }
+}
+
+/* ==========================================================================
+   GOLDEN GRADIENT THEME FOR RECOMMENDATIONS & PLACEHOLDERS
+   ========================================================================== */
+
+/* Golden Card */
+.group.cat-recommendations {
+  background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%) !important;
+  border: 1px solid #f59e0b !important;
+  border-top: 4px solid #d97706 !important;
+  --cat-color: #d97706;
+}
+
+body.dark-mode .group.cat-recommendations {
+  background: linear-gradient(135deg, #251c07 0%, #171103 100%) !important;
+  border: 1px solid #854d0e !important;
+  border-top: 4px solid #fbbf24 !important;
+  --cat-color: #fbbf24;
+}
+
+/* Golden Badge */
+.group-title .badge.badge-recommend {
+  background: linear-gradient(135deg, #fbbf24 0%, #d97706 50%, #b45309 100%) !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) !important;
+  box-shadow: 0 3px 6px rgba(217, 119, 6, 0.4) !important;
+  border: 1px solid #92400e !important;
+}
+
+body.dark-mode .group-title .badge.badge-recommend {
+  background: linear-gradient(135deg, #fef08a 0%, #f59e0b 50%, #d97706 100%) !important;
+  color: #1c1505 !important;
+  font-weight: 700 !important;
+  text-shadow: none !important;
+  box-shadow: 0 3px 6px rgba(251, 191, 36, 0.35) !important;
+  border: 1px solid #fbbf24 !important;
+}
+
+/* Standout styling for the Golden Recommendation card list items */
+.group.cat-recommendations li a {
+  color: #78350f !important;
+  font-weight: 600 !important;
+}
+
+body.dark-mode .group.cat-recommendations li a {
+  color: #fef08a !important;
+}
+
+/* Inline Placeholders */
+.group li.placeholder-ad-item a {
+  color: #6b7280 !important; /* Gray text in light mode */
+  font-weight: normal !important;
+  opacity: 0.5;
+  transition: opacity 0.2s ease;
+}
+
+body.dark-mode .group li.placeholder-ad-item a {
+  color: #9ca3af !important; /* Lighter gray text in dark mode */
+}
+
+.group li.placeholder-ad-item:hover a {
+  opacity: 1;
+}
+
+.group li.placeholder-ad-item:hover {
+  background-color: rgba(0, 0, 0, 0.04) !important; /* Subtle gray background on hover */
+}
+
+body.dark-mode .group li.placeholder-ad-item:hover {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+.placeholder-circle {
+  width: 16px;
+  height: 16px;
+  border: 1.5px solid currentColor;
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
+  margin-left: 0;
+  margin-right: 8px;
+  box-sizing: border-box;
+}
+
+.placeholder-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  width: 16px;
+  height: 16px;
+  line-height: 1;
+  flex-shrink: 0;
+  margin-right: 6px;
+}
