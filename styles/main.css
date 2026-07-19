@@ -894,14 +894,48 @@ body.dark-mode .group.cat-recommendations li a {
 
 /* Inline Placeholders */
 .group li.placeholder-ad-item a {
-  color: #b45309 !important; /* Gold/amber text */
+  color: #6b7280 !important; /* Gray text in light mode */
   font-weight: normal !important;
+  opacity: 0.5;
+  transition: opacity 0.2s ease;
 }
 
 body.dark-mode .group li.placeholder-ad-item a {
-  color: #fbbf24 !important; /* Brighter gold/amber in dark mode */
+  color: #9ca3af !important; /* Lighter gray text in dark mode */
+}
+
+.group li.placeholder-ad-item:hover a {
+  opacity: 1;
 }
 
 .group li.placeholder-ad-item:hover {
-  background-color: rgba(245, 158, 11, 0.08) !important; /* Golden glow on hover */
+  background-color: rgba(0, 0, 0, 0.04) !important; /* Subtle gray background on hover */
+}
+
+body.dark-mode .group li.placeholder-ad-item:hover {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+.placeholder-circle {
+  width: 16px;
+  height: 16px;
+  border: 1.5px solid currentColor;
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
+  margin-left: 0;
+  margin-right: 8px;
+  box-sizing: border-box;
+}
+
+.placeholder-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  width: 16px;
+  height: 16px;
+  line-height: 1;
+  flex-shrink: 0;
+  margin-right: 6px;
 }

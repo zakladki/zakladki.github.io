@@ -187,7 +187,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <div class="group-title"><span class="badge badge-recommend">Рекомендації Сайту</span></div>
           <ul>
             <li>
-              <a href="https://docs.google.com/document/d/15S2XrUxYaj1uu68wtfqww3Gkqa-Lq2Ra-P20AHWqKgs" target="_blank" title="Тут може бути Ваше посилання і опис. Контакти для зв'язку внизу сторінки."><img src="./favicon.ico" class="link-favicon" alt="" width="16" height="16">💎 Вільне Місце</a>
+              <a href="https://docs.google.com/document/d/15S2XrUxYaj1uu68wtfqww3Gkqa-Lq2Ra-P20AHWqKgs" target="_blank" title="Тут може бути Ваше посилання і опис на Ваш сайт, магазин, сервіс, тощо. Контакти для розміщення — внизу сторінки."><span class="link-favicon" style="display: none;"></span><span class="placeholder-circle"></span><span class="placeholder-icon">💎</span>Вільне Місце</a>
             </li>
           </ul>
         `;
@@ -196,7 +196,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <div class="group-title"><span class="badge badge-recommend">Рекомендації Розділу</span></div>
           <ul>
             <li>
-              <a href="https://docs.google.com/document/d/15S2XrUxYaj1uu68wtfqww3Gkqa-Lq2Ra-P20AHWqKgs" target="_blank" title="Тут може бути Ваше посилання і опис. Контакти для зв'язку внизу сторінки."><img src="./favicon.ico" class="link-favicon" alt="" width="16" height="16">⚡ Вільне Місце</a>
+              <a href="https://docs.google.com/document/d/15S2XrUxYaj1uu68wtfqww3Gkqa-Lq2Ra-P20AHWqKgs" target="_blank" title="Тут може бути Ваше посилання і опис на Ваш сайт, магазин, сервіс, тощо. Контакти для розміщення — внизу сторінки."><span class="link-favicon" style="display: none;"></span><span class="placeholder-circle"></span><span class="placeholder-icon">⚡</span>Вільне Місце</a>
             </li>
           </ul>
         `;
@@ -209,11 +209,30 @@ document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll('.group:not(.cat-recommendations) ul').forEach(ul => {
     if (!ul.children.length) return;
     
+    const groupElement = ul.closest('.group');
+    const badgeElement = groupElement ? groupElement.querySelector('.group-title span.badge') : null;
+    const groupTitle = badgeElement ? badgeElement.textContent.trim() : '';
+
     const li = document.createElement('li');
-    li.className = 'placeholder-ad-item';
-    li.innerHTML = `
-      <a href="https://docs.google.com/document/d/15S2XrUxYaj1uu68wtfqww3Gkqa-Lq2Ra-P20AHWqKgs" target="_blank" title="Тут Ви можете розмістити своє посилання та опис на Ваш сайт, магазин, сервіс, тощо. Контакти для зв'язку внизу сторінки."><img src="./favicon.ico" class="link-favicon" alt="" width="16" height="16">➤ Вільне Місце</a>
-    `;
+    
+    if (groupTitle === 'ТОП-Музика-Українська') {
+      li.innerHTML = `
+        <a href="https://www.youtube.com/@music-hitok-ua" target="_blank" title="ТОП провідник у світ сучасної української музики. Від легендарних хітів до найсвіжіших релізів молодих виконавців.">(YT) Music HitOK - UA</a>
+      `;
+    } else if (groupTitle === 'ТОП-Музика-Патріотична') {
+      li.innerHTML = `
+        <a href="https://www.youtube.com/@music-hitok-ua" target="_blank" title="Патріотичний провідник у світ сучасної української музики. Від легендарних хітів до найсвіжіших релізів молодих виконавців.">(YT) Music HitOK - UA</a>
+      `;
+    } else if (groupTitle === 'ТОП-Музика-WebSIS') {
+      li.innerHTML = `
+        <a href="https://www.youtube.com/@WebSIS_music" target="_blank" title="WebSIS - незалежний мультижанровий проєкт: український дух, експериментальний звук та сучасні технології.">(YT) WebSIS</a>
+      `;
+    } else {
+      li.className = 'placeholder-ad-item';
+      li.innerHTML = `
+        <a href="https://docs.google.com/document/d/15S2XrUxYaj1uu68wtfqww3Gkqa-Lq2Ra-P20AHWqKgs" target="_blank" title="Тут може бути Ваше посилання і опис на Ваш сайт, магазин, сервіс, тощо. Контакти для розміщення — внизу сторінки."><span class="link-favicon" style="display: none;"></span><span class="placeholder-circle"></span><span class="placeholder-icon">➤</span>Вільне Місце</a>
+      `;
+    }
     ul.appendChild(li);
   });
 
