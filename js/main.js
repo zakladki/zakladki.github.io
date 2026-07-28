@@ -651,12 +651,14 @@ document.addEventListener("DOMContentLoaded", () => {
       `;
 
       rightAd.innerHTML = `
-        <!-- Праворуч (Головна) - Фіксована вертикальна реклама 300x680 -->
-        <div class="ad-wrapper-300-680">
+        <!-- Праворуч-Вертикально (Головна) - Велика вертикальна реклама на всю висоту -->
+        <div class="ad-wrapper-vertical">
           <ins class="adsbygoogle"
-               style="display:inline-block;width:300px;height:680px"
+               style="display:block;"
                data-ad-client="ca-pub-3065705668384801"
-               data-ad-slot="7214909489"></ins>
+               data-ad-slot="7662418469"
+               data-ad-format="auto"
+               data-full-width-responsive="true"></ins>
         </div>
       `;
     } else {
@@ -731,8 +733,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // === 2. НИЖНІЙ МУЛЬТИПЛЕКС ПЕРЕД ФУТЕРОМ (Тимчасово закоментовано / приховано) ===
-  /*
+  // === 2. НИЖНІЙ МУЛЬТИПЛЕКС ПЕРЕД ФУТЕРОМ (На всіх сторінках, окрім Головної, і тільки для ПК екранів >= 1200px) ===
   if (!isHomepage && screenWidth >= 1200) {
     const footer = document.querySelector('footer.footer');
     if (footer) {
@@ -749,7 +750,6 @@ document.addEventListener("DOMContentLoaded", () => {
       observeAdStatus(multiplexContainer);
     }
   }
-  */
 
   // === 3. ВПРОВАДЖЕННЯ МОБІЛЬНИХ IN-FEED РЕКЛАМНИХ БЛОКІВ МІЖ КАРТКАМИ (Тільки для мобільних екранів < 1800px) ===
   if (screenWidth < 1800) {

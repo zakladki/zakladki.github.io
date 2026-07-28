@@ -771,24 +771,6 @@ footer.footer .btn-primary:active {
   height: 300px !important;
 }
 
-/* Спеціальний обмежувач для реклами 300x680 */
-.ad-wrapper-300-680 {
-  width: 300px;
-  height: 680px;
-  max-height: 680px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  overflow: hidden;
-  position: relative;
-}
-
-.ad-wrapper-300-680 .adsbygoogle {
-  display: inline-block !important;
-  width: 300px !important;
-  height: 680px !important;
-}
-
 .side-ad-left {
   left: calc(50% - 570px - 320px); /* Позиція зліва від центрального контейнера (570px половина контейнера + 300px ширина реклами + 20px відступ) */
 }
