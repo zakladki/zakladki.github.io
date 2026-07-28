@@ -733,7 +733,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // === 2. НИЖНІЙ МУЛЬТИПЛЕКС ПЕРЕД ФУТЕРОМ (На всіх сторінках, окрім Головної, і тільки для ПК екранів >= 1200px) ===
+  // === 2. НИЖНІЙ МУЛЬТИПЛЕКС ПЕРЕД ФУТЕРОМ (Тимчасово закоментовано / приховано) ===
+  /*
   if (!isHomepage && screenWidth >= 1200) {
     const footer = document.querySelector('footer.footer');
     if (footer) {
@@ -750,6 +751,7 @@ document.addEventListener("DOMContentLoaded", () => {
       observeAdStatus(multiplexContainer);
     }
   }
+  */
 
   // === 3. ВПРОВАДЖЕННЯ МОБІЛЬНИХ IN-FEED РЕКЛАМНИХ БЛОКІВ МІЖ КАРТКАМИ (Тільки для мобільних екранів < 1800px) ===
   if (screenWidth < 1800) {
