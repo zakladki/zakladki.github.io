@@ -651,14 +651,12 @@ document.addEventListener("DOMContentLoaded", () => {
       `;
 
       rightAd.innerHTML = `
-        <!-- Праворуч-Вертикально (Головна) - Велика вертикальна реклама на всю висоту -->
-        <div class="ad-wrapper-vertical">
+        <!-- Праворуч (Головна) - Фіксована вертикальна реклама 300x680 -->
+        <div class="ad-wrapper-300-680">
           <ins class="adsbygoogle"
-               style="display:block;"
+               style="display:inline-block;width:300px;height:680px"
                data-ad-client="ca-pub-3065705668384801"
-               data-ad-slot="7662418469"
-               data-ad-format="auto"
-               data-full-width-responsive="true"></ins>
+               data-ad-slot="7214909489"></ins>
         </div>
       `;
     } else {
