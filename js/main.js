@@ -267,6 +267,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // === Dynamic inline placeholders at the end of each card ===
   document.querySelectorAll('.group:not(.cat-recommendations) ul').forEach(ul => {
     if (!ul.children.length) return;
+    if (ul.querySelector('.placeholder-ad-item')) return;
     
     const groupElement = ul.closest('.group');
     const badgeElement = groupElement ? groupElement.querySelector('.group-title span.badge') : null;
