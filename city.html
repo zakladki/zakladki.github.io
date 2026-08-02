@@ -241,13 +241,16 @@
                 <div class="group-title"><span class="badge badge-success">Медіа / Спільноти</span></div>
                 <ul>
                   <li class="radio-legion-item">
-                    <button id="radioLegionBtn" type="button" class="radio-legion-btn" title="Слухати онлайн-радіо ЛЕГІОН (Новомиргород)">
-                      <span class="radio-legion-content">
-                        <span id="radioLegionText">▶ Радіо ЛЕГІОН</span>
-                      </span>
-                      <span class="radio-live-badge">LIVE</span>
-                    </button>
-                    <audio id="radioLegionAudio" src="http://82.207.23.148:8000/radio" preload="none"></audio>
+                    <div id="radioLegionContainer" class="radio-legion-container">
+                      <a href="https://radio-legion.com.ua/" target="_blank" class="radio-title-link">
+                        <i class="fas fa-broadcast-tower radio-icon"></i>
+                        <span>Радіо ЛЕГІОН</span>
+                      </a>
+                      <button id="radioLegionPlayBtn" type="button" class="radio-play-btn">
+                        <span id="radioPlayIcon">▶</span>
+                      </button>
+                    </div>
+                    <audio id="radioLegionAudio" src="/api/radio" preload="none"></audio>
                   </li>
                   <li>
                     <div class="icon youtube"></div><a href="https://www.youtube.com/channel/UCKjCg071hg21YxymgDfz5TA" target="_blank" title="YouTube-канал, присвячений подіям, новинам, культурному життю та історії міста Новомиргород.">(YT) м. Новомиргород</a>

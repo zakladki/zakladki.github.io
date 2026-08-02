@@ -101,47 +101,60 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // === Radio LEGION Stream Player Logic ===
-  const radioBtn = document.getElementById('radioLegionBtn');
+  const radioPlayBtn = document.getElementById('radioLegionPlayBtn');
   const radioAudio = document.getElementById('radioLegionAudio');
-  const radioText = document.getElementById('radioLegionText');
+  const radioPlayIcon = document.getElementById('radioPlayIcon');
+  const radioContainer = document.getElementById('radioLegionContainer');
 
-  if (radioBtn && radioAudio) {
-    radioBtn.addEventListener('click', () => {
+  if (radioPlayBtn && radioAudio) {
+    radioPlayBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
       if (radioAudio.paused) {
-        radioAudio.src = 'http://82.207.23.148:8000/radio';
+        // Use /api/radio proxy endpoint to avoid HTTPS Mixed Content blocks
+        const streamSrc = window.location.protocol === 'https:' ? '/api/radio' : 'http://82.207.23.148:8000/radio';
+        radioAudio.src = streamSrc;
         radioAudio.load();
         const playPromise = radioAudio.play();
         if (playPromise !== undefined) {
           playPromise.then(() => {
-            radioBtn.classList.add('playing');
-            if (radioText) radioText.textContent = '⏸ Радіо ЛЕГІОН';
-            radioBtn.setAttribute('title', 'Зупинити Радіо ЛЕГІОН');
+            if (radioContainer) radioContainer.classList.add('playing');
+            if (radioPlayIcon) radioPlayIcon.textContent = '⏸';
           }).catch((err) => {
             console.error('Radio playback error:', err);
-            radioBtn.classList.remove('playing');
-            if (radioText) radioText.textContent = '▶ Радіо ЛЕГІОН';
-            radioBtn.setAttribute('title', 'Слухати онлайн-радіо ЛЕГІОН (Новомиргород)');
+            // If proxy fails, attempt direct HTTP as fallback
+            if (radioAudio.src !== 'http://82.207.23.148:8000/radio') {
+              radioAudio.src = 'http://82.207.23.148:8000/radio';
+              radioAudio.load();
+              radioAudio.play().then(() => {
+                if (radioContainer) radioContainer.classList.add('playing');
+                if (radioPlayIcon) radioPlayIcon.textContent = '⏸';
+              }).catch((fallbackErr) => {
+                console.error('Fallback radio playback error:', fallbackErr);
+                if (radioContainer) radioContainer.classList.remove('playing');
+                if (radioPlayIcon) radioPlayIcon.textContent = '▶';
+              });
+            } else {
+              if (radioContainer) radioContainer.classList.remove('playing');
+              if (radioPlayIcon) radioPlayIcon.textContent = '▶';
+            }
           });
         }
       } else {
         radioAudio.pause();
         radioAudio.src = '';
-        radioBtn.classList.remove('playing');
-        if (radioText) radioText.textContent = '▶ Радіо ЛЕГІОН';
-        radioBtn.setAttribute('title', 'Слухати онлайн-радіо ЛЕГІОН (Новомиргород)');
+        if (radioContainer) radioContainer.classList.remove('playing');
+        if (radioPlayIcon) radioPlayIcon.textContent = '▶';
       }
     });
 
     radioAudio.addEventListener('ended', () => {
-      radioBtn.classList.remove('playing');
-      if (radioText) radioText.textContent = '▶ Радіо ЛЕГІОН';
-      radioBtn.setAttribute('title', 'Слухати онлайн-радіо ЛЕГІОН (Новомиргород)');
+      if (radioContainer) radioContainer.classList.remove('playing');
+      if (radioPlayIcon) radioPlayIcon.textContent = '▶';
     });
 
     radioAudio.addEventListener('error', () => {
-      radioBtn.classList.remove('playing');
-      if (radioText) radioText.textContent = '▶ Радіо ЛЕГІОН';
-      radioBtn.setAttribute('title', 'Помилка відтворення / Натисніть для повтору');
+      if (radioContainer) radioContainer.classList.remove('playing');
+      if (radioPlayIcon) radioPlayIcon.textContent = '▶';
     });
   }
 
