@@ -100,6 +100,51 @@ document.addEventListener("DOMContentLoaded", () => {
     subtree: true
   });
 
+  // === Radio LEGION Stream Player Logic ===
+  const radioBtn = document.getElementById('radioLegionBtn');
+  const radioAudio = document.getElementById('radioLegionAudio');
+  const radioText = document.getElementById('radioLegionText');
+
+  if (radioBtn && radioAudio) {
+    radioBtn.addEventListener('click', () => {
+      if (radioAudio.paused) {
+        radioAudio.src = 'http://82.207.23.148:8000/radio';
+        radioAudio.load();
+        const playPromise = radioAudio.play();
+        if (playPromise !== undefined) {
+          playPromise.then(() => {
+            radioBtn.classList.add('playing');
+            if (radioText) radioText.textContent = '⏸ Радіо ЛЕГІОН';
+            radioBtn.setAttribute('title', 'Зупинити Радіо ЛЕГІОН');
+          }).catch((err) => {
+            console.error('Radio playback error:', err);
+            radioBtn.classList.remove('playing');
+            if (radioText) radioText.textContent = '▶ Радіо ЛЕГІОН';
+            radioBtn.setAttribute('title', 'Слухати онлайн-радіо ЛЕГІОН (Новомиргород)');
+          });
+        }
+      } else {
+        radioAudio.pause();
+        radioAudio.src = '';
+        radioBtn.classList.remove('playing');
+        if (radioText) radioText.textContent = '▶ Радіо ЛЕГІОН';
+        radioBtn.setAttribute('title', 'Слухати онлайн-радіо ЛЕГІОН (Новомиргород)');
+      }
+    });
+
+    radioAudio.addEventListener('ended', () => {
+      radioBtn.classList.remove('playing');
+      if (radioText) radioText.textContent = '▶ Радіо ЛЕГІОН';
+      radioBtn.setAttribute('title', 'Слухати онлайн-радіо ЛЕГІОН (Новомиргород)');
+    });
+
+    radioAudio.addEventListener('error', () => {
+      radioBtn.classList.remove('playing');
+      if (radioText) radioText.textContent = '▶ Радіо ЛЕГІОН';
+      radioBtn.setAttribute('title', 'Помилка відтворення / Натисніть для повтору');
+    });
+  }
+
   // === Оновлення мобільного заголовка відповідно до поточного розділу ===
   const mobileTitleEl = document.querySelector('.mobile-navbar-title');
   if (mobileTitleEl) {
