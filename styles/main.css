@@ -99,6 +99,12 @@ body {
   }
   
   .theme-toggle-btn {
+    position: absolute !important;
+    right: 1rem !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    z-index: 1050 !important;
+    margin: 0 !important;
     padding: 0.22rem 0.75rem !important; /* Slightly reduced vertical padding for a sleeker PC layout */
   }
 
