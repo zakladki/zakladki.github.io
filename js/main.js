@@ -1,3 +1,30 @@
+// 0. Пригнічення помилок від сторонніх розширень браузера (MetaMask, Auro Wallet тощо)
+(function() {
+  function isExtensionError(err) {
+    if (!err) return false;
+    const str = String(err.message || err.stack || err.reason || err).toLowerCase();
+    return str.includes('metamask') || 
+           str.includes('auro wallet') || 
+           str.includes('phantom') || 
+           str.includes('coinbase') ||
+           str.includes('failed to connect');
+  }
+
+  window.addEventListener('unhandledrejection', function(event) {
+    if (isExtensionError(event.reason)) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+    }
+  }, true);
+
+  window.addEventListener('error', function(event) {
+    if (isExtensionError(event.error) || isExtensionError(event.message)) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+    }
+  }, true);
+})();
+
 // 1. Швидке застосування темної теми (запобігає білому спалаху)
 if (localStorage.getItem("theme") === "dark") {
   document.documentElement.classList.add("dark-mode");
