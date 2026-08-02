@@ -137,52 +137,64 @@ document.addEventListener("DOMContentLoaded", () => {
     const updateState = (isPlaying) => {
       if (isPlaying) {
         if (radioItem) radioItem.classList.add('playing');
-        if (radioPlayIcon) {
-          radioPlayIcon.className = 'fas fa-pause';
-        }
+        if (radioPlayIcon) radioPlayIcon.className = 'fas fa-pause';
       } else {
         if (radioItem) radioItem.classList.remove('playing');
-        if (radioPlayIcon) {
-          radioPlayIcon.className = 'fas fa-play';
-        }
+        if (radioPlayIcon) radioPlayIcon.className = 'fas fa-play';
+      }
+    };
+
+    const streamSources = [
+      'https://radio-legion.com.ua/stream.php?stream=radio',
+      '/api/radio',
+      'http://82.207.23.148:8000/radio'
+    ];
+
+    let currentSourceIdx = 0;
+
+    const playStream = () => {
+      const src = streamSources[currentSourceIdx];
+      radioAudio.src = src;
+      radioAudio.load();
+      const playPromise = radioAudio.play();
+      if (playPromise !== undefined) {
+        playPromise.then(() => {
+          updateState(true);
+        }).catch((err) => {
+          console.error('Radio playback error with source ' + src + ':', err);
+          if (currentSourceIdx < streamSources.length - 1) {
+            currentSourceIdx++;
+            playStream();
+          } else {
+            updateState(false);
+            currentSourceIdx = 0;
+          }
+        });
       }
     };
 
     radioPlayBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       if (radioAudio.paused) {
-        const streamSrc = window.location.protocol === 'https:' ? '/api/radio' : 'http://82.207.23.148:8000/radio';
-        radioAudio.src = streamSrc;
-        radioAudio.load();
-        const playPromise = radioAudio.play();
-        if (playPromise !== undefined) {
-          playPromise.then(() => {
-            updateState(true);
-          }).catch((err) => {
-            console.error('Radio playback error:', err);
-            if (streamSrc !== 'http://82.207.23.148:8000/radio') {
-              radioAudio.src = 'http://82.207.23.148:8000/radio';
-              radioAudio.load();
-              radioAudio.play().then(() => {
-                updateState(true);
-              }).catch((fallbackErr) => {
-                console.error('Fallback radio playback error:', fallbackErr);
-                updateState(false);
-              });
-            } else {
-              updateState(false);
-            }
-          });
-        }
+        currentSourceIdx = 0;
+        playStream();
       } else {
         radioAudio.pause();
-        radioAudio.src = '';
+        radioAudio.removeAttribute('src');
+        radioAudio.load();
         updateState(false);
       }
     });
 
     radioAudio.addEventListener('ended', () => updateState(false));
-    radioAudio.addEventListener('error', () => updateState(false));
+    radioAudio.addEventListener('error', () => {
+      if (!radioAudio.paused && currentSourceIdx < streamSources.length - 1) {
+        currentSourceIdx++;
+        playStream();
+      } else {
+        updateState(false);
+      }
+    });
   }
 
   // === Оновлення мобільного заголовка відповідно до поточного розділу ===
