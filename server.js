@@ -16,11 +16,14 @@ app.get('/api/radio', (req, res) => {
   const proxyReq = http.get(streamUrl, {
     headers: {
       'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
-      'Icy-MetaData': '1'
+      'Accept': '*/*',
+      'Icy-MetaData': '0'
     }
   }, (streamRes) => {
+    res.status(streamRes.statusCode || 200);
     res.setHeader('Content-Type', streamRes.headers['content-type'] || 'audio/mpeg');
     res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.setHeader('Pragma', 'no-cache');
     res.setHeader('Access-Control-Allow-Origin', '*');
     
     streamRes.pipe(res);

@@ -104,58 +104,58 @@ document.addEventListener("DOMContentLoaded", () => {
   const radioPlayBtn = document.getElementById('radioLegionPlayBtn');
   const radioAudio = document.getElementById('radioLegionAudio');
   const radioPlayIcon = document.getElementById('radioPlayIcon');
-  const radioContainer = document.getElementById('radioLegionContainer');
 
   if (radioPlayBtn && radioAudio) {
+    const radioItem = radioPlayBtn.closest('.radio-legion-item');
+    const updateState = (isPlaying) => {
+      if (isPlaying) {
+        if (radioItem) radioItem.classList.add('playing');
+        if (radioPlayIcon) {
+          radioPlayIcon.className = 'fas fa-pause';
+        }
+      } else {
+        if (radioItem) radioItem.classList.remove('playing');
+        if (radioPlayIcon) {
+          radioPlayIcon.className = 'fas fa-play';
+        }
+      }
+    };
+
     radioPlayBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       if (radioAudio.paused) {
-        // Use /api/radio proxy endpoint to avoid HTTPS Mixed Content blocks
         const streamSrc = window.location.protocol === 'https:' ? '/api/radio' : 'http://82.207.23.148:8000/radio';
         radioAudio.src = streamSrc;
         radioAudio.load();
         const playPromise = radioAudio.play();
         if (playPromise !== undefined) {
           playPromise.then(() => {
-            if (radioContainer) radioContainer.classList.add('playing');
-            if (radioPlayIcon) radioPlayIcon.textContent = '⏸';
+            updateState(true);
           }).catch((err) => {
             console.error('Radio playback error:', err);
-            // If proxy fails, attempt direct HTTP as fallback
-            if (radioAudio.src !== 'http://82.207.23.148:8000/radio') {
+            if (streamSrc !== 'http://82.207.23.148:8000/radio') {
               radioAudio.src = 'http://82.207.23.148:8000/radio';
               radioAudio.load();
               radioAudio.play().then(() => {
-                if (radioContainer) radioContainer.classList.add('playing');
-                if (radioPlayIcon) radioPlayIcon.textContent = '⏸';
+                updateState(true);
               }).catch((fallbackErr) => {
                 console.error('Fallback radio playback error:', fallbackErr);
-                if (radioContainer) radioContainer.classList.remove('playing');
-                if (radioPlayIcon) radioPlayIcon.textContent = '▶';
+                updateState(false);
               });
             } else {
-              if (radioContainer) radioContainer.classList.remove('playing');
-              if (radioPlayIcon) radioPlayIcon.textContent = '▶';
+              updateState(false);
             }
           });
         }
       } else {
         radioAudio.pause();
         radioAudio.src = '';
-        if (radioContainer) radioContainer.classList.remove('playing');
-        if (radioPlayIcon) radioPlayIcon.textContent = '▶';
+        updateState(false);
       }
     });
 
-    radioAudio.addEventListener('ended', () => {
-      if (radioContainer) radioContainer.classList.remove('playing');
-      if (radioPlayIcon) radioPlayIcon.textContent = '▶';
-    });
-
-    radioAudio.addEventListener('error', () => {
-      if (radioContainer) radioContainer.classList.remove('playing');
-      if (radioPlayIcon) radioPlayIcon.textContent = '▶';
-    });
+    radioAudio.addEventListener('ended', () => updateState(false));
+    radioAudio.addEventListener('error', () => updateState(false));
   }
 
   // === Оновлення мобільного заголовка відповідно до поточного розділу ===
