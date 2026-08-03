@@ -156,6 +156,11 @@ document.addEventListener("DOMContentLoaded", () => {
     radioPlayBtn.addEventListener('click', (e) => {
       e.stopPropagation();
 
+      // Зупиняємо YouTube плеєр якщо він грає
+      if (window.pauseYtTestPlayer) {
+        window.pauseYtTestPlayer();
+      }
+
       if (currentState === 'idle') {
         // Миттєво показуємо іконку завантаження (спінер)
         setState('loading');
@@ -193,6 +198,160 @@ document.addEventListener("DOMContentLoaded", () => {
     });
     radioAudio.addEventListener('ended', () => setState('idle'));
     radioAudio.addEventListener('error', () => setState('idle'));
+  }
+
+  // === YouTube Test Player Logic (Card "ТЕСТ") ===
+  const ytPlayBtns = document.querySelectorAll('.yt-play-btn');
+
+  if (ytPlayBtns.length > 0) {
+    let activeBtn = null;
+    let activePlaylistId = null;
+    let ytState = 'idle'; // 'idle', 'loading', 'playing'
+    let ytPlayer = null;
+    let isApiLoading = false;
+
+    window.pauseYtTestPlayer = () => {
+      if (ytPlayer && typeof ytPlayer.pauseVideo === 'function') {
+        ytPlayer.pauseVideo();
+      }
+      if (activeBtn) {
+        updateItemState(activeBtn, 'idle');
+        activeBtn = null;
+      }
+      ytState = 'idle';
+    };
+
+    const updateItemState = (btn, newState) => {
+      if (!btn) return;
+      const item = btn.closest('.radio-legion-item');
+      const icon = btn.querySelector('.yt-play-icon');
+
+      if (item) {
+        item.classList.remove('playing', 'loading');
+      }
+
+      if (newState === 'playing') {
+        if (item) item.classList.add('playing');
+        if (icon) icon.className = 'fas fa-pause yt-play-icon';
+      } else if (newState === 'loading') {
+        if (item) item.classList.add('loading');
+        if (icon) icon.className = 'fas fa-spinner fa-spin yt-play-icon';
+      } else {
+        if (icon) icon.className = 'fas fa-play yt-play-icon';
+      }
+    };
+
+    const createPlayer = (playlistId) => {
+      ytPlayer = new window.YT.Player('ytTestPlayer', {
+        height: '100%',
+        width: '100%',
+        playerVars: {
+          listType: 'playlist',
+          list: playlistId,
+          autoplay: 1,
+          playsinline: 1,
+          enablejsapi: 1
+        },
+        events: {
+          'onReady': (event) => {
+            try {
+              event.target.setShuffle(true);
+            } catch (e) {
+              console.log('Shuffle error:', e);
+            }
+            event.target.playVideo();
+          },
+          'onStateChange': (event) => {
+            if (window.YT && activeBtn) {
+              if (event.data === window.YT.PlayerState.BUFFERING) {
+                ytState = 'loading';
+                updateItemState(activeBtn, 'loading');
+              } else if (event.data === window.YT.PlayerState.PLAYING) {
+                ytState = 'playing';
+                updateItemState(activeBtn, 'playing');
+              } else if (event.data === window.YT.PlayerState.PAUSED || event.data === window.YT.PlayerState.ENDED) {
+                ytState = 'idle';
+                updateItemState(activeBtn, 'idle');
+              }
+            }
+          },
+          'onError': (err) => {
+            console.error('YouTube Player Error:', err);
+            if (activeBtn) updateItemState(activeBtn, 'idle');
+            ytState = 'idle';
+          }
+        }
+      });
+    };
+
+    const loadPlaylistAndPlay = (playlistId) => {
+      if (window.YT && window.YT.Player) {
+        if (!ytPlayer) {
+          createPlayer(playlistId);
+        } else {
+          ytPlayer.loadPlaylist({
+            listType: 'playlist',
+            list: playlistId
+          });
+          try {
+            ytPlayer.setShuffle(true);
+          } catch (e) {}
+          ytPlayer.playVideo();
+        }
+        return;
+      }
+
+      if (!isApiLoading) {
+        isApiLoading = true;
+        const previousOnReady = window.onYouTubeIframeAPIReady;
+        window.onYouTubeIframeAPIReady = function() {
+          if (previousOnReady) previousOnReady();
+          createPlayer(playlistId);
+        };
+
+        const tag = document.createElement('script');
+        tag.src = 'https://www.youtube.com/iframe_api';
+        const firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+      }
+    };
+
+    ytPlayBtns.forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+
+        const playlistId = btn.getAttribute('data-playlist');
+
+        // Зупиняємо радіо якщо воно грає
+        const radioAudio = document.getElementById('radioLegionAudio');
+        if (radioAudio && !radioAudio.paused) {
+          radioAudio.pause();
+        }
+
+        if (activeBtn === btn) {
+          if (ytState === 'playing' || ytState === 'loading') {
+            if (ytPlayer && typeof ytPlayer.pauseVideo === 'function') {
+              ytPlayer.pauseVideo();
+            }
+            updateItemState(btn, 'idle');
+            ytState = 'idle';
+          } else {
+            ytState = 'loading';
+            updateItemState(btn, 'loading');
+            loadPlaylistAndPlay(playlistId);
+          }
+        } else {
+          if (activeBtn) {
+            updateItemState(activeBtn, 'idle');
+          }
+          activeBtn = btn;
+          activePlaylistId = playlistId;
+          ytState = 'loading';
+          updateItemState(btn, 'loading');
+          loadPlaylistAndPlay(playlistId);
+        }
+      });
+    });
   }
 
   // === Оновлення мобільного заголовка відповідно до поточного розділу ===
@@ -370,24 +529,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const li = document.createElement('li');
     
-    if (groupTitle === 'ТОП-Музика-Українська') {
-      li.innerHTML = `
-        <a href="https://www.youtube.com/@music-hitok-ua" target="_blank" title="ТОП провідник у світ сучасної української музики. Від легендарних хітів до найсвіжіших релізів молодих виконавців.">(YT) Music HitOK - UA</a>
-      `;
-    } else if (groupTitle === 'ТОП-Музика-Патріотична') {
-      li.innerHTML = `
-        <a href="https://www.youtube.com/@music-hitok-ua" target="_blank" title="Патріотичний провідник у світ сучасної української музики. Від легендарних хітів до найсвіжіших релізів молодих виконавців.">(YT) Music HitOK - UA</a>
-      `;
-    } else if (groupTitle === 'ТОП-Музика-WebSIS') {
-      li.innerHTML = `
-        <a href="https://www.youtube.com/@WebSIS_music" target="_blank" title="WebSIS - незалежний мультижанровий проєкт: український дух, експериментальний звук та сучасні технології.">(YT) WebSIS</a>
-      `;
-    } else {
-      li.className = 'placeholder-ad-item';
-      li.innerHTML = `
-        <a href="https://docs.google.com/document/d/15S2XrUxYaj1uu68wtfqww3Gkqa-Lq2Ra-P20AHWqKgs" target="_blank" title="Тут може бути Ваше посилання і опис на Ваш сайт, магазин, сервіс, тощо. Контакти для розміщення — внизу сторінки."><span class="link-favicon" style="display: none;"></span><span class="placeholder-circle"></span><span class="placeholder-icon">➤</span>Вільне Місце</a>
-      `;
-    }
+    li.className = 'placeholder-ad-item';
+    li.innerHTML = `
+      <a href="https://docs.google.com/document/d/15S2XrUxYaj1uu68wtfqww3Gkqa-Lq2Ra-P20AHWqKgs" target="_blank" title="Тут може бути Ваше посилання і опис на Ваш сайт, магазин, сервіс, тощо. Контакти для розміщення — внизу сторінки."><span class="link-favicon" style="display: none;"></span><span class="placeholder-circle"></span><span class="placeholder-icon">➤</span>Вільне Місце</a>
+    `;
     ul.appendChild(li);
   });
 

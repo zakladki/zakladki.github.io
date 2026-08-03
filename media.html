@@ -65,31 +65,33 @@
           <div class="row animated fadeIn">
             <div class="col-sm">
               <div class="group cat-media">
-                <div class="group-title"><span class="badge badge-warning">ТОП-Музика-Українська</span></div>
+                <div class="group-title"><span class="badge badge-warning">Слухати Музику (натисни Play)</span></div>
                 <ul>
-                  <li>
-                    <!-- тут код плеера-->
-                    <iframe width="320" height="180" src="https://www.youtube.com/embed/videoseries?list=PLCbt8rNMaiwHl9brI0ggRrnvir9q8kSmA" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen=""></iframe>
+                  <li class="radio-legion-item yt-playlist-item">
+                    <div class="icon youtube"></div>
+                    <a href="https://www.youtube.com/@music-hitok-ua" target="_blank" title="Music HitOK UA - твій провідник у світ сучасної української музики. Від легендарних хітів до найсвіжіших релізів молодих виконавців.">HitOK-UA (Українська)</a>
+                    <button type="button" class="radio-play-btn yt-play-btn" data-playlist="PLCbt8rNMaiwHl9brI0ggRrnvir9q8kSmA" aria-label="Слухати плейлист HitOK-UA (Українська)">
+                      <i class="fas fa-play yt-play-icon"></i>
+                    </button>
+                  </li>
+                  <li class="radio-legion-item yt-playlist-item">
+                    <div class="icon youtube"></div>
+                    <a href="https://www.youtube.com/@music-hitok-ua" target="_blank" title="Music HitOK UA - твій провідник у світ сучасної української музики. Від легендарних хітів до найсвіжіших релізів молодих виконавців.">HitOK-UA (Патріотична)</a>
+                    <button type="button" class="radio-play-btn yt-play-btn" data-playlist="PLCbt8rNMaiwH0crotsDppzWMkODGmAl2n" aria-label="Слухати плейлист HitOK-UA (Патріотична)">
+                      <i class="fas fa-play yt-play-icon"></i>
+                    </button>
+                  </li>
+                  <li class="radio-legion-item yt-playlist-item">
+                    <div class="icon youtube"></div>
+                    <a href="https://www.youtube.com/@WebSIS_music" target="_blank" title="WebSIS - незалежний мультижанровий проєкт: український дух, експериментальний звук та сучасні технології.">WebSIS (UA-Best)</a>
+                    <button type="button" class="radio-play-btn yt-play-btn" data-playlist="PLkF1vM_kexQCgisbwlVnGa4zdE4gtMNxD" aria-label="Слухати плейлист WebSIS (UA-Best)">
+                      <i class="fas fa-play yt-play-icon"></i>
+                    </button>
                   </li>
                 </ul>
-              </div>
-              <div class="group cat-media">
-                <div class="group-title"><span class="badge badge-warning">ТОП-Музика-Патріотична</span></div>
-                <ul>
-                  <li>
-                    <!-- тут код плеера-->
-                    <iframe width="320" height="180" src="https://www.youtube.com/embed/videoseries?list=PLCbt8rNMaiwH0crotsDppzWMkODGmAl2n" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen=""></iframe>
-                  </li>
-                </ul>
-              </div>
-              <div class="group cat-media">
-                <div class="group-title"><span class="badge badge-warning">ТОП-Музика-WebSIS</span></div>
-                <ul>
-                  <li>
-                    <!-- тут код плеера-->
-                    <iframe width="320" height="180" src="https://www.youtube.com/embed/videoseries?list=PLkF1vM_kexQCgisbwlVnGa4zdE4gtMNxD" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen=""></iframe>
-                  </li>
-                </ul>
+                <div id="ytTestPlayerWrapper" class="yt-player-wrapper" style="position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden; pointer-events: none;">
+                  <div id="ytTestPlayer"></div>
+                </div>
               </div>
               <div class="group cat-media">
                 <div class="group-title"><span class="badge badge-success">Відео / Стрімінг</span></div>

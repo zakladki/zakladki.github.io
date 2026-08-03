@@ -970,6 +970,10 @@ body.dark-mode .group li.placeholder-ad-item:hover {
   margin-left: auto;
 }
 
+.radio-legion-item .radio-live-badge ~ .radio-play-btn {
+  margin-left: 0;
+}
+
 .radio-live-badge::before {
   content: '';
   display: inline-block;
@@ -1109,4 +1113,16 @@ body.dark-mode .radio-legion-item.playing .radio-play-btn {
 
 body.dark-mode .radio-legion-item.playing .radio-play-btn:hover {
   color: #4ade80;
+}
+
+/* YouTube Test Player Wrapper (Invisible background player) */
+.yt-player-wrapper {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  overflow: hidden;
+  pointer-events: none;
+  left: -9999px;
+  top: -9999px;
 }
