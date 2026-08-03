@@ -951,6 +951,93 @@ body.dark-mode .group li.placeholder-ad-item:hover {
   position: relative;
 }
 
+.radio-live-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #dc2626;
+  background: rgba(220, 38, 38, 0.1);
+  border: 1px solid rgba(220, 38, 38, 0.3);
+  padding: 0.1rem 0.35rem;
+  border-radius: 0.25rem;
+  line-height: 1;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  user-select: none;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.radio-live-badge::before {
+  content: '';
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  background-color: #dc2626;
+  border-radius: 50%;
+  animation: live-pulse 1.8s infinite;
+}
+
+@keyframes live-pulse {
+  0% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.35; transform: scale(0.75); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+body.dark-mode .radio-live-badge {
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.18);
+  border-color: rgba(239, 68, 68, 0.4);
+}
+
+body.dark-mode .radio-live-badge::before {
+  background-color: #ef4444;
+}
+
+/* Жовто-бурштинова плашка LIVE під час завантаження (стан очікування) */
+.radio-legion-item.loading .radio-live-badge {
+  color: #d97706;
+  background: rgba(245, 158, 11, 0.12);
+  border-color: rgba(245, 158, 11, 0.35);
+}
+
+.radio-legion-item.loading .radio-live-badge::before {
+  background-color: #d97706;
+}
+
+body.dark-mode .radio-legion-item.loading .radio-live-badge {
+  color: #fbbf24;
+  background: rgba(251, 191, 36, 0.18);
+  border-color: rgba(251, 191, 36, 0.4);
+}
+
+body.dark-mode .radio-legion-item.loading .radio-live-badge::before {
+  background-color: #fbbf24;
+}
+
+/* Зелена плашка LIVE під час активного відтворення */
+.radio-legion-item.playing .radio-live-badge {
+  color: #16a34a;
+  background: rgba(22, 163, 74, 0.12);
+  border-color: rgba(22, 163, 74, 0.35);
+}
+
+.radio-legion-item.playing .radio-live-badge::before {
+  background-color: #16a34a;
+}
+
+body.dark-mode .radio-legion-item.playing .radio-live-badge {
+  color: #22c55e;
+  background: rgba(34, 197, 94, 0.2);
+  border-color: rgba(34, 197, 94, 0.45);
+}
+
+body.dark-mode .radio-legion-item.playing .radio-live-badge::before {
+  background-color: #22c55e;
+}
+
 .radio-play-btn {
   display: inline-flex;
   align-items: center;
@@ -958,14 +1045,13 @@ body.dark-mode .group li.placeholder-ad-item:hover {
   background: transparent;
   border: none;
   padding: 0.2rem 0.4rem;
-  color: #475569;
+  color: #dc2626;
   cursor: pointer;
   font-size: 0.85rem;
   transition: all 0.2s ease;
   outline: none;
   flex-shrink: 0;
   border-radius: 0.25rem;
-  margin-left: auto;
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -982,7 +1068,7 @@ body.dark-mode .group li.placeholder-ad-item:hover {
 }
 
 .radio-play-btn:hover {
-  color: #ef4444;
+  color: #b91c1c;
   transform: scale(1.2);
 }
 
@@ -991,8 +1077,12 @@ body.dark-mode .group li.placeholder-ad-item:hover {
 }
 
 .radio-legion-item.playing .radio-play-btn {
-  color: #ef4444;
+  color: #16a34a;
   animation: pulse-radio-icon 1.5s infinite;
+}
+
+.radio-legion-item.playing .radio-play-btn:hover {
+  color: #15803d;
 }
 
 @keyframes pulse-radio-icon {
@@ -1002,14 +1092,21 @@ body.dark-mode .group li.placeholder-ad-item:hover {
 }
 
 body.dark-mode .radio-play-btn {
-  color: #94a3b8;
+  color: #ef4444;
+}
+
+body.dark-mode .radio-play-btn:hover {
+  color: #f87171;
 }
 
 body.dark-mode .radio-legion-item.loading .radio-play-btn {
   color: #fbbf24;
 }
 
-body.dark-mode .radio-play-btn:hover,
 body.dark-mode .radio-legion-item.playing .radio-play-btn {
-  color: #f87171;
+  color: #22c55e;
+}
+
+body.dark-mode .radio-legion-item.playing .radio-play-btn:hover {
+  color: #4ade80;
 }
