@@ -134,13 +134,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (radioPlayBtn && radioAudio) {
     const radioItem = radioPlayBtn.closest('.radio-legion-item');
+    let currentState = 'idle'; // 'idle', 'loading', 'playing'
 
-    const updateState = (isPlaying) => {
-      if (isPlaying) {
+    const setState = (newState) => {
+      currentState = newState;
+      if (radioItem) {
+        radioItem.classList.remove('playing', 'loading');
+      }
+
+      if (newState === 'playing') {
         if (radioItem) radioItem.classList.add('playing');
         if (radioPlayIcon) radioPlayIcon.className = 'fas fa-pause';
+      } else if (newState === 'loading') {
+        if (radioItem) radioItem.classList.add('loading');
+        if (radioPlayIcon) radioPlayIcon.className = 'fas fa-spinner fa-spin';
       } else {
-        if (radioItem) radioItem.classList.remove('playing');
         if (radioPlayIcon) radioPlayIcon.className = 'fas fa-play';
       }
     };
@@ -148,39 +156,43 @@ document.addEventListener("DOMContentLoaded", () => {
     radioPlayBtn.addEventListener('click', (e) => {
       e.stopPropagation();
 
-      if (radioAudio.paused) {
-        // Оновлюємо посилання з унікальним штампом часу для свіжого живого потоку на мобільних пристроях
+      if (currentState === 'idle') {
+        // Миттєво показуємо іконку завантаження (спінер)
+        setState('loading');
+
         const streamUrl = 'https://radio-legion.com.ua/stream.php?stream=radio&t=' + Date.now();
         radioAudio.src = streamUrl;
 
-        // Прямий виклик .play() у події кліку для дотримання авторизації жестів на iOS Safari / Android Chrome
         const playPromise = radioAudio.play();
         if (playPromise !== undefined) {
-          playPromise.then(() => {
-            updateState(true);
-          }).catch((err) => {
+          playPromise.catch((err) => {
             console.error('Помилка відтворення Радіо ЛЕГІОН:', err);
-            // Резервний HTTPS HD-потік у разі збою
+            // Спроба відтворення резервного потоку
             radioAudio.src = 'https://radio-legion.com.ua/stream.php?stream=radiohd&t=' + Date.now();
-            radioAudio.play().then(() => {
-              updateState(true);
-            }).catch((fallbackErr) => {
+            radioAudio.play().catch((fallbackErr) => {
               console.error('Помилка резервного потоку:', fallbackErr);
-              updateState(false);
+              setState('idle');
             });
           });
         }
       } else {
+        // Якщо завантажується або грає — зупиняємо
         radioAudio.pause();
         radioAudio.removeAttribute('src');
-        updateState(false);
+        radioAudio.load();
+        setState('idle');
       }
     });
 
-    radioAudio.addEventListener('playing', () => updateState(true));
-    radioAudio.addEventListener('pause', () => updateState(false));
-    radioAudio.addEventListener('ended', () => updateState(false));
-    radioAudio.addEventListener('error', () => updateState(false));
+    radioAudio.addEventListener('waiting', () => {
+      if (currentState === 'playing') setState('loading');
+    });
+    radioAudio.addEventListener('playing', () => setState('playing'));
+    radioAudio.addEventListener('pause', () => {
+      if (currentState !== 'loading') setState('idle');
+    });
+    radioAudio.addEventListener('ended', () => setState('idle'));
+    radioAudio.addEventListener('error', () => setState('idle'));
   }
 
   // === Оновлення мобільного заголовка відповідно до поточного розділу ===

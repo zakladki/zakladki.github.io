@@ -966,6 +966,14 @@ body.dark-mode .group li.placeholder-ad-item:hover {
   flex-shrink: 0;
   border-radius: 0.25rem;
   margin-left: auto;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.radio-play-btn:focus,
+.radio-play-btn:active,
+.radio-play-btn:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
 }
 
 .radio-play-btn #radioPlayIcon {
@@ -976,6 +984,10 @@ body.dark-mode .group li.placeholder-ad-item:hover {
 .radio-play-btn:hover {
   color: #ef4444;
   transform: scale(1.2);
+}
+
+.radio-legion-item.loading .radio-play-btn {
+  color: #f59e0b;
 }
 
 .radio-legion-item.playing .radio-play-btn {
@@ -991,6 +1003,10 @@ body.dark-mode .group li.placeholder-ad-item:hover {
 
 body.dark-mode .radio-play-btn {
   color: #94a3b8;
+}
+
+body.dark-mode .radio-legion-item.loading .radio-play-btn {
+  color: #fbbf24;
 }
 
 body.dark-mode .radio-play-btn:hover,
