@@ -1,0 +1,5 @@
+# Project Rules & Conventions
+
+- **YouTube Music Playlists**: All YouTube playlist play buttons in the "Слухати Музику (натисни Play)" card use class `.yt-play-btn` with `data-playlist="<playlist_id>"`.
+- **Shuffle Mode**: Every YouTube playlist playback must have shuffle (`setShuffle(true)`) enabled automatically by default.
+- **Descriptions**: Description dashes should use standard hyphens `-` instead of long em-dashes `—`.
