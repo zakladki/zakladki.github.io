@@ -835,6 +835,8 @@ function renderMarkdownToHtml(md) {
     .replace(/^## (.*$)/gim, '<h5 class="cl-h2 mt-4 mb-2 font-weight-bold text-info">$1</h5>')
     .replace(/^### (.*$)/gim, '<h6 class="cl-h3 mt-3 mb-2 font-weight-bold">$1</h6>')
     .replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>')
+    .replace(/\*(.*?)\*/gim, '<em>$1</em>')
+    .replace(/_(.*?)_/gim, '<em>$1</em>')
     .replace(/`(.*?)`/gim, '<code class="bg-light px-1 rounded">$1</code>')
     .replace(/---/gim, '<hr class="my-3">');
 
