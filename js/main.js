@@ -74,8 +74,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const fixFavicon = (img) => {
     if (!img) return;
-    let domain = "";
     const parentA = img.closest ? img.closest("a") : null;
+    if (parentA && parentA.getAttribute("href") && parentA.getAttribute("href").includes("CHANGELOG.md")) {
+      img.src = "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 32 32\"><rect width=\"32\" height=\"32\" rx=\"7\" fill=\"%23007bff\"/><path d=\"M9 8a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H11a2 2 0 0 1-2-2V8z\" fill=\"%23ffffff\"/><path d=\"M13 11h6M13 15h6M13 19h4\" stroke=\"%23007bff\" stroke-width=\"2\" stroke-linecap=\"round\"/></svg>";
+      return;
+    }
+    let domain = "";
     if (parentA && parentA.href && parentA.href.startsWith("http")) {
       try {
         domain = new URL(parentA.href).hostname.toLowerCase().replace(/^www\./, "");
@@ -819,7 +823,124 @@ document.addEventListener("DOMContentLoaded", () => {
     console.log("AdSense integration error:", e);
   }
 
+  // === Модальне вікно перегляду CHANGELOG.md ===
+  initChangelogModal();
 });
+
+// === Оптимізований рендерер CHANGELOG.md у модальне вікно ===
+function renderMarkdownToHtml(md) {
+  let html = md
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    .replace(/^# (.*$)/gim, '<h4 class="cl-h1 text-primary font-weight-bold mb-3">$1</h4>')
+    .replace(/^## (.*$)/gim, '<h5 class="cl-h2 mt-4 mb-2 font-weight-bold text-info">$1</h5>')
+    .replace(/^### (.*$)/gim, '<h6 class="cl-h3 mt-3 mb-2 font-weight-bold">$1</h6>')
+    .replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>')
+    .replace(/`(.*?)`/gim, '<code class="bg-light px-1 rounded">$1</code>')
+    .replace(/---/gim, '<hr class="my-3">');
+
+  const lines = html.split('\n');
+  let inList = false;
+  let result = [];
+  lines.forEach(line => {
+    const trimmed = line.trim();
+    if (trimmed.startsWith('- ')) {
+      if (!inList) {
+        result.push('<ul class="mb-3 pl-4">');
+        inList = true;
+      }
+      result.push('<li class="mb-1">' + trimmed.substring(2) + '</li>');
+    } else {
+      if (inList) {
+        result.push('</ul>');
+        inList = false;
+      }
+      if (trimmed !== '' && !trimmed.startsWith('<h') && !trimmed.startsWith('<hr') && !trimmed.startsWith('<ul')) {
+        result.push('<p class="mb-2">' + trimmed + '</p>');
+      } else {
+        result.push(line);
+      }
+    }
+  });
+  if (inList) result.push('</ul>');
+  return result.join('\n');
+}
+
+function initChangelogModal() {
+  document.addEventListener('click', function(e) {
+    const link = e.target.closest('a[href*="CHANGELOG.md"], .changelog-link');
+    if (link) {
+      if (e.ctrlKey || e.metaKey || e.button === 1) return;
+      e.preventDefault();
+      openChangelogModal();
+    }
+  });
+}
+
+function openChangelogModal() {
+  let backdrop = document.getElementById('clModalBackdrop');
+  if (!backdrop) {
+    backdrop = document.createElement('div');
+    backdrop.id = 'clModalBackdrop';
+    backdrop.className = 'cl-modal-backdrop';
+    backdrop.innerHTML = `
+      <div class="cl-modal" role="dialog" aria-modal="true">
+        <div class="cl-modal-header">
+          <h5 class="cl-modal-title">📋 Історія оновлень</h5>
+          <button type="button" class="cl-modal-close" aria-label="Закрити">&times;</button>
+        </div>
+        <div class="cl-modal-body" id="clModalBody">
+          <div class="text-center py-4">
+            <i class="fas fa-spinner fa-spin fa-2x text-muted"></i>
+            <p class="mt-2 text-muted">Завантаження історії...</p>
+          </div>
+        </div>
+        <div class="cl-modal-footer">
+          <button type="button" class="btn btn-secondary btn-sm cl-modal-close-btn">Закрити</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(backdrop);
+
+    const closeBtns = backdrop.querySelectorAll('.cl-modal-close, .cl-modal-close-btn');
+    closeBtns.forEach(btn => btn.addEventListener('click', closeChangelogModal));
+    backdrop.addEventListener('click', (ev) => {
+      if (ev.target === backdrop) closeChangelogModal();
+    });
+    document.addEventListener('keydown', (ev) => {
+      if (ev.key === 'Escape' && backdrop.classList.contains('show')) {
+        closeChangelogModal();
+      }
+    });
+  }
+
+  backdrop.classList.add('show');
+  document.body.style.overflow = 'hidden';
+
+  fetch('CHANGELOG.md')
+    .then(res => {
+      if (!res.ok) throw new Error("File not found");
+      return res.text();
+    })
+    .then(text => {
+      document.getElementById('clModalBody').innerHTML = renderMarkdownToHtml(text);
+    })
+    .catch(err => {
+      document.getElementById('clModalBody').innerHTML = `
+        <div class="alert alert-warning m-0">
+          <strong>Не вдалося завантажити CHANGELOG.md</strong>
+          <p class="mb-0 mt-1 font-size-sm">Ви можете переглянути оригінальний файл за цим посиланням: <a href="CHANGELOG.md" target="_blank">CHANGELOG.md</a></p>
+        </div>
+      `;
+    });
+}
+
+function closeChangelogModal() {
+  const backdrop = document.getElementById('clModalBackdrop');
+  if (backdrop) {
+    backdrop.classList.remove('show');
+    document.body.style.overflow = '';
+  }
+}
 
 // 4. Функція швидкого плавного прокручування вгору
 function topFunction() {
