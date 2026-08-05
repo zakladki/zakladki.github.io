@@ -1260,12 +1260,31 @@ body.dark-mode .cl-modal-body h2 {
 .cl-modal-body li {
   margin-bottom: 6px;
 }
-.cl-modal-footer {
-  padding: 12px 20px;
-  border-top: 1px solid var(--border-color, rgba(0, 0, 0, 0.1));
-  display: flex;
-  justify-content: flex-end;
-  background: var(--card-grad-end, #f8f9fa);
+/* Стилі для плашок торрент-трекерів */
+.torrent-badge {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.63rem;
+  line-height: 1;
+  padding: 2px 5px;
+  border-radius: 4px;
+  white-space: nowrap;
+  font-weight: 600;
+  font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+  background: rgba(0, 0, 0, 0.03);
+  color: #64748b;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  cursor: help;
+  user-select: none;
+  transition: all 0.2s ease;
 }
+
+body.dark-mode .torrent-badge {
+  background: rgba(255, 255, 255, 0.05);
+  color: #94a3b8;
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
 
 
