@@ -1123,12 +1123,11 @@ body.dark-mode .radio-legion-item.playing .radio-play-btn:hover {
   justify-content: center;
   width: 100% !important;
   padding-right: 2rem !important;
-  padding-left: 0.75rem !important;
+  padding-left: 2rem !important;
 }
 
 .yt-toggle-btn {
   position: absolute;
-  right: 5px;
   top: 50%;
   transform: translateY(-50%);
   background: rgba(255, 255, 255, 0.22);
@@ -1145,6 +1144,14 @@ body.dark-mode .radio-legion-item.playing .radio-play-btn:hover {
   transition: all 0.2s ease;
   padding: 0;
   line-height: 1;
+}
+
+.yt-toggle-btn-left {
+  left: 5px;
+}
+
+.yt-toggle-btn-right {
+  right: 5px;
 }
 
 .yt-toggle-btn:hover {

@@ -294,13 +294,13 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     const updateToggleBtnIcon = (isVisible) => {
-      const toggleBtn = document.getElementById('ytTogglePlayerBtn');
-      if (toggleBtn) {
-        const icon = toggleBtn.querySelector('i');
+      const toggleBtns = document.querySelectorAll('.yt-toggle-btn');
+      toggleBtns.forEach((btn) => {
+        const icon = btn.querySelector('i');
         if (icon) {
           icon.className = isVisible ? 'fas fa-chevron-up' : 'fas fa-chevron-down';
         }
-      }
+      });
     };
 
     const setPlayerVisible = (visible) => {
@@ -315,9 +315,9 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     };
 
-    const toggleBtn = document.getElementById('ytTogglePlayerBtn');
-    if (toggleBtn) {
-      toggleBtn.addEventListener('click', (e) => {
+    const toggleBtns = document.querySelectorAll('.yt-toggle-btn');
+    toggleBtns.forEach((btn) => {
+      btn.addEventListener('click', (e) => {
         e.preventDefault();
         e.stopPropagation();
         const wrapper = document.getElementById('ytTestPlayerWrapper');
@@ -326,7 +326,7 @@ document.addEventListener("DOMContentLoaded", () => {
           setPlayerVisible(isNowVisible);
         }
       });
-    }
+    });
 
     const loadPlaylistAndPlay = (playlistId) => {
       setPlayerVisible(true);
