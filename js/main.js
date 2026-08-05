@@ -293,7 +293,44 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     };
 
+    const updateToggleBtnIcon = (isVisible) => {
+      const toggleBtn = document.getElementById('ytTogglePlayerBtn');
+      if (toggleBtn) {
+        const icon = toggleBtn.querySelector('i');
+        if (icon) {
+          icon.className = isVisible ? 'fas fa-chevron-up' : 'fas fa-chevron-down';
+        }
+      }
+    };
+
+    const setPlayerVisible = (visible) => {
+      const wrapper = document.getElementById('ytTestPlayerWrapper');
+      if (wrapper) {
+        if (visible) {
+          wrapper.classList.add('visible-player');
+        } else {
+          wrapper.classList.remove('visible-player');
+        }
+        updateToggleBtnIcon(visible);
+      }
+    };
+
+    const toggleBtn = document.getElementById('ytTogglePlayerBtn');
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const wrapper = document.getElementById('ytTestPlayerWrapper');
+        if (wrapper) {
+          const isNowVisible = !wrapper.classList.contains('visible-player');
+          setPlayerVisible(isNowVisible);
+        }
+      });
+    }
+
     const loadPlaylistAndPlay = (playlistId) => {
+      setPlayerVisible(true);
+
       if (window.YT && window.YT.Player) {
         if (!ytPlayer) {
           createPlayer(playlistId, true);
@@ -325,30 +362,6 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     };
 
-    // Авто-ініціалізація плеєра на сторінці для відображення інтерактивного екрана з обкладинкою та кнопкою Play
-    const initPlayerOnLoad = () => {
-      const defaultPlaylist = 'PLkF1vM_kexQCgisbwlVnGa4zdE4gtMNxD';
-      if (window.YT && window.YT.Player) {
-        if (!ytPlayer) createPlayer(defaultPlaylist, false);
-      } else if (!isApiLoading) {
-        isApiLoading = true;
-        const previousOnReady = window.onYouTubeIframeAPIReady;
-        window.onYouTubeIframeAPIReady = function() {
-          if (previousOnReady) previousOnReady();
-          if (!ytPlayer) createPlayer(defaultPlaylist, false);
-        };
-
-        const tag = document.createElement('script');
-        tag.src = 'https://www.youtube.com/iframe_api';
-        const firstScriptTag = document.getElementsByTagName('script')[0];
-        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-      }
-    };
-
-    if (document.getElementById('ytTestPlayer')) {
-      initPlayerOnLoad();
-    }
-
     ytPlayBtns.forEach((btn) => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -366,9 +379,11 @@ document.addEventListener("DOMContentLoaded", () => {
             if (ytPlayer && typeof ytPlayer.pauseVideo === 'function') {
               ytPlayer.pauseVideo();
             }
+            setPlayerVisible(false);
             updateItemState(btn, 'idle');
             ytState = 'idle';
           } else {
+            setPlayerVisible(true);
             ytState = 'loading';
             updateItemState(btn, 'loading');
             loadPlaylistAndPlay(playlistId);
@@ -381,6 +396,7 @@ document.addEventListener("DOMContentLoaded", () => {
           activePlaylistId = playlistId;
           ytState = 'loading';
           updateItemState(btn, 'loading');
+          setPlayerVisible(true);
           loadPlaylistAndPlay(playlistId);
         }
       });
