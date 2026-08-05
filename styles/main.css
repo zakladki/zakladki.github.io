@@ -1179,8 +1179,8 @@ body.dark-mode .radio-legion-item.playing .radio-play-btn:hover {
   pointer-events: auto;
   left: auto;
   top: auto;
-  margin-top: 6px;
-  margin-bottom: 8px;
+  margin-top: 10px;
+  margin-bottom: 4px;
   border-radius: 8px;
   background: #000;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);

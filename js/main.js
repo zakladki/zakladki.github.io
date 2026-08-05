@@ -213,6 +213,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let ytState = 'idle'; // 'idle', 'loading', 'playing'
     let ytPlayer = null;
     let isApiLoading = false;
+    let needsShuffle = false;
 
     window.pauseYtTestPlayer = () => {
       if (ytPlayer && typeof ytPlayer.pauseVideo === 'function') {
@@ -269,13 +270,23 @@ document.addEventListener("DOMContentLoaded", () => {
           },
           'onStateChange': (event) => {
             if (window.YT) {
+              if (needsShuffle && (event.data === window.YT.PlayerState.BUFFERING || event.data === window.YT.PlayerState.PLAYING)) {
+                needsShuffle = false;
+                setTimeout(() => {
+                  try {
+                    if (ytPlayer && typeof ytPlayer.setShuffle === 'function') {
+                      ytPlayer.setShuffle(true);
+                    }
+                  } catch (e) {}
+                }, 300);
+              }
               if (event.data === window.YT.PlayerState.BUFFERING) {
                 ytState = 'loading';
                 if (activeBtn) updateItemState(activeBtn, 'loading');
               } else if (event.data === window.YT.PlayerState.PLAYING) {
                 ytState = 'playing';
-                if (!activeBtn) {
-                  activeBtn = document.querySelector(`.yt-play-btn[data-playlist="${playlistId}"]`);
+                if (!activeBtn && activePlaylistId) {
+                  activeBtn = document.querySelector(`.yt-play-btn[data-playlist="${activePlaylistId}"]`);
                 }
                 if (activeBtn) updateItemState(activeBtn, 'playing');
               } else if (event.data === window.YT.PlayerState.PAUSED || event.data === window.YT.PlayerState.ENDED) {
@@ -335,14 +346,16 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!ytPlayer) {
           createPlayer(playlistId, true);
         } else {
-          ytPlayer.loadPlaylist({
-            listType: 'playlist',
-            list: playlistId
-          });
-          try {
-            ytPlayer.setShuffle(true);
-          } catch (e) {}
-          ytPlayer.playVideo();
+          needsShuffle = true;
+          if (typeof ytPlayer.loadPlaylist === 'function') {
+            ytPlayer.loadPlaylist({
+              listType: 'playlist',
+              list: playlistId,
+              index: 0
+            });
+          } else {
+            createPlayer(playlistId, true);
+          }
         }
         return;
       }
