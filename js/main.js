@@ -218,6 +218,32 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const IDLE_TICKER_TEXT = '🎵 Режим очікування. Для прослуховування натисніть кнопку «Play»';
 
+    const ensurePlayerContainer = () => {
+      const wrapper = document.getElementById('ytTestPlayerWrapper');
+      if (wrapper) {
+        let container = document.getElementById('ytTestPlayer');
+        if (!container) {
+          container = document.createElement('div');
+          container.id = 'ytTestPlayer';
+          wrapper.appendChild(container);
+        }
+      }
+    };
+
+    const destroyPlayer = () => {
+      if (ytPlayer) {
+        try {
+          if (typeof ytPlayer.destroy === 'function') {
+            ytPlayer.destroy();
+          }
+        } catch (e) {
+          console.warn('Error destroying YT player:', e);
+        }
+        ytPlayer = null;
+      }
+      ensurePlayerContainer();
+    };
+
     const updateTickerText = (text) => {
       const tickerTextEl = document.getElementById('ytTickerText');
       if (tickerTextEl) {
@@ -286,6 +312,7 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     const createPlayer = (playlistId, autoPlay = true) => {
+      ensurePlayerContainer();
       ytPlayer = new window.YT.Player('ytTestPlayer', {
         height: '100%',
         width: '100%',
@@ -389,20 +416,8 @@ document.addEventListener("DOMContentLoaded", () => {
       updateTickerText('▶ Завантаження плейлиста...');
 
       if (window.YT && window.YT.Player) {
-        if (!ytPlayer) {
-          createPlayer(playlistId, true);
-        } else {
-          needsShuffle = true;
-          if (typeof ytPlayer.loadPlaylist === 'function') {
-            ytPlayer.loadPlaylist({
-              listType: 'playlist',
-              list: playlistId,
-              index: 0
-            });
-          } else {
-            createPlayer(playlistId, true);
-          }
-        }
+        destroyPlayer();
+        createPlayer(playlistId, true);
         return;
       }
 
@@ -411,6 +426,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const previousOnReady = window.onYouTubeIframeAPIReady;
         window.onYouTubeIframeAPIReady = function() {
           if (previousOnReady) previousOnReady();
+          ensurePlayerContainer();
           createPlayer(playlistId, true);
         };
 
@@ -445,7 +461,11 @@ document.addEventListener("DOMContentLoaded", () => {
             setPlayerVisible(true);
             ytState = 'loading';
             updateItemState(btn, 'loading');
-            loadPlaylistAndPlay(playlistId);
+            if (ytPlayer && typeof ytPlayer.playVideo === 'function') {
+              ytPlayer.playVideo();
+            } else {
+              loadPlaylistAndPlay(playlistId);
+            }
           }
         } else {
           if (activeBtn) {
