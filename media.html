@@ -104,15 +104,7 @@
               </div>
               <div class="group cat-media no-placeholder">
                 <div class="group-title">
-                  <span class="badge badge-danger yt-test-badge">
-                    <button type="button" class="yt-toggle-btn yt-toggle-btn-left" title="Згорнути / Розгорнути плеєр YouTube" aria-label="Згорнути або розгорнути плеєр YouTube">
-                      <i class="fas fa-chevron-down"></i>
-                    </button>
-                    <span class="badge-title">ТЕСТ відтворення</span>
-                    <button type="button" class="yt-toggle-btn yt-toggle-btn-right" title="Згорнути / Розгорнути плеєр YouTube" aria-label="Згорнути або розгорнути плеєр YouTube">
-                      <i class="fas fa-chevron-down"></i>
-                    </button>
-                  </span>
+                  <span class="badge badge-danger yt-test-badge">ТЕСТ відтворення</span>
                 </div>
                 <ul>
                   <li class="radio-legion-item yt-playlist-item">
@@ -137,6 +129,17 @@
                     </button>
                   </li>
                 </ul>
+                <div id="ytPlayerTicker" class="yt-player-ticker">
+                  <button type="button" class="yt-toggle-btn yt-toggle-btn-ticker-left" title="Згорнути / Розгорнути плеєр YouTube" aria-label="Згорнути або розгорнути плеєр YouTube">
+                    <i class="fas fa-chevron-down"></i>
+                  </button>
+                  <div class="yt-ticker-track">
+                    <span id="ytTickerText" class="yt-ticker-text">🎵 Режим очікування. Для прослуховування натисніть кнопку "Play"</span>
+                  </div>
+                  <button type="button" class="yt-toggle-btn yt-toggle-btn-ticker-right" title="Згорнути / Розгорнути плеєр YouTube" aria-label="Згорнути або розгорнути плеєр YouTube">
+                    <i class="fas fa-chevron-down"></i>
+                  </button>
+                </div>
                 <div id="ytTestPlayerWrapper" class="yt-player-wrapper">
                   <div id="ytTestPlayer"></div>
                 </div>

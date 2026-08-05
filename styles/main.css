@@ -1117,46 +1117,10 @@ body.dark-mode .radio-legion-item.playing .radio-play-btn:hover {
 
 /* YouTube Test Player Wrapper (Invisible background player or visible test screen) */
 .yt-test-badge {
-  position: relative;
   display: flex !important;
   align-items: center;
   justify-content: center;
   width: 100% !important;
-  padding-right: 2rem !important;
-  padding-left: 2rem !important;
-}
-
-.yt-toggle-btn {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  background: rgba(255, 255, 255, 0.22);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  color: #ffffff;
-  width: 22px;
-  height: 22px;
-  border-radius: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  font-size: 0.75rem;
-  transition: all 0.2s ease;
-  padding: 0;
-  line-height: 1;
-}
-
-.yt-toggle-btn-left {
-  left: 5px;
-}
-
-.yt-toggle-btn-right {
-  right: 5px;
-}
-
-.yt-toggle-btn:hover {
-  background: rgba(255, 255, 255, 0.4);
-  transform: translateY(-50%) scale(1.08);
 }
 
 .yt-player-wrapper {
@@ -1179,7 +1143,7 @@ body.dark-mode .radio-legion-item.playing .radio-play-btn:hover {
   pointer-events: auto;
   left: auto;
   top: auto;
-  margin-top: 10px;
+  margin-top: 8px;
   margin-bottom: 4px;
   border-radius: 8px;
   background: #000;
@@ -1188,8 +1152,99 @@ body.dark-mode .radio-legion-item.playing .radio-play-btn:hover {
 
 .yt-player-wrapper.visible-player iframe {
   width: 100%;
-  height: 100%;
+  height: 180px;
   border: 0;
+}
+
+.yt-player-ticker {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+  margin-top: 8px;
+  margin-bottom: 0;
+  position: relative;
+}
+
+.yt-ticker-track {
+  flex: 1;
+  height: 28px;
+  background-color: var(--card-bg);
+  background-image: linear-gradient(180deg, rgba(0, 0, 0, 0.02) 0%, var(--card-grad-end) 100%);
+  border: 1px solid var(--card-border);
+  border-radius: 0.38rem;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.03), 0 1px 2px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+  white-space: nowrap;
+  position: relative;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  padding: 0 4px;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.yt-ticker-text {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  padding-left: 100%;
+  animation: ytTickerScroll 16s linear infinite;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--text-color);
+  line-height: 1;
+}
+
+.yt-ticker-track:hover .yt-ticker-text {
+  animation-play-state: paused;
+}
+
+@keyframes ytTickerScroll {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-100%, 0, 0);
+  }
+}
+
+.yt-toggle-btn {
+  position: relative;
+  top: auto;
+  transform: none;
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  background-color: var(--card-bg);
+  background-image: linear-gradient(180deg, rgba(0, 0, 0, 0.02) 0%, var(--card-grad-end) 100%);
+  border: 1px solid var(--card-border);
+  border-radius: 0.38rem;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.03), 0 1px 2px rgba(0, 0, 0, 0.04);
+  color: var(--text-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  font-size: 0.8rem;
+  transition: all 0.2s ease;
+  outline: none !important;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.yt-toggle-btn:focus,
+.yt-toggle-btn:focus-visible,
+.yt-toggle-btn:active {
+  outline: none !important;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.03), 0 1px 2px rgba(0, 0, 0, 0.04) !important;
+  border-color: var(--card-border) !important;
+}
+
+.yt-toggle-btn:hover {
+  color: var(--text-color);
+  border-color: var(--card-border);
+  transform: scale(1.08);
 }
 
 /* Індикатори свіжості оновлень (пульсуюча зелена / жовта точка) */

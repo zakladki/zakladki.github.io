@@ -214,11 +214,50 @@ document.addEventListener("DOMContentLoaded", () => {
     let ytPlayer = null;
     let isApiLoading = false;
     let needsShuffle = false;
+    let tickerInterval = null;
+
+    const IDLE_TICKER_TEXT = '🎵 Режим очікування. Для прослуховування натисніть кнопку «Play»';
+
+    const updateTickerText = (text) => {
+      const tickerTextEl = document.getElementById('ytTickerText');
+      if (tickerTextEl) {
+        tickerTextEl.textContent = text;
+      }
+    };
+
+    const refreshTickerVideoData = () => {
+      if (ytPlayer && typeof ytPlayer.getVideoData === 'function') {
+        const data = ytPlayer.getVideoData();
+        if (data && (data.title || data.author)) {
+          const parts = [];
+          if (data.author) parts.push(data.author);
+          if (data.title) parts.push(data.title);
+          updateTickerText(`🎵 ${parts.join(' — ')}`);
+          return;
+        }
+      }
+      updateTickerText('🎵 Відтворення YouTube плейлиста...');
+    };
+
+    const startTickerPolling = () => {
+      if (tickerInterval) clearInterval(tickerInterval);
+      refreshTickerVideoData();
+      tickerInterval = setInterval(refreshTickerVideoData, 3000);
+    };
+
+    const stopTickerPolling = () => {
+      if (tickerInterval) {
+        clearInterval(tickerInterval);
+        tickerInterval = null;
+      }
+    };
 
     window.pauseYtTestPlayer = () => {
       if (ytPlayer && typeof ytPlayer.pauseVideo === 'function') {
         ytPlayer.pauseVideo();
       }
+      stopTickerPolling();
+      updateTickerText('⏸ Пауза. Натисніть «Play» для продовження');
       if (activeBtn) {
         updateItemState(activeBtn, 'idle');
         activeBtn = null;
@@ -283,15 +322,19 @@ document.addEventListener("DOMContentLoaded", () => {
               if (event.data === window.YT.PlayerState.BUFFERING) {
                 ytState = 'loading';
                 if (activeBtn) updateItemState(activeBtn, 'loading');
+                updateTickerText('▶ Завантаження треку...');
               } else if (event.data === window.YT.PlayerState.PLAYING) {
                 ytState = 'playing';
                 if (!activeBtn && activePlaylistId) {
                   activeBtn = document.querySelector(`.yt-play-btn[data-playlist="${activePlaylistId}"]`);
                 }
                 if (activeBtn) updateItemState(activeBtn, 'playing');
+                startTickerPolling();
               } else if (event.data === window.YT.PlayerState.PAUSED || event.data === window.YT.PlayerState.ENDED) {
                 ytState = 'idle';
                 if (activeBtn) updateItemState(activeBtn, 'idle');
+                stopTickerPolling();
+                updateTickerText(event.data === window.YT.PlayerState.ENDED ? '⏹ Відтворення завершено. Натисніть «Play» для повтору' : '⏸ Пауза. Натисніть «Play» для продовження');
               }
             }
           },
@@ -299,6 +342,8 @@ document.addEventListener("DOMContentLoaded", () => {
             console.error('YouTube Player Error:', err);
             if (activeBtn) updateItemState(activeBtn, 'idle');
             ytState = 'idle';
+            stopTickerPolling();
+            updateTickerText('⚠️ Помилка завантаження треку');
           }
         }
       });
@@ -341,6 +386,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const loadPlaylistAndPlay = (playlistId) => {
       setPlayerVisible(true);
+      updateTickerText('▶ Завантаження плейлиста...');
 
       if (window.YT && window.YT.Player) {
         if (!ytPlayer) {
