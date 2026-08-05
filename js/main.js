@@ -255,10 +255,15 @@ document.addEventListener("DOMContentLoaded", () => {
       if (ytPlayer && typeof ytPlayer.getVideoData === 'function') {
         const data = ytPlayer.getVideoData();
         if (data && (data.title || data.author)) {
-          const parts = [];
-          if (data.author) parts.push(data.author);
-          if (data.title) parts.push(data.title);
-          updateTickerText(`🎵 ${parts.join(' — ')}`);
+          const authorStr = data.author ? `КАНАЛ: «${data.author}»` : '';
+          const titleStr = data.title ? `ТРЕК: «${data.title}»` : '';
+          if (authorStr && titleStr) {
+            updateTickerText(`🎵 ${authorStr} 🎵 ${titleStr} 🎵`);
+          } else if (titleStr) {
+            updateTickerText(`🎵 ${titleStr} 🎵`);
+          } else if (authorStr) {
+            updateTickerText(`🎵 ${authorStr} 🎵`);
+          }
           return;
         }
       }
@@ -321,7 +326,9 @@ document.addEventListener("DOMContentLoaded", () => {
           list: playlistId,
           autoplay: autoPlay ? 1 : 0,
           playsinline: 1,
-          enablejsapi: 1
+          enablejsapi: 1,
+          cc_load_policy: 0,
+          iv_load_policy: 3
         },
         events: {
           'onReady': (event) => {
@@ -330,6 +337,11 @@ document.addEventListener("DOMContentLoaded", () => {
             } catch (e) {
               console.log('Shuffle error:', e);
             }
+            try {
+              if (typeof event.target.unloadModule === 'function') {
+                event.target.unloadModule('captions');
+              }
+            } catch (e) {}
             if (autoPlay) {
               event.target.playVideo();
             }
