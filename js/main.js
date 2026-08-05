@@ -245,14 +245,14 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     };
 
-    const createPlayer = (playlistId) => {
+    const createPlayer = (playlistId, autoPlay = true) => {
       ytPlayer = new window.YT.Player('ytTestPlayer', {
         height: '100%',
         width: '100%',
         playerVars: {
           listType: 'playlist',
           list: playlistId,
-          autoplay: 1,
+          autoplay: autoPlay ? 1 : 0,
           playsinline: 1,
           enablejsapi: 1
         },
@@ -263,19 +263,24 @@ document.addEventListener("DOMContentLoaded", () => {
             } catch (e) {
               console.log('Shuffle error:', e);
             }
-            event.target.playVideo();
+            if (autoPlay) {
+              event.target.playVideo();
+            }
           },
           'onStateChange': (event) => {
-            if (window.YT && activeBtn) {
+            if (window.YT) {
               if (event.data === window.YT.PlayerState.BUFFERING) {
                 ytState = 'loading';
-                updateItemState(activeBtn, 'loading');
+                if (activeBtn) updateItemState(activeBtn, 'loading');
               } else if (event.data === window.YT.PlayerState.PLAYING) {
                 ytState = 'playing';
-                updateItemState(activeBtn, 'playing');
+                if (!activeBtn) {
+                  activeBtn = document.querySelector(`.yt-play-btn[data-playlist="${playlistId}"]`);
+                }
+                if (activeBtn) updateItemState(activeBtn, 'playing');
               } else if (event.data === window.YT.PlayerState.PAUSED || event.data === window.YT.PlayerState.ENDED) {
                 ytState = 'idle';
-                updateItemState(activeBtn, 'idle');
+                if (activeBtn) updateItemState(activeBtn, 'idle');
               }
             }
           },
@@ -291,7 +296,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const loadPlaylistAndPlay = (playlistId) => {
       if (window.YT && window.YT.Player) {
         if (!ytPlayer) {
-          createPlayer(playlistId);
+          createPlayer(playlistId, true);
         } else {
           ytPlayer.loadPlaylist({
             listType: 'playlist',
@@ -310,7 +315,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const previousOnReady = window.onYouTubeIframeAPIReady;
         window.onYouTubeIframeAPIReady = function() {
           if (previousOnReady) previousOnReady();
-          createPlayer(playlistId);
+          createPlayer(playlistId, true);
         };
 
         const tag = document.createElement('script');
@@ -319,6 +324,30 @@ document.addEventListener("DOMContentLoaded", () => {
         firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
       }
     };
+
+    // Авто-ініціалізація плеєра на сторінці для відображення інтерактивного екрана з обкладинкою та кнопкою Play
+    const initPlayerOnLoad = () => {
+      const defaultPlaylist = 'PLkF1vM_kexQCgisbwlVnGa4zdE4gtMNxD';
+      if (window.YT && window.YT.Player) {
+        if (!ytPlayer) createPlayer(defaultPlaylist, false);
+      } else if (!isApiLoading) {
+        isApiLoading = true;
+        const previousOnReady = window.onYouTubeIframeAPIReady;
+        window.onYouTubeIframeAPIReady = function() {
+          if (previousOnReady) previousOnReady();
+          if (!ytPlayer) createPlayer(defaultPlaylist, false);
+        };
+
+        const tag = document.createElement('script');
+        tag.src = 'https://www.youtube.com/iframe_api';
+        const firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+      }
+    };
+
+    if (document.getElementById('ytTestPlayer')) {
+      initPlayerOnLoad();
+    }
 
     ytPlayBtns.forEach((btn) => {
       btn.addEventListener('click', (e) => {
@@ -523,13 +552,15 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // === Dynamic inline placeholders at the end of each card ===
-  document.querySelectorAll('.group:not(.cat-recommendations) ul').forEach(ul => {
+  document.querySelectorAll('.group:not(.cat-recommendations):not(.no-placeholder) ul').forEach(ul => {
     if (!ul.children.length) return;
     if (ul.querySelector('.placeholder-ad-item')) return;
     
     const groupElement = ul.closest('.group');
     const badgeElement = groupElement ? groupElement.querySelector('.group-title span.badge') : null;
     const groupTitle = badgeElement ? badgeElement.textContent.trim() : '';
+
+    if (groupTitle === 'ТЕСТ відтворення') return;
 
     const li = document.createElement('li');
     
