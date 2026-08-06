@@ -1190,7 +1190,7 @@ body.dark-mode .radio-legion-item.playing .radio-play-btn:hover {
   align-items: center;
   white-space: nowrap;
   padding-left: 100%;
-  animation: ytTickerScroll 25s linear infinite;
+  animation: ytTickerScroll 20s linear infinite;
   font-size: 0.78rem;
   font-weight: 500;
   color: var(--text-color);
