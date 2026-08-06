@@ -287,6 +287,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (ytPlayer && typeof ytPlayer.pauseVideo === 'function') {
         ytPlayer.pauseVideo();
       }
+      setPlayerVisible(false);
       stopTickerPolling();
       updateTickerText('⏸ Пауза. Натисніть «Play» для продовження');
       if (activeBtn) {
@@ -415,11 +416,6 @@ document.addEventListener("DOMContentLoaded", () => {
       btn.addEventListener('click', (e) => {
         e.preventDefault();
         e.stopPropagation();
-        const wrapper = document.getElementById('ytTestPlayerWrapper');
-        if (wrapper) {
-          const isNowVisible = !wrapper.classList.contains('visible-player');
-          setPlayerVisible(isNowVisible);
-        }
       });
     });
 
