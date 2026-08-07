@@ -105,7 +105,9 @@ body {
     transform: translateY(-50%) !important;
     z-index: 1050 !important;
     margin: 0 !important;
-    padding: 0.22rem 0.75rem !important; /* Slightly reduced vertical padding for a sleeker PC layout */
+    width: 30px !important;
+    height: 30px !important;
+    padding: 0 !important;
   }
 
   /* Повністю вертикальне виділення пунктів меню для ПК версії */
@@ -391,19 +393,23 @@ nav.navbar {
   background: rgba(255, 255, 255, 0.16) !important;
   border: 1px solid rgba(255, 255, 255, 0.3) !important;
   color: white !important;
-  padding: 0.28rem 0.75rem !important;
-  border-radius: 0.5rem;
+  width: 30px;
+  height: 30px;
+  padding: 0 !important;
+  border-radius: 7px;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.875rem;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 0.95rem;
   transition: all 0.20s ease;
+  line-height: 1;
 }
 
 .theme-toggle-btn:hover {
   background: rgba(255, 255, 255, 0.28) !important;
-  border-color: rgba(255, 255, 255, 0.45) !important;
+  border-color: rgba(255, 255, 255, 0.5) !important;
+  color: #facc15 !important;
 }
 
 /* ==========================================================================
@@ -570,10 +576,13 @@ footer.footer .btn-primary:active {
   #themeToggle {
       position: absolute;
       top: 50%;                     
-      transform: translateY(-50%) scale(0.72); 
+      transform: translateY(-50%); 
       left: 12px;                  
       z-index: 1050;                
       margin: 0;                    
+      width: 30px !important;
+      height: 30px !important;
+      padding: 0 !important;
   }
 
   /* 3. Кнопка гамбургера: вирівнювання всередині компактної шапки (справа) */
@@ -1345,17 +1354,24 @@ body.dark-mode .radio-legion-item.playing .radio-play-btn:hover {
   gap: 8px;
 }
 .cl-modal-close {
-  background: transparent;
-  border: none;
-  font-size: 1.5rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 12px;
   line-height: 1;
-  color: #6c757d;
-  cursor: pointer;
-  padding: 0 4px;
-  transition: color 0.15s ease;
+  font-size: 0.875rem;
 }
-.cl-modal-close:hover {
-  color: #dc3545;
+.cl-modal-close-sep {
+  display: inline-block;
+  width: 1px;
+  height: 15px;
+  background-color: rgba(255, 255, 255, 0.45);
+}
+.cl-modal-close-x {
+  font-size: 1.4rem;
+  line-height: 0.8;
+  font-weight: 700;
+  margin-top: -1px;
 }
 .cl-modal-body {
   padding: 20px;
@@ -1383,14 +1399,6 @@ body.dark-mode .cl-modal-body h2 {
 .cl-modal-body li {
   margin-bottom: 6px;
 }
-.cl-modal-footer {
-  padding: 12px 20px;
-  border-top: 1px solid var(--border-color, rgba(0, 0, 0, 0.1));
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  background: var(--card-grad-end, #f8f9fa);
-}
 
 @media (max-width: 576px) {
   .cl-modal-backdrop {
@@ -1407,9 +1415,6 @@ body.dark-mode .cl-modal-body h2 {
   .cl-modal-body {
     padding: 14px 16px;
     font-size: 0.9rem;
-  }
-  .cl-modal-footer {
-    padding: 10px 16px;
   }
 }
 /* Стилі для плашок торрент-трекерів */

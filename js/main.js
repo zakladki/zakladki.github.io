@@ -1024,16 +1024,17 @@ function openChangelogModal() {
       <div class="cl-modal" role="dialog" aria-modal="true">
         <div class="cl-modal-header">
           <h5 class="cl-modal-title">📋 Історія оновлень</h5>
-          <button type="button" class="cl-modal-close" aria-label="Закрити">&times;</button>
+          <button type="button" class="btn btn-secondary btn-sm cl-modal-close" aria-label="Закрити">
+            <span>Закрити</span>
+            <span class="cl-modal-close-sep"></span>
+            <span class="cl-modal-close-x">&times;</span>
+          </button>
         </div>
         <div class="cl-modal-body" id="clModalBody">
           <div class="text-center py-4">
             <i class="fas fa-spinner fa-spin fa-2x text-muted"></i>
             <p class="mt-2 text-muted">Завантаження історії...</p>
           </div>
-        </div>
-        <div class="cl-modal-footer">
-          <button type="button" class="btn btn-secondary btn-sm cl-modal-close-btn">Закрити</button>
         </div>
       </div>
     `;
