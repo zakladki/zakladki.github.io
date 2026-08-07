@@ -66,6 +66,7 @@ document.addEventListener("DOMContentLoaded", () => {
   "web.viber.com": "viber.com",
   "viber.com.ua": "viber.com",
   "pro.musixmatch.com": "musixmatch.com",
+  "ru.uptodown.com": "uptodown.com",
   "ukr.net": "ukr.net",
   "meta.ua": "meta.ua",
   "i.ua": "i.ua",
@@ -329,7 +330,8 @@ document.addEventListener("DOMContentLoaded", () => {
           playsinline: 1,
           enablejsapi: 1,
           cc_load_policy: 0,
-          iv_load_policy: 3
+          iv_load_policy: 3,
+          origin: window.location.origin
         },
         events: {
           'onReady': (event) => {
