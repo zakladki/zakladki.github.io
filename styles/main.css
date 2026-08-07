@@ -1383,6 +1383,35 @@ body.dark-mode .cl-modal-body h2 {
 .cl-modal-body li {
   margin-bottom: 6px;
 }
+.cl-modal-footer {
+  padding: 12px 20px;
+  border-top: 1px solid var(--border-color, rgba(0, 0, 0, 0.1));
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  background: var(--card-grad-end, #f8f9fa);
+}
+
+@media (max-width: 576px) {
+  .cl-modal-backdrop {
+    padding: 12px;
+  }
+  .cl-modal {
+    max-height: calc(100vh - 24px);
+    height: calc(100vh - 24px);
+    border-radius: 12px;
+  }
+  .cl-modal-header {
+    padding: 12px 16px;
+  }
+  .cl-modal-body {
+    padding: 14px 16px;
+    font-size: 0.9rem;
+  }
+  .cl-modal-footer {
+    padding: 10px 16px;
+  }
+}
 /* Стилі для плашок торрент-трекерів */
 .torrent-badge {
   margin-left: auto;
