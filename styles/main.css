@@ -1326,8 +1326,7 @@ body.dark-mode .radio-legion-item.playing .radio-play-btn:hover {
   color: var(--text-main, #212529);
   width: 100%;
   max-width: 680px;
-  max-height: 85vh;
-  max-height: calc(100dvh - 32px);
+  max-height: 100%;
   border-radius: 12px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
   display: flex;
@@ -1336,6 +1335,7 @@ body.dark-mode .radio-legion-item.playing .radio-play-btn:hover {
   border: 1px solid var(--border-color, rgba(0, 0, 0, 0.12));
   transform: translateY(20px);
   transition: transform 0.25s ease;
+  box-sizing: border-box;
 }
 .cl-modal-backdrop.show .cl-modal {
   transform: translateY(0);
@@ -1408,22 +1408,20 @@ body.dark-mode .cl-modal-body h2 {
 
 @media (max-width: 576px) {
   .cl-modal-backdrop {
-    padding: 12px;
-    padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+    padding: 10px;
+    padding: max(10px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right)) max(10px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left));
   }
   .cl-modal {
-    max-height: 85%;
-    max-height: calc(100vh - 40px);
-    max-height: calc(100dvh - 24px);
+    max-height: 100%;
     height: auto;
     border-radius: 12px;
   }
   .cl-modal-header {
-    padding: 12px 16px;
+    padding: 10px 14px;
   }
   .cl-modal-body {
-    padding: 14px 16px;
-    font-size: 0.9rem;
+    padding: 12px 14px;
+    font-size: 0.88rem;
   }
 }
 /* Стилі для плашок торрент-трекерів */
