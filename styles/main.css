@@ -1304,8 +1304,9 @@ body.dark-mode .radio-legion-item.playing .radio-play-btn:hover {
   left: 0;
   right: 0;
   bottom: 0;
-  width: 100%;
-  height: 100%;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
   background-color: rgba(0, 0, 0, 0.65);
   backdrop-filter: blur(4px);
   z-index: 10500;
@@ -1313,9 +1314,11 @@ body.dark-mode .radio-legion-item.playing .radio-play-btn:hover {
   align-items: center;
   justify-content: center;
   padding: 16px;
+  box-sizing: border-box;
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.25s ease, visibility 0.25s ease;
+  overflow: hidden;
 }
 .cl-modal-backdrop.show {
   opacity: 1;
@@ -1326,7 +1329,8 @@ body.dark-mode .radio-legion-item.playing .radio-play-btn:hover {
   color: var(--text-main, #212529);
   width: 100%;
   max-width: 680px;
-  max-height: 100%;
+  max-height: calc(100vh - 32px);
+  max-height: calc(100dvh - 32px);
   border-radius: 12px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
   display: flex;
@@ -1384,6 +1388,8 @@ body.dark-mode .radio-legion-item.playing .radio-play-btn:hover {
   line-height: 1.6;
   flex: 1 1 auto;
   min-height: 0;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 .cl-modal-body h2 {
   font-size: 1.05rem;
@@ -1412,7 +1418,8 @@ body.dark-mode .cl-modal-body h2 {
     padding: max(10px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right)) max(10px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left));
   }
   .cl-modal {
-    max-height: 100%;
+    max-height: calc(100vh - 20px);
+    max-height: calc(100dvh - 20px);
     height: auto;
     border-radius: 12px;
   }
