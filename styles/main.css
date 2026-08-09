@@ -1365,6 +1365,14 @@ body.dark-mode .radio-legion-item.playing .radio-play-btn:hover {
   display: flex;
   align-items: center;
   gap: 8px;
+  color: var(--text-main, #212529);
+}
+body.dark-mode .cl-modal-header {
+  border-bottom-color: rgba(255, 255, 255, 0.15);
+  background: var(--card-grad-end, rgba(248, 250, 252, 0.08));
+}
+body.dark-mode .cl-modal-title {
+  color: #f8fafc !important;
 }
 .cl-modal-close {
   display: inline-flex;
@@ -1404,21 +1412,112 @@ body.dark-mode .radio-legion-item.playing .radio-play-btn:hover {
   min-height: 0;
   word-wrap: break-word;
   overflow-wrap: break-word;
+  color: #212529;
 }
-.cl-modal-body h2, .cl-modal-body .cl-h2 {
-  font-size: 1.1rem;
-  margin-top: 10px;
+body.dark-mode .cl-modal-body {
+  color: #f1f5f9 !important;
+}
+body.dark-mode .cl-modal-body p,
+body.dark-mode .cl-modal-body li {
+  color: #e2e8f0 !important;
+}
+body.dark-mode .cl-modal-body strong {
+  color: #ffffff !important;
+}
+body.dark-mode .cl-modal-body .text-muted {
+  color: #94a3b8 !important;
+}
+
+.cl-modal-body code,
+.cl-modal-body .cl-code-tag {
+  background-color: rgba(0, 0, 0, 0.05) !important;
+  color: #c026d3 !important;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.88em;
+  font-family: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+body.dark-mode .cl-modal-body code,
+body.dark-mode .cl-modal-body .cl-code-tag {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  color: #f472b6 !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+}
+
+.cl-modal-body h2,
+.cl-modal-body h5,
+.cl-modal-body .cl-h2 {
+  font-size: 1rem;
+  margin-top: 12px;
   margin-bottom: 8px;
-  color: #007bff;
-  font-weight: 700;
   border-top: 1px solid rgba(0, 0, 0, 0.15);
   padding-top: 10px;
-  padding-bottom: 0;
+  display: flex !important;
+  align-items: center !important;
+  flex-direction: row;
 }
 body.dark-mode .cl-modal-body h2,
+body.dark-mode .cl-modal-body h5,
 body.dark-mode .cl-modal-body .cl-h2 {
-  color: #64b5f6;
   border-top-color: rgba(255, 255, 255, 0.18);
+}
+.cl-modal-body .cl-date-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Segoe UI", Roboto, -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "zero" 0;
+  background-color: #e8ecef;
+  color: #000000;
+  padding: 3px 10px;
+  border-radius: 5px;
+  font-size: 0.98rem;
+  font-weight: 700;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  letter-spacing: 0.2px;
+  line-height: 1.2;
+}
+body.dark-mode .cl-modal-body .cl-date-badge {
+  background-color: #2b3035;
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.15);
+}
+.cl-modal-body .cl-calendar-prefix {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin-right: 8px;
+  color: #495057;
+  flex-shrink: 0;
+  line-height: 1;
+}
+.cl-modal-body .cl-calendar-icon {
+  width: 17px;
+  height: 17px;
+  display: inline-block;
+  vertical-align: middle;
+  stroke: currentColor;
+  animation: cl-calendar-pulse-mono 2s ease-in-out infinite;
+}
+body.dark-mode .cl-modal-body .cl-calendar-prefix {
+  color: #cbd5e1;
+}
+
+@keyframes cl-calendar-pulse-mono {
+  0% {
+    transform: scale(0.92);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.92);
+    opacity: 0.7;
+  }
 }
 .cl-modal-body ul,
 .cl-modal-body .cl-changelog-list {
