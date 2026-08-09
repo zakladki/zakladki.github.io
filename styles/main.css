@@ -1373,6 +1373,15 @@ body.dark-mode .radio-legion-item.playing .radio-play-btn:hover {
   padding: 5px 12px;
   line-height: 1;
   font-size: 0.875rem;
+  font-weight: 600;
+  background-color: #808a93;
+  border-color: #808a93;
+  color: #ffffff;
+}
+.cl-modal-close:hover {
+  background-color: #717a82;
+  border-color: #717a82;
+  color: #ffffff;
 }
 .cl-modal-close-sep {
   display: inline-block;

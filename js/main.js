@@ -971,13 +971,13 @@ function renderMarkdownToHtml(md) {
   // Обробка шапки/вступу: менший шрифт для вступного речення
   headerPart = headerPart
     .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
-    .replace(/^\*(.*?)\*/gim, '<p class="text-muted small mb-2 font-italic">$1</p>')
+    .replace(/^\*(.*?)\*/gim, '<p class="text-muted small mb-1 font-italic">$1</p>')
     .replace(/---/gim, '');
 
   function renderBlock(rawBlock) {
     let html = rawBlock
       .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
-      .replace(/^## (.*$)/gim, '<h5 class="cl-h2 mt-4 mb-2 font-weight-bold text-info">$1</h5>')
+      .replace(/^## (.*$)/gim, '<h5 class="cl-h2 font-weight-bold text-info">$1</h5>')
       .replace(/^### (.*$)/gim, '<h6 class="cl-h3 mt-3 mb-2 font-weight-bold">$1</h6>')
       .replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>')
       .replace(/\*(.*?)\*/gim, '<em>$1</em>')
@@ -991,7 +991,7 @@ function renderMarkdownToHtml(md) {
       const trimmed = line.trim();
       if (trimmed.startsWith('- ')) {
         if (!inList) {
-          result.push('<ul class="mb-3 cl-changelog-list">');
+          result.push('<ul class="cl-changelog-list">');
           inList = true;
         }
         result.push('<li class="mb-1">' + trimmed.substring(2) + '</li>');
