@@ -1389,15 +1389,15 @@ body.dark-mode .radio-legion-item.playing .radio-play-btn:hover {
 .cl-modal-body {
   padding: 20px;
   overflow-y: auto;
-  font-size: 0.95rem;
+  font-size: 0.98rem;
   line-height: 1.6;
   flex: 1 1 auto;
   min-height: 0;
   word-wrap: break-word;
   overflow-wrap: break-word;
 }
-.cl-modal-body h2 {
-  font-size: 1.05rem;
+.cl-modal-body h2, .cl-modal-body .cl-h2 {
+  font-size: 1.1rem;
   margin-top: 16px;
   margin-bottom: 8px;
   color: #007bff;

@@ -971,7 +971,7 @@ function renderMarkdownToHtml(md) {
   // Обробка шапки/вступу: менший шрифт для вступного речення
   headerPart = headerPart
     .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
-    .replace(/^\*(.*?)\*/gim, '<p class="text-muted small mb-3 style-italic">$1</p>')
+    .replace(/^\*(.*?)\*/gim, '<p class="text-muted small mb-3 font-italic">$1</p>')
     .replace(/---/gim, '<hr class="my-3">');
 
   function renderBlock(rawBlock) {
