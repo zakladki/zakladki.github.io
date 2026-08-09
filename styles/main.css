@@ -1398,21 +1398,23 @@ body.dark-mode .radio-legion-item.playing .radio-play-btn:hover {
 }
 .cl-modal-body h2, .cl-modal-body .cl-h2 {
   font-size: 1.1rem;
-  margin-top: 16px;
+  margin-top: 10px;
   margin-bottom: 8px;
   color: #007bff;
   font-weight: 700;
-  border-bottom: 1px dashed rgba(0, 0, 0, 0.1);
-  padding-bottom: 4px;
+  border-top: 1px solid rgba(0, 0, 0, 0.15);
+  padding-top: 10px;
+  padding-bottom: 0;
 }
-body.dark-mode .cl-modal-body h2 {
+body.dark-mode .cl-modal-body h2,
+body.dark-mode .cl-modal-body .cl-h2 {
   color: #64b5f6;
-  border-bottom-color: rgba(255, 255, 255, 0.15);
+  border-top-color: rgba(255, 255, 255, 0.18);
 }
 .cl-modal-body ul,
 .cl-modal-body .cl-changelog-list {
   padding-left: 0;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
   list-style: none;
 }
 .cl-modal-body li {
