@@ -991,7 +991,7 @@ function renderMarkdownToHtml(md) {
       const trimmed = line.trim();
       if (trimmed.startsWith('- ')) {
         if (!inList) {
-          result.push('<ul class="mb-3 pl-4">');
+          result.push('<ul class="mb-3 cl-changelog-list">');
           inList = true;
         }
         result.push('<li class="mb-1">' + trimmed.substring(2) + '</li>');

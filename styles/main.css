@@ -1409,12 +1409,24 @@ body.dark-mode .cl-modal-body h2 {
   color: #64b5f6;
   border-bottom-color: rgba(255, 255, 255, 0.15);
 }
-.cl-modal-body ul {
-  padding-left: 20px;
+.cl-modal-body ul,
+.cl-modal-body .cl-changelog-list {
+  padding-left: 0;
   margin-bottom: 12px;
+  list-style: none;
 }
 .cl-modal-body li {
+  position: relative;
   margin-bottom: 6px;
+  padding-left: 9px;
+}
+.cl-modal-body li::before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  top: 0;
+  font-weight: bold;
+  color: inherit;
 }
 
 @media (max-width: 576px) {
@@ -1433,6 +1445,13 @@ body.dark-mode .cl-modal-body h2 {
   .cl-modal-body {
     padding: 12px 14px;
     font-size: 0.88rem;
+  }
+  .cl-modal-body ul,
+  .cl-modal-body .cl-changelog-list {
+    padding-left: 0;
+  }
+  .cl-modal-body li {
+    padding-left: 9px;
   }
 }
 /* Стилі для плашок торрент-трекерів */
