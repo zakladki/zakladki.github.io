@@ -533,6 +533,14 @@ footer.footer .btn-primary:active {
   footer.footer {
     position: static !important;
     bottom: auto !important;
+    padding: 0.6rem 1rem !important;
+  }
+  footer.footer .row {
+    row-gap: 8px;
+  }
+  footer.footer .footer-col {
+    padding-top: 4px;
+    padding-bottom: 4px;
   }
   body {
     padding-bottom: 0 !important;

@@ -964,42 +964,86 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // === Оптимізований рендерер CHANGELOG.md у модальне вікно ===
 function renderMarkdownToHtml(md) {
-  let html = md
+  const sections = md.split(/(?=^## \[)/m);
+  let headerPart = sections[0] || '';
+  let dateSections = sections.slice(1);
+
+  // Обробка шапки/вступу: менший шрифт для вступного речення
+  headerPart = headerPart
     .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
-    .replace(/^# (.*$)/gim, '<h4 class="cl-h1 text-primary font-weight-bold mb-3">$1</h4>')
-    .replace(/^## (.*$)/gim, '<h5 class="cl-h2 mt-4 mb-2 font-weight-bold text-info">$1</h5>')
-    .replace(/^### (.*$)/gim, '<h6 class="cl-h3 mt-3 mb-2 font-weight-bold">$1</h6>')
-    .replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>')
-    .replace(/\*(.*?)\*/gim, '<em>$1</em>')
-    .replace(/_(.*?)_/gim, '<em>$1</em>')
-    .replace(/`(.*?)`/gim, '<code class="bg-light px-1 rounded">$1</code>')
+    .replace(/^\*(.*?)\*/gim, '<p class="text-muted small mb-3 style-italic">$1</p>')
     .replace(/---/gim, '<hr class="my-3">');
 
-  const lines = html.split('\n');
-  let inList = false;
-  let result = [];
-  lines.forEach(line => {
-    const trimmed = line.trim();
-    if (trimmed.startsWith('- ')) {
-      if (!inList) {
-        result.push('<ul class="mb-3 pl-4">');
-        inList = true;
-      }
-      result.push('<li class="mb-1">' + trimmed.substring(2) + '</li>');
-    } else {
-      if (inList) {
-        result.push('</ul>');
-        inList = false;
-      }
-      if (trimmed !== '' && !trimmed.startsWith('<h') && !trimmed.startsWith('<hr') && !trimmed.startsWith('<ul')) {
-        result.push('<p class="mb-2">' + trimmed + '</p>');
+  function renderBlock(rawBlock) {
+    let html = rawBlock
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+      .replace(/^## (.*$)/gim, '<h5 class="cl-h2 mt-4 mb-2 font-weight-bold text-info">$1</h5>')
+      .replace(/^### (.*$)/gim, '<h6 class="cl-h3 mt-3 mb-2 font-weight-bold">$1</h6>')
+      .replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>')
+      .replace(/\*(.*?)\*/gim, '<em>$1</em>')
+      .replace(/_(.*?)_/gim, '<em>$1</em>')
+      .replace(/`(.*?)`/gim, '<code class="bg-light px-1 rounded">$1</code>');
+
+    const lines = html.split('\n');
+    let inList = false;
+    let result = [];
+    lines.forEach(line => {
+      const trimmed = line.trim();
+      if (trimmed.startsWith('- ')) {
+        if (!inList) {
+          result.push('<ul class="mb-3 pl-4">');
+          inList = true;
+        }
+        result.push('<li class="mb-1">' + trimmed.substring(2) + '</li>');
       } else {
-        result.push(line);
+        if (inList) {
+          result.push('</ul>');
+          inList = false;
+        }
+        if (trimmed !== '' && !trimmed.startsWith('<h') && !trimmed.startsWith('<hr') && !trimmed.startsWith('<ul')) {
+          result.push('<p class="mb-2">' + trimmed + '</p>');
+        } else {
+          result.push(line);
+        }
       }
-    }
-  });
-  if (inList) result.push('</ul>');
-  return result.join('\n');
+    });
+    if (inList) result.push('</ul>');
+    return result.join('\n');
+  }
+
+  let finalHtml = headerPart;
+
+  if (dateSections.length <= 10) {
+    dateSections.forEach(sec => {
+      finalHtml += renderBlock(sec);
+    });
+  } else {
+    // Перші 10 дат - показуємо
+    const visibleSections = dateSections.slice(0, 10);
+    const hiddenSections = dateSections.slice(10);
+
+    visibleSections.forEach(sec => {
+      finalHtml += renderBlock(sec);
+    });
+
+    // Решта приховані
+    finalHtml += '<div id="clMoreSections" style="display: none;">';
+    hiddenSections.forEach(sec => {
+      finalHtml += renderBlock(sec);
+    });
+    finalHtml += '</div>';
+
+    // Широка кнопка під списком
+    finalHtml += `
+      <div class="text-center my-4" id="clShowMoreWrapper">
+        <button type="button" id="clShowMoreBtn" class="btn btn-outline-primary btn-block py-2 font-weight-bold" style="border-radius: 8px;">
+          <i class="fas fa-chevron-down mr-2"></i>Показати всі оновлення (${dateSections.length})
+        </button>
+      </div>
+    `;
+  }
+
+  return finalHtml;
 }
 
 function initChangelogModal() {
@@ -1009,6 +1053,17 @@ function initChangelogModal() {
       if (e.ctrlKey || e.metaKey || e.button === 1) return;
       e.preventDefault();
       openChangelogModal();
+    }
+
+    if (e.target.closest('#clShowMoreBtn')) {
+      const moreDiv = document.getElementById('clMoreSections');
+      const btnWrapper = document.getElementById('clShowMoreWrapper');
+      if (moreDiv) {
+        moreDiv.style.display = 'block';
+      }
+      if (btnWrapper) {
+        btnWrapper.style.display = 'none';
+      }
     }
   });
 }
