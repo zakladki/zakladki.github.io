@@ -330,6 +330,7 @@ document.addEventListener("DOMContentLoaded", () => {
           enablejsapi: 1,
           cc_load_policy: 0,
           iv_load_policy: 3,
+          vq: 'medium',
           origin: window.location.origin
         },
         events: {
@@ -339,6 +340,11 @@ document.addEventListener("DOMContentLoaded", () => {
             } catch (e) {
               console.log('Shuffle error:', e);
             }
+            try {
+              if (typeof event.target.setPlaybackQuality === 'function') {
+                event.target.setPlaybackQuality('medium');
+              }
+            } catch (e) {}
             try {
               if (typeof event.target.unloadModule === 'function') {
                 event.target.unloadModule('captions');
@@ -366,6 +372,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 updateTickerText('▶ Завантаження треку...');
               } else if (event.data === window.YT.PlayerState.PLAYING) {
                 ytState = 'playing';
+                try {
+                  if (ytPlayer && typeof ytPlayer.setPlaybackQuality === 'function') {
+                    ytPlayer.setPlaybackQuality('medium');
+                  }
+                } catch (e) {}
                 if (!activeBtn && activePlaylistId) {
                   activeBtn = document.querySelector(`.yt-play-btn[data-playlist="${activePlaylistId}"]`);
                 }
