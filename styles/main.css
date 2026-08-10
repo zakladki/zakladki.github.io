@@ -1216,6 +1216,13 @@ body.dark-mode .radio-legion-item.playing .radio-play-btn:hover {
   line-height: 1;
 }
 
+.yt-ticker-play-icon {
+  color: #dc2626;
+  font-size: 0.72rem;
+  margin: 0 4px;
+  vertical-align: middle;
+}
+
 .yt-ticker-track:hover .yt-ticker-text {
   animation-play-state: paused;
 }

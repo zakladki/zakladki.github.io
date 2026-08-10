@@ -216,7 +216,16 @@ document.addEventListener("DOMContentLoaded", () => {
     let needsShuffle = false;
     let tickerInterval = null;
 
-    const IDLE_TICKER_TEXT = '🎵 Режим очікування. Для прослуховування натисніть кнопку «Play»';
+    const IDLE_TICKER_TEXT = '🎵 Для прослуховування натисніть кнопку <i class="fas fa-play yt-ticker-play-icon"></i> «Play» 🎵 Режим очікування 🎵';
+
+    const escapeHtml = (str) => {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    };
 
     const ensurePlayerContainer = () => {
       const wrapper = document.getElementById('ytTestPlayerWrapper');
@@ -245,18 +254,25 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     const updateTickerText = (text) => {
-      const tickerTextEl = document.getElementById('ytTickerText');
-      if (tickerTextEl) {
-        tickerTextEl.textContent = text;
-      }
+      const activeCard = activeBtn ? activeBtn.closest('.group') : null;
+      document.querySelectorAll('.group.cat-media').forEach((card) => {
+        const tickerTextEl = card.querySelector('.yt-ticker-text');
+        if (tickerTextEl) {
+          if (activeCard && card === activeCard) {
+            tickerTextEl.innerHTML = text;
+          } else {
+            tickerTextEl.innerHTML = IDLE_TICKER_TEXT;
+          }
+        }
+      });
     };
 
     const refreshTickerVideoData = () => {
       if (ytPlayer && typeof ytPlayer.getVideoData === 'function') {
         const data = ytPlayer.getVideoData();
         if (data && (data.title || data.author)) {
-          const authorStr = data.author ? `КАНАЛ: «${data.author}»` : '';
-          const titleStr = data.title ? `ТРЕК: «${data.title}»` : '';
+          const authorStr = data.author ? `КАНАЛ: «${escapeHtml(data.author)}»` : '';
+          const titleStr = data.title ? `ТРЕК: «${escapeHtml(data.title)}»` : '';
           if (authorStr && titleStr) {
             updateTickerText(`🎵 ${authorStr} 🎵 ${titleStr} 🎵`);
           } else if (titleStr) {
@@ -402,12 +418,18 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     const updateToggleBtnIcon = (isVisible) => {
-      const toggleBtns = document.querySelectorAll('.yt-toggle-btn');
-      toggleBtns.forEach((btn) => {
-        const icon = btn.querySelector('i');
-        if (icon) {
-          icon.className = isVisible ? 'fas fa-chevron-up' : 'fas fa-chevron-down';
-        }
+      const wrapper = document.getElementById('ytTestPlayerWrapper');
+      const activeCard = wrapper ? wrapper.closest('.group') : null;
+
+      document.querySelectorAll('.group.cat-media').forEach((card) => {
+        const toggleBtns = card.querySelectorAll('.yt-toggle-btn');
+        const isCardPlayerVisible = (card === activeCard) && isVisible;
+        toggleBtns.forEach((btn) => {
+          const icon = btn.querySelector('i');
+          if (icon) {
+            icon.className = isCardPlayerVisible ? 'fas fa-chevron-up' : 'fas fa-chevron-down';
+          }
+        });
       });
     };
 
@@ -428,6 +450,22 @@ document.addEventListener("DOMContentLoaded", () => {
       btn.addEventListener('click', (e) => {
         e.preventDefault();
         e.stopPropagation();
+        const card = btn.closest('.group');
+        const wrapper = document.getElementById('ytTestPlayerWrapper');
+        if (card && wrapper) {
+          if (wrapper.parentElement !== card) {
+            const ticker = card.querySelector('.yt-player-ticker');
+            if (ticker) {
+              ticker.after(wrapper);
+            } else {
+              card.appendChild(wrapper);
+            }
+            setPlayerVisible(true);
+          } else {
+            const isCurrentlyVisible = wrapper.classList.contains('visible-player');
+            setPlayerVisible(!isCurrentlyVisible);
+          }
+        }
       });
     });
 
@@ -462,6 +500,17 @@ document.addEventListener("DOMContentLoaded", () => {
         e.stopPropagation();
 
         const playlistId = btn.getAttribute('data-playlist');
+        const targetCard = btn.closest('.group');
+        const wrapper = document.getElementById('ytTestPlayerWrapper');
+
+        if (targetCard && wrapper) {
+          const ticker = targetCard.querySelector('.yt-player-ticker');
+          if (ticker) {
+            ticker.after(wrapper);
+          } else if (wrapper.parentElement !== targetCard) {
+            targetCard.appendChild(wrapper);
+          }
+        }
 
         // Зупиняємо радіо якщо воно грає
         const radioAudio = document.getElementById('radioLegionAudio');
