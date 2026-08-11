@@ -977,8 +977,8 @@ document.addEventListener("DOMContentLoaded", () => {
         // Соціум / Ігри / Ринок / Місто: InFeed-Назва Вгорі
         firstAdSlot = '5930414256';
         firstAdLayoutKey = '-ef+6k-30-ac+ty';
-      } else if (path.includes('news.html') || path.includes('communal.html') || path.includes('shops.html') || path.includes('programs.html')) {
-        // Новини / Комуналка / Магазини / Soft: InFeed-Зображення збоку
+      } else if (path.includes('news.html') || path.includes('communal.html') || path.includes('shops.html') || path.includes('programs.html') || path.includes('ai.html')) {
+        // Новини / Комуналка / Магазини / Soft / AI: InFeed-Зображення збоку
         firstAdSlot = '5495299989';
         firstAdLayoutKey = '-fb+5w+4e-db+86';
       }

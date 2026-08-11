@@ -490,6 +490,7 @@ footer.footer .btn-primary:active {
 .group.cat-shops { background: linear-gradient(135deg, var(--card-bg) 0%, var(--card-grad-end) 100%); border-top: 3.5px solid rgba(20, 184, 166, 0.9); --cat-color: rgba(20, 184, 166, 0.9); }
 .group.cat-others { background: linear-gradient(135deg, var(--card-bg) 0%, var(--card-grad-end) 100%); border-top: 3.5px solid rgba(100, 116, 139, 0.9); --cat-color: rgba(100, 116, 139, 0.9); }
 .group.cat-city { background: linear-gradient(135deg, var(--card-bg) 0%, var(--card-grad-end) 100%); border-top: 3.5px solid rgba(234, 179, 8, 0.9); --cat-color: rgba(234, 179, 8, 0.9); }
+.group.cat-ai { background: linear-gradient(135deg, var(--card-bg) 0%, var(--card-grad-end) 100%); border-top: 3.5px solid rgba(168, 85, 247, 0.9); --cat-color: rgba(168, 85, 247, 0.9); }
 .group.cat-programs { background: linear-gradient(135deg, var(--card-bg) 0%, var(--card-grad-end) 100%); border-top: 3.5px solid rgba(249, 115, 22, 0.9); --cat-color: rgba(249, 115, 22, 0.9); }
 .group.cat-search { background: linear-gradient(135deg, var(--card-bg) 0%, var(--card-grad-end) 100%); border-top: 3.5px solid rgba(14, 165, 233, 0.9); --cat-color: rgba(14, 165, 233, 0.9); }
 .group.cat-updates { background: linear-gradient(135deg, var(--card-bg) 0%, var(--card-grad-end) 100%); border-top: 3.5px solid rgba(239, 68, 68, 0.95); --cat-color: rgba(239, 68, 68, 0.95); }
@@ -505,6 +506,7 @@ footer.footer .btn-primary:active {
 .group.cat-shops .group-title .badge, .group.cat-shops .badge { background: linear-gradient(to right, #14b8a6 0%, #0f766e 50%, #14b8a6 100%) !important; color: white !important; }
 .group.cat-others .group-title .badge, .group.cat-others .badge { background: linear-gradient(to right, #64748b 0%, #475569 50%, #64748b 100%) !important; color: white !important; }
 .group.cat-city .group-title .badge, .group.cat-city .badge { background: linear-gradient(to right, #eab308 0%, #a16207 50%, #eab308 100%) !important; color: white !important; }
+.group.cat-ai .group-title .badge, .group.cat-ai .badge { background: linear-gradient(to right, #a855f7 0%, #7e22ce 50%, #a855f7 100%) !important; color: white !important; }
 .group.cat-programs .group-title .badge, .group.cat-programs .badge { background: linear-gradient(to right, #f97316 0%, #c2410c 50%, #f97316 100%) !important; color: white !important; }
 .group.cat-search .group-title .badge, .group.cat-search .badge { background: linear-gradient(to right, #0ea5e9 0%, #0369a1 50%, #0ea5e9 100%) !important; color: white !important; }
 .group.cat-updates .group-title .badge, .group.cat-updates .badge { background: linear-gradient(to right, #ef4444 0%, #dc2626 50%, #ef4444 100%) !important; color: white !important; }

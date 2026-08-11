@@ -11,6 +11,7 @@ const files = [
   'market.html',
   'shops.html',
   'city.html',
+  'ai.html',
   'programs.html',
   'games.html',
   'others.html'

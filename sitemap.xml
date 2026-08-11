@@ -54,12 +54,17 @@
   </url>
   <url>
     <loc>https://zakladki.github.io/city.html</loc>
-    <lastmod>2026-08-10T12:00:00+02:00</lastmod>
+    <lastmod>2026-08-11T10:00:00+02:00</lastmod>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://zakladki.github.io/ai.html</loc>
+    <lastmod>2026-08-11T10:00:00+02:00</lastmod>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://zakladki.github.io/programs.html</loc>
-    <lastmod>2026-08-10T12:00:00+02:00</lastmod>
+    <lastmod>2026-08-11T10:00:00+02:00</lastmod>
     <priority>0.6</priority>
   </url>
 </urlset>
