@@ -4,16 +4,18 @@
 
 ## [2026-08-11]
 - **Новий розділ / AI (Штучний Інтелект)**: Створено новий самостійний розділ та сторінку `AI` (`ai.html`), яку розміщено перед розділом `Soft` у головному навігаційному меню на всіх сторінках сайту.
-- **AI / Картки та Ресурси**: У розділ «AI» додано 8 впорядкованих категорій з 35 провідними сервісами штучного інтелекту й деталізованими описами:
-  1. **Текстові асистенти, Пошук** (`ChatGPT`, `Claude`, `Gemini`, `Perplexity`, `DeepSeek`)
-  2. **Генерація зображень** (`Midjourney`, `Ideogram`, `Leonardo.ai`, `Flux`, `Recraft`)
-  3. **Обробка фото, графіки** (`Photoroom`, `Clipdrop`, `Remove.bg`, `VanceAI`)
-  4. **Музика, Аудіо, Голос** (`Suno`, `Udio`, `ElevenLabs`, `LALAL.AI`)
-  5. **Відео, Анімація** (`Runway`, `Kling AI`, `Luma Dream Machine`, `HeyGen`)
-  6. **Програмування, Код** (`GitHub Copilot`, `Cursor`, `v0.dev`, `Replit`)
-  7. **Документи, Презентації** (`NotebookLM`, `Gamma`, `ChatPDF`, `Consensus`)
-  8. **Каталоги сервісів ШІ** (`There's An AI For That`, `Futurepedia`, `AI Valley`)
-- **Стилі та Специфікація**: Для розділу AI додано власну стилізацію `.group.cat-ai` із фіолетово-бузковим градієнтом та бейджами, оновлено `sitemap.xml`, конфігурацію рекламних блоків у `js/main.js` та сценарії обробки посилань.
+- **AI / Розширення категорій та ресурсів**: До розділу «AI» додано 10 впорядкованих категорій з топовими сервісами штучного інтелекту:
+  1. **Текстові асистенти, Пошук** (`ChatGPT`, `Claude`, `Gemini`, `Microsoft Copilot`, `Perplexity`, `DeepSeek`, `Groq`)
+  2. **Генерація зображень** (`Midjourney`, `Ideogram`, `Leonardo.ai`, `Flux`, `Recraft`, `Google Flow`)
+  3. **3D та 3D-моделювання** (`Meshy`, `Tripo3D`, `Spline AI`, `Luma Genie`)
+  4. **Обробка фото, графіки** (`Photoroom`, `Clipdrop`, `Remove.bg`, `VanceAI`)
+  5. **Музика, Аудіо, Голос** (`Suno`, `Udio`, `ElevenLabs`, `LALAL.AI`)
+  6. **Відео, Анімація** (`Runway`, `Kling AI`, `Luma Dream Machine`, `Pika`, `InVideo AI`, `HeyGen`)
+  7. **Програмування, Код** (`Google AI Studio`, `GitHub Copilot`, `Cursor`, `v0.dev`, `Replit`)
+  8. **Документи, Презентації** (`NotebookLM`, `Gamma`, `ChatPDF`, `Consensus`)
+  9. **Навчання, Мови, Текст** (`Grammarly`, `QuillBot`, `TalkPal AI`, `Photomath`)
+  10. **Каталоги сервісів ШІ** (`There's An AI For That`, `Futurepedia`, `AI Valley`)
+- **Стилі та Специфікація**: Для розділу AI додано власну стилізацію `.group.cat-ai` із фіолетово-бузковим градієнтом та бейджами, оновлено `sitemap.xml`, конфігурацію рекламних блоків у `js/main.js`, футер сайту та адаптивні колонки.
 
 ## [2026-08-10]
 - **Медіа / Музичні картки**: Відновлено відображення бігучого рядка у картці «Слухати Закордонну Музику», що забезпечує однаковий інтерфейс та можливість керування відтворенням у двох музичних блоках.
