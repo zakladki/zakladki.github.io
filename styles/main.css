@@ -549,11 +549,10 @@ footer.footer .btn-primary:active {
   }
   .navbar-nav {
     display: grid !important;
-    grid-template-columns: repeat(2, 1fr) !important;
-    grid-auto-flow: column !important;
-    grid-template-rows: repeat(6, auto) !important;
-    gap: 12px 14px !important; /* 12px vertical spacing between rows, 14px horizontal spacing */
-    padding: 16px !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    grid-auto-flow: row !important;
+    gap: 10px 8px !important; /* 10px vertical spacing between rows, 8px horizontal spacing */
+    padding: 14px 10px !important;
     width: 100% !important;
     margin: 0 auto !important;
   }
@@ -562,12 +561,16 @@ footer.footer .btn-primary:active {
     width: 100% !important;
   }
   .navbar-nav .nav-link {
-    padding: 8px 12px !important; /* Increased padding inside links for easier touch targets */
-    font-size: 0.95rem !important;
-    line-height: 1.4 !important; /* Beautifully increased line spacing */
+    padding: 7px 6px !important; /* Touch target padding for 3-column layout */
+    font-size: 0.88rem !important;
+    font-weight: 500 !important;
+    line-height: 1.3 !important;
     border-radius: 8px !important;
     display: block !important;
     text-align: center !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
   }
 
   /* 1. Закріплюємо шапку зверху (fixed) для мобільних */
