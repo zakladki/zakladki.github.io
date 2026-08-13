@@ -550,7 +550,8 @@ footer.footer .btn-primary:active {
   .navbar-nav {
     display: grid !important;
     grid-template-columns: repeat(3, 1fr) !important;
-    grid-auto-flow: row !important;
+    grid-template-rows: repeat(5, auto) !important;
+    grid-auto-flow: column !important;
     gap: 10px 8px !important; /* 10px vertical spacing between rows, 8px horizontal spacing */
     padding: 14px 10px !important;
     width: 100% !important;
