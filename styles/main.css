@@ -1603,5 +1603,232 @@ body.dark-mode .torrent-badge {
   border-color: rgba(255, 255, 255, 0.12);
 }
 
+/* ==========================================================================
+   Спливаюче повідомлення про налагоджувальні роботи (з таймером відліку)
+   ========================================================================== */
+.maintenance-modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 10500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.25s ease, visibility 0.25s ease;
+}
+
+.maintenance-modal-backdrop.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+.maintenance-modal {
+  position: relative;
+  width: 100%;
+  max-width: 440px;
+  background: #ffffff;
+  color: #0f172a;
+  border-radius: 14px;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  box-shadow: 0 20px 35px -10px rgba(0, 0, 0, 0.2), 0 8px 16px -6px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transform: scale(0.92) translateY(10px);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  padding: 20px 20px 16px 20px;
+}
+
+.maintenance-modal-backdrop.show .maintenance-modal {
+  transform: scale(1) translateY(0);
+}
+
+body.dark-mode .maintenance-modal {
+  background: #1e293b;
+  color: #f8fafc;
+  border-color: #334155;
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.6);
+}
+
+.maintenance-close-btn {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: transparent;
+  color: #64748b;
+  font-size: 22px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+  padding: 0;
+}
+
+.maintenance-close-btn:hover {
+  background: rgba(0, 0, 0, 0.06);
+  color: #0f172a;
+}
+
+body.dark-mode .maintenance-close-btn {
+  color: #94a3b8;
+}
+
+body.dark-mode .maintenance-close-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #f8fafc;
+}
+
+.maintenance-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.maintenance-icon-wrap {
+  flex-shrink: 0;
+}
+
+.maintenance-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  background: #fef3c7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  border: 1px solid #fde68a;
+}
+
+body.dark-mode .maintenance-icon {
+  background: rgba(245, 158, 11, 0.18);
+  border-color: rgba(245, 158, 11, 0.35);
+}
+
+.maintenance-text {
+  flex: 1;
+  padding-right: 14px;
+}
+
+.maintenance-title {
+  margin: 0 0 6px 0;
+  font-size: 1.02rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+body.dark-mode .maintenance-title {
+  color: #f8fafc;
+}
+
+.maintenance-desc {
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.45;
+  color: #475569;
+}
+
+body.dark-mode .maintenance-desc {
+  color: #cbd5e1;
+}
+
+.maintenance-desc strong {
+  color: #0284c7;
+}
+
+body.dark-mode .maintenance-desc strong {
+  color: #38bdf8;
+}
+
+.maintenance-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 14px;
+}
+
+.maintenance-confirm-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #0284c7;
+  color: #ffffff;
+  border: none;
+  padding: 6px 14px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.1s ease;
+}
+
+.maintenance-confirm-btn:hover {
+  background: #0369a1;
+}
+
+.maintenance-confirm-btn:active {
+  transform: scale(0.98);
+}
+
+body.dark-mode .maintenance-confirm-btn {
+  background: #0284c7;
+  color: #ffffff;
+}
+
+body.dark-mode .maintenance-confirm-btn:hover {
+  background: #38bdf8;
+  color: #0f172a;
+}
+
+.maintenance-timer-badge {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.22);
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  font-family: monospace;
+}
+
+body.dark-mode .maintenance-confirm-btn:hover .maintenance-timer-badge {
+  background: rgba(0, 0, 0, 0.15);
+}
+
+.maintenance-progress-track {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: rgba(0, 0, 0, 0.06);
+}
+
+body.dark-mode .maintenance-progress-track {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.maintenance-progress-bar {
+  height: 100%;
+  width: 100%;
+  background: #0284c7;
+  transform-origin: left center;
+  transition: width 0.05s linear;
+}
+
+body.dark-mode .maintenance-progress-bar {
+  background: #38bdf8;
+}
+
 
 

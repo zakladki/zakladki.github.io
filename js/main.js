@@ -1020,7 +1020,104 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // === Модальне вікно перегляду CHANGELOG.md ===
   initChangelogModal();
+
+  // === Спливаюче сповіщення про налагоджувальні роботи з таймером (до 2026-10-01) ===
+  initMaintenanceNotice();
 });
+
+// === Спливаюче повідомлення про налагоджувальні роботи з автоматичним таймером ===
+function initMaintenanceNotice() {
+  const expiryDate = new Date("2026-10-01T23:59:59");
+  const now = new Date();
+  if (now > expiryDate) return;
+
+  const backdrop = document.createElement("div");
+  backdrop.id = "maintenanceModalBackdrop";
+  backdrop.className = "maintenance-modal-backdrop";
+  backdrop.innerHTML = `
+    <div class="maintenance-modal" id="maintenanceModal" role="dialog" aria-modal="true" aria-labelledby="maintenanceTitle">
+      <button class="maintenance-close-btn" id="maintenanceCloseBtn" title="Закрити" aria-label="Закрити">&times;</button>
+      <div class="maintenance-content">
+        <div class="maintenance-icon-wrap">
+          <div class="maintenance-icon">🛠️</div>
+        </div>
+        <div class="maintenance-text">
+          <h4 class="maintenance-title" id="maintenanceTitle">Налагоджувальні роботи</h4>
+          <p class="maintenance-desc">
+            На сайті проводяться налагоджувальні роботи, які триватимуть до <strong>2026-10-01</strong>. Усі сервіси та посилання доступні у звичному режимі.
+          </p>
+        </div>
+      </div>
+      <div class="maintenance-actions">
+        <button class="maintenance-confirm-btn" id="maintenanceConfirmBtn">
+          <span>Зрозуміло</span>
+          <span class="maintenance-timer-badge" id="maintenanceTimerBadge">5 с</span>
+        </button>
+      </div>
+      <div class="maintenance-progress-track">
+        <div class="maintenance-progress-bar" id="maintenanceProgressBar"></div>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(backdrop);
+
+  requestAnimationFrame(() => {
+    backdrop.classList.add("show");
+  });
+
+  const totalDuration = 5000;
+  const startTime = Date.now();
+  let closed = false;
+
+  function closeModal() {
+    if (closed) return;
+    closed = true;
+    backdrop.classList.remove("show");
+    setTimeout(() => {
+      if (backdrop.parentNode) {
+        backdrop.parentNode.removeChild(backdrop);
+      }
+    }, 300);
+  }
+
+  const closeBtn = backdrop.querySelector("#maintenanceCloseBtn");
+  const confirmBtn = backdrop.querySelector("#maintenanceConfirmBtn");
+  const timerBadge = backdrop.querySelector("#maintenanceTimerBadge");
+  const progressBar = backdrop.querySelector("#maintenanceProgressBar");
+
+  if (closeBtn) closeBtn.addEventListener("click", closeModal);
+  if (confirmBtn) confirmBtn.addEventListener("click", closeModal);
+  backdrop.addEventListener("click", (e) => {
+    if (e.target === backdrop) closeModal();
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && !closed) closeModal();
+  });
+
+  const timerInterval = setInterval(() => {
+    if (closed) {
+      clearInterval(timerInterval);
+      return;
+    }
+    const elapsed = Date.now() - startTime;
+    const remaining = Math.max(0, totalDuration - elapsed);
+    const secondsLeft = Math.ceil(remaining / 1000);
+
+    if (timerBadge) {
+      timerBadge.textContent = `${secondsLeft} с`;
+    }
+    if (progressBar) {
+      const percentage = (remaining / totalDuration) * 100;
+      progressBar.style.width = `${percentage}%`;
+    }
+
+    if (remaining <= 0) {
+      clearInterval(timerInterval);
+      closeModal();
+    }
+  }, 50);
+}
 
 // === Оптимізований рендерер CHANGELOG.md у модальне вікно ===
 function renderMarkdownToHtml(md) {
