@@ -1051,7 +1051,7 @@ function initMaintenanceNotice() {
       <div class="maintenance-actions">
         <button class="maintenance-confirm-btn" id="maintenanceConfirmBtn">
           <span>Зрозуміло</span>
-          <span class="maintenance-timer-badge" id="maintenanceTimerBadge">5 с</span>
+          <span class="maintenance-timer-badge" id="maintenanceTimerBadge">10 с</span>
         </button>
       </div>
       <div class="maintenance-progress-track">
@@ -1066,7 +1066,7 @@ function initMaintenanceNotice() {
     backdrop.classList.add("show");
   });
 
-  const totalDuration = 5000;
+  const totalDuration = 10000;
   const startTime = Date.now();
   let closed = false;
 
