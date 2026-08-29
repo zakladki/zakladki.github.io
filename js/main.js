@@ -1021,21 +1021,205 @@ document.addEventListener("DOMContentLoaded", () => {
   // === Модальне вікно перегляду CHANGELOG.md ===
   initChangelogModal();
 
-  // === Спливаюче сповіщення про налагоджувальні роботи з таймером (до 2026-10-01) ===
-  initMaintenanceNotice();
+  // === Розумний Дзвіночок сповіщень у шапці сайту ===
+  initNoticeBell();
 });
 
-// === Спливаюче повідомлення про налагоджувальні роботи з автоматичним таймером ===
-function initMaintenanceNotice() {
+// Ключі для localStorage оголошень (змінюються при нових оголошеннях)
+const TOP_NOTICE_ID = "top_zakladki_top_bar_2026_feedback";
+const RIGHT_NOTICE_ID = "top_zakladki_notice_maintenance_2026_10_01";
+
+// Перевірка наявності непрочитаних повідомлень
+function hasUnreadNotices() {
+  try {
+    const isTopUnread = localStorage.getItem(TOP_NOTICE_ID) !== "viewed";
+    const isRightUnread = localStorage.getItem(RIGHT_NOTICE_ID) !== "viewed" && new Date() <= new Date("2026-10-01T23:59:59");
+    return isTopUnread || isRightUnread;
+  } catch (e) {
+    return false;
+  }
+}
+
+// Оновлення стану кнопки дзвіночка (анімація та бейдж)
+function updateNoticeBellState() {
+  const bellBtn = document.getElementById("noticeBellBtn");
+  if (!bellBtn) return;
+  const dot = bellBtn.querySelector(".notice-bell-badge-dot");
+  const unread = hasUnreadNotices();
+
+  if (unread) {
+    bellBtn.classList.add("has-unread");
+    if (dot) dot.style.display = "block";
+  } else {
+    bellBtn.classList.remove("has-unread");
+    if (dot) dot.style.display = "none";
+  }
+}
+
+// === Ініціалізація кнопки-дзвіночка у шапці ===
+function initNoticeBell() {
+  const bellBtn = document.getElementById("noticeBellBtn");
+  if (!bellBtn) return;
+
+  updateNoticeBellState();
+
+  bellBtn.addEventListener("click", () => {
+    openAnnouncementsModal();
+  });
+}
+
+// === Модальне вікно центру оголошень сайту ===
+function openAnnouncementsModal() {
+  let backdrop = document.getElementById('announcementsModalBackdrop');
+  if (!backdrop) {
+    backdrop = document.createElement('div');
+    backdrop.id = 'announcementsModalBackdrop';
+    backdrop.className = 'cl-modal-backdrop';
+    backdrop.innerHTML = `
+      <div class="cl-modal" role="dialog" aria-modal="true" style="max-width: 600px;">
+        <div class="cl-modal-header">
+          <h5 class="cl-modal-title"><i class="fas fa-bell text-warning mr-2"></i> Оголошення та сповіщення</h5>
+          <button type="button" class="btn btn-secondary btn-sm cl-modal-close" aria-label="Закрити">
+            <span>Закрити</span>
+            <span class="cl-modal-close-sep"></span>
+            <span class="cl-modal-close-x">&times;</span>
+          </button>
+        </div>
+        <div class="cl-modal-body" id="announcementsModalBody" style="padding: 20px;">
+          <!-- Картка 1: Для користувачів (Побажання / Чат) -->
+          <div class="announcement-card-item item-user">
+            <div class="announcement-card-header">
+              <span>💡 Формування каталогу</span>
+              <span class="announcement-card-badge badge-user">Для користувачів</span>
+            </div>
+            <div class="announcement-card-body">
+              Поки триває наповнення сайту, ми відкриті до ваших побажань та ідей. Пропонуйте дійсно значущі, перевірені та корисні ресурси у наш 
+              <a href="https://t.me/+1UKue84k2AVjZDcy" target="_blank" class="top-announcement-link" style="font-weight:700;"><i class="fas fa-comments"></i> відкритий ЧАТ</a> (посилання також завжди доступне в нижньому меню сайту).
+            </div>
+          </div>
+
+          <!-- Картка 2: Технічні / Налагоджувальні роботи -->
+          <div class="announcement-card-item item-tech">
+            <div class="announcement-card-header">
+              <span>🛠️ Налагоджувальні роботи</span>
+              <span class="announcement-card-badge badge-tech">Технічне</span>
+            </div>
+            <div class="announcement-card-body">
+              На сайті проводяться регламентні налагоджувальні роботи (триватимуть до <strong>2026-10-01</strong>). Усі сервіси, розділи та посилання каталогу працюють стабільно і доступні без обмежень.
+            </div>
+          </div>
+
+          <div class="text-center pt-2 pb-1">
+            <button type="button" class="btn btn-primary px-4 cl-modal-close font-weight-bold" style="border-radius: 20px;">
+              <i class="fas fa-check mr-1"></i> Зрозуміло
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(backdrop);
+
+    const closeBtns = backdrop.querySelectorAll('.cl-modal-close');
+    closeBtns.forEach(btn => btn.addEventListener('click', closeAnnouncementsModal));
+    backdrop.addEventListener('click', (ev) => {
+      if (ev.target === backdrop) closeAnnouncementsModal();
+    });
+    document.addEventListener('keydown', (ev) => {
+      if (ev.key === 'Escape' && backdrop.classList.contains('show')) {
+        closeAnnouncementsModal();
+      }
+    });
+  }
+
+  // При відкритті відзначаємо всі оголошення як переглянуті
+  try {
+    localStorage.setItem(TOP_NOTICE_ID, "viewed");
+    localStorage.setItem(RIGHT_NOTICE_ID, "viewed");
+  } catch (e) {}
+  updateNoticeBellState();
+
+  backdrop.classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeAnnouncementsModal() {
+  const backdrop = document.getElementById('announcementsModalBackdrop');
+  if (backdrop) {
+    backdrop.classList.remove('show');
+    document.body.style.overflow = '';
+  }
+}
+
+// === ВЕРХНІЙ ІНФОРМЕР / Топ-рядок над шапкою (Top Announcement Bar) ===
+function initTopInformer() {
+  try {
+    if (localStorage.getItem(TOP_NOTICE_ID) === "viewed") return;
+  } catch (e) {
+    // ігноруємо можливу помилку доступу до localStorage
+  }
+
+  const mainContainer = document.querySelector(".container-fluid.main") || document.body;
+  const wrapper = document.createElement("div");
+  wrapper.id = "topInformerWrapper";
+  wrapper.className = "container top-announcement-wrapper";
+  wrapper.innerHTML = `
+    <div class="top-announcement-bar" id="topInformerBar" role="region" aria-label="Оголошення сайту">
+      <div class="top-announcement-content">
+        <span class="top-announcement-icon" aria-hidden="true">💡</span>
+        <div class="top-announcement-text">
+          <strong class="top-announcement-badge">Формування каталогу:</strong>
+          <span class="top-announcement-message">
+            Поки триває наповнення сайту, ми відкриті до ваших побажань та ідей. Пропонуйте дійсно значущі, перевірені та корисні ресурси у наш <a href="https://t.me/+1UKue84k2AVjZDcy" target="_blank" class="top-announcement-link" title="Перейти у відкритий Telegram-чат сайту"><i class="fas fa-comments"></i> відкритий ЧАТ</a> (посилання також доступне в нижньому меню сайту)!
+          </span>
+        </div>
+      </div>
+      <button class="top-announcement-close" id="topInformerCloseBtn" title="Приховати оголошення" aria-label="Закрити">&times;</button>
+    </div>
+  `;
+
+  // Вставляємо на самий початок основного контейнера над закладками
+  if (mainContainer.firstChild) {
+    mainContainer.insertBefore(wrapper, mainContainer.firstChild);
+  } else {
+    mainContainer.appendChild(wrapper);
+  }
+
+  const closeBtn = wrapper.querySelector("#topInformerCloseBtn");
+  if (closeBtn) {
+    closeBtn.addEventListener("click", () => {
+      try {
+        localStorage.setItem(TOP_NOTICE_ID, "viewed");
+      } catch (e) {}
+      updateNoticeBellDot();
+
+      wrapper.classList.add("collapsing-out");
+      setTimeout(() => {
+        if (wrapper.parentNode) {
+          wrapper.parentNode.removeChild(wrapper);
+        }
+      }, 350);
+    });
+  }
+}
+
+// === ПРАВИЙ ІНФОРМЕР / Спливаючий тост у кутку (Floating Toast з таймером та пам'яттю) ===
+function initRightInformer() {
   const expiryDate = new Date("2026-10-01T23:59:59");
   const now = new Date();
-  if (now > expiryDate) return;
 
-  const backdrop = document.createElement("div");
-  backdrop.id = "maintenanceModalBackdrop";
-  backdrop.className = "maintenance-modal-backdrop";
-  backdrop.innerHTML = `
-    <div class="maintenance-modal" id="maintenanceModal" role="dialog" aria-modal="true" aria-labelledby="maintenanceTitle">
+  // Не показувати після закінчення терміну або якщо користувач вже бачив/закрив це оголошення
+  if (now > expiryDate) return;
+  try {
+    if (localStorage.getItem(RIGHT_NOTICE_ID) === "viewed") return;
+  } catch (e) {
+    // ігноруємо можливу помилку доступу до localStorage
+  }
+
+  const container = document.createElement("div");
+  container.id = "maintenanceToastContainer";
+  container.className = "maintenance-toast-container";
+  container.innerHTML = `
+    <div class="maintenance-toast" id="maintenanceToast" role="alert" aria-live="polite">
       <button class="maintenance-close-btn" id="maintenanceCloseBtn" title="Закрити" aria-label="Закрити">&times;</button>
       <div class="maintenance-content">
         <div class="maintenance-icon-wrap">
@@ -1044,14 +1228,14 @@ function initMaintenanceNotice() {
         <div class="maintenance-text">
           <h4 class="maintenance-title" id="maintenanceTitle">Налагоджувальні роботи</h4>
           <p class="maintenance-desc">
-            На сайті проводяться налагоджувальні роботи, які триватимуть до <strong>2026-10-01</strong>. Усі сервіси та посилання доступні у звичному режимі.
+            На сайті проводяться налагоджувальні роботи (триватимуть до <strong>2026-10-01</strong>). Усі сервіси та посилання доступні без обмежень.
           </p>
         </div>
       </div>
       <div class="maintenance-actions">
         <button class="maintenance-confirm-btn" id="maintenanceConfirmBtn">
           <span>Зрозуміло</span>
-          <span class="maintenance-timer-badge" id="maintenanceTimerBadge">10 с</span>
+          <span class="maintenance-timer-badge" id="maintenanceTimerBadge">20 с</span>
         </button>
       </div>
       <div class="maintenance-progress-track">
@@ -1060,39 +1244,58 @@ function initMaintenanceNotice() {
     </div>
   `;
 
-  document.body.appendChild(backdrop);
+  document.body.appendChild(container);
 
+  const toast = container.querySelector("#maintenanceToast");
   requestAnimationFrame(() => {
-    backdrop.classList.add("show");
+    if (toast) toast.classList.add("show");
   });
 
-  const totalDuration = 10000;
-  const startTime = Date.now();
+  const totalDuration = 20000; // 20 секунд
+  let remainingTime = totalDuration;
+  let lastTick = Date.now();
+  let isPaused = false;
   let closed = false;
 
-  function closeModal() {
-    if (closed) return;
-    closed = true;
-    backdrop.classList.remove("show");
-    setTimeout(() => {
-      if (backdrop.parentNode) {
-        backdrop.parentNode.removeChild(backdrop);
-      }
-    }, 300);
+  function markAsViewed() {
+    try {
+      localStorage.setItem(RIGHT_NOTICE_ID, "viewed");
+    } catch (e) {}
+    updateNoticeBellDot();
   }
 
-  const closeBtn = backdrop.querySelector("#maintenanceCloseBtn");
-  const confirmBtn = backdrop.querySelector("#maintenanceConfirmBtn");
-  const timerBadge = backdrop.querySelector("#maintenanceTimerBadge");
-  const progressBar = backdrop.querySelector("#maintenanceProgressBar");
+  function closeToast() {
+    if (closed) return;
+    closed = true;
+    markAsViewed();
 
-  if (closeBtn) closeBtn.addEventListener("click", closeModal);
-  if (confirmBtn) confirmBtn.addEventListener("click", closeModal);
-  backdrop.addEventListener("click", (e) => {
-    if (e.target === backdrop) closeModal();
-  });
+    if (toast) toast.classList.remove("show");
+    setTimeout(() => {
+      if (container.parentNode) {
+        container.parentNode.removeChild(container);
+      }
+    }, 350);
+  }
+
+  const closeBtn = container.querySelector("#maintenanceCloseBtn");
+  const confirmBtn = container.querySelector("#maintenanceConfirmBtn");
+  const timerBadge = container.querySelector("#maintenanceTimerBadge");
+  const progressBar = container.querySelector("#maintenanceProgressBar");
+
+  if (closeBtn) closeBtn.addEventListener("click", closeToast);
+  if (confirmBtn) confirmBtn.addEventListener("click", closeToast);
+
+  // Пауза зворотного відліку при наведенні курсора для зручного читання
+  if (toast) {
+    toast.addEventListener("mouseenter", () => { isPaused = true; });
+    toast.addEventListener("mouseleave", () => {
+      isPaused = false;
+      lastTick = Date.now();
+    });
+  }
+
   document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && !closed) closeModal();
+    if (e.key === "Escape" && !closed) closeToast();
   });
 
   const timerInterval = setInterval(() => {
@@ -1100,21 +1303,27 @@ function initMaintenanceNotice() {
       clearInterval(timerInterval);
       return;
     }
-    const elapsed = Date.now() - startTime;
-    const remaining = Math.max(0, totalDuration - elapsed);
-    const secondsLeft = Math.ceil(remaining / 1000);
 
-    if (timerBadge) {
-      timerBadge.textContent = `${secondsLeft} с`;
-    }
-    if (progressBar) {
-      const percentage = (remaining / totalDuration) * 100;
-      progressBar.style.width = `${percentage}%`;
-    }
+    const currentNow = Date.now();
+    const delta = currentNow - lastTick;
+    lastTick = currentNow;
 
-    if (remaining <= 0) {
-      clearInterval(timerInterval);
-      closeModal();
+    if (!isPaused) {
+      remainingTime = Math.max(0, remainingTime - delta);
+      const secondsLeft = Math.ceil(remainingTime / 1000);
+
+      if (timerBadge) {
+        timerBadge.textContent = `${secondsLeft} с`;
+      }
+      if (progressBar) {
+        const percentage = (remainingTime / totalDuration) * 100;
+        progressBar.style.width = `${percentage}%`;
+      }
+
+      if (remainingTime <= 0) {
+        clearInterval(timerInterval);
+        closeToast();
+      }
     }
   }, 50);
 }
