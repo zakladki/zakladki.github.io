@@ -1076,21 +1076,20 @@ function openAnnouncementsModal() {
     backdrop.id = 'announcementsModalBackdrop';
     backdrop.className = 'cl-modal-backdrop';
     backdrop.innerHTML = `
-      <div class="cl-modal" role="dialog" aria-modal="true" style="max-width: 600px;">
-        <div class="cl-modal-header">
-          <h5 class="cl-modal-title"><i class="fas fa-bell text-warning mr-2"></i> Оголошення та сповіщення</h5>
+      <div class="cl-modal announcements-modal" role="dialog" aria-modal="true" style="max-width: 580px;">
+        <div class="cl-modal-header announcements-modal-header">
+          <h5 class="cl-modal-title"><i class="fas fa-bell text-warning mr-2"></i> Оголошення</h5>
           <button type="button" class="btn btn-secondary btn-sm cl-modal-close" aria-label="Закрити">
             <span>Закрити</span>
             <span class="cl-modal-close-sep"></span>
             <span class="cl-modal-close-x">&times;</span>
           </button>
         </div>
-        <div class="cl-modal-body" id="announcementsModalBody" style="padding: 20px;">
+        <div class="cl-modal-body announcements-modal-body" id="announcementsModalBody">
           <!-- Картка 1: Для користувачів (Побажання / Чат) -->
           <div class="announcement-card-item item-user">
             <div class="announcement-card-header">
               <span>💡 Формування каталогу</span>
-              <span class="announcement-card-badge badge-user">Для користувачів</span>
             </div>
             <div class="announcement-card-body">
               Поки триває наповнення сайту, ми відкриті до ваших побажань та ідей. Пропонуйте дійсно значущі, перевірені та корисні ресурси у наш 
@@ -1102,7 +1101,6 @@ function openAnnouncementsModal() {
           <div class="announcement-card-item item-tech">
             <div class="announcement-card-header">
               <span>🛠️ Налагоджувальні роботи</span>
-              <span class="announcement-card-badge badge-tech">Технічне</span>
             </div>
             <div class="announcement-card-body">
               На сайті проводяться регламентні налагоджувальні роботи (триватимуть до <strong>2026-10-01</strong>). Усі сервіси, розділи та посилання каталогу працюють стабільно і доступні без обмежень.

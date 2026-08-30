@@ -31,7 +31,7 @@
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
     <link rel="apple-touch-icon" href="favicon.ico">
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    
     <!-- Bootstrap CSS-->
     <link href="styles/bootstrap.min.css" rel="stylesheet">
     <link href="styles/all.css" rel="stylesheet">
@@ -42,6 +42,39 @@
     <link href="styles/animation.css" rel="stylesheet">
     <link href="styles/menu_button.css" rel="stylesheet">
     <title>Магазини - ЗАКЛАДКИ - ТОП Популярних Сайтів</title>
+      <!-- Critical CSS for instant Navbar rendering without layout shift / FOUC -->
+    <style>
+      .navbar, .nav-container { position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; background-color: #1e293b; }
+      @media (max-width: 1199.98px) {
+        .navbar, .nav-container { height: 42px; display: block; }
+        .mobile-navbar-title {
+          position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+          color: #ffffff; font-weight: 600; font-size: 0.9rem; background-color: rgba(255, 255, 255, 0.08);
+          padding: 3px 10px; border-radius: 6px; white-space: nowrap; z-index: 1040; letter-spacing: 0.02em; display: block !important;
+        }
+      }
+      @media (min-width: 1200px) {
+        .mobile-navbar-title { display: none !important; }
+      }
+      .theme-toggle-btn {
+        position: absolute !important; left: 12px !important; right: auto !important; top: 50% !important;
+        transform: translateY(-50%) !important; width: 30px !important; height: 30px !important; border-radius: 7px !important;
+        background: rgba(255, 255, 255, 0.16) !important; border: 1px solid rgba(255, 255, 255, 0.3) !important;
+        color: #ffffff !important; display: inline-flex !important; align-items: center !important; justify-content: center !important;
+        padding: 0 !important; margin: 0 !important; cursor: pointer; z-index: 1050 !important; font-size: 0.95rem; line-height: 1; outline: none;
+      }
+      .notice-bell-btn {
+        position: absolute !important; left: 48px !important; right: auto !important; top: 50% !important;
+        transform: translateY(-50%) !important; width: 30px !important; height: 30px !important; border-radius: 7px !important;
+        background: rgba(255, 255, 255, 0.16) !important; border: 1px solid rgba(255, 255, 255, 0.3) !important;
+        color: #ffffff !important; display: inline-flex !important; align-items: center !important; justify-content: center !important;
+        padding: 0 !important; margin: 0 !important; cursor: pointer; z-index: 1050 !important; font-size: 0.95rem; line-height: 1; outline: none;
+      }
+      .hamburger {
+        position: absolute !important; top: 50% !important; transform: translateY(-50%) scale(0.7) !important;
+        right: 12px !important; z-index: 1050 !important; transform-origin: right center !important; padding: 6px !important; margin: 0 !important;
+      }
+    </style>
   </head>
   <body>
     <div class="container nav-container">
@@ -51,7 +84,7 @@
             <div class="hamburger-inner"></div>
           </div>
         </div>
-        <div class="mobile-navbar-title d-md-none">ТОП-ЗАКЛАДКИ</div>
+        <div class="mobile-navbar-title">МАГАЗИНИ</div>
         <div class="collapse navbar-collapse text-center justify-content-center flex-grow-1" id="navbarCollapse">
           <ul class="nav nav-pills mb-0 navbar-nav mx-auto justify-content-center">
                           <li class="nav-item"><a class="nav-link " href="./">Головна</a></li>
@@ -69,8 +102,8 @@
                           <li class="nav-item"><a class="nav-link" href="./programs.html">Soft</a></li>
             </ul>
         </div>
-        <button id="themeToggle" class="theme-toggle-btn ml-auto" aria-label="Переключити тему" title="Переключити тему (світла/темна)"><i class="fas fa-moon"></i></button>
-        <button id="noticeBellBtn" class="notice-bell-btn" aria-label="Оголошення та сповіщення" title="Оголошення та сповіщення"><i class="fas fa-bell"></i><span class="notice-bell-badge-dot"></span></button>
+        <button id="themeToggle" class="theme-toggle-btn" aria-label="Переключити тему" title="Переключити тему (світла/темна)"><i class="fas fa-moon"></i></button>
+        <button id="noticeBellBtn" class="notice-bell-btn" aria-label="Оголошення" title="Оголошення"><i class="fas fa-bell"></i><span class="notice-bell-badge-dot"></span></button>
       </nav>
     </div>
     <div class="container-fluid main">
@@ -369,7 +402,7 @@
             </div>
             <div class="col-sm">
               <div class="group cat-shops">
-                <div class="group-title"><span class="badge badge-success">Здоровя</span></div>
+                <div class="group-title"><span class="badge badge-success">Здоров'я / Аптеки</span></div>
                 <ul>
                   <li>
                     <div class="icon liki24 com"></div><a href="https://liki24.com/" target="_blank" title="Головний сервіс порівняння цін, пошуку та замовлення доставки ліків з аптек України.">Liki24.com</a>
@@ -470,6 +503,7 @@
         </div>
       </div>
     </footer>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
     <script src="js/main.js"></script>
