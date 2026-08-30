@@ -2138,6 +2138,67 @@ body.dark-mode .announcement-card-body {
   color: #cbd5e1;
 }
 
+.announcement-card-footer {
+  display: flex;
+  align-items: center;
+  margin-top: 6px;
+  font-size: 0.76rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: #64748b;
+  border-top: 1px dashed rgba(0, 0, 0, 0.08);
+  padding-top: 5px;
+}
+
+body.dark-mode .announcement-card-footer {
+  color: #94a3b8;
+  border-top-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Стан без оголошень (Empty State) */
+.announcements-empty-state {
+  text-align: center;
+  padding: 24px 16px 20px;
+  background: var(--card-bg, #ffffff);
+  border: 1px solid var(--border-color, rgba(0, 0, 0, 0.08));
+  border-radius: 8px;
+  margin-bottom: 12px;
+}
+
+body.dark-mode .announcements-empty-state {
+  background: rgba(30, 41, 59, 0.6);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.announcements-empty-state .empty-icon {
+  font-size: 2rem;
+  color: #94a3b8;
+  margin-bottom: 10px;
+}
+
+.announcements-empty-state .empty-title {
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--text-main, #1e293b);
+  margin-bottom: 6px;
+}
+
+body.dark-mode .announcements-empty-state .empty-title {
+  color: #f1f5f9;
+}
+
+.announcements-empty-state .empty-desc {
+  font-size: 0.88rem;
+  line-height: 1.45;
+  color: var(--text-muted, #64748b);
+  margin: 0 auto;
+  max-width: 380px;
+}
+
+body.dark-mode .announcements-empty-state .empty-desc {
+  color: #94a3b8;
+}
+
 
 
 

@@ -1025,16 +1025,103 @@ document.addEventListener("DOMContentLoaded", () => {
   initNoticeBell();
 });
 
-// Ключі для localStorage оголошень (змінюються при нових оголошеннях)
-const TOP_NOTICE_ID = "top_zakladki_top_bar_2026_feedback";
-const RIGHT_NOTICE_ID = "top_zakladki_notice_maintenance_2026_10_01";
+// ==========================================================================
+// КОНФІГУРАЦІЯ ОГОЛОШЕНЬ ТА СПОВІЩЕНЬ САЙТУ
+// ==========================================================================
+// Правила для endDate:
+// 1) "YYYY-MM-DD" -> оголошення діє строго до кінця зазначеного дня
+// 2) "unlimited" (або не вказано/null) -> безстрокове оголошення
+// 3) Якщо endDate: "default" або не вказано -> автоматично +10 днів від startDate
+// ==========================================================================
+const SITE_ANNOUNCEMENTS = [
+  {
+    id: "notice_feedback_catalog_2026",
+    type: "user", // "user" (синій) або "tech" (бурштиновий)
+    title: "💡 Формування каталогу",
+    text: `Поки триває наповнення сайту, ми відкриті до ваших побажань та ідей. Пропонуйте дійсно значущі, перевірені та корисні ресурси у наш <a href="https://t.me/+1UKue84k2AVjZDcy" target="_blank" class="top-announcement-link" style="font-weight:700;"><i class="fas fa-comments"></i> відкритий ЧАТ</a> (посилання також завжди доступне в нижньому меню сайту).`,
+    startDate: "2026-08-29",
+    endDate: "2027-01-01" // До 2027-01-01 включно
+  },
+  {
+    id: "notice_maintenance_2026_10_01",
+    type: "tech",
+    title: "🛠️ Налагоджувальні роботи",
+    text: `На сайті проводяться регламентні налагоджувальні роботи (триватимуть до <strong>2026-10-01</strong>). Усі сервіси, розділи та посилання каталогу працюють стабільно і доступні без обмежень.`,
+    startDate: "2026-08-29",
+    endDate: "2026-10-01" // До конкретної дати включно
+  }
+];
 
-// Перевірка наявності непрочитаних повідомлень
+// Допоміжна функція: розрахунок та перевірка актуальності оголошення
+function getAnnouncementExpiryInfo(announcement) {
+  const now = new Date();
+  const start = new Date(announcement.startDate + "T00:00:00");
+  
+  if (announcement.endDate === "unlimited" || !announcement.endDate) {
+    return {
+      isActive: now >= start,
+      expiryLabel: "Термін дії: необмежений",
+      isUnlimited: true,
+      endDateObj: new Date("2099-12-31T23:59:59")
+    };
+  }
+
+  let end;
+  if (announcement.endDate === "default" || announcement.endDate === "10days") {
+    end = new Date(start.getTime() + (10 * 24 * 60 * 60 * 1000));
+    end.setHours(23, 59, 59, 999);
+  } else {
+    end = new Date(announcement.endDate + "T23:59:59");
+  }
+
+  const isActive = now >= start && now <= end;
+  const formattedEndDate = end.toISOString().split("T")[0];
+
+  return {
+    isActive,
+    expiryLabel: `Термін дії: до ${formattedEndDate}`,
+    isUnlimited: false,
+    endDateObj: end
+  };
+}
+
+// Отримання списку всіх активних на поточний момент оголошень з розумним сортуванням
+// 1. Непрочитані оголошення завжди показуються вище за вже прочитані
+// 2. Новіші за датою старту (startDate) показуються вище
+function getActiveAnnouncements() {
+  const active = SITE_ANNOUNCEMENTS.filter(item => {
+    const info = getAnnouncementExpiryInfo(item);
+    return info.isActive;
+  });
+
+  return active.sort((a, b) => {
+    const aUnread = localStorage.getItem("top_zakladki_read_" + a.id) !== "viewed";
+    const bUnread = localStorage.getItem("top_zakladki_read_" + b.id) !== "viewed";
+    
+    // Пріоритет 1: Непрочитані зверху
+    if (aUnread && !bUnread) return -1;
+    if (!aUnread && bUnread) return 1;
+
+    // Пріоритет 2: Свіжіші оголошення (за датою старту) зверху
+    const dateA = new Date(a.startDate + "T00:00:00").getTime();
+    const dateB = new Date(b.startDate + "T00:00:00").getTime();
+    if (dateB !== dateA) {
+      return dateB - dateA;
+    }
+
+    // Пріоритет 3: Терміновіші (з ближчим дедлайном) вище безстрокових
+    const infoA = getAnnouncementExpiryInfo(a);
+    const infoB = getAnnouncementExpiryInfo(b);
+    return infoA.endDateObj.getTime() - infoB.endDateObj.getTime();
+  });
+}
+
+// Перевірка наявності хоча б одного непрочитаного оголошення
 function hasUnreadNotices() {
   try {
-    const isTopUnread = localStorage.getItem(TOP_NOTICE_ID) !== "viewed";
-    const isRightUnread = localStorage.getItem(RIGHT_NOTICE_ID) !== "viewed" && new Date() <= new Date("2026-10-01T23:59:59");
-    return isTopUnread || isRightUnread;
+    const active = getActiveAnnouncements();
+    if (active.length === 0) return false;
+    return active.some(item => localStorage.getItem("top_zakladki_read_" + item.id) !== "viewed");
   } catch (e) {
     return false;
   }
@@ -1068,6 +1155,41 @@ function initNoticeBell() {
   });
 }
 
+// Генерація HTML-коду активних карток оголошень
+function renderAnnouncementsCardsHtml() {
+  const active = getActiveAnnouncements();
+  
+  if (active.length === 0) {
+    return `
+      <div class="announcements-empty-state">
+        <div class="empty-icon"><i class="fas fa-bell-slash"></i></div>
+        <h6 class="empty-title">Нових оголошень немає</h6>
+        <p class="empty-desc">Наразі всі системи та сервіси каталогу працюють у штатному режимі, актуальні повідомлення відсутні.</p>
+      </div>
+    `;
+  }
+
+  return active.map(item => {
+    const expiry = getAnnouncementExpiryInfo(item);
+    const itemClass = item.type === "tech" ? "item-tech" : "item-user";
+    const iconType = item.type === "tech" ? "fa-calendar-alt" : (expiry.isUnlimited ? "fa-infinity" : "fa-calendar-alt");
+    
+    return `
+      <div class="announcement-card-item ${itemClass}">
+        <div class="announcement-card-header">
+          <span>${item.title}</span>
+        </div>
+        <div class="announcement-card-body">
+          ${item.text}
+        </div>
+        <div class="announcement-card-footer">
+          <i class="fas ${iconType} mr-1"></i> ${expiry.expiryLabel}
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+
 // === Модальне вікно центру оголошень сайту ===
 function openAnnouncementsModal() {
   let backdrop = document.getElementById('announcementsModalBackdrop');
@@ -1086,27 +1208,9 @@ function openAnnouncementsModal() {
           </button>
         </div>
         <div class="cl-modal-body announcements-modal-body" id="announcementsModalBody">
-          <!-- Картка 1: Для користувачів (Побажання / Чат) -->
-          <div class="announcement-card-item item-user">
-            <div class="announcement-card-header">
-              <span>💡 Формування каталогу</span>
-            </div>
-            <div class="announcement-card-body">
-              Поки триває наповнення сайту, ми відкриті до ваших побажань та ідей. Пропонуйте дійсно значущі, перевірені та корисні ресурси у наш 
-              <a href="https://t.me/+1UKue84k2AVjZDcy" target="_blank" class="top-announcement-link" style="font-weight:700;"><i class="fas fa-comments"></i> відкритий ЧАТ</a> (посилання також завжди доступне в нижньому меню сайту).
-            </div>
+          <div id="announcementsContentContainer">
+            ${renderAnnouncementsCardsHtml()}
           </div>
-
-          <!-- Картка 2: Технічні / Налагоджувальні роботи -->
-          <div class="announcement-card-item item-tech">
-            <div class="announcement-card-header">
-              <span>🛠️ Налагоджувальні роботи</span>
-            </div>
-            <div class="announcement-card-body">
-              На сайті проводяться регламентні налагоджувальні роботи (триватимуть до <strong>2026-10-01</strong>). Усі сервіси, розділи та посилання каталогу працюють стабільно і доступні без обмежень.
-            </div>
-          </div>
-
           <div class="text-center pt-2 pb-1">
             <button type="button" class="btn btn-primary px-4 cl-modal-close font-weight-bold" style="border-radius: 20px;">
               <i class="fas fa-check mr-1"></i> Зрозуміло
@@ -1127,12 +1231,20 @@ function openAnnouncementsModal() {
         closeAnnouncementsModal();
       }
     });
+  } else {
+    // Оновлюємо контент при кожному відкритті (перевірка актуальності)
+    const container = document.getElementById('announcementsContentContainer');
+    if (container) {
+      container.innerHTML = renderAnnouncementsCardsHtml();
+    }
   }
 
-  // При відкритті відзначаємо всі оголошення як переглянуті
+  // При відкритті позначаємо всі діючі оголошення як прочитані
   try {
-    localStorage.setItem(TOP_NOTICE_ID, "viewed");
-    localStorage.setItem(RIGHT_NOTICE_ID, "viewed");
+    const active = getActiveAnnouncements();
+    active.forEach(item => {
+      localStorage.setItem("top_zakladki_read_" + item.id, "viewed");
+    });
   } catch (e) {}
   updateNoticeBellState();
 
