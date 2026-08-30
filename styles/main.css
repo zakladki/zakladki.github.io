@@ -2117,11 +2117,53 @@ body.dark-mode .announcement-card-item.item-user {
 .announcement-card-header {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 8px;
   font-weight: 700;
   font-size: 0.98rem;
   margin-bottom: 4px;
   color: var(--text-main, #1e293b);
+}
+
+.announcement-new-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: #ffffff !important;
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  padding: 2px 7px;
+  border-radius: 12px;
+  box-shadow: 0 1px 4px rgba(220, 38, 38, 0.35);
+  animation: pulseNewBadge 2s infinite ease-in-out;
+  white-space: nowrap;
+}
+
+@keyframes pulseNewBadge {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.05); opacity: 0.92; }
+}
+
+.announcement-card-item.is-unread {
+  background: rgba(2, 132, 199, 0.04);
+  border-color: rgba(2, 132, 199, 0.25);
+}
+
+.announcement-card-item.is-unread.item-tech {
+  background: rgba(245, 158, 11, 0.04);
+  border-color: rgba(245, 158, 11, 0.28);
+}
+
+body.dark-mode .announcement-card-item.is-unread {
+  background: rgba(56, 189, 248, 0.08);
+  border-color: rgba(56, 189, 248, 0.3);
+}
+
+body.dark-mode .announcement-card-item.is-unread.item-tech {
+  background: rgba(245, 158, 11, 0.08);
+  border-color: rgba(245, 158, 11, 0.35);
 }
 
 body.dark-mode .announcement-card-header {

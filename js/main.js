@@ -1171,13 +1171,15 @@ function renderAnnouncementsCardsHtml() {
 
   return active.map(item => {
     const expiry = getAnnouncementExpiryInfo(item);
-    const itemClass = item.type === "tech" ? "item-tech" : "item-user";
+    const isUnread = localStorage.getItem("top_zakladki_read_" + item.id) !== "viewed";
+    const itemClass = (item.type === "tech" ? "item-tech" : "item-user") + (isUnread ? " is-unread" : "");
     const iconType = item.type === "tech" ? "fa-calendar-alt" : (expiry.isUnlimited ? "fa-infinity" : "fa-calendar-alt");
     
     return `
       <div class="announcement-card-item ${itemClass}">
         <div class="announcement-card-header">
           <span>${item.title}</span>
+          ${isUnread ? '<span class="announcement-new-badge"><i class="fas fa-sparkles"></i> НОВЕ</span>' : ''}
         </div>
         <div class="announcement-card-body">
           ${item.text}
