@@ -2184,17 +2184,19 @@ body.dark-mode .announcement-card-body {
   display: flex;
   align-items: center;
   margin-top: 6px;
-  font-size: 0.76rem;
-  font-weight: 600;
+  font-size: 0.73rem;
+  font-weight: 500;
   letter-spacing: 0.01em;
-  color: #64748b;
-  border-top: 1px dashed rgba(0, 0, 0, 0.08);
-  padding-top: 5px;
+  color: #94a3b8;
+  border-top: 1px dashed rgba(0, 0, 0, 0.06);
+  padding-top: 4px;
+  opacity: 0.85;
 }
 
 body.dark-mode .announcement-card-footer {
-  color: #94a3b8;
-  border-top-color: rgba(255, 255, 255, 0.1);
+  color: #64748b;
+  border-top-color: rgba(255, 255, 255, 0.06);
+  opacity: 0.85;
 }
 
 /* Стан без оголошень (Empty State) */
