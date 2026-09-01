@@ -1346,6 +1346,9 @@ body.dark-mode .radio-legion-item.playing .radio-play-btn:hover {
   transition: opacity 0.25s ease, visibility 0.25s ease;
   overflow: hidden;
 }
+#clModalBackdrop {
+  z-index: 10600;
+}
 .cl-modal-backdrop.show {
   opacity: 1;
   visibility: visible;

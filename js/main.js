@@ -1046,7 +1046,7 @@ const SITE_ANNOUNCEMENTS = [
     id: "notice_maintenance_2026_10_01",
     type: "tech",
     title: "🛠️ Налагоджувальні роботи",
-    text: `На сайті проводяться регламентні налагоджувальні роботи (триватимуть до <strong>2026-10-01</strong>). Усі сервіси, розділи та посилання каталогу працюють стабільно і доступні без обмежень.`,
+    text: `На сайті проводяться регламентні налагоджувальні роботи. Усі сервіси, розділи та посилання каталогу працюють стабільно і доступні без обмежень. Дізнатися про всі останні зміни та оновлення каталогу можна за посиланням <a href="CHANGELOG.md" class="top-announcement-link changelog-link" title="Відкрити історію оновлень" style="font-weight:700;">«Що нового?»</a> (також завжди доступне внизу сайту).`,
     startDate: "2026-08-29",
     endDate: "2026-10-01" // До конкретної дати включно
   }
@@ -1258,7 +1258,9 @@ function closeAnnouncementsModal() {
   const backdrop = document.getElementById('announcementsModalBackdrop');
   if (backdrop) {
     backdrop.classList.remove('show');
-    document.body.style.overflow = '';
+    if (!document.querySelector('.cl-modal-backdrop.show')) {
+      document.body.style.overflow = '';
+    }
   }
 }
 
@@ -1610,7 +1612,9 @@ function closeChangelogModal() {
   const backdrop = document.getElementById('clModalBackdrop');
   if (backdrop) {
     backdrop.classList.remove('show');
-    document.body.style.overflow = '';
+    if (!document.querySelector('.cl-modal-backdrop.show')) {
+      document.body.style.overflow = '';
+    }
   }
 }
 
