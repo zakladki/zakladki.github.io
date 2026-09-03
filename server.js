@@ -41,8 +41,16 @@ app.get('/api/radio', (req, res) => {
   });
 });
 
-// Serve static files from root
-app.use(express.static(__dirname));
+// Serve static files from root with no-cache for HTML
+app.use(express.static(__dirname, {
+  setHeaders: (res, filePath) => {
+    if (filePath.endsWith('.html')) {
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
+    }
+  }
+}));
 
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server running on http://0.0.0.0:${PORT}`);
