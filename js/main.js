@@ -925,8 +925,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // === 2. НИЖНІЙ МУЛЬТИПЛЕКС ПЕРЕД ФУТЕРОМ (На всіх сторінках, окрім Головної, і тільки для ПК екранів >= 1200px) ===
-  if (!isHomepage && screenWidth >= 1200) {
+  // === 2. НИЖНІЙ МУЛЬТИПЛЕКС ПЕРЕД ФУТЕРОМ (На всіх сторінках, окрім Головної, і тільки для ПК екранів >= 1230px) ===
+  if (!isHomepage && screenWidth >= 1230) {
     const footer = document.querySelector('footer.footer');
     if (footer) {
       const multiplexContainer = document.createElement('div');
