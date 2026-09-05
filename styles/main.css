@@ -325,6 +325,51 @@ body {
   align-items: center;
 }
 
+/* Dual link cabinet sub-link styling */
+.group li .link-sep {
+  display: none;
+}
+
+.group li .sub-link {
+  font-size: 0.82rem;
+  font-weight: 500;
+  margin-left: 0.35rem;
+  padding: 0.1rem 0.45rem;
+  border-radius: 4px;
+  background-color: rgba(59, 130, 246, 0.1);
+  color: #2563eb !important;
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  white-space: nowrap;
+  text-decoration: none;
+  transition: all 0.15s ease;
+  line-height: 1.2;
+  flex-shrink: 0;
+}
+
+.group li .sub-link:hover {
+  background-color: #2563eb;
+  color: #ffffff !important;
+  border-color: #2563eb;
+  text-decoration: none;
+}
+
+/* Dark mode adjustments for sub-link */
+body.dark-mode .group li .sub-link {
+  background-color: rgba(59, 130, 246, 0.2);
+  color: #93c5fd !important;
+  border-color: rgba(59, 130, 246, 0.35);
+}
+
+body.dark-mode .group li .sub-link:hover {
+  background-color: #3b82f6;
+  color: #ffffff !important;
+  border-color: #3b82f6;
+}
+
+body.dark-mode .group li .link-sep {
+  color: #64748b;
+}
+
 .opisi {
   font-size: 0.8rem;
   color: #64748b;
