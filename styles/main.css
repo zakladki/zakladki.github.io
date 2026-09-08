@@ -348,6 +348,7 @@ body {
   flex-shrink: 0;
   opacity: 0.55;
   font-size: 0; /* hides raw text if any remains */
+  line-height: 0;
   position: relative;
   vertical-align: middle;
 }
@@ -356,9 +357,9 @@ body {
 .group li .sub-link::before,
 .sub-link::before {
   content: '';
-  display: inline-block;
-  width: 14px;
-  height: 14px;
+  display: block;
+  width: 16px;
+  height: 16px;
   background-color: currentColor;
   -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/%3E%3C/svg%3E") no-repeat center / contain;
   mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/%3E%3C/svg%3E") no-repeat center / contain;
@@ -1831,6 +1832,18 @@ body.dark-mode .cl-modal-body .cl-calendar-prefix {
 #badgesModalBackdrop {
   z-index: 10650;
 }
+#badgesModalBackdrop .cl-modal-body {
+  padding: 16px 12px;
+  background-color: #f8fafc;
+}
+body.dark-mode #badgesModalBackdrop .cl-modal-body {
+  background-color: #0f172a;
+}
+@media (max-width: 576px) {
+  #badgesModalBackdrop .cl-modal-body {
+    padding: 12px 10px;
+  }
+}
 .badges-legend-list {
   display: flex;
   flex-direction: column;
@@ -1843,21 +1856,25 @@ body.dark-mode .cl-modal-body .cl-calendar-prefix {
   gap: 8px;
   padding: 12px 14px;
   border-radius: 10px;
-  background: rgba(0, 0, 0, 0.02);
-  border: 1px solid var(--border-color, rgba(0, 0, 0, 0.08));
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
   transition: all 0.2s ease;
 }
 .badges-legend-item:hover {
-  background: rgba(0, 0, 0, 0.04);
-  border-color: var(--border-color, rgba(0, 0, 0, 0.15));
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.16);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.06);
 }
 body.dark-mode .badges-legend-item {
-  background: rgba(255, 255, 255, 0.03);
+  background: #1e293b;
   border-color: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 body.dark-mode .badges-legend-item:hover {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.15);
+  background: #242e42;
+  border-color: rgba(255, 255, 255, 0.16);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
 }
 .badges-legend-header {
   display: flex;
@@ -1865,27 +1882,29 @@ body.dark-mode .badges-legend-item:hover {
   gap: 12px;
 }
 .badges-legend-preview {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 76px;
-  min-width: 76px;
-  height: 38px;
-  padding: 0 4px;
-  border-radius: 8px;
-  background: var(--card-bg, #ffffff);
-  border: 1px dashed rgba(0, 0, 0, 0.15);
+  width: auto;
+  min-width: 26px;
+  height: auto;
+  min-height: 26px;
+  padding: 0;
+  background: transparent;
+  border: none;
   flex-shrink: 0;
 }
 body.dark-mode .badges-legend-preview {
-  background: rgba(15, 23, 42, 0.6);
-  border-color: rgba(255, 255, 255, 0.15);
+  background: transparent;
+  border: none;
 }
 .badges-legend-info {
   flex: 1;
   min-width: 0;
 }
 .badges-legend-title {
+  flex: 1;
+  min-width: 0;
   font-weight: 700;
   font-size: 0.96rem;
   line-height: 1.3;
@@ -1925,6 +1944,7 @@ body.dark-mode .badges-legend-desc {
   flex-shrink: 0;
   opacity: 0.55;
   font-size: 0; /* приховує текст TT */
+  line-height: 0;
   position: relative;
   vertical-align: middle;
   cursor: help;
@@ -1935,9 +1955,9 @@ body.dark-mode .badges-legend-desc {
 .group li .torrent-badge::before,
 .torrent-badge::before {
   content: '';
-  display: inline-block;
-  width: 14px;
-  height: 14px;
+  display: block;
+  width: 16px;
+  height: 16px;
   background-color: currentColor;
   -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M4 2h4v4H4zm12 0h4v4h-4zm-12 5.5h4V10a4 4 0 0 0 8 0V7.5h4V10a8 8 0 0 1-16 0z'/%3E%3C/svg%3E") no-repeat center / contain;
   mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M4 2h4v4H4zm12 0h4v4h-4zm-12 5.5h4V10a4 4 0 0 0 8 0V7.5h4V10a8 8 0 0 1-16 0z'/%3E%3C/svg%3E") no-repeat center / contain;
@@ -2014,6 +2034,7 @@ body.dark-mode .torrent-badge:hover {
   flex-shrink: 0;
   opacity: 0.55;
   font-size: 0;
+  line-height: 0;
   position: relative;
   vertical-align: middle;
   cursor: pointer;
@@ -2037,9 +2058,9 @@ body.dark-mode .torrent-badge:hover {
 .group li .auth-badge::before, .auth-badge::before, .group li .lock-badge::before, .lock-badge::before,
 .group li .opensource-badge::before, .opensource-badge::before, .group li .free-badge::before, .free-badge::before {
   content: '';
-  display: inline-block;
-  width: 14px;
-  height: 14px;
+  display: block;
+  width: 16px;
+  height: 16px;
   background-color: currentColor;
   transition: transform 0.15s ease;
 }
@@ -2104,10 +2125,10 @@ body.dark-mode .torrent-badge:hover {
   transform: scale(1.1);
 }
 
-/* 4. Дзеркало сайту / Альтернативний домен (🔀) */
+/* 4. Дзеркало сайту / Альтернативний домен (⑂ розгалуження шляху / альтернативний маршрут) */
 .group li .mirror-badge::before, .mirror-badge::before {
-  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M6.99 11L3 15l3.99 4v-3H14v-2H6.99v-3zM21 9l-3.99-4v3H10v2h7.01v3L21 9z'/%3E%3C/svg%3E") no-repeat center / contain;
-  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M6.99 11L3 15l3.99 4v-3H14v-2H6.99v-3zM21 9l-3.99-4v3H10v2h7.01v3L21 9z'/%3E%3C/svg%3E") no-repeat center / contain;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M14 4l2.29 2.29-2.88 2.88 1.42 1.42 2.88-2.88L20 10V4h-6zm-4 0H4v6l2.29-2.29 4.71 4.7V20h2v-8.41l-5.29-5.3L10 4z'/%3E%3C/svg%3E") no-repeat center / contain;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M14 4l2.29 2.29-2.88 2.88 1.42 1.42 2.88-2.88L20 10V4h-6zm-4 0H4v6l2.29-2.29 4.71 4.7V20h2v-8.41l-5.29-5.3L10 4z'/%3E%3C/svg%3E") no-repeat center / contain;
 }
 .group li .mirror-badge:hover, .mirror-badge:hover {
   opacity: 1;

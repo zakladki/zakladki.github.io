@@ -1649,8 +1649,8 @@ function openBadgesModal() {
             <span class="cl-modal-close-x">&times;</span>
           </button>
         </div>
-        <div class="cl-modal-body" style="padding: 18px 20px;">
-          <p class="text-muted mb-3" style="font-size: 0.9rem; line-height: 1.45; font-style: italic;">Розшифровка спеціальних інтерактивних позначок та індикаторів:</p>
+        <div class="cl-modal-body" style="padding: 16px 10px;">
+          <p class="text-muted mb-3" style="font-size: 0.9rem; line-height: 1.45; font-style: italic; padding: 0 2px;">Розшифровка спеціальних інтерактивних позначок та індикаторів:</p>
           
           <div class="badges-legend-list">
             <!-- 1. Особистий кабінет -->
