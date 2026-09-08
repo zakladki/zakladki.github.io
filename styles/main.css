@@ -330,40 +330,83 @@ body {
   display: none;
 }
 
-.group li .sub-link {
-  font-size: 0.82rem;
-  font-weight: 500;
-  margin-left: 0.35rem;
-  padding: 0.1rem 0.45rem;
-  border-radius: 4px;
-  background-color: rgba(59, 130, 246, 0.1);
-  color: #2563eb !important;
-  border: 1px solid rgba(59, 130, 246, 0.2);
-  white-space: nowrap;
+.group li .sub-link,
+.sub-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  margin-left: auto;
+  padding: 0;
+  border-radius: 6px;
+  background-color: rgba(100, 116, 139, 0.08);
+  color: #64748b !important;
+  border: 1px solid rgba(100, 116, 139, 0.2);
   text-decoration: none;
-  transition: all 0.15s ease;
-  line-height: 1.2;
+  transition: all 0.2s ease;
   flex-shrink: 0;
+  opacity: 0.55;
+  font-size: 0; /* hides raw text if any remains */
+  position: relative;
+  vertical-align: middle;
 }
 
-.group li .sub-link:hover {
-  background-color: #2563eb;
-  color: #ffffff !important;
-  border-color: #2563eb;
+/* User profile SVG icon rendered via mask or background */
+.group li .sub-link::before,
+.sub-link::before {
+  content: '';
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  background-color: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/%3E%3C/svg%3E") no-repeat center / contain;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/%3E%3C/svg%3E") no-repeat center / contain;
+  transition: transform 0.15s ease;
+}
+
+/* Hover effect on list item reveals the cabinet button */
+.group li:hover .sub-link {
+  opacity: 0.85;
+}
+
+/* Direct hover on cabinet button */
+.group li .sub-link:hover,
+.sub-link:hover {
+  opacity: 1;
+  background-color: rgba(37, 99, 235, 0.12);
+  color: #2563eb !important;
+  border-color: rgba(37, 99, 235, 0.35);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
   text-decoration: none;
+}
+
+.group li .sub-link:hover::before,
+.sub-link:hover::before {
+  transform: scale(1.1);
 }
 
 /* Dark mode adjustments for sub-link */
-body.dark-mode .group li .sub-link {
-  background-color: rgba(59, 130, 246, 0.2);
-  color: #93c5fd !important;
-  border-color: rgba(59, 130, 246, 0.35);
+body.dark-mode .group li .sub-link,
+body.dark-mode .sub-link {
+  background-color: rgba(148, 163, 184, 0.1);
+  color: #94a3b8 !important;
+  border-color: rgba(148, 163, 184, 0.2);
+  opacity: 0.55;
 }
 
-body.dark-mode .group li .sub-link:hover {
-  background-color: #3b82f6;
-  color: #ffffff !important;
-  border-color: #3b82f6;
+body.dark-mode .group li:hover .sub-link {
+  opacity: 0.85;
+}
+
+body.dark-mode .group li .sub-link:hover,
+body.dark-mode .sub-link:hover {
+  opacity: 1;
+  background-color: rgba(59, 130, 246, 0.25);
+  color: #60a5fa !important;
+  border-color: rgba(59, 130, 246, 0.45);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
 }
 
 body.dark-mode .group li .link-sep {
@@ -1015,11 +1058,171 @@ body.dark-mode .group li.placeholder-ad-item:hover {
   margin-right: 6px;
 }
 
-/* Radio LEGION Player Component */
+/* Radio LEGION Player Component & Unified LIVE Capsule Button («LIVE ▶») */
 .radio-legion-item {
   position: relative;
 }
 
+/* Єдина інтерактивна кнопка-капсула «LIVE ▶» */
+.radio-live-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-left: auto;
+  padding: 3px 8px 3px 7px;
+  border-radius: 9999px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  user-select: none;
+  flex-shrink: 0;
+  border: 1px solid rgba(220, 38, 38, 0.35);
+  background: rgba(220, 38, 38, 0.08);
+  color: #dc2626;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  outline: none;
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.radio-live-btn:hover {
+  background: rgba(220, 38, 38, 0.16);
+  border-color: rgba(220, 38, 38, 0.6);
+  color: #b91c1c;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(220, 38, 38, 0.2);
+  text-decoration: none;
+}
+
+.radio-live-btn:focus,
+.radio-live-btn:active,
+.radio-live-btn:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.radio-live-btn .live-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  background-color: #dc2626;
+  border-radius: 50%;
+  animation: live-pulse 1.8s infinite;
+  flex-shrink: 0;
+}
+
+.radio-live-btn .live-text {
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  line-height: 1;
+}
+
+.radio-live-btn .live-icon,
+.radio-live-btn i {
+  font-size: 0.65rem;
+  margin-left: 2px;
+  transition: transform 0.15s ease;
+}
+
+.radio-live-btn:hover .live-icon,
+.radio-live-btn:hover i {
+  transform: scale(1.15);
+}
+
+@keyframes live-pulse {
+  0% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.35; transform: scale(0.75); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+body.dark-mode .radio-live-btn {
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.4);
+}
+
+body.dark-mode .radio-live-btn .live-dot {
+  background-color: #ef4444;
+}
+
+body.dark-mode .radio-live-btn:hover {
+  color: #f87171;
+  background: rgba(239, 68, 68, 0.25);
+  border-color: rgba(239, 68, 68, 0.65);
+  box-shadow: 0 2px 6px rgba(239, 68, 68, 0.25);
+}
+
+/* Жовто-бурштиновий стан завантаження */
+.radio-legion-item.loading .radio-live-btn,
+.radio-live-btn.loading {
+  color: #d97706;
+  background: rgba(245, 158, 11, 0.12);
+  border-color: rgba(245, 158, 11, 0.45);
+}
+
+.radio-legion-item.loading .radio-live-btn .live-dot,
+.radio-live-btn.loading .live-dot {
+  background-color: #d97706;
+  animation: none;
+}
+
+body.dark-mode .radio-legion-item.loading .radio-live-btn,
+body.dark-mode .radio-live-btn.loading {
+  color: #fbbf24;
+  background: rgba(251, 191, 36, 0.2);
+  border-color: rgba(251, 191, 36, 0.5);
+}
+
+body.dark-mode .radio-legion-item.loading .radio-live-btn .live-dot,
+body.dark-mode .radio-live-btn.loading .live-dot {
+  background-color: #fbbf24;
+}
+
+/* Зелений стан під час активного відтворення */
+.radio-legion-item.playing .radio-live-btn,
+.radio-live-btn.playing {
+  color: #16a34a;
+  background: rgba(22, 163, 74, 0.12);
+  border-color: rgba(22, 163, 74, 0.45);
+}
+
+.radio-legion-item.playing .radio-live-btn .live-dot,
+.radio-live-btn.playing .live-dot {
+  background-color: #16a34a;
+  animation: live-pulse 1.2s infinite;
+}
+
+.radio-legion-item.playing .radio-live-btn:hover,
+.radio-live-btn.playing:hover {
+  color: #15803d;
+  background: rgba(22, 163, 74, 0.2);
+  border-color: rgba(22, 163, 74, 0.65);
+}
+
+body.dark-mode .radio-legion-item.playing .radio-live-btn,
+body.dark-mode .radio-live-btn.playing {
+  color: #22c55e;
+  background: rgba(34, 197, 94, 0.2);
+  border-color: rgba(34, 197, 94, 0.5);
+}
+
+body.dark-mode .radio-legion-item.playing .radio-live-btn .live-dot,
+body.dark-mode .radio-live-btn.playing .live-dot {
+  background-color: #22c55e;
+}
+
+body.dark-mode .radio-legion-item.playing .radio-live-btn:hover,
+body.dark-mode .radio-live-btn.playing:hover {
+  color: #4ade80;
+  background: rgba(34, 197, 94, 0.3);
+  border-color: rgba(34, 197, 94, 0.7);
+}
+
+/* Backward compatibility for standalone live badge if used */
 .radio-live-badge {
   display: inline-flex;
   align-items: center;
@@ -1053,12 +1256,6 @@ body.dark-mode .group li.placeholder-ad-item:hover {
   animation: live-pulse 1.8s infinite;
 }
 
-@keyframes live-pulse {
-  0% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.35; transform: scale(0.75); }
-  100% { opacity: 1; transform: scale(1); }
-}
-
 body.dark-mode .radio-live-badge {
   color: #ef4444;
   background: rgba(239, 68, 68, 0.18);
@@ -1069,7 +1266,6 @@ body.dark-mode .radio-live-badge::before {
   background-color: #ef4444;
 }
 
-/* Жовто-бурштинова плашка LIVE під час завантаження (стан очікування) */
 .radio-legion-item.loading .radio-live-badge {
   color: #d97706;
   background: rgba(245, 158, 11, 0.12);
@@ -1090,7 +1286,6 @@ body.dark-mode .radio-legion-item.loading .radio-live-badge::before {
   background-color: #fbbf24;
 }
 
-/* Зелена плашка LIVE під час активного відтворення */
 .radio-legion-item.playing .radio-live-badge {
   color: #16a34a;
   background: rgba(22, 163, 74, 0.12);
@@ -1632,30 +1827,411 @@ body.dark-mode .cl-modal-body .cl-calendar-prefix {
     padding-left: 9px;
   }
 }
-/* Стилі для плашок торрент-трекерів */
-.torrent-badge {
-  margin-left: auto;
-  display: inline-flex;
+/* Модальне вікно для умовних позначок */
+#badgesModalBackdrop {
+  z-index: 10650;
+}
+.badges-legend-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 4px 0;
+}
+.badges-legend-item {
+  display: flex;
   align-items: center;
-  font-size: 0.63rem;
-  line-height: 1;
-  padding: 2px 5px;
-  border-radius: 4px;
-  white-space: nowrap;
-  font-weight: 600;
-  font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
-  background: rgba(0, 0, 0, 0.03);
-  color: #64748b;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  cursor: help;
-  user-select: none;
+  gap: 14px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.02);
+  border: 1px solid var(--border-color, rgba(0, 0, 0, 0.08));
   transition: all 0.2s ease;
 }
+.badges-legend-item:hover {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: var(--border-color, rgba(0, 0, 0, 0.15));
+}
+body.dark-mode .badges-legend-item {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+body.dark-mode .badges-legend-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+.badges-legend-preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 76px;
+  min-width: 76px;
+  height: 38px;
+  padding: 0 4px;
+  border-radius: 8px;
+  background: var(--card-bg, #ffffff);
+  border: 1px dashed rgba(0, 0, 0, 0.15);
+  flex-shrink: 0;
+}
+body.dark-mode .badges-legend-preview {
+  background: rgba(15, 23, 42, 0.6);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+.badges-legend-info {
+  flex: 1;
+  min-width: 0;
+}
+.badges-legend-title {
+  font-weight: 700;
+  font-size: 0.95rem;
+  margin-bottom: 3px;
+  color: var(--text-main, #1e293b);
+}
+body.dark-mode .badges-legend-title {
+  color: #f8fafc !important;
+}
+.badges-legend-desc {
+  font-size: 0.85rem;
+  line-height: 1.4;
+  color: #64748b;
+  margin: 0;
+}
+body.dark-mode .badges-legend-desc {
+  color: #94a3b8 !important;
+}
 
+/* Стилі для векторної міні-іконки торрент-ресурсів (Торрент-трекер) за аналогією до Кабінету 👤 */
+.group li .torrent-badge,
+.torrent-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  margin-left: auto;
+  padding: 0;
+  border-radius: 6px;
+  background-color: rgba(100, 116, 139, 0.08);
+  color: #64748b !important;
+  border: 1px solid rgba(100, 116, 139, 0.2);
+  text-decoration: none;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  opacity: 0.55;
+  font-size: 0; /* приховує текст TT */
+  position: relative;
+  vertical-align: middle;
+  cursor: help;
+  user-select: none;
+}
+
+/* Векторна контурна іконка магнітного лінку (Magnet / Torrent) */
+.group li .torrent-badge::before,
+.torrent-badge::before {
+  content: '';
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  background-color: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M4 2h4v4H4zm12 0h4v4h-4zm-12 5.5h4V10a4 4 0 0 0 8 0V7.5h4V10a8 8 0 0 1-16 0z'/%3E%3C/svg%3E") no-repeat center / contain;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M4 2h4v4H4zm12 0h4v4h-4zm-12 5.5h4V10a4 4 0 0 0 8 0V7.5h4V10a8 8 0 0 1-16 0z'/%3E%3C/svg%3E") no-repeat center / contain;
+  transition: transform 0.15s ease;
+}
+
+/* При наведенні курсора на рядок списку */
+.group li:hover .torrent-badge {
+  opacity: 0.85;
+}
+
+/* Безпосередній фокус / наведення на іконку торрента */
+.group li .torrent-badge:hover,
+.torrent-badge:hover {
+  opacity: 1;
+  background-color: rgba(16, 185, 129, 0.12);
+  color: #059669 !important;
+  border-color: rgba(16, 185, 129, 0.35);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+}
+
+.group li .torrent-badge:hover::before,
+.torrent-badge:hover::before {
+  transform: scale(1.1);
+}
+
+/* Dark mode для іконки торрента */
+body.dark-mode .group li .torrent-badge,
 body.dark-mode .torrent-badge {
-  background: rgba(255, 255, 255, 0.05);
-  color: #94a3b8;
-  border-color: rgba(255, 255, 255, 0.12);
+  background-color: rgba(148, 163, 184, 0.1);
+  color: #94a3b8 !important;
+  border-color: rgba(148, 163, 184, 0.2);
+  opacity: 0.55;
+}
+
+body.dark-mode .group li:hover .torrent-badge {
+  opacity: 0.85;
+}
+
+body.dark-mode .group li .torrent-badge:hover,
+body.dark-mode .torrent-badge:hover {
+  opacity: 1;
+  background-color: rgba(16, 185, 129, 0.22);
+  color: #34d399 !important;
+  border-color: rgba(52, 211, 153, 0.45);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+/* --------------------------------------------------------------------------
+   УНІФІКОВАНІ МІКРО-КНОПКИ КАТАЛОГУ (24x24px)
+   -------------------------------------------------------------------------- */
+
+/* Базові властивості для всіх типів мікро-кнопок */
+.group li .telegram-badge, .telegram-badge, .group li .tg-badge, .tg-badge,
+.group li .app-badge, .app-badge, .group li .mobile-badge, .mobile-badge,
+.group li .chat-badge, .chat-badge, .group li .bot-badge, .bot-badge,
+.group li .mirror-badge, .mirror-badge,
+.group li .auth-badge, .auth-badge, .group li .lock-badge, .lock-badge,
+.group li .opensource-badge, .opensource-badge, .group li .free-badge, .free-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  margin-left: auto;
+  padding: 0;
+  border-radius: 6px;
+  background-color: rgba(100, 116, 139, 0.08);
+  color: #64748b !important;
+  border: 1px solid rgba(100, 116, 139, 0.2);
+  text-decoration: none;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  opacity: 0.55;
+  font-size: 0;
+  position: relative;
+  vertical-align: middle;
+  cursor: pointer;
+  user-select: none;
+}
+
+.group li:hover .telegram-badge, .group li:hover .tg-badge,
+.group li:hover .app-badge, .group li:hover .mobile-badge,
+.group li:hover .chat-badge, .group li:hover .bot-badge,
+.group li:hover .mirror-badge,
+.group li:hover .auth-badge, .group li:hover .lock-badge,
+.group li:hover .opensource-badge, .group li:hover .free-badge {
+  opacity: 0.85;
+}
+
+/* Базовий псевдоелемент векторної маски */
+.group li .telegram-badge::before, .telegram-badge::before, .group li .tg-badge::before, .tg-badge::before,
+.group li .app-badge::before, .app-badge::before, .group li .mobile-badge::before, .mobile-badge::before,
+.group li .chat-badge::before, .chat-badge::before, .group li .bot-badge::before, .bot-badge::before,
+.group li .mirror-badge::before, .mirror-badge::before,
+.group li .auth-badge::before, .auth-badge::before, .group li .lock-badge::before, .lock-badge::before,
+.group li .opensource-badge::before, .opensource-badge::before, .group li .free-badge::before, .free-badge::before {
+  content: '';
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  background-color: currentColor;
+  transition: transform 0.15s ease;
+}
+
+/* 1. Telegram-канал або бот (✈️) */
+.group li .telegram-badge::before, .telegram-badge::before,
+.group li .tg-badge::before, .tg-badge::before {
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M21.92 3.63a1 1 0 0 0-1.05-.21l-18 7a1 1 0 0 0-.09 1.83l4.9 2.2 1.9 5.8a1 1 0 0 0 1.6.43l3.2-2.7 4.8 3.5a1 1 0 0 0 1.58-.58l3-16a1 1 0 0 0-.84-1.27zm-3.08 3.24-8.8 7.9-1.2-3.7 10-4.2zm-2.26 12.3-4.2-3.1 7.2-6.5-3 9.6z'/%3E%3C/svg%3E") no-repeat center / contain;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M21.92 3.63a1 1 0 0 0-1.05-.21l-18 7a1 1 0 0 0-.09 1.83l4.9 2.2 1.9 5.8a1 1 0 0 0 1.6.43l3.2-2.7 4.8 3.5a1 1 0 0 0 1.58-.58l3-16a1 1 0 0 0-.84-1.27zm-3.08 3.24-8.8 7.9-1.2-3.7 10-4.2zm-2.26 12.3-4.2-3.1 7.2-6.5-3 9.6z'/%3E%3C/svg%3E") no-repeat center / contain;
+}
+.group li .telegram-badge:hover, .telegram-badge:hover,
+.group li .tg-badge:hover, .tg-badge:hover {
+  opacity: 1;
+  background-color: rgba(0, 136, 204, 0.12);
+  color: #0088cc !important;
+  border-color: rgba(0, 136, 204, 0.35);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+}
+.group li .telegram-badge:hover::before, .telegram-badge:hover::before,
+.group li .tg-badge:hover::before, .tg-badge:hover::before {
+  transform: scale(1.1);
+}
+
+/* 2. Мобільний застосунок (📱) */
+.group li .app-badge::before, .app-badge::before,
+.group li .mobile-badge::before, .mobile-badge::before {
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M17 1.01L7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99zM17 19H7V5h10v14zm-5 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2z'/%3E%3C/svg%3E") no-repeat center / contain;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M17 1.01L7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99zM17 19H7V5h10v14zm-5 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2z'/%3E%3C/svg%3E") no-repeat center / contain;
+}
+.group li .app-badge:hover, .app-badge:hover,
+.group li .mobile-badge:hover, .mobile-badge:hover {
+  opacity: 1;
+  background-color: rgba(124, 58, 237, 0.12);
+  color: #7c3aed !important;
+  border-color: rgba(124, 58, 237, 0.35);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+}
+.group li .app-badge:hover::before, .app-badge:hover::before,
+.group li .mobile-badge:hover::before, .mobile-badge:hover::before {
+  transform: scale(1.1);
+}
+
+/* 3. Швидкий онлайн-чат / Підтримка (💬) */
+.group li .chat-badge::before, .chat-badge::before,
+.group li .bot-badge::before, .bot-badge::before {
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H5.17L4 17.17V4h16v12zm-9-4h2v-2h-2v2zm-4 0h2v-2H7v2zm8 0h2v-2h-2v2z'/%3E%3C/svg%3E") no-repeat center / contain;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H5.17L4 17.17V4h16v12zm-9-4h2v-2h-2v2zm-4 0h2v-2H7v2zm8 0h2v-2h-2v2z'/%3E%3C/svg%3E") no-repeat center / contain;
+}
+.group li .chat-badge:hover, .chat-badge:hover,
+.group li .bot-badge:hover, .bot-badge:hover {
+  opacity: 1;
+  background-color: rgba(2, 132, 199, 0.12);
+  color: #0284c7 !important;
+  border-color: rgba(2, 132, 199, 0.35);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+}
+.group li .chat-badge:hover::before, .chat-badge:hover::before,
+.group li .bot-badge:hover::before, .bot-badge:hover::before {
+  transform: scale(1.1);
+}
+
+/* 4. Дзеркало сайту / Альтернативний домен (🔀) */
+.group li .mirror-badge::before, .mirror-badge::before {
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M6.99 11L3 15l3.99 4v-3H14v-2H6.99v-3zM21 9l-3.99-4v3H10v2h7.01v3L21 9z'/%3E%3C/svg%3E") no-repeat center / contain;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M6.99 11L3 15l3.99 4v-3H14v-2H6.99v-3zM21 9l-3.99-4v3H10v2h7.01v3L21 9z'/%3E%3C/svg%3E") no-repeat center / contain;
+}
+.group li .mirror-badge:hover, .mirror-badge:hover {
+  opacity: 1;
+  background-color: rgba(217, 119, 6, 0.12);
+  color: #d97706 !important;
+  border-color: rgba(217, 119, 6, 0.35);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+}
+.group li .mirror-badge:hover::before, .mirror-badge:hover::before {
+  transform: scale(1.1);
+}
+
+/* 5. Потрібна реєстрація / Вхід (🔒) */
+.group li .auth-badge::before, .auth-badge::before,
+.group li .lock-badge::before, .lock-badge::before {
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z'/%3E%3C/svg%3E") no-repeat center / contain;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z'/%3E%3C/svg%3E") no-repeat center / contain;
+}
+.group li .auth-badge:hover, .auth-badge:hover,
+.group li .lock-badge:hover, .lock-badge:hover {
+  opacity: 1;
+  background-color: rgba(225, 29, 72, 0.12);
+  color: #e11d48 !important;
+  border-color: rgba(225, 29, 72, 0.35);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+}
+.group li .auth-badge:hover::before, .auth-badge:hover::before,
+.group li .lock-badge:hover::before, .lock-badge:hover::before {
+  transform: scale(1.1);
+}
+
+/* 6. Вільний / Open Source сервіс (🌐 / OSI) */
+.group li .opensource-badge::before, .opensource-badge::before,
+.group li .free-badge::before, .free-badge::before {
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M12 2a10 10 0 0 0-3.8 19.26l2.12-3.67A5.8 5.8 0 1 1 12 6.2a5.8 5.8 0 0 1 1.68 11.39l2.12 3.67A10 10 0 0 0 12 2z'/%3E%3C/svg%3E") no-repeat center / contain;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M12 2a10 10 0 0 0-3.8 19.26l2.12-3.67A5.8 5.8 0 1 1 12 6.2a5.8 5.8 0 0 1 1.68 11.39l2.12 3.67A10 10 0 0 0 12 2z'/%3E%3C/svg%3E") no-repeat center / contain;
+}
+.group li .opensource-badge:hover, .opensource-badge:hover,
+.group li .free-badge:hover, .free-badge:hover {
+  opacity: 1;
+  background-color: rgba(16, 185, 129, 0.12);
+  color: #059669 !important;
+  border-color: rgba(16, 185, 129, 0.35);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+}
+.group li .opensource-badge:hover::before, .opensource-badge:hover::before,
+.group li .free-badge:hover::before, .free-badge:hover::before {
+  transform: scale(1.1);
+}
+
+/* Темна тема (Dark Mode) для мікро-кнопок */
+body.dark-mode .group li .telegram-badge, body.dark-mode .telegram-badge,
+body.dark-mode .group li .tg-badge, body.dark-mode .tg-badge,
+body.dark-mode .group li .app-badge, body.dark-mode .app-badge,
+body.dark-mode .group li .mobile-badge, body.dark-mode .mobile-badge,
+body.dark-mode .group li .chat-badge, body.dark-mode .chat-badge,
+body.dark-mode .group li .bot-badge, body.dark-mode .bot-badge,
+body.dark-mode .group li .mirror-badge, body.dark-mode .mirror-badge,
+body.dark-mode .group li .auth-badge, body.dark-mode .auth-badge,
+body.dark-mode .group li .lock-badge, body.dark-mode .lock-badge,
+body.dark-mode .group li .opensource-badge, body.dark-mode .opensource-badge,
+body.dark-mode .group li .free-badge, body.dark-mode .free-badge {
+  background-color: rgba(148, 163, 184, 0.1);
+  color: #94a3b8 !important;
+  border-color: rgba(148, 163, 184, 0.2);
+  opacity: 0.55;
+}
+
+body.dark-mode .group li:hover .telegram-badge, body.dark-mode .group li:hover .tg-badge,
+body.dark-mode .group li:hover .app-badge, body.dark-mode .group li:hover .mobile-badge,
+body.dark-mode .group li:hover .chat-badge, body.dark-mode .group li:hover .bot-badge,
+body.dark-mode .group li:hover .mirror-badge,
+body.dark-mode .group li:hover .auth-badge, body.dark-mode .group li:hover .lock-badge,
+body.dark-mode .group li:hover .opensource-badge, body.dark-mode .group li:hover .free-badge {
+  opacity: 0.85;
+}
+
+body.dark-mode .group li .telegram-badge:hover, body.dark-mode .telegram-badge:hover,
+body.dark-mode .group li .tg-badge:hover, body.dark-mode .tg-badge:hover {
+  opacity: 1;
+  background-color: rgba(0, 136, 204, 0.22);
+  color: #38bdf8 !important;
+  border-color: rgba(56, 189, 248, 0.45);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-mode .group li .app-badge:hover, body.dark-mode .app-badge:hover,
+body.dark-mode .group li .mobile-badge:hover, body.dark-mode .mobile-badge:hover {
+  opacity: 1;
+  background-color: rgba(139, 92, 246, 0.22);
+  color: #a78bfa !important;
+  border-color: rgba(167, 139, 250, 0.45);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-mode .group li .chat-badge:hover, body.dark-mode .chat-badge:hover,
+body.dark-mode .group li .bot-badge:hover, body.dark-mode .bot-badge:hover {
+  opacity: 1;
+  background-color: rgba(2, 132, 199, 0.22);
+  color: #38bdf8 !important;
+  border-color: rgba(56, 189, 248, 0.45);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-mode .group li .mirror-badge:hover, body.dark-mode .mirror-badge:hover {
+  opacity: 1;
+  background-color: rgba(245, 158, 11, 0.22);
+  color: #fbbf24 !important;
+  border-color: rgba(251, 191, 36, 0.45);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-mode .group li .auth-badge:hover, body.dark-mode .auth-badge:hover,
+body.dark-mode .group li .lock-badge:hover, body.dark-mode .lock-badge:hover {
+  opacity: 1;
+  background-color: rgba(225, 29, 72, 0.22);
+  color: #fb7185 !important;
+  border-color: rgba(251, 113, 133, 0.45);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-mode .group li .opensource-badge:hover, body.dark-mode .opensource-badge:hover,
+body.dark-mode .group li .free-badge:hover, body.dark-mode .free-badge:hover {
+  opacity: 1;
+  background-color: rgba(16, 185, 129, 0.22);
+  color: #34d399 !important;
+  border-color: rgba(52, 211, 153, 0.45);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
 }
 
 /* ==========================================================================
