@@ -1642,7 +1642,7 @@ function openBadgesModal() {
     backdrop.innerHTML = `
       <div class="cl-modal" role="dialog" aria-modal="true" style="max-width: 620px;">
         <div class="cl-modal-header">
-          <h5 class="cl-modal-title"><i class="fas fa-info-circle text-primary"></i> Умовні позначки на сайті</h5>
+          <h5 class="cl-modal-title"><i class="fas fa-info-circle text-primary"></i> Умовні позначки</h5>
           <button type="button" class="btn btn-secondary btn-sm cl-modal-close" aria-label="Закрити">
             <span>Закрити</span>
             <span class="cl-modal-close-sep"></span>
@@ -1650,132 +1650,132 @@ function openBadgesModal() {
           </button>
         </div>
         <div class="cl-modal-body" style="padding: 18px 20px;">
-          <p class="text-muted mb-3" style="font-size: 0.9rem; line-height: 1.45;">Розшифровка спеціальних інтерактивних позначок та індикаторів поруч із посиланнями каталогу:</p>
+          <p class="text-muted mb-3" style="font-size: 0.9rem; line-height: 1.45; font-style: italic;">Розшифровка спеціальних інтерактивних позначок та індикаторів:</p>
           
           <div class="badges-legend-list">
             <!-- 1. Особистий кабінет -->
             <div class="badges-legend-item">
-              <div class="badges-legend-preview" title="Іконка особистого кабінету">
-                <span class="sub-link" style="opacity: 1; margin: 0; pointer-events: none; width: 24px; height: 24px;"></span>
-              </div>
-              <div class="badges-legend-info">
+              <div class="badges-legend-header">
+                <div class="badges-legend-preview" title="Іконка особистого кабінету">
+                  <span class="sub-link" style="opacity: 1; margin: 0; pointer-events: none; width: 24px; height: 24px;"></span>
+                </div>
                 <div class="badges-legend-title">Особистий кабінет користувача</div>
-                <p class="badges-legend-desc">Швидкий прямий перехід до електронного кабінету споживача, клієнта чи платника (перевірка рахунків, передача показників лічильників, керування послугами або відправленнями).</p>
               </div>
+              <p class="badges-legend-desc">Швидкий прямий перехід до електронного кабінету споживача, клієнта чи платника (перевірка рахунків, передача показників лічильників, керування послугами або відправленнями).</p>
             </div>
 
             <!-- 2. Музичний плеєр -->
             <div class="badges-legend-item">
-              <div class="badges-legend-preview" title="Кнопка відтворення плейлиста">
-                <button type="button" class="radio-play-btn yt-play-btn" style="pointer-events: none; margin: 0;" title="Слухати"><i class="fas fa-play"></i></button>
-              </div>
-              <div class="badges-legend-info">
+              <div class="badges-legend-header">
+                <div class="badges-legend-preview" title="Кнопка відтворення плейлиста">
+                  <button type="button" class="radio-play-btn yt-play-btn" style="pointer-events: none; margin: 0;" title="Слухати"><i class="fas fa-play"></i></button>
+                </div>
                 <div class="badges-legend-title">Музичний плейлист (YouTube Music)</div>
-                <p class="badges-legend-desc">Вбудоване відтворення музичного плейлиста безпосередньо на сторінці з увімкненим за замовчуванням режимом перемішування (Shuffle).</p>
               </div>
+              <p class="badges-legend-desc">Вбудоване відтворення музичного плейлиста безпосередньо на сторінці з увімкненим за замовчуванням режимом перемішування (Shuffle).</p>
             </div>
 
             <!-- 3. Прямий ефір онлайн-радіо -->
             <div class="badges-legend-item">
-              <div class="badges-legend-preview" title="Пряма трансляція радіо">
-                <button type="button" class="radio-live-btn" style="pointer-events: none; margin: 0;">
-                  <span class="live-dot"></span>
-                  <span class="live-text">LIVE</span>
-                  <i class="fas fa-play live-icon"></i>
-                </button>
-              </div>
-              <div class="badges-legend-info">
+              <div class="badges-legend-header">
+                <div class="badges-legend-preview" title="Пряма трансляція радіо">
+                  <button type="button" class="radio-live-btn" style="pointer-events: none; margin: 0;">
+                    <span class="live-dot"></span>
+                    <span class="live-text">LIVE</span>
+                    <i class="fas fa-play live-icon"></i>
+                  </button>
+                </div>
                 <div class="badges-legend-title">Прямий ефір радіо (LIVE)</div>
-                <p class="badges-legend-desc">Миттєвий запуск прямої онлайн-трансляції радіостанції в реальному часі без переходу на зовнішні сайти.</p>
               </div>
+              <p class="badges-legend-desc">Миттєвий запуск прямої онлайн-трансляції радіостанції в реальному часі без переходу на зовнішні сайти.</p>
             </div>
 
             <!-- 4. Торрент-ресурс -->
             <div class="badges-legend-item">
-              <div class="badges-legend-preview" title="Позначка торрент-ресурсу">
-                <span class="torrent-badge" style="opacity: 1; margin: 0; pointer-events: none; width: 24px; height: 24px;"></span>
-              </div>
-              <div class="badges-legend-info">
+              <div class="badges-legend-header">
+                <div class="badges-legend-preview" title="Позначка торрент-ресурсу">
+                  <span class="torrent-badge" style="opacity: 1; margin: 0; pointer-events: none; width: 24px; height: 24px;"></span>
+                </div>
                 <div class="badges-legend-title">Торрент-ресурс (Торрент-трекер)</div>
-                <p class="badges-legend-desc">Для завантаження файлів (фільмів, музики, ігор або програм) із зазначеного сервісу на комп'ютері чи смартфоні має бути встановлена програма Торрент-клієнт (uTorrent, qBittorrent тощо).</p>
               </div>
+              <p class="badges-legend-desc">Для завантаження файлів (фільмів, музики, ігор або програм) із зазначеного сервісу на комп'ютері чи смартфоні має бути встановлена програма Торрент-клієнт (uTorrent, qBittorrent тощо).</p>
             </div>
 
             <!-- 5. Telegram-канал або бот -->
             <div class="badges-legend-item">
-              <div class="badges-legend-preview" title="Офіційний Telegram">
-                <span class="telegram-badge" style="opacity: 1; margin: 0; pointer-events: none; width: 24px; height: 24px;"></span>
-              </div>
-              <div class="badges-legend-info">
+              <div class="badges-legend-header">
+                <div class="badges-legend-preview" title="Офіційний Telegram">
+                  <span class="telegram-badge" style="opacity: 1; margin: 0; pointer-events: none; width: 24px; height: 24px;"></span>
+                </div>
                 <div class="badges-legend-title">Офіційний Telegram-канал або бот</div>
-                <p class="badges-legend-desc">Швидкий перехід до офіційного каналу новин, оперативних сповіщень чи корисного чат-бота організації/сервісу в Telegram.</p>
               </div>
+              <p class="badges-legend-desc">Швидкий перехід до офіційного каналу новин, оперативних сповіщень чи корисного чат-бота організації/сервісу в Telegram.</p>
             </div>
 
             <!-- 6. Мобільний застосунок -->
             <div class="badges-legend-item">
-              <div class="badges-legend-preview" title="Мобільний додаток">
-                <span class="app-badge" style="opacity: 1; margin: 0; pointer-events: none; width: 24px; height: 24px;"></span>
-              </div>
-              <div class="badges-legend-info">
+              <div class="badges-legend-header">
+                <div class="badges-legend-preview" title="Мобільний додаток">
+                  <span class="app-badge" style="opacity: 1; margin: 0; pointer-events: none; width: 24px; height: 24px;"></span>
+                </div>
                 <div class="badges-legend-title">Мобільний застосунок (App)</div>
-                <p class="badges-legend-desc">Наявність фірмового мобільного додатка для смартфонів Android або iOS (прямий перехід у магазин застосунків або сторінку завантаження).</p>
               </div>
+              <p class="badges-legend-desc">Наявність фірмового мобільного додатка для смартфонів Android або iOS (прямий перехід у магазин застосунків або сторінку завантаження).</p>
             </div>
 
             <!-- 7. Онлайн-чат / Чат-бот підтримки -->
             <div class="badges-legend-item">
-              <div class="badges-legend-preview" title="Онлайн-чат підтримки">
-                <span class="chat-badge" style="opacity: 1; margin: 0; pointer-events: none; width: 24px; height: 24px;"></span>
-              </div>
-              <div class="badges-legend-info">
+              <div class="badges-legend-header">
+                <div class="badges-legend-preview" title="Онлайн-чат підтримки">
+                  <span class="chat-badge" style="opacity: 1; margin: 0; pointer-events: none; width: 24px; height: 24px;"></span>
+                </div>
                 <div class="badges-legend-title">Швидкий онлайн-чат / Підтримка</div>
-                <p class="badges-legend-desc">Прямий зв'язок зі службою клієнтської підтримки, онлайн-консультантом, диспетчером або помічником на сайті.</p>
               </div>
+              <p class="badges-legend-desc">Прямий зв'язок зі службою клієнтської підтримки, онлайн-консультантом, диспетчером або помічником на сайті.</p>
             </div>
 
             <!-- 8. Дзеркало сайту / Альтернативний домен -->
             <div class="badges-legend-item">
-              <div class="badges-legend-preview" title="Альтернативна адреса">
-                <span class="mirror-badge" style="opacity: 1; margin: 0; pointer-events: none; width: 24px; height: 24px;"></span>
-              </div>
-              <div class="badges-legend-info">
+              <div class="badges-legend-header">
+                <div class="badges-legend-preview" title="Альтернативна адреса">
+                  <span class="mirror-badge" style="opacity: 1; margin: 0; pointer-events: none; width: 24px; height: 24px;"></span>
+                </div>
                 <div class="badges-legend-title">Дзеркало сайту / Альтернативний домен</div>
-                <p class="badges-legend-desc">Запасна резервна адреса або дзеркало веб-ресурсу на випадок перевантаження або тимчасової недоступності основного посилання.</p>
               </div>
+              <p class="badges-legend-desc">Запасна резервна адреса або дзеркало веб-ресурсу на випадок перевантаження або тимчасової недоступності основного посилання.</p>
             </div>
 
             <!-- 9. Потрібна реєстрація / Вхід -->
             <div class="badges-legend-item">
-              <div class="badges-legend-preview" title="Необхідна реєстрація">
-                <span class="auth-badge" style="opacity: 1; margin: 0; pointer-events: none; width: 24px; height: 24px;"></span>
-              </div>
-              <div class="badges-legend-info">
+              <div class="badges-legend-header">
+                <div class="badges-legend-preview" title="Необхідна реєстрація">
+                  <span class="auth-badge" style="opacity: 1; margin: 0; pointer-events: none; width: 24px; height: 24px;"></span>
+                </div>
                 <div class="badges-legend-title">Потрібна реєстрація / Авторизація</div>
-                <p class="badges-legend-desc">Доступ до основних функцій чи матеріалів сервісу потребує створення облікового запису (реєстрації або входу).</p>
               </div>
+              <p class="badges-legend-desc">Доступ до основних функцій чи матеріалів сервісу потребує створення облікового запису (реєстрації або входу).</p>
             </div>
 
             <!-- 10. Вільний / Open Source сервіс -->
             <div class="badges-legend-item">
-              <div class="badges-legend-preview" title="Вільне ПЗ / Open Source">
-                <span class="opensource-badge" style="opacity: 1; margin: 0; pointer-events: none; width: 24px; height: 24px;"></span>
-              </div>
-              <div class="badges-legend-info">
+              <div class="badges-legend-header">
+                <div class="badges-legend-preview" title="Вільне ПЗ / Open Source">
+                  <span class="opensource-badge" style="opacity: 1; margin: 0; pointer-events: none; width: 24px; height: 24px;"></span>
+                </div>
                 <div class="badges-legend-title">Вільний / Open Source сервіс</div>
-                <p class="badges-legend-desc">Повністю вільне некомерційне програмне забезпечення або сервіс із відкритим вихідним кодом без нав'язливих платних підписок.</p>
               </div>
+              <p class="badges-legend-desc">Повністю вільне некомерційне програмне забезпечення або сервіс із відкритим вихідним кодом без нав'язливих платних підписок.</p>
             </div>
 
             <!-- 11. Рекомендовано сайтом -->
             <div class="badges-legend-item">
-              <div class="badges-legend-preview" title="Рекомендація нашого сайту">
-                <span class="status-dot dot-green" style="margin: 0; display: inline-block;"></span>
-              </div>
-              <div class="badges-legend-info">
+              <div class="badges-legend-header">
+                <div class="badges-legend-preview" title="Рекомендація нашого сайту">
+                  <span class="status-dot dot-green" style="margin: 0; display: inline-block;"></span>
+                </div>
                 <div class="badges-legend-title">Рекомендовано сайтом</div>
-                <p class="badges-legend-desc">Особливо якісні, перевірені та надійні ресурси, відзначені редакцією нашого каталогу.</p>
               </div>
+              <p class="badges-legend-desc">Особливо якісні, перевірені та надійні ресурси, відзначені редакцією нашого каталогу.</p>
             </div>
           </div>
         </div>

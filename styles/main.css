@@ -1834,14 +1834,14 @@ body.dark-mode .cl-modal-body .cl-calendar-prefix {
 .badges-legend-list {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
   padding: 4px 0;
 }
 .badges-legend-item {
   display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 10px 14px;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 14px;
   border-radius: 10px;
   background: rgba(0, 0, 0, 0.02);
   border: 1px solid var(--border-color, rgba(0, 0, 0, 0.08));
@@ -1858,6 +1858,11 @@ body.dark-mode .badges-legend-item {
 body.dark-mode .badges-legend-item:hover {
   background: rgba(255, 255, 255, 0.06);
   border-color: rgba(255, 255, 255, 0.15);
+}
+.badges-legend-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 .badges-legend-preview {
   display: flex;
@@ -1882,18 +1887,20 @@ body.dark-mode .badges-legend-preview {
 }
 .badges-legend-title {
   font-weight: 700;
-  font-size: 0.95rem;
-  margin-bottom: 3px;
+  font-size: 0.96rem;
+  line-height: 1.3;
+  margin: 0;
   color: var(--text-main, #1e293b);
 }
 body.dark-mode .badges-legend-title {
   color: #f8fafc !important;
 }
 .badges-legend-desc {
-  font-size: 0.85rem;
-  line-height: 1.4;
+  font-size: 0.88rem;
+  line-height: 1.45;
   color: #64748b;
   margin: 0;
+  padding-left: 2px;
 }
 body.dark-mode .badges-legend-desc {
   color: #94a3b8 !important;
