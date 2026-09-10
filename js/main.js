@@ -1653,7 +1653,18 @@ function openBadgesModal() {
           <p class="text-muted mb-3" style="font-size: 0.9rem; line-height: 1.45; font-style: italic; padding: 0 2px;">Розшифровка спеціальних інтерактивних позначок та індикаторів:</p>
           
           <div class="badges-legend-list">
-            <!-- 1. Особистий кабінет -->
+            <!-- 1. Рекомендовано сайтом -->
+            <div class="badges-legend-item">
+              <div class="badges-legend-header">
+                <div class="badges-legend-preview" title="Рекомендація нашого сайту">
+                  <span class="status-dot dot-green" style="margin: 0; display: inline-block;"></span>
+                </div>
+                <div class="badges-legend-title">Рекомендовано сайтом</div>
+              </div>
+              <p class="badges-legend-desc">Особливо якісні, перевірені та надійні ресурси, відзначені редакцією нашого каталогу.</p>
+            </div>
+
+            <!-- 2. Особистий кабінет -->
             <div class="badges-legend-item">
               <div class="badges-legend-header">
                 <div class="badges-legend-preview" title="Іконка особистого кабінету">
@@ -1664,7 +1675,40 @@ function openBadgesModal() {
               <p class="badges-legend-desc">Швидкий прямий перехід до електронного кабінету споживача, клієнта чи платника (перевірка рахунків, передача показників лічильників, керування послугами або відправленнями).</p>
             </div>
 
-            <!-- 2. Музичний плеєр -->
+            <!-- 3. Торрент-ресурс -->
+            <div class="badges-legend-item">
+              <div class="badges-legend-header">
+                <div class="badges-legend-preview" title="Позначка торрент-ресурсу">
+                  <a href="https://www.qbittorrent.org/download" target="_blank" class="torrent-badge" style="opacity: 1; margin: 0; width: 24px; height: 24px;" title="Завантажити безкоштовний торрент-клієнт qBittorrent">TT</a>
+                </div>
+                <div class="badges-legend-title">Торрент-ресурс (Торрент-трекер)</div>
+              </div>
+              <p class="badges-legend-desc">Для завантаження файлів (фільмів, музики, ігор або програм) із зазначеного сервісу потрібна програма Торрент-клієнт. Натисніть на позначку, щоб безкоштовно завантажити офіційний qBittorrent.</p>
+            </div>
+
+            <!-- 4. Telegram-канал або бот -->
+            <div class="badges-legend-item">
+              <div class="badges-legend-header">
+                <div class="badges-legend-preview" title="Офіційний Telegram">
+                  <span class="telegram-badge" style="opacity: 1; margin: 0; pointer-events: none; width: 24px; height: 24px;"></span>
+                </div>
+                <div class="badges-legend-title">Офіційний Telegram-канал або бот</div>
+              </div>
+              <p class="badges-legend-desc">Швидкий перехід до офіційного каналу новин, оперативних сповіщень чи корисного чат-бота організації/сервісу в Telegram.</p>
+            </div>
+
+            <!-- 5. Дзеркало сайту / Альтернативний домен -->
+            <div class="badges-legend-item">
+              <div class="badges-legend-header">
+                <div class="badges-legend-preview" title="Альтернативна адреса">
+                  <span class="mirror-badge" style="opacity: 1; margin: 0; pointer-events: none; width: 24px; height: 24px;"></span>
+                </div>
+                <div class="badges-legend-title">Дзеркало сайту / Альтернативний домен</div>
+              </div>
+              <p class="badges-legend-desc">Запасна резервна адреса або дзеркало веб-ресурсу на випадок перевантаження або тимчасової недоступності основного посилання.</p>
+            </div>
+
+            <!-- 6. Музичний плейлист (YouTube Music) -->
             <div class="badges-legend-item">
               <div class="badges-legend-header">
                 <div class="badges-legend-preview" title="Кнопка відтворення плейлиста">
@@ -1675,7 +1719,7 @@ function openBadgesModal() {
               <p class="badges-legend-desc">Вбудоване відтворення музичного плейлиста безпосередньо на сторінці з увімкненим за замовчуванням режимом перемішування (Shuffle).</p>
             </div>
 
-            <!-- 3. Прямий ефір онлайн-радіо -->
+            <!-- 7. Прямий ефір радіо (LIVE) -->
             <div class="badges-legend-item">
               <div class="badges-legend-header">
                 <div class="badges-legend-preview" title="Пряма трансляція радіо">
@@ -1690,29 +1734,7 @@ function openBadgesModal() {
               <p class="badges-legend-desc">Миттєвий запуск прямої онлайн-трансляції радіостанції в реальному часі без переходу на зовнішні сайти.</p>
             </div>
 
-            <!-- 4. Торрент-ресурс -->
-            <div class="badges-legend-item">
-              <div class="badges-legend-header">
-                <div class="badges-legend-preview" title="Позначка торрент-ресурсу">
-                  <span class="torrent-badge" style="opacity: 1; margin: 0; pointer-events: none; width: 24px; height: 24px;"></span>
-                </div>
-                <div class="badges-legend-title">Торрент-ресурс (Торрент-трекер)</div>
-              </div>
-              <p class="badges-legend-desc">Для завантаження файлів (фільмів, музики, ігор або програм) із зазначеного сервісу на комп'ютері чи смартфоні має бути встановлена програма Торрент-клієнт (uTorrent, qBittorrent тощо).</p>
-            </div>
-
-            <!-- 5. Telegram-канал або бот -->
-            <div class="badges-legend-item">
-              <div class="badges-legend-header">
-                <div class="badges-legend-preview" title="Офіційний Telegram">
-                  <span class="telegram-badge" style="opacity: 1; margin: 0; pointer-events: none; width: 24px; height: 24px;"></span>
-                </div>
-                <div class="badges-legend-title">Офіційний Telegram-канал або бот</div>
-              </div>
-              <p class="badges-legend-desc">Швидкий перехід до офіційного каналу новин, оперативних сповіщень чи корисного чат-бота організації/сервісу в Telegram.</p>
-            </div>
-
-            <!-- 6. Мобільний застосунок -->
+            <!-- 8. Мобільний застосунок (App) -->
             <div class="badges-legend-item">
               <div class="badges-legend-header">
                 <div class="badges-legend-preview" title="Мобільний додаток">
@@ -1723,7 +1745,7 @@ function openBadgesModal() {
               <p class="badges-legend-desc">Наявність фірмового мобільного додатка для смартфонів Android або iOS (прямий перехід у магазин застосунків або сторінку завантаження).</p>
             </div>
 
-            <!-- 7. Онлайн-чат / Чат-бот підтримки -->
+            <!-- 9. Швидкий онлайн-чат / Підтримка -->
             <div class="badges-legend-item">
               <div class="badges-legend-header">
                 <div class="badges-legend-preview" title="Онлайн-чат підтримки">
@@ -1732,28 +1754,6 @@ function openBadgesModal() {
                 <div class="badges-legend-title">Швидкий онлайн-чат / Підтримка</div>
               </div>
               <p class="badges-legend-desc">Прямий зв'язок зі службою клієнтської підтримки, онлайн-консультантом, диспетчером або помічником на сайті.</p>
-            </div>
-
-            <!-- 8. Дзеркало сайту / Альтернативний домен -->
-            <div class="badges-legend-item">
-              <div class="badges-legend-header">
-                <div class="badges-legend-preview" title="Альтернативна адреса">
-                  <span class="mirror-badge" style="opacity: 1; margin: 0; pointer-events: none; width: 24px; height: 24px;"></span>
-                </div>
-                <div class="badges-legend-title">Дзеркало сайту / Альтернативний домен</div>
-              </div>
-              <p class="badges-legend-desc">Запасна резервна адреса або дзеркало веб-ресурсу на випадок перевантаження або тимчасової недоступності основного посилання.</p>
-            </div>
-
-            <!-- 9. Потрібна реєстрація / Вхід -->
-            <div class="badges-legend-item">
-              <div class="badges-legend-header">
-                <div class="badges-legend-preview" title="Необхідна реєстрація">
-                  <span class="auth-badge" style="opacity: 1; margin: 0; pointer-events: none; width: 24px; height: 24px;"></span>
-                </div>
-                <div class="badges-legend-title">Потрібна реєстрація / Авторизація</div>
-              </div>
-              <p class="badges-legend-desc">Доступ до основних функцій чи матеріалів сервісу потребує створення облікового запису (реєстрації або входу).</p>
             </div>
 
             <!-- 10. Вільний / Open Source сервіс -->
@@ -1767,15 +1767,15 @@ function openBadgesModal() {
               <p class="badges-legend-desc">Повністю вільне некомерційне програмне забезпечення або сервіс із відкритим вихідним кодом без нав'язливих платних підписок.</p>
             </div>
 
-            <!-- 11. Рекомендовано сайтом -->
+            <!-- 11. Потрібна реєстрація / Авторизація -->
             <div class="badges-legend-item">
               <div class="badges-legend-header">
-                <div class="badges-legend-preview" title="Рекомендація нашого сайту">
-                  <span class="status-dot dot-green" style="margin: 0; display: inline-block;"></span>
+                <div class="badges-legend-preview" title="Необхідна реєстрація">
+                  <span class="auth-badge" style="opacity: 1; margin: 0; pointer-events: none; width: 24px; height: 24px;"></span>
                 </div>
-                <div class="badges-legend-title">Рекомендовано сайтом</div>
+                <div class="badges-legend-title">Потрібна реєстрація / Авторизація</div>
               </div>
-              <p class="badges-legend-desc">Особливо якісні, перевірені та надійні ресурси, відзначені редакцією нашого каталогу.</p>
+              <p class="badges-legend-desc">Доступ до основних функцій чи матеріалів сервісу потребує створення облікового запису (реєстрації або входу).</p>
             </div>
           </div>
         </div>

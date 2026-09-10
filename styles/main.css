@@ -1947,7 +1947,7 @@ body.dark-mode .badges-legend-desc {
   line-height: 0;
   position: relative;
   vertical-align: middle;
-  cursor: help;
+  cursor: pointer;
   user-select: none;
 }
 
