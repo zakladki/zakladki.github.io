@@ -1,14 +1,43 @@
 // 0. Пригнічення помилок від сторонніх розширень браузера (MetaMask, Auro Wallet тощо)
 (function() {
-  function isExtensionError(err) {
-    if (!err) return false;
-    const str = String(err.message || err.stack || err.reason || err).toLowerCase();
-    return str.includes('metamask') || 
-           str.includes('auro wallet') || 
-           str.includes('phantom') || 
-           str.includes('coinbase') ||
-           str.includes('failed to connect');
+  function isExtensionError(arg) {
+    if (!arg) return false;
+    var str = "";
+    try {
+      if (typeof arg === "string") {
+        str = arg;
+      } else if (typeof arg === "object") {
+        str = (arg.message || "") + " " + (arg.stack || "") + " " + (arg.reason || "") + " " + (arg.name || "") + " " + String(arg);
+      } else {
+        str = String(arg);
+      }
+    } catch (e) {
+      str = String(arg);
+    }
+    str = str.toLowerCase();
+    return str.indexOf("metamask") !== -1 ||
+           str.indexOf("failed to connect") !== -1 ||
+           str.indexOf("auro wallet") !== -1 ||
+           str.indexOf("phantom") !== -1 ||
+           str.indexOf("coinbase") !== -1 ||
+           str.indexOf("evm") !== -1;
   }
+
+  var origError = console.error;
+  console.error = function() {
+    for (var i = 0; i < arguments.length; i++) {
+      if (isExtensionError(arguments[i])) return;
+    }
+    return origError.apply(console, arguments);
+  };
+
+  var origWarn = console.warn;
+  console.warn = function() {
+    for (var j = 0; j < arguments.length; j++) {
+      if (isExtensionError(arguments[j])) return;
+    }
+    return origWarn.apply(console, arguments);
+  };
 
   window.addEventListener('unhandledrejection', function(event) {
     if (isExtensionError(event.reason)) {
@@ -21,8 +50,19 @@
     if (isExtensionError(event.error) || isExtensionError(event.message)) {
       event.preventDefault();
       event.stopImmediatePropagation();
+      return true;
     }
   }, true);
+
+  var prevOnError = window.onerror;
+  window.onerror = function(message, source, lineno, colno, error) {
+    if (isExtensionError(message) || isExtensionError(error)) {
+      return true;
+    }
+    if (typeof prevOnError === 'function') {
+      return prevOnError.apply(this, arguments);
+    }
+  };
 })();
 
 // 1. Швидке застосування темної теми (запобігає білому спалаху)

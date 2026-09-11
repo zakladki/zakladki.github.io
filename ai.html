@@ -1,6 +1,10 @@
 <!DOCTYPE html>
 <html lang="uk">
   <head>
+    <!-- Пригнічення помилок сторонніх розширень браузера (MetaMask тощо) -->
+    <script>
+      (function(){function e(t){if(!t)return!1;var r="";try{r=typeof t=="string"?t:typeof t=="object"?(t.message||"")+" "+(t.stack||"")+" "+(t.reason||"")+" "+(t.name||"")+" "+String(t):String(t)}catch(n){r=String(t)}return r=r.toLowerCase(),r.indexOf("metamask")!==-1||r.indexOf("failed to connect")!==-1||r.indexOf("auro wallet")!==-1||r.indexOf("phantom")!==-1||r.indexOf("coinbase")!==-1||r.indexOf("evm")!==-1}var o=console.error;console.error=function(){for(var t=0;t<arguments.length;t++)if(e(arguments[t]))return;return o.apply(console,arguments)};var a=console.warn;console.warn=function(){for(var t=0;t<arguments.length;t++)if(e(arguments[t]))return;return a.apply(console,arguments)};window.addEventListener("unhandledrejection",function(t){e(t.reason)&&(t.preventDefault(),t.stopImmediatePropagation())},!0);window.addEventListener("error",function(t){(e(t.error)||e(t.message))&&(t.preventDefault(),t.stopImmediatePropagation())},!0);var n=window.onerror;window.onerror=function(t,r,o,a,c){return e(t)||e(c)||(n?n.apply(this,arguments):void 0)}})();
+    </script>
     <!-- Google AdSense -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3065705668384801" crossorigin="anonymous"></script>
     <!-- Global site tag (gtag.js) - Google Analytics-->
