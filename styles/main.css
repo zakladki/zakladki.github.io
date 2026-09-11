@@ -1833,7 +1833,7 @@ body.dark-mode .cl-modal-body .cl-calendar-prefix {
   z-index: 10650;
 }
 #badgesModalBackdrop .cl-modal-body {
-  padding: 16px 12px;
+  padding: 16px 12px 18px;
   background-color: #f8fafc;
 }
 body.dark-mode #badgesModalBackdrop .cl-modal-body {
@@ -1841,7 +1841,7 @@ body.dark-mode #badgesModalBackdrop .cl-modal-body {
 }
 @media (max-width: 576px) {
   #badgesModalBackdrop .cl-modal-body {
-    padding: 12px 10px;
+    padding: 12px 10px 16px;
   }
 }
 .badges-legend-list {

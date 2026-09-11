@@ -1655,7 +1655,7 @@ function openBadgesModal() {
             <span class="cl-modal-close-x">&times;</span>
           </button>
         </div>
-        <div class="cl-modal-body" style="padding: 16px 10px;">
+        <div class="cl-modal-body">
           <p class="text-muted mb-3" style="font-size: 0.9rem; line-height: 1.45; font-style: italic; padding: 0 2px;">Розшифровка спеціальних інтерактивних позначок та індикаторів:</p>
           
           <div class="badges-legend-list">
@@ -1784,9 +1784,6 @@ function openBadgesModal() {
               <p class="badges-legend-desc">Доступ до основних функцій чи матеріалів сервісу потребує створення облікового запису (реєстрації або входу).</p>
             </div>
           </div>
-        </div>
-        <div class="cl-modal-footer text-right p-3" style="border-top: 1px solid var(--border-color, rgba(0,0,0,0.1)); background: var(--card-grad-end, #f8f9fa);">
-          <button type="button" class="btn btn-primary btn-sm px-4 cl-modal-close" style="border-radius: 6px;">Зрозуміло</button>
         </div>
       </div>
     `;
