@@ -243,7 +243,7 @@ body {
 .group-title .badge {
   background: linear-gradient(135deg, #64748b, #475569);
   color: white;
-  padding: 0.2rem 0.75rem;
+  padding: 0.2rem 0.5rem;
   border-radius: 0.18rem;
   font-size: 0.92rem;
   font-weight: 600;
