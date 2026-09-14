@@ -227,7 +227,8 @@ body {
   opacity: 0.75;
 }
 
-.group-title a {
+.group-title > a,
+.group-title-bottom a {
   text-decoration: none;
   color: inherit;
   display: flex;
@@ -240,10 +241,85 @@ body {
   overflow-wrap: break-word;
 }
 
+.group-title-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 0.28rem;
+  padding: 0 0.15rem;
+}
+
+.group-title-top a.group-category-link {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--cat-color, #475569);
+  text-decoration: none !important;
+  opacity: 0.9;
+  width: auto;
+  text-align: left;
+  transition: opacity 0.2s ease, transform 0.15s ease;
+}
+
+.group-title-top a.group-category-link:hover {
+  opacity: 1;
+  text-decoration: none !important;
+  transform: translateX(1px);
+}
+
+.group-title-top a.group-add-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 19px;
+  height: 19px;
+  min-width: 19px;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.06);
+  color: var(--cat-color, #475569);
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-decoration: none !important;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+  padding: 0;
+  line-height: 1;
+  cursor: pointer;
+}
+
+body.dark-mode .group-title-top a.group-category-link {
+  color: var(--cat-color, #94a3b8);
+}
+
+body.dark-mode .group-title-top a.group-add-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.15);
+  color: var(--cat-color, #cbd5e1);
+}
+
+.group-title-top a.group-add-btn:hover {
+  background: var(--cat-color, #3b82f6);
+  color: #ffffff !important;
+  border-color: var(--cat-color, #3b82f6);
+  transform: scale(1.15);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.group-title-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
 .group-title .badge {
   background: linear-gradient(135deg, #64748b, #475569);
   color: white;
-  padding: 0.2rem 0.5rem;
+  padding: 0.2rem 0.75rem;
   border-radius: 0.18rem;
   font-size: 0.92rem;
   font-weight: 600;
