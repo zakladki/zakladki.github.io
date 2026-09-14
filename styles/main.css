@@ -552,7 +552,7 @@ body.dark-mode .group li .link-sep {
 .link-favicon {
   width: 16px;
   height: 16px;
-  margin-right: 8px;
+  margin-right: 5px;
   border-radius: 3px;
   object-fit: contain;
   flex-shrink: 0;
