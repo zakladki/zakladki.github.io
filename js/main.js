@@ -740,7 +740,10 @@ document.addEventListener("DOMContentLoaded", () => {
       
       if (isHome) {
         recCard.innerHTML = `
-          <div class="group-title"><span class="badge badge-recommend">Рекомендації Сайту</span></div>
+          <div class="group-title">
+            <span class="badge badge-recommend">Рекомендації Сайту</span>
+            <a href="https://docs.google.com/document/d/15S2XrUxYaj1uu68wtfqww3Gkqa-Lq2Ra-P20AHWqKgs" target="_blank" class="group-add-btn" title="Вільне Місце. Добавте свій сайт, магазин, сервіс, тощо (посилання і опис)."><i class="fas fa-plus"></i></a>
+          </div>
           <ul>
             <li>
               <a href="https://docs.google.com/document/d/15S2XrUxYaj1uu68wtfqww3Gkqa-Lq2Ra-P20AHWqKgs" target="_blank" title="Тут може бути Ваше посилання і опис на Ваш сайт, магазин, сервіс, тощо. Контакти для розміщення — внизу сторінки."><span class="link-favicon" style="display: none;"></span><span class="placeholder-circle"></span><span class="placeholder-icon">💎</span>Вільне Місце</a>
@@ -749,7 +752,10 @@ document.addEventListener("DOMContentLoaded", () => {
         `;
       } else {
         recCard.innerHTML = `
-          <div class="group-title"><span class="badge badge-recommend">Рекомендації Розділу</span></div>
+          <div class="group-title">
+            <span class="badge badge-recommend">Рекомендації Розділу</span>
+            <a href="https://docs.google.com/document/d/15S2XrUxYaj1uu68wtfqww3Gkqa-Lq2Ra-P20AHWqKgs" target="_blank" class="group-add-btn" title="Вільне Місце. Добавте свій сайт, магазин, сервіс, тощо (посилання і опис)."><i class="fas fa-plus"></i></a>
+          </div>
           <ul>
             <li>
               <a href="https://docs.google.com/document/d/15S2XrUxYaj1uu68wtfqww3Gkqa-Lq2Ra-P20AHWqKgs" target="_blank" title="Тут може бути Ваше посилання і опис на Ваш сайт, магазин, сервіс, тощо. Контакти для розміщення — внизу сторінки."><span class="link-favicon" style="display: none;"></span><span class="placeholder-circle"></span><span class="placeholder-icon">🔥</span>Вільне Місце</a>
@@ -761,24 +767,17 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // === Dynamic inline placeholders at the end of each card ===
-  document.querySelectorAll('.group:not(.cat-recommendations):not(.no-placeholder) ul').forEach(ul => {
-    if (!ul.children.length) return;
-    if (ul.querySelector('.placeholder-ad-item')) return;
-    
-    const groupElement = ul.closest('.group');
-    const badgeElement = groupElement ? groupElement.querySelector('.group-title span.badge') : null;
-    const groupTitle = badgeElement ? badgeElement.textContent.trim() : '';
-
-    if (groupTitle === 'ТЕСТ відтворення') return;
-
-    const li = document.createElement('li');
-    
-    li.className = 'placeholder-ad-item';
-    li.innerHTML = `
-      <a href="https://docs.google.com/document/d/15S2XrUxYaj1uu68wtfqww3Gkqa-Lq2Ra-P20AHWqKgs" target="_blank" title="Тут може бути Ваше посилання і опис на Ваш сайт, магазин, сервіс, тощо. Контакти для розміщення — внизу сторінки."><span class="link-favicon" style="display: none;"></span><span class="placeholder-circle"></span><span class="placeholder-icon">➤</span>Вільне Місце</a>
-    `;
-    ul.appendChild(li);
+  // === Кнопка додавання [+] у шапках карток усіх розділів сайту (Вільне Місце) ===
+  document.querySelectorAll('.group .group-title').forEach(titleEl => {
+    if (!titleEl.querySelector('.group-add-btn')) {
+      const addBtn = document.createElement('a');
+      addBtn.href = 'https://docs.google.com/document/d/15S2XrUxYaj1uu68wtfqww3Gkqa-Lq2Ra-P20AHWqKgs';
+      addBtn.target = '_blank';
+      addBtn.className = 'group-add-btn';
+      addBtn.title = 'Вільне Місце. Добавте свій сайт, магазин, сервіс, тощо (посилання і опис).';
+      addBtn.innerHTML = '<i class="fas fa-plus"></i>';
+      titleEl.appendChild(addBtn);
+    }
   });
 
   // Налаштовуємо перемикачі для кожного елемента списку, де є опис у тезі `a[title]`
