@@ -1709,7 +1709,18 @@ function openBadgesModal() {
               <p class="badges-legend-desc">Особливо якісні, перевірені та надійні ресурси, відзначені редакцією нашого каталогу.</p>
             </div>
 
-            <!-- 2. Особистий кабінет -->
+            <!-- 2. Вільне Місце (+) Додати свій сайт -->
+            <div class="badges-legend-item">
+              <div class="badges-legend-header">
+                <div class="badges-legend-preview" title="Вільне Місце — Додати сайт">
+                  <a href="https://docs.google.com/document/d/15S2XrUxYaj1uu68wtfqww3Gkqa-Lq2Ra-P20AHWqKgs" target="_blank" class="badges-legend-add-btn" title="Вільне Місце. Добавте свій сайт, магазин, сервіс, тощо"><i class="fas fa-plus"></i></a>
+                </div>
+                <div class="badges-legend-title">Кнопка «+» (Вільне Місце)</div>
+              </div>
+              <p class="badges-legend-desc">Розташована в лівому кутку шапки кожної картки (її колір відповідає забарвленню конкретного розділу). Швидкий перехід для розміщення вашого сайту, інтернет-магазину, сервісу чи авторського проєкту в нашому каталозі (з персональним описом та прямим посиланням у відповідному розділі).</p>
+            </div>
+
+            <!-- 3. Особистий кабінет -->
             <div class="badges-legend-item">
               <div class="badges-legend-header">
                 <div class="badges-legend-preview" title="Іконка особистого кабінету">
