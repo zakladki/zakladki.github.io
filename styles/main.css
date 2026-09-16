@@ -1043,11 +1043,40 @@ footer.footer .btn-primary:active {
 }
 
 .side-ad-left {
-  left: calc(50% - 570px - 320px); /* Позиція зліва від центрального контейнера (570px половина контейнера + 300px ширина реклами + 20px відступ) */
+  left: calc(50% - 580px - 320px); /* Позиція зліва від центрального контейнера (580px половина контейнера 1160px + 300px ширина реклами + 20px відступ) */
 }
 
 .side-ad-right {
-  right: calc(50% - 570px - 320px); /* Позиція справа від центрального контейнера (570px половина контейнера + 300px ширина реклами + 20px відступ) */
+  right: calc(50% - 580px - 320px); /* Позиція справа від центрального контейнера (580px половина контейнера 1160px + 300px ширина реклами + 20px відступ) */
+}
+
+/* Вузькі бокові блоки (160px) для екранів від 1530px до 1799px */
+.side-ad-left.side-ad-narrow {
+  width: 160px;
+  left: calc(50% - 580px - 180px); /* 580px + 160px ширина + 20px відступ */
+}
+
+.side-ad-right.side-ad-narrow {
+  width: 160px;
+  right: calc(50% - 580px - 180px); /* 580px + 160px ширина + 20px відступ */
+}
+
+.ad-wrapper-narrow {
+  width: 160px;
+  height: 100%;
+  max-height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  overflow: visible;
+  position: relative;
+}
+
+.ad-wrapper-narrow .adsbygoogle {
+  width: 100% !important;
+  height: 100% !important;
+  max-height: 100% !important;
 }
 
 /* Контейнер для мобільних InFeed-оголошень між картками */
@@ -1108,8 +1137,10 @@ footer.footer .btn-primary:active {
   }
 }
 
-/* Відображаємо рекламу тільки на великих моніторах (від 1800px), де є достатньо вільного місця (наприклад, повністю розгорнуте вікно на 1920x1080 і більше, навіть із бічними панелями) */
-@media (min-width: 1800px) {
+/* Відображаємо рекламу на моніторах від 1530px, де є достатньо вільного місця по боках:
+   - від 1530px до 1799px: вузькі блоки 160px (.side-ad-narrow)
+   - від 1800px: стандартні широкі блоки 300px */
+@media (min-width: 1530px) {
   .side-ad-left, .side-ad-right {
     display: flex;
   }

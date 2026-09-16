@@ -865,7 +865,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const screenWidth = window.innerWidth;
   let totalAdCount = 0;
 
-  // === 1. БОКОВА РЕКЛАМА (Тільки на великих ПК моніторах від 1800px, де є місце) ===
+  // === 1. БОКОВА РЕКЛАМА ===
+  // А) На великих ПК моніторах від 1800px (широкі блоки 300px)
+  // Б) На екранах від 1530px до 1799px (вузькі блоки 160px)
   if (screenWidth >= 1800) {
     const leftAd = document.createElement('div');
     leftAd.className = 'side-ad-left';
@@ -874,7 +876,7 @@ document.addEventListener("DOMContentLoaded", () => {
     rightAd.className = 'side-ad-right';
 
     if (isHomepage) {
-      // === ШАБЛОН РЕКЛАМИ ДЛЯ СТОРІНКИ "ГОЛОВНА" ===
+      // === ШАБЛОН РЕКЛАМИ ДЛЯ СТОРІНКИ "ГОЛОВНА" (>= 1800px) ===
       leftAd.innerHTML = `
         <!-- Ліворуч-Вертикально (Головна) - Велика вертикальна реклама на всю висоту -->
         <div class="ad-wrapper-vertical">
@@ -899,7 +901,7 @@ document.addEventListener("DOMContentLoaded", () => {
         </div>
       `;
     } else {
-      // === ШАБЛОН РЕКЛАМИ ДЛЯ ВСІХ ІНШИХ СТОРІНОК ===
+      // === ШАБЛОН РЕКЛАМИ ДЛЯ ВСІХ ІНШИХ СТОРІНОК (>= 1800px) ===
       // Трисекційне розділення, верхній блок під 300x300, решта пустують
       leftAd.innerHTML = `
         <div class="ad-sidebar-three-parts">
@@ -937,6 +939,45 @@ document.addEventListener("DOMContentLoaded", () => {
     document.body.appendChild(leftAd);
     document.body.appendChild(rightAd);
     totalAdCount += 2; // Два бокових блоки
+    observeAdStatus(leftAd);
+    observeAdStatus(rightAd);
+  } else if (screenWidth >= 1530) {
+    // Вузькі бокові блоки шириною 160px для середніх ПК моніторів (1530px - 1799px)
+    const leftAd = document.createElement('div');
+    leftAd.className = 'side-ad-left side-ad-narrow';
+
+    const rightAd = document.createElement('div');
+    rightAd.className = 'side-ad-right side-ad-narrow';
+
+    leftAd.innerHTML = `
+      <!-- Бокова-ліва (при менше 1799) -->
+      <div class="ad-wrapper-narrow">
+        <ins class="adsbygoogle"
+             style="display:block"
+             data-ad-client="ca-pub-3065705668384801"
+             data-ad-slot="3337256495"
+             data-ad-format="auto"
+             data-full-width-responsive="true"></ins>
+      </div>
+    `;
+
+    rightAd.innerHTML = `
+      <!-- Бокова-права (при менше 1799) -->
+      <div class="ad-wrapper-narrow">
+        <ins class="adsbygoogle"
+             style="display:block"
+             data-ad-client="ca-pub-3065705668384801"
+             data-ad-slot="8603604626"
+             data-ad-format="auto"
+             data-full-width-responsive="true"></ins>
+      </div>
+    `;
+
+    document.body.appendChild(leftAd);
+    document.body.appendChild(rightAd);
+    totalAdCount += 2; // Два бокових блоки
+    observeAdStatus(leftAd);
+    observeAdStatus(rightAd);
   }
 
   // Функція для відстеження статусу завантаження реклами (MutationObserver)
