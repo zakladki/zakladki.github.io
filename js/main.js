@@ -865,120 +865,161 @@ document.addEventListener("DOMContentLoaded", () => {
   const screenWidth = window.innerWidth;
   let totalAdCount = 0;
 
-  // === 1. БОКОВА РЕКЛАМА ===
-  // А) На великих ПК моніторах від 1800px (широкі блоки 300px)
-  // Б) На екранах від 1530px до 1799px (вузькі блоки 160px)
-  if (screenWidth >= 1800) {
-    const leftAd = document.createElement('div');
-    leftAd.className = 'side-ad-left';
-    
-    const rightAd = document.createElement('div');
-    rightAd.className = 'side-ad-right';
+  // === 1. БОКОВА РЕКЛАМА (Динамічне перемикання: 300px при >= 1800px, 160px при 1530-1799px) ===
+  let currentSideAdType = null; // 'wide' (300px), 'narrow' (160px), або 'none'
 
-    if (isHomepage) {
-      // === ШАБЛОН РЕКЛАМИ ДЛЯ СТОРІНКИ "ГОЛОВНА" (>= 1800px) ===
-      leftAd.innerHTML = `
-        <!-- Ліворуч-Вертикально (Головна) - Велика вертикальна реклама на всю висоту -->
-        <div class="ad-wrapper-vertical">
-          <ins class="adsbygoogle"
-               style="display:block;"
-               data-ad-client="ca-pub-3065705668384801"
-               data-ad-slot="9621533245"
-               data-ad-format="auto"
-               data-full-width-responsive="true"></ins>
-        </div>
-      `;
-
-      rightAd.innerHTML = `
-        <!-- Праворуч-Вертикально (Головна) - Велика вертикальна реклама на всю висоту -->
-        <div class="ad-wrapper-vertical">
-          <ins class="adsbygoogle"
-               style="display:block;"
-               data-ad-client="ca-pub-3065705668384801"
-               data-ad-slot="7662418469"
-               data-ad-format="auto"
-               data-full-width-responsive="true"></ins>
-        </div>
-      `;
-    } else {
-      // === ШАБЛОН РЕКЛАМИ ДЛЯ ВСІХ ІНШИХ СТОРІНОК (>= 1800px) ===
-      // Трисекційне розділення, верхній блок під 300x300, решта пустують
-      leftAd.innerHTML = `
-        <div class="ad-sidebar-three-parts">
-          <div class="ad-sidebar-part ad-part-top">
-            <div class="ad-wrapper-300-300">
-              <ins class="adsbygoogle"
-                   style="display:inline-block;width:300px;height:300px"
-                   data-ad-client="ca-pub-3065705668384801"
-                   data-ad-slot="5145579105"
-                   data-full-width-responsive="false"></ins>
-            </div>
-          </div>
-          <div class="ad-sidebar-part ad-part-middle"></div>
-          <div class="ad-sidebar-part ad-part-bottom"></div>
-        </div>
-      `;
-
-      rightAd.innerHTML = `
-        <div class="ad-sidebar-three-parts">
-          <div class="ad-sidebar-part ad-part-top">
-            <div class="ad-wrapper-300-300">
-              <ins class="adsbygoogle"
-                   style="display:inline-block;width:300px;height:300px"
-                   data-ad-client="ca-pub-3065705668384801"
-                   data-ad-slot="7980314361"
-                   data-full-width-responsive="false"></ins>
-            </div>
-          </div>
-          <div class="ad-sidebar-part ad-part-middle"></div>
-          <div class="ad-sidebar-part ad-part-bottom"></div>
-        </div>
-      `;
+  function updateSideAds() {
+    const width = window.innerWidth;
+    let targetType = 'none';
+    if (width >= 1800) {
+      targetType = 'wide';
+    } else if (width >= 1530) {
+      targetType = 'narrow';
     }
 
-    document.body.appendChild(leftAd);
-    document.body.appendChild(rightAd);
-    totalAdCount += 2; // Два бокових блоки
-    observeAdStatus(leftAd);
-    observeAdStatus(rightAd);
-  } else if (screenWidth >= 1530) {
-    // Вузькі бокові блоки шириною 160px для середніх ПК моніторів (1530px - 1799px)
-    const leftAd = document.createElement('div');
-    leftAd.className = 'side-ad-left side-ad-narrow';
+    // Якщо поточний тип блоків уже збігається з потрібним - нічого не перестворюємо
+    if (targetType === currentSideAdType) return;
+    currentSideAdType = targetType;
 
-    const rightAd = document.createElement('div');
-    rightAd.className = 'side-ad-right side-ad-narrow';
+    // Видаляємо попередні бокові блоки, якщо розмір вікна змінився
+    document.querySelectorAll('.side-ad-left, .side-ad-right').forEach(el => el.remove());
 
-    leftAd.innerHTML = `
-      <!-- Бокова-ліва (при менше 1799) -->
-      <div class="ad-wrapper-narrow">
-        <ins class="adsbygoogle"
-             style="display:block"
-             data-ad-client="ca-pub-3065705668384801"
-             data-ad-slot="3337256495"
-             data-ad-format="auto"
-             data-full-width-responsive="true"></ins>
-      </div>
-    `;
+    if (targetType === 'none') {
+      return;
+    }
 
-    rightAd.innerHTML = `
-      <!-- Бокова-права (при менше 1799) -->
-      <div class="ad-wrapper-narrow">
-        <ins class="adsbygoogle"
-             style="display:block"
-             data-ad-client="ca-pub-3065705668384801"
-             data-ad-slot="8603604626"
-             data-ad-format="auto"
-             data-full-width-responsive="true"></ins>
-      </div>
-    `;
+    if (targetType === 'wide') {
+      // Повнорозмірні 300px блоки (від 1800px)
+      const leftAd = document.createElement('div');
+      leftAd.className = 'side-ad-left';
+      
+      const rightAd = document.createElement('div');
+      rightAd.className = 'side-ad-right';
 
-    document.body.appendChild(leftAd);
-    document.body.appendChild(rightAd);
-    totalAdCount += 2; // Два бокових блоки
-    observeAdStatus(leftAd);
-    observeAdStatus(rightAd);
+      if (isHomepage) {
+        leftAd.innerHTML = `
+          <!-- Ліворуч-Вертикально (Головна) - Велика вертикальна реклама на всю висоту -->
+          <div class="ad-wrapper-vertical">
+            <ins class="adsbygoogle"
+                 style="display:block;"
+                 data-ad-client="ca-pub-3065705668384801"
+                 data-ad-slot="9621533245"
+                 data-ad-format="auto"
+                 data-full-width-responsive="true"></ins>
+          </div>
+        `;
+
+        rightAd.innerHTML = `
+          <!-- Праворуч-Вертикально (Головна) - Велика вертикальна реклама на всю висоту -->
+          <div class="ad-wrapper-vertical">
+            <ins class="adsbygoogle"
+                 style="display:block;"
+                 data-ad-client="ca-pub-3065705668384801"
+                 data-ad-slot="7662418469"
+                 data-ad-format="auto"
+                 data-full-width-responsive="true"></ins>
+          </div>
+        `;
+      } else {
+        leftAd.innerHTML = `
+          <div class="ad-sidebar-three-parts">
+            <div class="ad-sidebar-part ad-part-top">
+              <div class="ad-wrapper-300-300">
+                <ins class="adsbygoogle"
+                     style="display:inline-block;width:300px;height:300px"
+                     data-ad-client="ca-pub-3065705668384801"
+                     data-ad-slot="5145579105"
+                     data-full-width-responsive="false"></ins>
+              </div>
+            </div>
+            <div class="ad-sidebar-part ad-part-middle"></div>
+            <div class="ad-sidebar-part ad-part-bottom"></div>
+          </div>
+        `;
+
+        rightAd.innerHTML = `
+          <div class="ad-sidebar-three-parts">
+            <div class="ad-sidebar-part ad-part-top">
+              <div class="ad-wrapper-300-300">
+                <ins class="adsbygoogle"
+                     style="display:inline-block;width:300px;height:300px"
+                     data-ad-client="ca-pub-3065705668384801"
+                     data-ad-slot="7980314361"
+                     data-full-width-responsive="false"></ins>
+              </div>
+            </div>
+            <div class="ad-sidebar-part ad-part-middle"></div>
+            <div class="ad-sidebar-part ad-part-bottom"></div>
+          </div>
+        `;
+      }
+
+      document.body.appendChild(leftAd);
+      document.body.appendChild(rightAd);
+      observeAdStatus(leftAd);
+      observeAdStatus(rightAd);
+
+      try {
+        (window.adsbygoogle = window.adsbygoogle || []).push({});
+        (window.adsbygoogle = window.adsbygoogle || []).push({});
+      } catch (e) {
+        console.log("Side ads init error:", e);
+      }
+    } else if (targetType === 'narrow') {
+      // Вузькі бокові блоки шириною 160px для моніторів 1530px - 1799px
+      const leftAd = document.createElement('div');
+      leftAd.className = 'side-ad-left side-ad-narrow';
+
+      const rightAd = document.createElement('div');
+      rightAd.className = 'side-ad-right side-ad-narrow';
+
+      leftAd.innerHTML = `
+        <!-- Бокова-ліва (при менше 1799) -->
+        <div class="ad-wrapper-narrow">
+          <ins class="adsbygoogle"
+               style="display:block"
+               data-ad-client="ca-pub-3065705668384801"
+               data-ad-slot="3337256495"
+               data-ad-format="auto"
+               data-full-width-responsive="true"></ins>
+        </div>
+      `;
+
+      rightAd.innerHTML = `
+        <!-- Бокова-права (при менше 1799) -->
+        <div class="ad-wrapper-narrow">
+          <ins class="adsbygoogle"
+               style="display:block"
+               data-ad-client="ca-pub-3065705668384801"
+               data-ad-slot="8603604626"
+               data-ad-format="auto"
+               data-full-width-responsive="true"></ins>
+        </div>
+      `;
+
+      document.body.appendChild(leftAd);
+      document.body.appendChild(rightAd);
+      observeAdStatus(leftAd);
+      observeAdStatus(rightAd);
+
+      try {
+        (window.adsbygoogle = window.adsbygoogle || []).push({});
+        (window.adsbygoogle = window.adsbygoogle || []).push({});
+      } catch (e) {
+        console.log("Side narrow ads init error:", e);
+      }
+    }
   }
+
+  // Первинна ініціалізація бокових блоків
+  updateSideAds();
+
+  // Відстежуємо зміну ширини вікна в реальному часі (наприклад, перетягування межі вікна)
+  let sideAdsResizeTimer = null;
+  window.addEventListener('resize', () => {
+    clearTimeout(sideAdsResizeTimer);
+    sideAdsResizeTimer = setTimeout(updateSideAds, 200);
+  });
 
   // Функція для відстеження статусу завантаження реклами (MutationObserver)
   function observeAdStatus(adContainer) {

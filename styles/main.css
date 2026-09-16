@@ -1137,12 +1137,34 @@ footer.footer .btn-primary:active {
   }
 }
 
-/* Відображаємо рекламу на моніторах від 1530px, де є достатньо вільного місця по боках:
-   - від 1530px до 1799px: вузькі блоки 160px (.side-ad-narrow)
-   - від 1800px: стандартні широкі блоки 300px */
-@media (min-width: 1530px) {
-  .side-ad-left, .side-ad-right {
-    display: flex;
+/* Широкі блоки (300px) відображаються ВИКЛЮЧНО від 1800px */
+@media (min-width: 1800px) {
+  .side-ad-left:not(.side-ad-narrow),
+  .side-ad-right:not(.side-ad-narrow) {
+    display: flex !important;
+  }
+  .side-ad-narrow {
+    display: none !important;
+  }
+}
+
+/* Вузькі блоки (160px) відображаються у проміжку від 1530px до 1799px */
+@media (min-width: 1530px) and (max-width: 1799px) {
+  .side-ad-left:not(.side-ad-narrow),
+  .side-ad-right:not(.side-ad-narrow) {
+    display: none !important; /* Гарантує, що 300px блоки негайно зникають при < 1800px */
+  }
+  .side-ad-narrow {
+    display: flex !important;
+  }
+}
+
+/* На екранах менше 1530px повністю ховаємо будь-які бокові блоки */
+@media (max-width: 1529px) {
+  .side-ad-left,
+  .side-ad-right,
+  .side-ad-narrow {
+    display: none !important;
   }
 }
 
