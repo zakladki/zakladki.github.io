@@ -73,6 +73,9 @@ body {
 
 /* Large screen columns */
 @media (min-width: 1230px) {
+  .tab-content.container {
+    max-width: 1160px;
+  }
   .row.animated.fadeIn {
     column-count: 4;
   }
