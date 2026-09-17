@@ -1070,8 +1070,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // === 3. ВПРОВАДЖЕННЯ МОБІЛЬНИХ IN-FEED РЕКЛАМНИХ БЛОКІВ МІЖ КАРТКАМИ (Тільки для мобільних екранів < 1800px) ===
-  if (screenWidth < 1800) {
+  // === 3. ВПРОВАДЖЕННЯ МОБІЛЬНИХ IN-FEED РЕКЛАМНИХ БЛОКІВ МІЖ КАРТКАМИ (Тільки для мобільних екранів < 1230px) ===
+  if (screenWidth < 1230) {
     const groups = document.querySelectorAll('.group');
     const totalGroups = groups.length;
 
