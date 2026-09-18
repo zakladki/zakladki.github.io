@@ -39,59 +39,95 @@ body {
 }
 
 /* ==========================================================================
-   2. LAYOUT & MASONRY GRID (CSS Columns)
+   2. LAYOUT & FIXED INDEPENDENT COLUMNS (Flexbox)
+   Prevents column re-flow and jumping across all pages when descriptions toggle
    ========================================================================== */
 .tab-content.container > .row {
   justify-content: center;
 }
 
-/* Default mobile column layout */
+/* Default mobile column layout (< 768px): clean vertical single column */
 .row.animated.fadeIn {
-  display: block !important;
-  column-count: 1;
-  column-gap: 20px;
-  padding: 1rem;
+  display: flex !important;
+  flex-direction: column !important;
+  column-count: auto !important;
+  column-gap: 0 !important;
+  gap: 0 !important;
+  padding: 1rem !important;
 }
 
 .row.animated.fadeIn > .col-sm {
-  display: contents;
+  display: flex !important;
+  flex-direction: column !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  flex: none !important;
+  gap: 0 !important;
 }
 
 .row.animated.fadeIn .group {
-  break-inside: avoid;
-  -webkit-column-break-inside: avoid;
-  page-break-inside: avoid;
-  margin-bottom: 20px;
+  width: 100% !important;
+  margin-bottom: 20px !important;
+  break-inside: auto !important;
 }
 
-/* Tablet screen columns */
+/* Tablet screen columns (768px - 1229.98px): 2 balanced independent columns */
 @media (min-width: 768px) and (max-width: 1229.98px) {
   .row.animated.fadeIn {
-    column-count: 2;
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    align-items: flex-start !important;
+    column-count: auto !important;
+    column-gap: 0 !important;
+    gap: 10px !important;
+    padding: 0.5rem !important;
+  }
+  .row.animated.fadeIn > .col-sm {
+    display: flex !important;
+    flex-direction: column !important;
+    flex: 0 0 calc(50% - 5px) !important;
+    width: calc(50% - 5px) !important;
+    max-width: calc(50% - 5px) !important;
+    min-width: 0 !important;
+    gap: 0 !important;
+  }
+  .row.animated.fadeIn .group {
+    width: 100% !important;
+    margin-bottom: 10px !important;
+    break-inside: auto !important;
   }
 }
 
-/* Large screen columns */
+/* Large screen columns (>= 1230px): 4 fixed independent columns for all pages */
 @media (min-width: 1230px) {
   .tab-content.container {
     max-width: 1160px;
   }
   .row.animated.fadeIn {
-    column-count: 4;
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: center !important;
+    align-items: flex-start !important;
+    column-count: auto !important;
+    column-gap: 0 !important;
+    gap: 10px !important;
+    padding: 0.5rem !important;
   }
-}
-
-/* Reduced spacing for PC / Tablet (>= 768px) */
-@media (min-width: 768px) {
-  .row.animated.fadeIn {
-    column-gap: 10px;
-    padding: 0.5rem;
+  .row.animated.fadeIn > .col-sm {
+    display: flex !important;
+    flex-direction: column !important;
+    flex: 1 1 0% !important;
+    min-width: 0 !important;
+    width: 275px !important;
+    max-width: 282px !important;
+    gap: 0 !important;
   }
   .row.animated.fadeIn .group {
-    margin-bottom: 10px;
-  }
-  .col-sm {
-    gap: 0.75rem;
+    width: 100% !important;
+    margin-bottom: 10px !important;
+    break-inside: auto !important;
   }
 }
 
