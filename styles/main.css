@@ -1823,6 +1823,16 @@ body.dark-mode .radio-legion-item.playing .radio-play-btn:hover {
   box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.7);
   animation: pulse-green 2s infinite;
 }
+.status-dot.dot-gold {
+  background-color: #f59e0b;
+  border: 1.5px solid #ffffff;
+  box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.85);
+  animation: rec-beacon-double-ping 2.2s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+body.dark-mode .status-dot.dot-gold {
+  background-color: #fbbf24;
+  border-color: #0f172a;
+}
 .status-dot.dot-yellow {
   background-color: #ffc107;
 }
@@ -2332,7 +2342,8 @@ body.dark-mode .torrent-badge:hover {
 .group li .chat-badge, .chat-badge, .group li .bot-badge, .bot-badge,
 .group li .mirror-badge, .mirror-badge,
 .group li .auth-badge, .auth-badge, .group li .lock-badge, .lock-badge,
-.group li .opensource-badge, .opensource-badge, .group li .free-badge, .free-badge {
+.group li .opensource-badge, .opensource-badge, .group li .free-badge, .free-badge,
+.group li .like-badge, .like-badge, .group li .sparkle-badge, .sparkle-badge {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -2361,7 +2372,8 @@ body.dark-mode .torrent-badge:hover {
 .group li:hover .chat-badge, .group li:hover .bot-badge,
 .group li:hover .mirror-badge,
 .group li:hover .auth-badge, .group li:hover .lock-badge,
-.group li:hover .opensource-badge, .group li:hover .free-badge {
+.group li:hover .opensource-badge, .group li:hover .free-badge,
+.group li:hover .like-badge, .group li:hover .sparkle-badge {
   opacity: 0.85;
 }
 
@@ -2371,7 +2383,8 @@ body.dark-mode .torrent-badge:hover {
 .group li .chat-badge::before, .chat-badge::before, .group li .bot-badge::before, .bot-badge::before,
 .group li .mirror-badge::before, .mirror-badge::before,
 .group li .auth-badge::before, .auth-badge::before, .group li .lock-badge::before, .lock-badge::before,
-.group li .opensource-badge::before, .opensource-badge::before, .group li .free-badge::before, .free-badge::before {
+.group li .opensource-badge::before, .opensource-badge::before, .group li .free-badge::before, .free-badge::before,
+.group li .like-badge::before, .like-badge::before, .group li .sparkle-badge::before, .sparkle-badge::before {
   content: '';
   display: block;
   width: 16px;
@@ -2497,6 +2510,163 @@ body.dark-mode .torrent-badge:hover {
   transform: scale(1.1);
 }
 
+/* 7. Рекомендовано: Варіант з Лайком 👍 (.like-badge) з пульсуючою точкою-маячком */
+.group li .like-badge::before, .like-badge::before {
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M2 20h2c.55 0 1-.45 1-1v-9c0-.55-.45-1-1-1H2v11zm19.83-7.12c.11-.25.17-.52.17-.8 0-1.1-.9-2-2-2h-5.5l.92-4.65c.05-.22.02-.46-.08-.66-.23-.45-.72-.77-1.24-.77-.4 0-.78.17-1.04.46l-4.57 5.05c-.32.35-.49.81-.49 1.28v7.21c0 1.1.9 2 2 2h7.82c.86 0 1.62-.55 1.88-1.37l2.13-6.8z'/%3E%3C/svg%3E") no-repeat center / contain;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M2 20h2c.55 0 1-.45 1-1v-9c0-.55-.45-1-1-1H2v11zm19.83-7.12c.11-.25.17-.52.17-.8 0-1.1-.9-2-2-2h-5.5l.92-4.65c.05-.22.02-.46-.08-.66-.23-.45-.72-.77-1.24-.77-.4 0-.78.17-1.04.46l-4.57 5.05c-.32.35-.49.81-.49 1.28v7.21c0 1.1.9 2 2 2h7.82c.86 0 1.62-.55 1.88-1.37l2.13-6.8z'/%3E%3C/svg%3E") no-repeat center / contain;
+}
+
+/* Пульсуюча точка-маячок у правому верхньому кутку кнопки 👍 (Неоново-смарагдовий з подвійним імпульсом) */
+.group li .like-badge::after, .like-badge::after {
+  content: '';
+  position: absolute;
+  top: -2.5px;
+  right: -2.5px;
+  width: 7.5px;
+  height: 7.5px;
+  border-radius: 50%;
+  background-color: #10b981;
+  border: 1.5px solid #ffffff;
+  box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.85);
+  animation: like-beacon-double-ping 2.2s cubic-bezier(0, 0, 0.2, 1) infinite;
+  pointer-events: none;
+  z-index: 2;
+}
+
+body.dark-mode .group li .like-badge::after, body.dark-mode .like-badge::after {
+  border-color: #1e293b;
+  background-color: #34d399;
+}
+
+.group li .like-badge:hover, .like-badge:hover {
+  opacity: 1;
+  background-color: rgba(37, 99, 235, 0.12);
+  color: #2563eb !important;
+  border-color: rgba(37, 99, 235, 0.35);
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.15);
+  animation: badge-bounce 0.6s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+.group li .like-badge:hover::before, .like-badge:hover::before {
+  transform: scale(1.15) rotate(-6deg);
+}
+.group li .like-badge:hover::after, .like-badge:hover::after {
+  background-color: #10b981;
+  border-color: #ffffff;
+  animation: like-beacon-double-ping 1.4s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+body.dark-mode .group li .like-badge:hover::after, body.dark-mode .like-badge:hover::after {
+  background-color: #34d399;
+  border-color: #0f172a;
+}
+
+/* Подвійний радарний імпульс (два золотистих кільця розширення, що біжать одне за одним) */
+@keyframes rec-beacon-double-ping {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.9), 0 0 0 0 rgba(245, 158, 11, 0.7);
+  }
+  30% {
+    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.5), 0 0 0 0 rgba(245, 158, 11, 0.8);
+  }
+  55% {
+    transform: scale(1.15);
+    box-shadow: 0 0 0 6px rgba(245, 158, 11, 0), 0 0 0 3px rgba(245, 158, 11, 0.45);
+  }
+  80% {
+    box-shadow: 0 0 0 6px rgba(245, 158, 11, 0), 0 0 0 6px rgba(245, 158, 11, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(245, 158, 11, 0), 0 0 0 0 rgba(245, 158, 11, 0);
+  }
+}
+
+/* Позначка «Рекомендовано» у кінці назви посилання (золотистий маячок) */
+.rec-beacon-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: #f59e0b;
+  border: 1.5px solid #ffffff;
+  box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.85);
+  animation: rec-beacon-double-ping 2.2s cubic-bezier(0, 0, 0.2, 1) infinite;
+  margin-left: 6px;
+  margin-right: 2px;
+  vertical-align: middle;
+  flex-shrink: 0;
+  cursor: help;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+body.dark-mode .rec-beacon-dot {
+  background-color: #fbbf24;
+  border-color: #0f172a;
+}
+.rec-beacon-dot:hover,
+a:hover .rec-beacon-dot {
+  transform: scale(1.25);
+  background-color: #d97706;
+  animation-duration: 1.4s;
+}
+body.dark-mode a:hover .rec-beacon-dot {
+  background-color: #f59e0b;
+}
+
+/* Позначка «Рекомендовано» усередині назви: Мікро-зірочка якості ✦ */
+.rec-star {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 5px;
+  font-size: 11px;
+  line-height: 1;
+  color: #f59e0b;
+  vertical-align: middle;
+  cursor: help;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.2s ease, filter 0.25s ease;
+  user-select: none;
+}
+body.dark-mode .rec-star {
+  color: #fbbf24;
+}
+.rec-star:hover,
+a:hover .rec-star {
+  transform: scale(1.35) rotate(15deg);
+  color: #d97706;
+  filter: drop-shadow(0 0 4px rgba(245, 158, 11, 0.65));
+}
+body.dark-mode .rec-star:hover,
+body.dark-mode a:hover .rec-star {
+  color: #fcd34d;
+  filter: drop-shadow(0 0 5px rgba(251, 191, 36, 0.8));
+}
+
+/* 8. Рекомендовано: Варіант з Іскорками ✨ (.sparkle-badge) */
+.group li .sparkle-badge::before, .sparkle-badge::before {
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M12 2L9.5 9.5 2 12l7.5 2.5L12 22l2.5-7.5L22 12l-7.5-2.5L12 2zm7 14l-1.25 3.75L14 21l3.75 1.25L19 26l1.25-3.75L24 21l-3.75-1.25L19 16zM19 0l-1.25 3.75L14 5l3.75 1.25L19 10l1.25-3.75L24 5l-3.75-1.25L19 0z'/%3E%3C/svg%3E") no-repeat center / contain;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M12 2L9.5 9.5 2 12l7.5 2.5L12 22l2.5-7.5L22 12l-7.5-2.5L12 2zm7 14l-1.25 3.75L14 21l3.75 1.25L19 26l1.25-3.75L24 21l-3.75-1.25L19 16zM19 0l-1.25 3.75L14 5l3.75 1.25L19 10l1.25-3.75L24 5l-3.75-1.25L19 0z'/%3E%3C/svg%3E") no-repeat center / contain;
+}
+.group li .sparkle-badge:hover, .sparkle-badge:hover {
+  opacity: 1;
+  background-color: rgba(217, 119, 6, 0.14);
+  color: #d97706 !important;
+  border-color: rgba(217, 119, 6, 0.4);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(217, 119, 6, 0.2);
+}
+.group li .sparkle-badge:hover::before, .sparkle-badge:hover::before {
+  transform: scale(1.18) rotate(15deg);
+  transition: transform 0.25s ease;
+}
+
+@keyframes badge-bounce {
+  0% { transform: translateY(0); }
+  30% { transform: translateY(-4px) scale(1.08); }
+  50% { transform: translateY(0) scale(1); }
+  75% { transform: translateY(-2px) scale(1.04); }
+  100% { transform: translateY(-1px) scale(1); }
+}
+
 /* Темна тема (Dark Mode) для мікро-кнопок */
 body.dark-mode .group li .telegram-badge, body.dark-mode .telegram-badge,
 body.dark-mode .group li .tg-badge, body.dark-mode .tg-badge,
@@ -2508,7 +2678,9 @@ body.dark-mode .group li .mirror-badge, body.dark-mode .mirror-badge,
 body.dark-mode .group li .auth-badge, body.dark-mode .auth-badge,
 body.dark-mode .group li .lock-badge, body.dark-mode .lock-badge,
 body.dark-mode .group li .opensource-badge, body.dark-mode .opensource-badge,
-body.dark-mode .group li .free-badge, body.dark-mode .free-badge {
+body.dark-mode .group li .free-badge, body.dark-mode .free-badge,
+body.dark-mode .group li .like-badge, body.dark-mode .like-badge,
+body.dark-mode .group li .sparkle-badge, body.dark-mode .sparkle-badge {
   background-color: rgba(148, 163, 184, 0.1);
   color: #94a3b8 !important;
   border-color: rgba(148, 163, 184, 0.2);
@@ -2520,7 +2692,8 @@ body.dark-mode .group li:hover .app-badge, body.dark-mode .group li:hover .mobil
 body.dark-mode .group li:hover .chat-badge, body.dark-mode .group li:hover .bot-badge,
 body.dark-mode .group li:hover .mirror-badge,
 body.dark-mode .group li:hover .auth-badge, body.dark-mode .group li:hover .lock-badge,
-body.dark-mode .group li:hover .opensource-badge, body.dark-mode .group li:hover .free-badge {
+body.dark-mode .group li:hover .opensource-badge, body.dark-mode .group li:hover .free-badge,
+body.dark-mode .group li:hover .like-badge, body.dark-mode .group li:hover .sparkle-badge {
   opacity: 0.85;
 }
 
@@ -2575,6 +2748,22 @@ body.dark-mode .group li .free-badge:hover, body.dark-mode .free-badge:hover {
   color: #34d399 !important;
   border-color: rgba(52, 211, 153, 0.45);
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-mode .group li .like-badge:hover, body.dark-mode .like-badge:hover {
+  opacity: 1;
+  background-color: rgba(59, 130, 246, 0.22);
+  color: #60a5fa !important;
+  border-color: rgba(96, 165, 250, 0.45);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-mode .group li .sparkle-badge:hover, body.dark-mode .sparkle-badge:hover {
+  opacity: 1;
+  background-color: rgba(245, 158, 11, 0.22);
+  color: #fbbf24 !important;
+  border-color: rgba(251, 191, 36, 0.45);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
 }
 
 /* ==========================================================================

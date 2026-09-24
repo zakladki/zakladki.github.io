@@ -1826,11 +1826,11 @@ function openBadgesModal() {
             <div class="badges-legend-item">
               <div class="badges-legend-header">
                 <div class="badges-legend-preview" title="Рекомендація нашого сайту">
-                  <span class="status-dot dot-green" style="margin: 0; display: inline-block;"></span>
+                  <span class="rec-beacon-dot" style="margin: 0; display: inline-block;"></span>
                 </div>
                 <div class="badges-legend-title">Рекомендовано сайтом</div>
               </div>
-              <p class="badges-legend-desc">Особливо якісні, перевірені та надійні ресурси, відзначені редакцією нашого каталогу.</p>
+              <p class="badges-legend-desc">Особливо якісні, перевірені та надійні ресурси, відзначені редакцією нашого каталогу (індикатор розташований наприкінці назви посилання).</p>
             </div>
 
             <!-- 2. Вільне Місце (+) Додати свій сайт -->
