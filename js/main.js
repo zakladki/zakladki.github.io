@@ -2508,6 +2508,42 @@ function openAdOrderModal(opts = {}) {
             <!-- Повідомлення про помилку валідації -->
             <div id="adFormError" class="alert alert-danger" style="display:none; margin-bottom: 12px; font-size: 0.88rem; padding: 10px 14px;"></div>
 
+            <!-- РЕГЛАМЕНТ РОЗМІЩЕННЯ, ГАРАНТІЙ ТА МОДЕРАЦІЇ -->
+            <details id="adRegulationsDetails" class="ad-regulations-box">
+              <summary class="ad-regulations-summary">
+                <span><i class="fas fa-file-contract text-primary me-2"></i><strong>Регламент розміщення, гарантій та модерації</strong></span>
+                <span class="text-primary fs-6"><i class="fas fa-chevron-down"></i></span>
+              </summary>
+              <div class="ad-regulations-body">
+                <ol class="ad-rules-list">
+                  <li>
+                    <strong>Працездатність посилання та захист каталогу (Dead links):</strong>
+                    Клієнт зобов'язується підтримувати доступність розміщеного ресурсу. Якщо сайт стає неробочим або видає помилку понад 30 календарних днів і власник не реагує на сповіщення (Email або Telegram) протягом 14 днів, публікація тимчасово деактивується для захисту SEO та відвідувачів каталогу без повернення коштів. За тарифами від 3 років та «Назавжди» замовник зберігає право на поновлення посилання на вільне місце в картці за зверненням та пред'явленням номера замовлення.
+                  </li>
+                  <li>
+                    <strong>Гарантія довгострокових тарифів (1 заміна на рік):</strong>
+                    Для замовлень на 3 роки, 5 років та «Назавжди» надається офіційне право на 1 безкоштовну зміну URL, назви або опису на рік у разі ребрендингу чи зміни домену. Кожна наступна (повторна) зміна протягом того ж календарного року узгоджується в діалозі за символічну технічну плату (100 грн).
+                  </li>
+                  <li>
+                    <strong>Модерація оновлень та відповідність тематиці:</strong>
+                    Будь-яка зміна посилання чи опису проходить обов'язкову ручну перевірку. Заміна ресурсу на інший, що не відповідає тематиці картки, не допускається (або здійснюється перенесення у відповідний розділ за діючими тарифами з доплатою різниці).
+                  </li>
+                  <li>
+                    <strong>Категорично заборонений контент (Content Policy):</strong>
+                    Суворо заборонено сайти, що порушують законодавство України, містять шкідливе ПЗ / віруси, фішинг, шахрайські схеми, неліцензовані азартні ігри / казино, деструктивну пропаганду чи матеріали 18+. Якщо розміщений ресурс пізніше трансформується у заборонений контент, посилання негайно видаляється без права повернення коштів.
+                  </li>
+                  <li>
+                    <strong>Правило черги та терміни активації:</strong>
+                    У кожній картці допускається до 6 місць. Перше замовлення займає верхню позицію в обраній зоні з автоматичним просуванням угору після завершення терміну попередніх замовлень. Активація посилання здійснюється протягом 1-24 годин після підтвердження оплати.
+                  </li>
+                </ol>
+              </div>
+            </details>
+
+            <div class="ad-terms-agreement-note">
+              <i class="fas fa-shield-alt text-success me-1"></i> Натискаючи кнопку нижче, ви погоджуєтеся з <a href="javascript:void(0)" id="adToggleRulesBtn" class="ad-terms-link">Регламентом розміщення та модерації</a>.
+            </div>
+
             <!-- Кнопка фінального кроку -->
             <button type="button" id="adSubmitOrderBtn" class="ad-submit-btn">
               <span>Сформувати замовлення та отримати реквізити</span>
@@ -2548,6 +2584,9 @@ function openAdOrderModal(opts = {}) {
             <div class="ad-badge-rule-box" style="margin-bottom: 12px;">
               <i class="fas fa-exclamation-triangle text-warning me-1"></i>
               <strong>Важливо:</strong> У призначенні або коментарі до платежу обов'язково вкажіть номер замовлення <strong id="adRecNoteOrderId"></strong> (або надішліть квитанцію/скріншот у наш Telegram).
+            </div>
+            <div style="font-size: 0.78rem; text-align: center; color: var(--text-muted, #64748b); margin-bottom: 12px;">
+              <i class="fas fa-shield-alt text-success me-1"></i> Оформленням замовлення зафіксовано згоду з офіційним Регламентом розміщення та модерації.
             </div>
 
             <!-- Кнопки швидких дій -->
@@ -2758,6 +2797,21 @@ function openAdOrderModal(opts = {}) {
         promoBtn.click();
       }
     });
+
+    // Відкриття Регламенту при кліку на посилання
+    const toggleRulesBtn = document.getElementById('adToggleRulesBtn');
+    if (toggleRulesBtn) {
+      toggleRulesBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const details = document.getElementById('adRegulationsDetails');
+        if (details) {
+          details.open = !details.open;
+          if (details.open) {
+            details.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          }
+        }
+      });
+    }
 
     // Фінальне сабміт-замовлення (перехід на Крок 2)
     document.getElementById('adSubmitOrderBtn').addEventListener('click', submitAdOrder);
