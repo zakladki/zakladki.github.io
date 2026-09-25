@@ -783,24 +783,24 @@ document.addEventListener("DOMContentLoaded", () => {
       if (isHome) {
         recCard.innerHTML = `
           <div class="group-title">
-            <span class="badge badge-recommend">Рекомендації Сайту</span>
+            <span class="badge badge-recommend">Партнери Сайту</span>
             <a href="https://docs.google.com/document/d/15S2XrUxYaj1uu68wtfqww3Gkqa-Lq2Ra-P20AHWqKgs" target="_blank" class="group-add-btn" title="Вільне Місце. Добавте свій сайт, магазин, сервіс, тощо (посилання і опис)."><i class="fas fa-plus"></i></a>
           </div>
           <ul>
             <li>
-              <a href="https://docs.google.com/document/d/15S2XrUxYaj1uu68wtfqww3Gkqa-Lq2Ra-P20AHWqKgs" target="_blank" title="Тут може бути Ваше посилання і опис на Ваш сайт, магазин, сервіс, тощо. Контакти для розміщення — внизу сторінки."><span class="link-favicon" style="display: none;"></span><span class="placeholder-circle"></span><span class="placeholder-icon">💎</span>Вільне Місце</a>
+              <a href="https://docs.google.com/document/d/15S2XrUxYaj1uu68wtfqww3Gkqa-Lq2Ra-P20AHWqKgs" target="_blank" title="Тут може бути Ваше посилання і опис на Ваш сайт, магазин, сервіс, тощо. Контакти для розміщення - внизу сторінки."><span class="link-favicon" style="display: none;"></span><span class="placeholder-circle"></span><span class="placeholder-icon">💎</span>Вільне Місце</a>
             </li>
           </ul>
         `;
       } else {
         recCard.innerHTML = `
           <div class="group-title">
-            <span class="badge badge-recommend">Рекомендації Розділу</span>
+            <span class="badge badge-recommend">Партнери Розділу</span>
             <a href="https://docs.google.com/document/d/15S2XrUxYaj1uu68wtfqww3Gkqa-Lq2Ra-P20AHWqKgs" target="_blank" class="group-add-btn" title="Вільне Місце. Добавте свій сайт, магазин, сервіс, тощо (посилання і опис)."><i class="fas fa-plus"></i></a>
           </div>
           <ul>
             <li>
-              <a href="https://docs.google.com/document/d/15S2XrUxYaj1uu68wtfqww3Gkqa-Lq2Ra-P20AHWqKgs" target="_blank" title="Тут може бути Ваше посилання і опис на Ваш сайт, магазин, сервіс, тощо. Контакти для розміщення — внизу сторінки."><span class="link-favicon" style="display: none;"></span><span class="placeholder-circle"></span><span class="placeholder-icon">🔥</span>Вільне Місце</a>
+              <a href="https://docs.google.com/document/d/15S2XrUxYaj1uu68wtfqww3Gkqa-Lq2Ra-P20AHWqKgs" target="_blank" title="Тут може бути Ваше посилання і опис на Ваш сайт, магазин, сервіс, тощо. Контакти для розміщення - внизу сторінки."><span class="link-favicon" style="display: none;"></span><span class="placeholder-circle"></span><span class="placeholder-icon">🔥</span>Вільне Місце</a>
             </li>
           </ul>
         `;
@@ -1831,9 +1831,40 @@ function openBadgesModal() {
                 <div class="badges-legend-preview" title="Рекомендація нашого сайту">
                   <span class="rec-beacon-dot" style="margin: 0; display: inline-block;"></span>
                 </div>
-                <div class="badges-legend-title">Рекомендовано сайтом</div>
+                <div class="badges-legend-title">Рекомендовано сайтом (Редакція)</div>
               </div>
               <p class="badges-legend-desc">Особливо якісні, перевірені та надійні ресурси, відзначені редакцією нашого каталогу (індикатор розташований наприкінці назви посилання).</p>
+            </div>
+
+            <!-- Партнерські та рекламні позначки -->
+            <div class="badges-legend-item">
+              <div class="badges-legend-header">
+                <div class="badges-legend-preview" title="Партнери Сайту (Головна)">
+                  <span style="font-size: 1.25rem;">💎</span>
+                </div>
+                <div class="badges-legend-title">Позначка «💎» - Партнери Сайту (Головна)</div>
+              </div>
+              <p class="badges-legend-desc">Преміальне партнерське розміщення в ексклюзивному блоці «Партнери Сайту» на Головній сторінці порталу.</p>
+            </div>
+
+            <div class="badges-legend-item">
+              <div class="badges-legend-header">
+                <div class="badges-legend-preview" title="Партнери Розділу">
+                  <span style="font-size: 1.25rem;">🔥</span>
+                </div>
+                <div class="badges-legend-title">Позначка «🔥» - Партнери Розділу</div>
+              </div>
+              <p class="badges-legend-desc">Провідне партнерське розміщення в блоці «Партнери Розділу» конкретного тематичного розділу сайту.</p>
+            </div>
+
+            <div class="badges-legend-item">
+              <div class="badges-legend-header">
+                <div class="badges-legend-preview" title="Рекламне розміщення в картці">
+                  <span style="font-size: 1.25rem;">⚡️</span>
+                </div>
+                <div class="badges-legend-title">Позначка «⚡️» - Партнерське розміщення в картці</div>
+              </div>
+              <p class="badges-legend-desc">Офіційне партнерське розміщення ресурсу в тематичній картці каталогу (у верхній або стандартній зоні списку).</p>
             </div>
 
             <!-- 2. Вільне Місце (+) Додати свій сайт -->
@@ -2014,8 +2045,8 @@ const AD_CONFIG = {
   
   // Множники вартості згідно з правилами та зонами сайту
   multipliers: {
-    home_vip: 7,     // Головна -> Рекомендації Сайту (VIP): БВ × 7 = 700 грн/міс
-    section_vip: 3,  // Інші розділи -> Рекомендації Розділу (VIP): БВ × 3 = 300 грн/міс
+    home_vip: 7,     // Головна -> Партнери Сайту (VIP): БВ × 7 = 700 грн/міс
+    section_vip: 3,  // Інші розділи -> Партнери Розділу (VIP): БВ × 3 = 300 грн/міс
     home_top: 4,     // Головна -> Вгорі картки: БВ × 4 = 400 грн/міс
     home_bottom: 2,  // Головна -> Внизу картки: БВ × 2 = 200 грн/міс
     other_top: 2,    // Інші розділи -> Вгорі картки: БВ × 2 = 200 грн/міс
@@ -2185,7 +2216,7 @@ function getSectionBasePrice(section) {
 
 function getSinglePlacementRate(sec, crd, loc) {
   const isHome = sec === 'Головна';
-  const isVip = (crd && crd.includes('Рекомендаці')) || loc === 'vip';
+  const isVip = (crd && (crd.includes('Партнери') || crd.includes('Рекомендаці'))) || loc === 'vip';
   const baseRate = getSectionBasePrice(sec);
 
   if (isVip) {
@@ -2205,7 +2236,7 @@ function getSinglePlacementRate(sec, crd, loc) {
 
 function calculateAdPricing(section, card, location, termId, paymentMethod, duplicateOpt = null) {
   const isHome = section === 'Головна';
-  const isVip = (card && card.includes('Рекомендаці')) || location === 'vip';
+  const isVip = (card && (card.includes('Партнери') || card.includes('Рекомендаці'))) || location === 'vip';
   const primaryMonthlyRate = getSinglePlacementRate(section, card, location);
 
   let hasDuplicate = false;
@@ -2296,7 +2327,7 @@ function openAdOrderModal(opts = {}) {
 
             <!-- Пояснення черги 6 місць -->
             <div class="ad-badge-rule-box">
-              <i class="fas fa-info-circle me-1"></i> <strong>Правило черги та розміщення:</strong> В одній картці допускається до 6 місць. Перше замовлення займає верхню позицію в обраній зоні, послідуючі — нижчі рядки. Діє автоматичне просування вгору після завершення терміну попереднього партнера.
+              <i class="fas fa-info-circle me-1"></i> <strong>Правило черги та розміщення:</strong> В одній картці допускається до 6 рекламних місць. Перше замовлення займає верхню позицію в обраній зоні, послідуючі - нижчі рядки. Діє автоматичне просування вгору після завершення терміну попереднього партнера.
             </div>
 
             <!-- БЛОК 1: Локація на сайті -->
@@ -2389,7 +2420,7 @@ function openAdOrderModal(opts = {}) {
                   <div class="ad-preview-content">
                     <div class="ad-preview-title">
                       <span id="adPreviewTitleText">Назва Вашого Ресурсу</span>
-                      <span id="adPreviewBeacon" class="rec-beacon-dot" style="display:none;" title="Рекомендація редакції"></span>
+                      <span id="adPreviewBadgeIcon" class="ad-badge-marker" title="Рекламне розміщення в картці">⚡️</span>
                     </div>
                     <div id="adPreviewDescText" class="ad-preview-desc">Тут відображатиметься короткий опис вашого сайту при наведенні чи кліку...</div>
                   </div>
@@ -2534,7 +2565,7 @@ function openAdOrderModal(opts = {}) {
                   </li>
                   <li>
                     <strong>Правило черги та терміни активації:</strong>
-                    У кожній картці допускається до 6 місць. Перше замовлення займає верхню позицію в обраній зоні з автоматичним просуванням угору після завершення терміну попередніх замовлень. Активація посилання здійснюється протягом 1-24 годин після підтвердження оплати.
+                    У кожній картці допускається до 6 рекламних місць. Перше замовлення займає верхню позицію в обраній зоні з автоматичним просуванням угору після завершення терміну попередніх замовлень. Активація посилання здійснюється протягом 1-24 годин після підтвердження оплати.
                   </li>
                 </ol>
               </div>
@@ -2874,12 +2905,12 @@ function updateCardOptions(section, preferredCard = '') {
   const vipPrice = isHome 
     ? AD_CONFIG.basePriceUah * AD_CONFIG.multipliers.home_vip 
     : baseRate * AD_CONFIG.multipliers.section_vip;
-  const vipTitle = isHome ? '⭐ Рекомендації Сайту (VIP)' : '⭐ Рекомендації Розділу (VIP)';
+  const vipTitle = isHome ? 'Партнери Сайту (VIP)' : 'Партнери Розділу (VIP)';
   
   // Додаємо опцію VIP з ціною
   const vipOpt = document.createElement('option');
   vipOpt.value = vipTitle;
-  vipOpt.textContent = `${vipTitle} — ${vipPrice} грн/міс`;
+  vipOpt.textContent = `${vipTitle} - ${vipPrice} грн/міс`;
   cardSelect.appendChild(vipOpt);
 
   const cards = SECTIONS_CATALOG[section] || [];
@@ -2907,7 +2938,7 @@ function updateLocationOptions() {
   const locSelect = document.getElementById('adLocationSelect');
   const isHome = section === 'Головна';
   const baseRate = getSectionBasePrice(section);
-  const isVipCard = cardSelect && cardSelect.value.includes('Рекомендаці');
+  const isVipCard = cardSelect && (cardSelect.value.includes('Партнери') || cardSelect.value.includes('Рекомендаці'));
 
   locSelect.innerHTML = '';
 
@@ -2917,7 +2948,7 @@ function updateLocationOptions() {
       : baseRate * AD_CONFIG.multipliers.section_vip;
     const opt = document.createElement('option');
     opt.value = 'vip';
-    opt.textContent = `⭐ VIP Рекомендація — ${vipPrice} грн/міс`;
+    opt.textContent = isHome ? `Партнери Сайту - ${vipPrice} грн/міс` : `Партнери Розділу - ${vipPrice} грн/міс`;
     locSelect.appendChild(opt);
     locSelect.value = 'vip';
     locSelect.disabled = true;
@@ -2932,11 +2963,11 @@ function updateLocationOptions() {
 
     const topOpt = document.createElement('option');
     topOpt.value = 'top';
-    topOpt.textContent = `🔝 Вгорі картки (ТОП) — ${topPrice} грн/міс`;
+    topOpt.textContent = `🔝 Вгорі картки (ТОП) - ${topPrice} грн/міс`;
 
     const bottomOpt = document.createElement('option');
     bottomOpt.value = 'bottom';
-    bottomOpt.textContent = `📍 Внизу картки (Стандарт) — ${bottomPrice} грн/міс`;
+    bottomOpt.textContent = `📍 Внизу картки (Стандарт) - ${bottomPrice} грн/міс`;
 
     locSelect.appendChild(topOpt);
     locSelect.appendChild(bottomOpt);
@@ -2953,11 +2984,11 @@ function updateDupCardOptions(section, preferredCard = '') {
   const vipPrice = isHome 
     ? AD_CONFIG.basePriceUah * AD_CONFIG.multipliers.home_vip 
     : baseRate * AD_CONFIG.multipliers.section_vip;
-  const vipTitle = isHome ? '⭐ Рекомендації Сайту (VIP)' : '⭐ Рекомендації Розділу (VIP)';
+  const vipTitle = isHome ? 'Партнери Сайту (VIP)' : 'Партнери Розділу (VIP)';
   
   const vipOpt = document.createElement('option');
   vipOpt.value = vipTitle;
-  vipOpt.textContent = `${vipTitle} — ${vipPrice} грн/міс`;
+  vipOpt.textContent = `${vipTitle} - ${vipPrice} грн/міс`;
   cardSelect.appendChild(vipOpt);
 
   const cards = SECTIONS_CATALOG[section] || [];
@@ -2985,7 +3016,7 @@ function updateDupLocationOptions() {
   if (!cardSelect || !locSelect) return;
   const isHome = section === 'Головна';
   const baseRate = getSectionBasePrice(section);
-  const isVipCard = cardSelect.value.includes('Рекомендаці');
+  const isVipCard = cardSelect && (cardSelect.value.includes('Партнери') || cardSelect.value.includes('Рекомендаці'));
 
   locSelect.innerHTML = '';
   if (isVipCard) {
@@ -2994,7 +3025,7 @@ function updateDupLocationOptions() {
       : baseRate * AD_CONFIG.multipliers.section_vip;
     const opt = document.createElement('option');
     opt.value = 'vip';
-    opt.textContent = `⭐ VIP Рекомендація — ${vipPrice} грн/міс`;
+    opt.textContent = isHome ? `Партнери Сайту - ${vipPrice} грн/міс` : `Партнери Розділу - ${vipPrice} грн/міс`;
     locSelect.appendChild(opt);
     locSelect.value = 'vip';
     locSelect.disabled = true;
@@ -3009,15 +3040,27 @@ function updateDupLocationOptions() {
 
     const topOpt = document.createElement('option');
     topOpt.value = 'top';
-    topOpt.textContent = `🔝 Вгорі картки (ТОП) — ${topPrice} грн/міс`;
+    topOpt.textContent = `🔝 Вгорі картки (ТОП) - ${topPrice} грн/міс`;
 
     const bottomOpt = document.createElement('option');
     bottomOpt.value = 'bottom';
-    bottomOpt.textContent = `📍 Внизу картки (Стандарт) — ${bottomPrice} грн/міс`;
+    bottomOpt.textContent = `📍 Внизу картки (Стандарт) - ${bottomPrice} грн/міс`;
 
     locSelect.appendChild(topOpt);
     locSelect.appendChild(bottomOpt);
     locSelect.value = 'bottom';
+  }
+}
+
+function getAdResourceBadge(section, card, location) {
+  const isHome = section === 'Головна';
+  const isVip = (card && (card.includes('Партнери') || card.includes('Рекомендаці'))) || location === 'vip';
+  if (isVip && isHome) {
+    return { icon: '💎', name: 'Партнери Сайту (Головна)' };
+  } else if (isVip && !isHome) {
+    return { icon: '🔥', name: 'Партнери Розділу' };
+  } else {
+    return { icon: '⚡️', name: 'Рекламне розміщення в картці' };
   }
 }
 
@@ -3026,13 +3069,26 @@ function updateLivePreview() {
   const urlInput = document.getElementById('adSiteUrl');
   const descInput = document.getElementById('adSiteDesc');
   const locSelect = document.getElementById('adLocationSelect');
+  const secSelect = document.getElementById('adSectionSelect');
+  const cardSelect = document.getElementById('adCardSelect');
 
   const titleEl = document.getElementById('adPreviewTitleText');
+  const badgeEl = document.getElementById('adPreviewBadgeIcon');
   const faviconEl = document.getElementById('adPreviewFavicon');
-  const beaconEl = document.getElementById('adPreviewBeacon');
   const descEl = document.getElementById('adPreviewDescText');
 
   titleEl.textContent = nameInput.value.trim() || 'Назва Вашого Ресурсу';
+
+  // Визначення відповідного партнерського значка
+  const currentSec = secSelect?.value || 'Головна';
+  const currentCard = cardSelect?.value || '';
+  const currentLoc = locSelect?.value || 'bottom';
+  const badgeInfo = getAdResourceBadge(currentSec, currentCard, currentLoc);
+
+  if (badgeEl) {
+    badgeEl.textContent = badgeInfo.icon;
+    badgeEl.title = badgeInfo.name;
+  }
 
   const rawUrl = urlInput.value.trim();
   if (rawUrl) {
@@ -3046,7 +3102,6 @@ function updateLivePreview() {
     faviconEl.src = 'favicon.ico';
   }
 
-  beaconEl.style.display = (locSelect.value === 'vip') ? 'inline-block' : 'none';
   descEl.textContent = descInput.value.trim() || 'Тут відображатиметься короткий опис вашого сайту при наведенні чи кліку...';
 }
 
@@ -3213,23 +3268,36 @@ function submitAdOrder() {
     const dupSec = document.getElementById('adDupSectionSelect').value;
     const dupCrd = document.getElementById('adDupCardSelect').value;
     const dupLocVal = document.getElementById('adDupLocationSelect').value;
+    const isDupHome = dupSec === 'Головна';
     duplicateInfo = {
       section: dupSec,
       card: dupCrd,
-      location: dupLocVal === 'vip' ? 'VIP Рекомендація' : dupLocVal === 'top' ? 'Вгорі картки (ТОП)' : 'Внизу картки (Стандарт)'
+      location: dupLocVal === 'vip' ? (isDupHome ? 'Партнери Сайту (VIP)' : 'Партнери Розділу (VIP)') : dupLocVal === 'top' ? 'Вгорі картки (ТОП)' : 'Внизу картки (Стандарт)'
     };
+  }
+
+  const primaryBadge = getAdResourceBadge(section, card, location);
+  let secondBadge = null;
+  if (duplicateInfo) {
+    secondBadge = getAdResourceBadge(duplicateInfo.section, duplicateInfo.card, duplicateInfo.location.includes('VIP') || duplicateInfo.location.includes('Партнери') ? 'vip' : duplicateInfo.location.includes('ТОП') ? 'top' : 'bottom');
   }
 
   const orderPayload = {
     orderId,
     timestamp: new Date().toISOString(),
     siteName: name,
+    siteNameWithBadge: `${name} ${primaryBadge.icon}`,
+    badgeIcon: primaryBadge.icon,
+    badgeName: primaryBadge.name,
     siteUrl: url,
     siteDesc: desc,
     section,
     card,
-    location: location === 'vip' ? 'VIP Рекомендація' : location === 'top' ? 'Вгорі картки (ТОП)' : 'Внизу картки (Стандарт)',
-    secondPlacement: duplicateInfo,
+    location: location === 'vip' ? (isHome ? 'Партнери Сайту (VIP)' : 'Партнери Розділу (VIP)') : location === 'top' ? 'Вгорі картки (ТОП)' : 'Внизу картки (Стандарт)',
+    secondPlacement: duplicateInfo ? {
+      ...duplicateInfo,
+      badgeIcon: secondBadge ? secondBadge.icon : '⚡️'
+    } : null,
     term: pricing.termLabel,
     months: pricing.months,
     hasGuarantee: !!pricing.hasGuarantee,
@@ -3255,7 +3323,7 @@ function submitAdOrder() {
   // Заповнення Кроку 2
   document.getElementById('adSuccessOrderId').textContent = `#${orderId}`;
   document.getElementById('adRecNoteOrderId').textContent = `#${orderId}`;
-  document.getElementById('adRecSite').innerHTML = `<strong>${name}</strong> (<a href="${url}" target="_blank">${url}</a>)`;
+  document.getElementById('adRecSite').innerHTML = `<strong>${name} ${primaryBadge.icon}</strong> (<a href="${url}" target="_blank">${url}</a>)`;
   
   let recPlacementHtml = `<strong>1:</strong> ${section} → ${card} (${orderPayload.location})`;
   if (duplicateInfo) {
@@ -3284,7 +3352,7 @@ function submitAdOrder() {
   const orderSummaryText = 
 `🔔 Замовлення на розміщення на ТОП ЗАКЛАДКИ:
 🆔 Номер: #${orderId}
-🔗 Ресурс: ${name} (${url})
+🔗 Ресурс: ${name} ${primaryBadge.icon} (${url})
 📝 Опис: ${desc}
 ${placementTgText}
 ⏱️ Термін: ${pricing.termLabel}${guaranteeTgText}

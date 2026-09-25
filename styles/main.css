@@ -4267,6 +4267,17 @@ body.dark-mode .ad-terms-link {
   color: #60a5fa;
 }
 
+/* Маркери рекламних та партнерських ресурсів */
+.ad-badge-marker {
+  display: inline-block;
+  font-size: 0.9em;
+  margin-left: 4px;
+  line-height: 1;
+  vertical-align: middle;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.12));
+}
+
+
 
 
 
