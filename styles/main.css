@@ -1341,7 +1341,8 @@ body.dark-mode .group li.placeholder-ad-item:hover {
   height: 16px;
   line-height: 1;
   flex-shrink: 0;
-  margin-right: 6px;
+  margin-left: 4px;
+  margin-right: 0;
 }
 
 /* Radio LEGION Player Component & Unified LIVE Capsule Button («LIVE ▶») */

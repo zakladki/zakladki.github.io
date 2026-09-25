@@ -788,7 +788,7 @@ document.addEventListener("DOMContentLoaded", () => {
           </div>
           <ul>
             <li>
-              <a href="https://docs.google.com/document/d/15S2XrUxYaj1uu68wtfqww3Gkqa-Lq2Ra-P20AHWqKgs" target="_blank" title="Тут може бути Ваше посилання і опис на Ваш сайт, магазин, сервіс, тощо. Контакти для розміщення - внизу сторінки."><span class="link-favicon" style="display: none;"></span><span class="placeholder-circle"></span><span class="placeholder-icon">💎</span>Вільне Місце</a>
+              <a href="https://docs.google.com/document/d/15S2XrUxYaj1uu68wtfqww3Gkqa-Lq2Ra-P20AHWqKgs" target="_blank" title="Тут може бути Ваше посилання і опис на Ваш сайт, магазин, сервіс, тощо. Контакти для розміщення - внизу сторінки."><span class="link-favicon" style="display: none;"></span><span class="placeholder-circle"></span>Вільне Місце<span class="placeholder-icon ad-badge-marker" title="Партнери Сайту">💎</span></a>
             </li>
           </ul>
         `;
@@ -800,7 +800,7 @@ document.addEventListener("DOMContentLoaded", () => {
           </div>
           <ul>
             <li>
-              <a href="https://docs.google.com/document/d/15S2XrUxYaj1uu68wtfqww3Gkqa-Lq2Ra-P20AHWqKgs" target="_blank" title="Тут може бути Ваше посилання і опис на Ваш сайт, магазин, сервіс, тощо. Контакти для розміщення - внизу сторінки."><span class="link-favicon" style="display: none;"></span><span class="placeholder-circle"></span><span class="placeholder-icon">🔥</span>Вільне Місце</a>
+              <a href="https://docs.google.com/document/d/15S2XrUxYaj1uu68wtfqww3Gkqa-Lq2Ra-P20AHWqKgs" target="_blank" title="Тут може бути Ваше посилання і опис на Ваш сайт, магазин, сервіс, тощо. Контакти для розміщення - внизу сторінки."><span class="link-favicon" style="display: none;"></span><span class="placeholder-circle"></span>Вільне Місце<span class="placeholder-icon ad-badge-marker" title="Партнери Розділу">🔥</span></a>
             </li>
           </ul>
         `;
