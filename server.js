@@ -2,12 +2,45 @@ import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import http from 'http';
+import fs from 'fs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = 3000;
+
+app.use(express.json());
+
+// API route to safely store ad placement orders
+app.post('/api/orders', (req, res) => {
+  try {
+    const orderData = req.body;
+    if (!orderData || !orderData.orderId) {
+      return res.status(400).json({ error: 'Недійсні дані замовлення' });
+    }
+    const ordersFilePath = path.join(__dirname, 'orders.json');
+    let orders = [];
+    if (fs.existsSync(ordersFilePath)) {
+      try {
+        const fileContent = fs.readFileSync(ordersFilePath, 'utf8');
+        orders = JSON.parse(fileContent);
+      } catch (e) {
+        orders = [];
+      }
+    }
+    orders.unshift({
+      ...orderData,
+      receivedAt: new Date().toISOString()
+    });
+    if (orders.length > 500) orders = orders.slice(0, 500);
+    fs.writeFileSync(ordersFilePath, JSON.stringify(orders, null, 2), 'utf8');
+    return res.json({ success: true, orderId: orderData.orderId });
+  } catch (err) {
+    console.error('Error saving order:', err);
+    return res.status(500).json({ error: 'Помилка збереження замовлення на сервері' });
+  }
+});
 
 // Radio stream proxy route to fix Mixed Content (HTTP stream on HTTPS site)
 app.get('/api/radio', (req, res) => {

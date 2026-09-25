@@ -3387,6 +3387,782 @@ body.dark-mode .announcements-empty-state .empty-title {
   color: #f1f5f9;
 }
 
+/* ==========================================================================
+   МОДАЛЬНЕ ВІКНО РОЗМІЩЕННЯ РЕСУРСУ ТА ОПЛАТИ (AD PLACEMENT ORDER SYSTEM)
+   ========================================================================== */
+#adOrderModalBackdrop {
+  z-index: 10700;
+}
+.ad-order-modal {
+  max-width: 820px;
+  width: 100%;
+}
+.ad-modal-body {
+  padding: 16px 20px;
+  max-height: calc(88vh - 120px);
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* Закріплена плаваюча плашка вартості (завжди видима при будь-якому скролі) */
+.ad-sticky-price-bar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--card-bg, #ffffff);
+  border: 1.5px solid #3b82f6;
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin-bottom: 14px;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.12);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: all 0.2s ease;
+}
+body.dark-mode .ad-sticky-price-bar {
+  background: rgba(15, 23, 42, 0.94);
+  border-color: #60a5fa;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+.ad-sticky-price-left {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.ad-sticky-price-title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted, #64748b);
+}
+body.dark-mode .ad-sticky-price-title {
+  color: #94a3b8;
+}
+.ad-sticky-price-uah {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #2563eb;
+  line-height: 1;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+body.dark-mode .ad-sticky-price-uah {
+  color: #60a5fa;
+}
+.ad-sticky-price-uah.price-flash {
+  transform: scale(1.15);
+  color: #10b981 !important;
+}
+.ad-sticky-price-usdt {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #10b981;
+}
+body.dark-mode .ad-sticky-price-usdt {
+  color: #34d399;
+}
+.ad-sticky-price-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.ad-sticky-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 4px;
+  background: #eff6ff;
+  color: #1d4ed8;
+  border: 1px solid #bfdbfe;
+  white-space: nowrap;
+}
+body.dark-mode .ad-sticky-badge {
+  background: rgba(30, 58, 138, 0.4);
+  color: #93c5fd;
+  border-color: #1e40af;
+}
+
+.ad-badge-rule-box {
+  background: rgba(14, 165, 233, 0.08);
+  border: 1px dashed rgba(14, 165, 233, 0.4);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: #0369a1;
+  margin-bottom: 16px;
+}
+body.dark-mode .ad-badge-rule-box {
+  background: rgba(14, 165, 233, 0.12);
+  border-color: rgba(56, 189, 248, 0.35);
+  color: #7dd3fc;
+}
+.ad-section-block {
+  background: var(--card-bg, #ffffff);
+  border: 1px solid var(--border-color, rgba(0, 0, 0, 0.09));
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+}
+body.dark-mode .ad-section-block {
+  background: rgba(30, 41, 59, 0.5);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+.ad-block-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-main, #1e293b);
+}
+body.dark-mode .ad-block-title {
+  color: #f1f5f9;
+}
+.ad-form-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}
+.ad-form-group {
+  margin-bottom: 12px;
+}
+.ad-form-group:last-child {
+  margin-bottom: 0;
+}
+.ad-label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+.ad-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-muted, #64748b);
+  margin: 0;
+}
+body.dark-mode .ad-label {
+  color: #94a3b8;
+}
+.ad-char-counter {
+  font-size: 0.75rem;
+  color: #64748b;
+  font-family: monospace;
+}
+.ad-char-counter.warning {
+  color: #eab308;
+  font-weight: bold;
+}
+.ad-char-counter.danger {
+  color: #ef4444;
+  font-weight: bold;
+}
+.ad-input, .ad-select, .ad-textarea {
+  width: 100%;
+  border-radius: 6px;
+  border: 1px solid var(--border-color, #cbd5e1);
+  padding: 8px 12px;
+  font-size: 0.9rem;
+  background: var(--input-bg, #ffffff);
+  color: var(--text-main, #1e293b);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  box-sizing: border-box;
+}
+body.dark-mode .ad-input,
+body.dark-mode .ad-select,
+body.dark-mode .ad-textarea {
+  background: #0f172a;
+  border-color: #334155;
+  color: #f8fafc;
+}
+.ad-input:focus, .ad-select:focus, .ad-textarea:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+.ad-textarea {
+  resize: vertical;
+  min-height: 52px;
+  max-height: 100px;
+}
+
+/* Живе прев'ю */
+.ad-live-preview-box {
+  background: #f8fafc;
+  border: 1px dashed #94a3b8;
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin-top: 8px;
+}
+body.dark-mode .ad-live-preview-box {
+  background: rgba(15, 23, 42, 0.6);
+  border-color: #475569;
+}
+.ad-preview-header {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 700;
+  color: #64748b;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+body.dark-mode .ad-preview-header {
+  color: #94a3b8;
+}
+.ad-preview-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: var(--card-bg, #ffffff);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 6px;
+  padding: 8px 12px;
+}
+body.dark-mode .ad-preview-item {
+  background: #1e293b;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+.ad-preview-favicon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  border-radius: 3px;
+  margin-top: 2px;
+}
+.ad-preview-content {
+  flex-grow: 1;
+  min-width: 0;
+}
+.ad-preview-title {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: #0284c7;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  word-break: break-word;
+}
+body.dark-mode .ad-preview-title {
+  color: #38bdf8;
+}
+.ad-preview-desc {
+  font-size: 0.82rem;
+  color: var(--text-muted, #64748b);
+  line-height: 1.4;
+  margin-top: 2px;
+  word-break: break-word;
+}
+body.dark-mode .ad-preview-desc {
+  color: #cbd5e1;
+}
+
+/* Методи оплати */
+.ad-payment-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 10px;
+}
+.ad-payment-option {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 2px solid var(--border-color, #e2e8f0);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  user-select: none;
+  background: var(--card-bg, #ffffff);
+}
+body.dark-mode .ad-payment-option {
+  background: rgba(30, 41, 59, 0.7);
+  border-color: #334155;
+}
+.ad-payment-option:hover {
+  border-color: #93c5fd;
+  transform: translateY(-1px);
+}
+.ad-payment-option input[type="radio"] {
+  accent-color: #2563eb;
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+.ad-payment-option.active {
+  border-color: #2563eb;
+  background: rgba(37, 99, 235, 0.05);
+}
+body.dark-mode .ad-payment-option.active {
+  border-color: #3b82f6;
+  background: rgba(59, 130, 246, 0.15);
+}
+.ad-payment-icon {
+  font-size: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ad-payment-text {
+  flex-grow: 1;
+}
+.ad-payment-name {
+  font-weight: 700;
+  font-size: 0.88rem;
+  color: var(--text-main, #1e293b);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+body.dark-mode .ad-payment-name {
+  color: #f8fafc;
+}
+.ad-payment-sub {
+  font-size: 0.72rem;
+  color: #64748b;
+}
+body.dark-mode .ad-payment-sub {
+  color: #94a3b8;
+}
+.ad-discount-badge {
+  font-size: 0.65rem;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: #ffffff;
+  letter-spacing: 0.3px;
+}
+
+/* Промокод */
+.ad-promo-row {
+  display: flex;
+  gap: 8px;
+}
+.ad-promo-input {
+  max-width: 220px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 600;
+}
+.ad-promo-btn {
+  padding: 8px 16px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border-radius: 6px;
+  background: #3b82f6;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s;
+  white-space: nowrap;
+}
+.ad-promo-btn:hover {
+  background: #2563eb;
+}
+.ad-promo-feedback {
+  font-size: 0.8rem;
+  margin-top: 6px;
+}
+.ad-promo-feedback.success {
+  color: #10b981;
+  font-weight: 600;
+}
+.ad-promo-feedback.error {
+  color: #ef4444;
+}
+
+/* Калькулятор підсумку */
+.ad-calc-summary {
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.06), rgba(14, 165, 233, 0.06));
+  border: 1.5px solid rgba(59, 130, 246, 0.3);
+  border-radius: 10px;
+  padding: 14px 18px;
+  margin-top: 14px;
+}
+body.dark-mode .ad-calc-summary {
+  background: linear-gradient(135deg, rgba(30, 58, 138, 0.25), rgba(14, 165, 233, 0.15));
+  border-color: rgba(96, 165, 250, 0.35);
+}
+.ad-calc-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+  margin-bottom: 6px;
+  color: var(--text-muted, #475569);
+}
+body.dark-mode .ad-calc-row {
+  color: #94a3b8;
+}
+.ad-calc-row.discount-row {
+  color: #059669;
+  font-weight: 600;
+}
+body.dark-mode .ad-calc-row.discount-row {
+  color: #34d399;
+}
+.ad-calc-total-row {
+  border-top: 1px dashed rgba(59, 130, 246, 0.3);
+  padding-top: 8px;
+  margin-top: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+.ad-calc-total-label {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-main, #0f172a);
+}
+body.dark-mode .ad-calc-total-label {
+  color: #f8fafc;
+}
+.ad-calc-total-values {
+  text-align: right;
+}
+.ad-calc-total-uah {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #2563eb;
+  line-height: 1.1;
+}
+body.dark-mode .ad-calc-total-uah {
+  color: #60a5fa;
+}
+.ad-calc-total-usdt {
+  font-size: 0.85rem;
+  color: #10b981;
+  font-weight: 700;
+  margin-top: 2px;
+}
+body.dark-mode .ad-calc-total-usdt {
+  color: #34d399;
+}
+
+/* Кнопка відправки */
+.ad-submit-btn {
+  width: 100%;
+  padding: 13px 20px;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.28);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 16px;
+}
+.ad-submit-btn:hover {
+  background: linear-gradient(135deg, #1d4ed8, #1e40af);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.35);
+}
+
+/* КРОК 2: Електронний чек та реквізити */
+.ad-step2-wrapper {
+  animation: fadeIn 0.3s ease;
+}
+.ad-order-success-banner {
+  background: linear-gradient(135deg, #059669, #10b981);
+  color: #ffffff;
+  padding: 16px;
+  border-radius: 10px;
+  text-align: center;
+  margin-bottom: 18px;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+}
+.ad-order-success-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  margin-bottom: 4px;
+}
+.ad-order-id-display {
+  display: inline-block;
+  background: rgba(0, 0, 0, 0.25);
+  font-family: monospace;
+  font-size: 1.15rem;
+  font-weight: 800;
+  padding: 4px 12px;
+  border-radius: 6px;
+  letter-spacing: 1px;
+  margin-top: 4px;
+  user-select: all;
+}
+.ad-receipt-table {
+  width: 100%;
+  font-size: 0.88rem;
+  margin-bottom: 16px;
+  border-collapse: collapse;
+}
+.ad-receipt-table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border-color, rgba(0, 0, 0, 0.08));
+}
+body.dark-mode .ad-receipt-table td {
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+.ad-receipt-table td:first-child {
+  color: var(--text-muted, #64748b);
+  width: 40%;
+}
+body.dark-mode .ad-receipt-table td:first-child {
+  color: #94a3b8;
+}
+.ad-receipt-table td:last-child {
+  font-weight: 600;
+  color: var(--text-main, #1e293b);
+  text-align: right;
+}
+body.dark-mode .ad-receipt-table td:last-child {
+  color: #f1f5f9;
+}
+
+.ad-requisite-box {
+  background: var(--card-bg, #ffffff);
+  border: 2px solid #3b82f6;
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+body.dark-mode .ad-requisite-box {
+  background: rgba(30, 41, 59, 0.7);
+  border-color: #60a5fa;
+}
+.ad-requisite-title {
+  font-weight: 700;
+  font-size: 1rem;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #2563eb;
+}
+body.dark-mode .ad-requisite-title {
+  color: #93c5fd;
+}
+.ad-copy-field {
+  display: flex;
+  align-items: center;
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  padding: 6px 10px;
+  margin-bottom: 8px;
+}
+body.dark-mode .ad-copy-field {
+  background: #0f172a;
+  border-color: #334155;
+}
+.ad-copy-val {
+  flex-grow: 1;
+  font-family: monospace;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-main, #0f172a);
+  word-break: break-all;
+}
+body.dark-mode .ad-copy-val {
+  color: #f8fafc;
+}
+.ad-copy-btn {
+  background: #3b82f6;
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  padding: 5px 10px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.ad-copy-btn:hover {
+  background: #2563eb;
+}
+.ad-copy-btn.copied {
+  background: #10b981 !important;
+}
+.ad-action-btns-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 10px;
+  margin-top: 16px;
+}
+.ad-action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-decoration: none !important;
+  cursor: pointer;
+  border: none;
+  transition: all 0.15s ease;
+}
+.ad-btn-tg {
+  background: #0088cc;
+  color: #ffffff !important;
+}
+.ad-btn-tg:hover {
+  background: #0077b5;
+  transform: translateY(-1px);
+}
+.ad-btn-copy-all {
+  background: #475569;
+  color: #ffffff !important;
+}
+.ad-btn-copy-all:hover {
+  background: #334155;
+  transform: translateY(-1px);
+}
+.ad-btn-email {
+  background: #64748b;
+  color: #ffffff !important;
+}
+.ad-btn-email:hover {
+  background: #475569;
+  transform: translateY(-1px);
+}
+.ad-btn-back {
+  background: transparent;
+  color: #64748b;
+  border: 1px solid var(--border-color, #cbd5e1);
+}
+body.dark-mode .ad-btn-back {
+  color: #94a3b8;
+  border-color: #475569;
+}
+.ad-btn-back:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+.ad-legal-iban-note {
+  font-size: 0.8rem;
+  line-height: 1.4;
+  color: var(--text-muted, #64748b);
+  border-top: 1px solid var(--border-color, rgba(0, 0, 0, 0.08));
+  padding-top: 12px;
+  margin-top: 16px;
+  text-align: center;
+}
+body.dark-mode .ad-legal-iban-note {
+  border-top-color: rgba(255, 255, 255, 0.08);
+  color: #94a3b8;
+}
+
+/* Опція мульти-розміщення (дублювання в інший розділ) */
+.ad-dup-toggle-wrapper {
+  margin-top: 10px;
+  background: var(--bg-hover, rgba(0, 0, 0, 0.03));
+  border: 1px dashed var(--border-color, #cbd5e1);
+  border-radius: 8px;
+  padding: 8px 12px;
+  transition: all 0.2s ease;
+}
+
+body.dark-mode .ad-dup-toggle-wrapper {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.ad-dup-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  margin: 0;
+  user-select: none;
+  font-size: 0.9rem;
+  color: var(--text-main, #1e293b);
+}
+
+body.dark-mode .ad-dup-checkbox-label {
+  color: #f1f5f9;
+}
+
+.ad-dup-checkbox {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: #2563eb;
+}
+
+.ad-dup-block {
+  margin-top: 10px;
+  padding: 12px;
+  border-radius: 8px;
+  background: rgba(37, 99, 235, 0.04);
+  border: 1.5px solid rgba(37, 99, 235, 0.25);
+  animation: fadeInDup 0.25s ease;
+}
+
+body.dark-mode .ad-dup-block {
+  background: rgba(59, 130, 246, 0.08);
+  border-color: rgba(59, 130, 246, 0.35);
+}
+
+@keyframes fadeInDup {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.ad-dup-subtitle {
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: #1d4ed8;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+}
+
+body.dark-mode .ad-dup-subtitle {
+  color: #93c5fd;
+}
+
+/* Гарантія для довгострокових тарифів */
+.ad-guarantee-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  border-radius: 6px;
+  padding: 8px 12px;
+  margin-top: 8px;
+  font-size: 0.84rem;
+  color: #065f46;
+  line-height: 1.35;
+}
+
+body.dark-mode .ad-guarantee-box {
+  background: rgba(16, 185, 129, 0.15);
+  border-color: rgba(16, 185, 129, 0.4);
+  color: #6ee7b7;
+}
+
+
 
 
 

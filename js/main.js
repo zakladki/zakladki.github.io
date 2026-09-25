@@ -1195,6 +1195,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // === Розумний Дзвіночок сповіщень у шапці сайту ===
   initNoticeBell();
+
+  // === Автоматизована система замовлення та розміщення реклами/ресурсів ===
+  initAdOrderSystem();
 });
 
 // ==========================================================================
@@ -1997,3 +2000,1372 @@ function topFunction() {
   });
 }
 
+
+
+// ==========================================================================
+// АВТОМАТИЗОВАНА СИСТЕМА ЗАМОВЛЕННЯ ТА РОЗМІЩЕННЯ РЕКЛАМИ / РЕСУРСІВ
+// ==========================================================================
+const AD_CONFIG = {
+  basePriceUah: 100,           // Стандартна БВ для звичайних розділів (100 грн/міс)
+  commercialBasePriceUah: 150, // Підвищена БВ для комерційних розділів (150 грн/міс)
+  commercialSections: ["Ринок", "Магазини", "Банкінг", "AI"], // Комерційні розділи з високою віддачею
+  usdRate: 41.5,               // Орієнтовний курс перерахунку для еквівалента USDT
+  cryptoDiscountPercent: 10,   // Постійна знижка 10% при оплаті криптовалютою
+  
+  // Множники вартості згідно з правилами та зонами сайту
+  multipliers: {
+    home_vip: 7,     // Головна -> Рекомендації Сайту (VIP): БВ × 7 = 700 грн/міс
+    section_vip: 3,  // Інші розділи -> Рекомендації Розділу (VIP): БВ × 3 = 300 грн/міс
+    home_top: 4,     // Головна -> Вгорі картки: БВ × 4 = 400 грн/міс
+    home_bottom: 2,  // Головна -> Внизу картки: БВ × 2 = 200 грн/міс
+    other_top: 2,    // Інші розділи -> Вгорі картки: БВ × 2 = 200 грн/міс
+    other_bottom: 1  // Інші розділи -> Внизу картки: БВ × 1 = 100 грн/міс
+  },
+
+  // Терміни розміщення та знижки (2 місяці прибрано; 3+ роки мають гарантію)
+  terms: [
+    { id: "1", label: "1 місяць (без знижки)", months: 1, discount: 0 },
+    { id: "3", label: "3 місяці (знижка 10%)", months: 3, discount: 10 },
+    { id: "6", label: "6 місяців (знижка 20%)", months: 6, discount: 20 },
+    { id: "12", label: "12 місяців / 1 рік (знижка 30%)", months: 12, discount: 30 },
+    { id: "36", label: "3 роки (знижка 35%) + 🛡️ Гарантія", months: 36, discount: 35, hasGuarantee: true },
+    { id: "60", label: "5 років (знижка 40%) + 🛡️ Гарантія", months: 60, discount: 40, hasGuarantee: true },
+    { id: "unlimited", label: "Назавжди / Безстроково (знижка 50%) + 🛡️ Гарантія", months: 120, discount: 50, isForever: true, hasGuarantee: true }
+  ],
+
+  // 12-значні промокоди (надійний захист від перебору / брутфорсу)
+  promoCodes: {
+    "TOPZ-2026-X8Y9": { discount: 15, name: "Стартовий бонус (-15%)" },
+    "ZAKL-SAVE-2026": { discount: 10, name: "Партнерська знижка (-10%)" },
+    "WEBER-VIP-2026": { discount: 20, name: "VIP-промокод (-20%)" }
+  },
+
+  // Контакти адміністрації
+  contacts: {
+    telegram: "@WeberSIS",
+    telegramUrl: "https://t.me/WeberSIS",
+    email: "weber515sis@gmail.com"
+  },
+
+  // Реквізити для оплати
+  wallets: {
+    privat: {
+      name: "Конверт ПриватБанку",
+      url: "https://www.privat24.ua/send/4gta3",
+      card: "5168 7521 6238 9582",
+      cardRaw: "5168752162389582",
+      note: "Миттєве поповнення Конверта у додатку Приват24"
+    },
+    mono: {
+      name: "Банка Монобанку",
+      url: "https://send.monobank.ua/jar/4s1YJ94LYP",
+      card: "4874 1000 2790 3460",
+      cardRaw: "4874100027903460",
+      note: "Оплата в 1 клік через Apple Pay / Google Pay або картку будь-якого банку"
+    },
+    crypto: [
+      { id: "usdt_trc20", name: "USDT (TRC-20 - Tron)", address: "TZ3cHFT4T5Sv6FruDQsonJvykPLoTLHje2", badge: "⚡ Рекомендовано (низька комісія)" },
+      { id: "usdt_bep20", name: "USDT / USDC (BEP-20 - BNB Chain)", address: "0x40C7AC3d39913606f854dF40d8386bbF2b22D87B", badge: "Низька комісія" },
+      { id: "ton", name: "TON / USDT (The Open Network)", address: "UQBv5ZgXlNl6eyCGs4q-COY9ya_RTdOdeAmpm2j3oLEaG3cq", badge: "Швидко" },
+      { id: "sol", name: "SOL / USDT (Solana)", address: "2tRrdkzJfHyRocQvqDpzGAc56vuKZQW2Jpb5imaT8EH5", badge: "Швидко" },
+      { id: "btc", name: "BTC (Bitcoin)", address: "bc1q2pxyrsx7z3d7dc83k880mujmlpqykg7hmsrkqa", badge: "Native SegWit" },
+      { id: "eth", name: "ETH (Ethereum / Arbitrum / Polygon / Base)", address: "0x40C7AC3d39913606f854dF40d8386bbF2b22D87B", badge: "EVM" },
+      { id: "doge", name: "DOGE (Dogecoin)", address: "DDy3sfatTConkRUQ1vdwGW1joM1JXUYLn3", badge: "Dogecoin" },
+      { id: "ltc", name: "LTC (Litecoin)", address: "ltc1qtfaehd4errc3rzpuusne2kd4zu9r7y9hsvc6xt", badge: "Litecoin" },
+      { id: "xrp", name: "XRP (Ripple)", address: "rBCqF1MT8B3pEn1MG3FZPg2em97fZ2ZvC6", badge: "Ripple" },
+      { id: "near", name: "NEAR (Near Protocol)", address: "weber515sis.near", badge: "NEAR" },
+      { id: "atom", name: "ATOM (Cosmos)", address: "cosmos1wz8jr4j9w83vpvxrlgh9uhn2n4e7u3ttevn8ag", badge: "Cosmos" }
+    ]
+  }
+};
+
+const SECTIONS_CATALOG = {
+  "Головна": ["Важливе!", "Наші Міста", "Мережі", "Зв'язок", "Україна", "Світ та Аналітика", "Відео та ТВ", "Музика та Радіо", "Платформи та ПК", "Онлайн та Логічні", "Рахунки", "Провайдери", "Фінанси", "Оголошення та Доставка", "Робота, Авто та Житло", "Маркетплейси та Техніка", "Здоров'я, Краса та Шопінг", "Пошук, Мови та Довідники", "Онлайн-сервіси та Інструменти", "Текстові асистенти та Пошук", "Мультимедіа ШІ та Творчість"],
+  "Соціум": ["Месенджери та Відеозв'язок", "Прокачати свій TELEGRAM", "Брендинг і соцмережі", "Соціальні мережі", "Платформи контенту та блогів", "Форуми та спільноти України", "ЗСУ: Бригади та рекрутинг", "ЗСУ: Волонтерські фонди", "Електронні скриньки (Україна)", "Електронні скриньки (Зарубіж)", "E-Mail (на 10 хвилин)", "Професійні мережі та портфоліо"],
+  "Новини": ["Новини / Україна", "Новини / Світ та Аналітика", "Новини спорту", "Новини на Youtube", "Новини на Youtube (online)", "Органи державної влади", "Інші органи та міністерства", "Інші Новини"],
+  "Медіа": ["Слухати Українську Музику", "Слухати Закордонну Музику", "Музика (онлайн)", "Музика (завантажити)", "Радіо", "ТЕЛЕБАЧЕННЯ (Україна)", "КІНОФІЛЬМИ", "Книги / Аудіокниги", "Аудіокниги (онлайн)", "Подкасти", "Сервіси для авторів музики", "AI генератори музики"],
+  "Ігри": ["Для КОМПА", "Логічні", "Азартні", "Ігрові ЗМІ / Новини", "Онлайн-ігри / Браузерні", "Ретро / Емулятори", "Ігрові портали / Платформи", "Моди / Чіти / Патчі", "Стріми / Кіберспорт"],
+  "Комуналка": ["Легкі-оплати", "Бензин / Дизель / Автогаз", "ГАЗ", "Електроенергія", "Вода", "Тепло / Опалення", "Вивіз сміття", "Інтернет / ТБ провайдери", "Державні послуги (Дія тощо)", "Поштові служби", "ОСББ / ЖЕК"],
+  "Банкінг": ["КОРИСНЕ", "Курси та обмін валют", "Інструменти для торгівлі", "Біржі Криптовалют", "Крипто-гаманці", "Банки України", "Міжнародні платіжні системи", "Кредитування / МФО", "Інвестиції / Цінні папери", "Крипто-новини та аналітика", "Податкова / Звітність"],
+  "Ринок": ["Відстежити відправлення", "Нерухомість", "Безпека (база шахраїв)", "Загальні оголошення", "Одяг / Взуття", "Авторинок / Запчастини", "Електроніка / Гаджети", "Робота / Вакансії", "Послуги / Фріланс", "Тварини / Зоотовари"],
+  "Магазини": ["Повернення % з покупок", "Аналізатор покупок", "Відгуки покупок", "Доставка з-за кордону", "Закордонні майданчики", "Супермаркети / Продукти", "Аптеки / Медикаменти", "Побутова техніка / Електроніка", "Будівництво / Ремонт", "Дитячі товари", "Косметика та парфумерія", "Книжкові магазини", "Спортивні товари", "Автотовари", "Зоомагазини", "Подарунки / Сувеніри", "Ювелірні вироби", "Меблі / Інтер'єр", "Дім і сад"],
+  "Інше": ["Аналізатор мережі", "Пошуковики", "Перекладачі", "Граматика / Мова", "Освіта / Навчання", "Наука та космос", "Кулінарія / Рецепти", "Здоров'я / Медицина", "Подорожі / Туризм", "Погода / Клімат", "Карти / Навігація", "Юридична допомога", "Екологія / Природа", "Хобі / Рукоділля", "Фото / Відеохостинги", "Телебачення онлайн", "Радіо онлайн", "Астрологія / Гороскопи", "Корисні таблиці / Калькулятори", "Різне"],
+  "Місто": ["Новомиргород", "Влада / Сервіси", "Комуналка Н.", "Транспорт / Маршрути", "Медицина / Аптеки", "Освіта / Школи / Садочки", "Культура / Дозвілля", "Новини міста", "Оголошення Новомиргород", "Довідник та бізнес"],
+  "AI": ["Текстові асистенти, Пошук", "Генерація зображень", "3D та 3D-моделювання", "Обробка фото, графіки", "Музика, Аудіо, Голос", "Відео та Анімація", "Код та Розробка", "Презентації та Документи", "Аналіз даних та Наука", "Платформи та Агрегатори AI"],
+  "Soft": ["❗❗❗ ВАЖЛИВО ❗❗❗", "Налаштування (пояснення)", "Завантажити месенджери", "Завантажити браузери", "Вебмайстру / SEO", "Антивіруси та безпека", "Офісні програми", "Архіватори та файли", "Графіка та дизайн", "Відео редактори", "Аудіо редактори", "Системні утиліти", "Драйвери", "Запис екрана", "Торрент клієнти", "VPN сервіси", "Віддалений доступ"]
+};
+
+let adPromoState = {
+  appliedCode: "",
+  discountPercent: 0,
+  failedAttempts: 0,
+  blockedUntil: 0
+};
+
+function getCurrentSiteSection() {
+  const activeLink = document.querySelector('.nav-link.active');
+  if (activeLink && activeLink.textContent.trim()) {
+    const text = activeLink.textContent.trim();
+    if (SECTIONS_CATALOG[text]) return text;
+  }
+  const path = window.location.pathname;
+  if (path.endsWith('/') || path.endsWith('/index.html') || !path.includes('.html')) return 'Головна';
+  if (path.includes('city.html')) return 'Місто';
+  if (path.includes('social.html')) return 'Соціум';
+  if (path.includes('news.html')) return 'Новини';
+  if (path.includes('media.html')) return 'Медіа';
+  if (path.includes('games.html')) return 'Ігри';
+  if (path.includes('communal.html')) return 'Комуналка';
+  if (path.includes('bank.html')) return 'Банкінг';
+  if (path.includes('market.html')) return 'Ринок';
+  if (path.includes('shops.html')) return 'Магазини';
+  if (path.includes('others.html')) return 'Інше';
+  if (path.includes('ai.html')) return 'AI';
+  if (path.includes('programs.html')) return 'Soft';
+  return 'Головна';
+}
+
+function generateAdOrderId() {
+  const now = new Date();
+  const yy = String(now.getFullYear()).slice(-2);
+  const mm = String(now.getMonth() + 1).padStart(2, '0');
+  const dd = String(now.getDate()).padStart(2, '0');
+  const hh = String(now.getHours()).padStart(2, '0');
+  const min = String(now.getMinutes()).padStart(2, '0');
+  return `TZ-${yy}${mm}${dd}-${hh}${min}`;
+}
+
+// Ініціалізація слухачів подій для відкриття форми замовлення
+function initAdOrderSystem() {
+  document.addEventListener('click', (e) => {
+    // 1. Клік на кнопку [+] у шапці картки
+    const addBtn = e.target.closest('.group-add-btn');
+    if (addBtn) {
+      if (e.ctrlKey || e.metaKey || e.button === 1) return;
+      e.preventDefault();
+      const groupEl = addBtn.closest('.group');
+      let cardTitle = '';
+      if (groupEl) {
+        const badge = groupEl.querySelector('.group-title .badge');
+        cardTitle = badge ? badge.textContent.trim() : '';
+      }
+      openAdOrderModal({
+        section: getCurrentSiteSection(),
+        card: cardTitle
+      });
+      return;
+    }
+
+    // 2. Клік на плейсхолдер "Вільне Місце" або посилання на Google Docs
+    const placeholderLink = e.target.closest('a[href*="15S2XrUxYaj1uu68wtfqww3Gkqa-Lq2Ra-P20AHWqKgs"], .footer-ad-link, .ad-order-modal-trigger');
+    if (placeholderLink) {
+      if (e.ctrlKey || e.metaKey || e.button === 1) return;
+      e.preventDefault();
+      const groupEl = placeholderLink.closest('.group');
+      let cardTitle = '';
+      if (groupEl) {
+        const badge = groupEl.querySelector('.group-title .badge');
+        cardTitle = badge ? badge.textContent.trim() : '';
+      }
+      openAdOrderModal({
+        section: getCurrentSiteSection(),
+        card: cardTitle
+      });
+      return;
+    }
+  });
+}
+
+function getSectionBasePrice(section) {
+  if (AD_CONFIG.commercialSections && AD_CONFIG.commercialSections.includes(section)) {
+    return AD_CONFIG.commercialBasePriceUah; // 150 грн/міс для комерційних розділів
+  }
+  return AD_CONFIG.basePriceUah; // 100 грн/міс для стандартних розділів
+}
+
+function getSinglePlacementRate(sec, crd, loc) {
+  const isHome = sec === 'Головна';
+  const isVip = (crd && crd.includes('Рекомендаці')) || loc === 'vip';
+  const baseRate = getSectionBasePrice(sec);
+
+  if (isVip) {
+    return isHome 
+      ? (AD_CONFIG.basePriceUah * AD_CONFIG.multipliers.home_vip) // 700 грн
+      : (baseRate * AD_CONFIG.multipliers.section_vip); // 450 грн (комерційний) або 300 грн (стандарт)
+  }
+  if (isHome) {
+    return loc === 'top' 
+      ? (AD_CONFIG.basePriceUah * AD_CONFIG.multipliers.home_top) // 400 грн
+      : (AD_CONFIG.basePriceUah * AD_CONFIG.multipliers.home_bottom); // 200 грн
+  }
+  return loc === 'top' 
+    ? (baseRate * AD_CONFIG.multipliers.other_top) // 300 грн (комерційний) або 200 грн (стандарт)
+    : (baseRate * AD_CONFIG.multipliers.other_bottom); // 150 грн (комерційний) або 100 грн (стандарт)
+}
+
+function calculateAdPricing(section, card, location, termId, paymentMethod, duplicateOpt = null) {
+  const isHome = section === 'Головна';
+  const isVip = (card && card.includes('Рекомендаці')) || location === 'vip';
+  const primaryMonthlyRate = getSinglePlacementRate(section, card, location);
+
+  let hasDuplicate = false;
+  let dupMonthlyRate = 0;
+  if (duplicateOpt && duplicateOpt.enabled && duplicateOpt.section && duplicateOpt.card) {
+    hasDuplicate = true;
+    dupMonthlyRate = getSinglePlacementRate(duplicateOpt.section, duplicateOpt.card, duplicateOpt.location);
+  }
+
+  const monthlyRate = primaryMonthlyRate + dupMonthlyRate;
+  const termObj = AD_CONFIG.terms.find(t => t.id === termId) || AD_CONFIG.terms[0];
+  const months = termObj.months;
+  const baseCost = monthlyRate * months;
+  
+  // Знижка за термін
+  const termDiscountAmount = Math.round(baseCost * (termObj.discount / 100));
+  const costAfterTerm = baseCost - termDiscountAmount;
+
+  // Знижка за промокод
+  let promoDiscountAmount = 0;
+  if (adPromoState.discountPercent > 0) {
+    promoDiscountAmount = Math.round(costAfterTerm * (adPromoState.discountPercent / 100));
+  }
+  const costAfterPromo = costAfterTerm - promoDiscountAmount;
+
+  // Знижка за криптовалюту (-10%)
+  let cryptoDiscountAmount = 0;
+  if (paymentMethod === 'crypto') {
+    cryptoDiscountAmount = Math.round(costAfterPromo * (AD_CONFIG.cryptoDiscountPercent / 100));
+  }
+  const finalUah = costAfterPromo - cryptoDiscountAmount;
+  const finalUsdt = (finalUah / AD_CONFIG.usdRate).toFixed(2);
+
+  return {
+    isVip,
+    isForever: !!termObj.isForever,
+    hasGuarantee: !!termObj.hasGuarantee,
+    primaryMonthlyRate,
+    hasDuplicate,
+    dupMonthlyRate,
+    monthlyRate,
+    months,
+    termLabel: termObj.label,
+    baseCost,
+    termDiscountPercent: termObj.discount,
+    termDiscountAmount,
+    promoDiscountPercent: adPromoState.discountPercent,
+    promoDiscountAmount,
+    cryptoDiscountAmount,
+    finalUah,
+    finalUsdt
+  };
+}
+
+function openAdOrderModal(opts = {}) {
+  let backdrop = document.getElementById('adOrderModalBackdrop');
+  if (!backdrop) {
+    backdrop = document.createElement('div');
+    backdrop.id = 'adOrderModalBackdrop';
+    backdrop.className = 'cl-modal-backdrop';
+    backdrop.innerHTML = `
+      <div class="cl-modal ad-order-modal" role="dialog" aria-modal="true">
+        <div class="cl-modal-header">
+          <h5 class="cl-modal-title"><i class="fas fa-bullhorn text-primary"></i> Розміщення ресурсу / Додати сайт</h5>
+          <button type="button" class="btn btn-secondary btn-sm cl-modal-close" aria-label="Закрити">
+            <span>Закрити</span>
+            <span class="cl-modal-close-sep"></span>
+            <span class="cl-modal-close-x">&times;</span>
+          </button>
+        </div>
+        <div class="cl-modal-body ad-modal-body">
+          
+          <!-- КРОК 1: ФОРМА ЗАПОВНЕННЯ ТА КАЛЬКУЛЯТОР -->
+          <div id="adStep1">
+            
+            <!-- ПЛАВАЮЧИЙ БАР ВАРТОСТІ (ЗАВЖДИ НА ВИДУ ПРИ СКРОЛІ) -->
+            <div class="ad-sticky-price-bar" id="adStickyPriceBar">
+              <div class="ad-sticky-price-left">
+                <span class="ad-sticky-price-title"><i class="fas fa-coins text-warning me-1"></i> До сплати:</span>
+                <span class="ad-sticky-price-uah" id="adStickyPriceUah">100 грн</span>
+                <span class="ad-sticky-price-usdt" id="adStickyPriceUsdt">(~ $2.41 USDT)</span>
+              </div>
+              <div class="ad-sticky-price-right">
+                <span class="ad-sticky-badge" id="adStickyTariffBadge">100 грн/міс</span>
+                <span class="ad-discount-badge" id="adStickyDiscountBadge" style="display:none;">-10%</span>
+              </div>
+            </div>
+
+            <!-- Пояснення черги 6 місць -->
+            <div class="ad-badge-rule-box">
+              <i class="fas fa-info-circle me-1"></i> <strong>Правило черги та розміщення:</strong> В одній картці допускається до 6 місць. Перше замовлення займає верхню позицію в обраній зоні, послідуючі — нижчі рядки. Діє автоматичне просування вгору після завершення терміну попереднього партнера.
+            </div>
+
+            <!-- БЛОК 1: Локація на сайті -->
+            <div class="ad-section-block">
+              <div class="ad-block-title"><i class="fas fa-map-marker-alt text-primary"></i> 1. Вибір місця розташування</div>
+              <div class="ad-form-grid-3">
+                <div class="ad-form-group">
+                  <div class="ad-label-row"><label class="ad-label" for="adSectionSelect">Розділ сайту:</label></div>
+                  <select id="adSectionSelect" class="ad-select"></select>
+                </div>
+                <div class="ad-form-group">
+                  <div class="ad-label-row"><label class="ad-label" for="adCardSelect">Картка / Тематика:</label></div>
+                  <select id="adCardSelect" class="ad-select"></select>
+                </div>
+                <div class="ad-form-group">
+                  <div class="ad-label-row"><label class="ad-label" for="adLocationSelect">Зона в картці:</label></div>
+                  <select id="adLocationSelect" class="ad-select">
+                    <option value="top">🔝 Вгорі картки (ТОП)</option>
+                    <option value="bottom" selected>📍 Внизу картки (Стандарт)</option>
+                    <option value="vip" id="adLocVipOption" style="display:none;">⭐ Рекомендація (VIP)</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Опція мульти-розміщення (Продублювати в суміжний розділ) -->
+              <div class="ad-dup-toggle-wrapper">
+                <label class="ad-dup-checkbox-label" for="adDuplicateCheckbox">
+                  <input type="checkbox" id="adDuplicateCheckbox" class="ad-dup-checkbox">
+                  <span class="ad-dup-checkbox-text">
+                    <i class="fas fa-layer-group text-primary me-1"></i> <strong>Продублювати в суміжний розділ</strong> (додаткове друге розміщення)
+                  </span>
+                </label>
+              </div>
+              <div id="adDuplicateBlock" class="ad-dup-block" style="display: none;">
+                <div class="ad-dup-subtitle">
+                  <i class="fas fa-plus-circle text-success me-1"></i> Оберіть другий розділ та картку (вартість сумується):
+                </div>
+                <div class="ad-form-grid-3">
+                  <div class="ad-form-group">
+                    <div class="ad-label-row"><label class="ad-label" for="adDupSectionSelect">Другий розділ:</label></div>
+                    <select id="adDupSectionSelect" class="ad-select"></select>
+                  </div>
+                  <div class="ad-form-group">
+                    <div class="ad-label-row"><label class="ad-label" for="adDupCardSelect">Картка в розділі:</label></div>
+                    <select id="adDupCardSelect" class="ad-select"></select>
+                  </div>
+                  <div class="ad-form-group">
+                    <div class="ad-label-row"><label class="ad-label" for="adDupLocationSelect">Зона в картці:</label></div>
+                    <select id="adDupLocationSelect" class="ad-select">
+                      <option value="top">🔝 Вгорі картки (ТОП)</option>
+                      <option value="bottom" selected>📍 Внизу картки (Стандарт)</option>
+                      <option value="vip" id="adDupLocVipOption" style="display:none;">⭐ Рекомендація (VIP)</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- БЛОК 2: Дані ресурсу та живе прев'ю -->
+            <div class="ad-section-block">
+              <div class="ad-block-title"><i class="fas fa-globe text-primary"></i> 2. Дані Вашого ресурсу</div>
+              <div class="ad-form-group">
+                <div class="ad-label-row">
+                  <label class="ad-label" for="adSiteName">Назва ресурсу (до 25 символів):</label>
+                  <span id="adNameCounter" class="ad-char-counter">0 / 25</span>
+                </div>
+                <input type="text" id="adSiteName" class="ad-input" maxlength="25" placeholder="Наприклад: Мій Проект, Магазин, Канал" autocomplete="off">
+              </div>
+
+              <div class="ad-form-group">
+                <div class="ad-label-row">
+                  <label class="ad-label" for="adSiteUrl">Адреса посилання (URL сайту або Telegram):</label>
+                </div>
+                <input type="url" id="adSiteUrl" class="ad-input" placeholder="https://example.com" autocomplete="off">
+              </div>
+
+              <div class="ad-form-group">
+                <div class="ad-label-row">
+                  <label class="ad-label" for="adSiteDesc">Опис ресурсу (до 150 символів):</label>
+                  <span id="adDescCounter" class="ad-char-counter">0 / 150</span>
+                </div>
+                <textarea id="adSiteDesc" class="ad-textarea" maxlength="150" placeholder="Короткий, привабливий опис вашого сайту або послуги..."></textarea>
+              </div>
+
+              <!-- Живе інтерактивне прев'ю майбутньої закладки -->
+              <div class="ad-live-preview-box">
+                <div class="ad-preview-header"><i class="fas fa-eye"></i> Живий приклад (як виглядатиме на сайті):</div>
+                <div class="ad-preview-item">
+                  <img id="adPreviewFavicon" class="ad-preview-favicon" src="favicon.ico" alt="icon">
+                  <div class="ad-preview-content">
+                    <div class="ad-preview-title">
+                      <span id="adPreviewTitleText">Назва Вашого Ресурсу</span>
+                      <span id="adPreviewBeacon" class="rec-beacon-dot" style="display:none;" title="Рекомендація редакції"></span>
+                    </div>
+                    <div id="adPreviewDescText" class="ad-preview-desc">Тут відображатиметься короткий опис вашого сайту при наведенні чи кліку...</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- БЛОК 3: Термін, Промокод та Спосіб Оплати -->
+            <div class="ad-section-block">
+              <div class="ad-block-title"><i class="fas fa-calculator text-primary"></i> 3. Термін, Промокод та Оплата</div>
+              
+              <div class="ad-form-grid-3 mb-3">
+                <div class="ad-form-group" style="grid-column: span 2;">
+                  <div class="ad-label-row"><label class="ad-label" for="adTermSelect">Термін розміщення:</label></div>
+                  <select id="adTermSelect" class="ad-select"></select>
+                  <!-- Гарантія стабільності для довгострокових тарифів (від 3 років та Назавжди) -->
+                  <div id="adGuaranteeNotice" class="ad-guarantee-box" style="display:none;">
+                    <i class="fas fa-shield-alt text-success fs-5"></i>
+                    <div>
+                      <strong>Гарантія довгострокового тарифу:</strong> Включено <strong>1 безкоштовну зміну</strong> посилання, назви або опису на рік у разі ребрендингу сайту або зміни домену.
+                    </div>
+                  </div>
+                </div>
+                <div class="ad-form-group">
+                  <div class="ad-label-row"><label class="ad-label" for="adPromoInput">Промокод (12 знаків):</label></div>
+                  <div class="ad-promo-row">
+                    <input type="text" id="adPromoInput" class="ad-input ad-promo-input" maxlength="16" placeholder="XXXX-XXXX-XXXX">
+                    <button type="button" id="adApplyPromoBtn" class="ad-promo-btn">ОК</button>
+                  </div>
+                  <div id="adPromoFeedback" class="ad-promo-feedback"></div>
+                </div>
+              </div>
+
+              <!-- Способи оплати (Радіо-картки) -->
+              <div class="ad-label-row mb-1"><label class="ad-label">Оберіть зручний спосіб оплати:</label></div>
+              <div class="ad-payment-grid">
+                <label class="ad-payment-option active" data-method="mono">
+                  <input type="radio" name="adPaymentMethod" value="mono" checked>
+                  <div class="ad-payment-icon" style="color: #1e293b;">⚫</div>
+                  <div class="ad-payment-text">
+                    <div class="ad-payment-name">Монобанк</div>
+                    <div class="ad-payment-sub">Банка / Apple & Google Pay</div>
+                  </div>
+                </label>
+
+                <label class="ad-payment-option" data-method="privat">
+                  <input type="radio" name="adPaymentMethod" value="privat">
+                  <div class="ad-payment-icon" style="color: #16a34a;">🟢</div>
+                  <div class="ad-payment-text">
+                    <div class="ad-payment-name">ПриватБанк</div>
+                    <div class="ad-payment-sub">Конверт / Приват24</div>
+                  </div>
+                </label>
+
+                <label class="ad-payment-option" data-method="crypto">
+                  <input type="radio" name="adPaymentMethod" value="crypto">
+                  <div class="ad-payment-icon" style="color: #0284c7;">💎</div>
+                  <div class="ad-payment-text">
+                    <div class="ad-payment-name">Криптовалюта <span class="ad-discount-badge">-10%</span></div>
+                    <div class="ad-payment-sub">USDT, BTC, TON, SOL тощо</div>
+                  </div>
+                </label>
+              </div>
+
+              <!-- Підсумковий калькулятор -->
+              <div class="ad-calc-summary">
+                <div class="ad-calc-row">
+                  <span>Базовий тариф:</span>
+                  <span id="adCalcBaseRate">100 грн / міс</span>
+                </div>
+                <div class="ad-calc-row">
+                  <span>Обраний період:</span>
+                  <span id="adCalcPeriod">1 міс.</span>
+                </div>
+                <div class="ad-calc-row discount-row" id="adCalcTermDiscountRow" style="display:none;">
+                  <span>Знижка за тривалість:</span>
+                  <span id="adCalcTermDiscountVal">-0 грн</span>
+                </div>
+                <div class="ad-calc-row discount-row" id="adCalcPromoDiscountRow" style="display:none;">
+                  <span>Знижка за промокодом:</span>
+                  <span id="adCalcPromoDiscountVal">-0 грн</span>
+                </div>
+                <div class="ad-calc-row discount-row" id="adCalcCryptoDiscountRow" style="display:none;">
+                  <span>Знижка за оплату криптовалютою (-10%):</span>
+                  <span id="adCalcCryptoDiscountVal">-0 грн</span>
+                </div>
+                <div class="ad-calc-total-row">
+                  <div class="ad-calc-total-label">РАЗОМ ДО СПЛАТИ:</div>
+                  <div class="ad-calc-total-values">
+                    <div class="ad-calc-total-uah" id="adCalcTotalUah">100 грн</div>
+                    <div class="ad-calc-total-usdt" id="adCalcTotalUsdt">~ $2.41 USDT</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- БЛОК 4: Контакти замовника -->
+            <div class="ad-section-block">
+              <div class="ad-block-title"><i class="fas fa-address-card text-primary"></i> 4. Ваші контакти для зв'язку та підтвердження</div>
+              <div class="ad-form-grid-3">
+                <div class="ad-form-group">
+                  <div class="ad-label-row"><label class="ad-label" for="adContactEmail">E-Mail (обов'язково):</label></div>
+                  <input type="email" id="adContactEmail" class="ad-input" placeholder="name@example.com" required>
+                </div>
+                <div class="ad-form-group">
+                  <div class="ad-label-row"><label class="ad-label" for="adContactTg">Telegram (@username):</label></div>
+                  <input type="text" id="adContactTg" class="ad-input" placeholder="@your_nickname">
+                </div>
+                <div class="ad-form-group">
+                  <div class="ad-label-row"><label class="ad-label" for="adContactPhone">Телефон (за бажанням):</label></div>
+                  <input type="tel" id="adContactPhone" class="ad-input" placeholder="+380...">
+                </div>
+              </div>
+            </div>
+
+            <!-- Повідомлення про помилку валідації -->
+            <div id="adFormError" class="alert alert-danger" style="display:none; margin-bottom: 12px; font-size: 0.88rem; padding: 10px 14px;"></div>
+
+            <!-- Кнопка фінального кроку -->
+            <button type="button" id="adSubmitOrderBtn" class="ad-submit-btn">
+              <span>Сформувати замовлення та отримати реквізити</span>
+              <i class="fas fa-arrow-right"></i>
+            </button>
+          </div>
+
+          <!-- КРОК 2: ЕЛЕКТРОННИЙ ЧЕК ТА РЕКВІЗИТИ ДЛЯ ОПЛАТИ -->
+          <div id="adStep2" class="ad-step2-wrapper" style="display:none;">
+            <div class="ad-order-success-banner">
+              <div class="ad-order-success-title"><i class="fas fa-check-circle"></i> Замовлення успішно сформовано!</div>
+              <div>Номер Вашого замовлення:</div>
+              <div class="ad-order-id-display" id="adSuccessOrderId">#TZ-000000-0000</div>
+            </div>
+
+            <!-- Таблиця чека -->
+            <div class="ad-section-block">
+              <div class="ad-block-title"><i class="fas fa-file-invoice text-primary"></i> Деталі Вашого розміщення</div>
+              <table class="ad-receipt-table">
+                <tbody>
+                  <tr><td>Ресурс:</td><td id="adRecSite"></td></tr>
+                  <tr><td>Розташування:</td><td id="adRecPlacement"></td></tr>
+                  <tr><td>Термін:</td><td id="adRecTerm"></td></tr>
+                  <tr><td>Контакт клієнта:</td><td id="adRecContact"></td></tr>
+                  <tr style="border-top: 1.5px solid var(--border-color, #cbd5e1);">
+                    <td style="font-weight: 700; font-size: 1rem;">Сума до сплати:</td>
+                    <td id="adRecAmount" style="font-size: 1.15rem; color: #2563eb; font-weight: 800;"></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Реквізити обраного методу -->
+            <div class="ad-requisite-box" id="adRequisiteBox">
+              <!-- Динамічно заповнюється для Моно, Привату або Крипти -->
+            </div>
+
+            <div class="ad-badge-rule-box" style="margin-bottom: 12px;">
+              <i class="fas fa-exclamation-triangle text-warning me-1"></i>
+              <strong>Важливо:</strong> У призначенні або коментарі до платежу обов'язково вкажіть номер замовлення <strong id="adRecNoteOrderId"></strong> (або надішліть квитанцію/скріншот у наш Telegram).
+            </div>
+
+            <!-- Кнопки швидких дій -->
+            <div class="ad-action-btns-grid">
+              <a href="#" id="adActionTgBtn" target="_blank" class="ad-action-btn ad-btn-tg">
+                <i class="fab fa-telegram-plane"></i> Написати в Telegram @WeberSIS
+              </a>
+              <button type="button" id="adActionCopyBtn" class="ad-action-btn ad-btn-copy-all">
+                <i class="fas fa-copy"></i> Скопіювати текст замовлення
+              </button>
+              <a href="#" id="adActionEmailBtn" class="ad-action-btn ad-btn-email">
+                <i class="far fa-envelope"></i> Надіслати на Email
+              </a>
+              <button type="button" id="adActionBackBtn" class="ad-action-btn ad-btn-back">
+                <i class="fas fa-arrow-left"></i> Змінити замовлення
+              </button>
+            </div>
+
+            <div class="ad-legal-iban-note">
+              Потрібен офіційний рахунок IBAN або договір для юридичних осіб / ФОП? Зв'яжіться з адміністратором у Telegram <a href="https://t.me/WeberSIS" target="_blank">@WeberSIS</a> або поштою <a href="mailto:weber515sis@gmail.com">weber515sis@gmail.com</a>.
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+    `;
+    document.body.appendChild(backdrop);
+
+    // Закриття вікна
+    const closeBtns = backdrop.querySelectorAll('.cl-modal-close');
+    closeBtns.forEach(btn => btn.addEventListener('click', closeAdOrderModal));
+    backdrop.addEventListener('click', (ev) => {
+      if (ev.target === backdrop) closeAdOrderModal();
+    });
+    document.addEventListener('keydown', (ev) => {
+      if (ev.key === 'Escape' && backdrop.classList.contains('show')) {
+        closeAdOrderModal();
+      }
+    });
+
+    // Наповнення селектів розділів і термінів
+    const secSelect = document.getElementById('adSectionSelect');
+    Object.keys(SECTIONS_CATALOG).forEach(s => {
+      const opt = document.createElement('option');
+      opt.value = s;
+      opt.textContent = s;
+      secSelect.appendChild(opt);
+    });
+
+    // Селект для другого розділу (мульти-розміщення)
+    const dupSecSelect = document.getElementById('adDupSectionSelect');
+    Object.keys(SECTIONS_CATALOG).forEach(s => {
+      const opt = document.createElement('option');
+      opt.value = s;
+      opt.textContent = s;
+      dupSecSelect.appendChild(opt);
+    });
+
+    const termSelect = document.getElementById('adTermSelect');
+    AD_CONFIG.terms.forEach(t => {
+      const opt = document.createElement('option');
+      opt.value = t.id;
+      opt.textContent = t.label;
+      termSelect.appendChild(opt);
+    });
+
+    // Подія зміни розділу
+    secSelect.addEventListener('change', () => {
+      updateCardOptions(secSelect.value);
+      updateLocationOptions();
+      recalcAdOrderPrice();
+    });
+
+    // Подія зміни картки
+    document.getElementById('adCardSelect').addEventListener('change', () => {
+      updateLocationOptions();
+      recalcAdOrderPrice();
+    });
+
+    // Подія зміни локації
+    document.getElementById('adLocationSelect').addEventListener('change', () => {
+      recalcAdOrderPrice();
+      updateLivePreview();
+    });
+
+    // Обробники мульти-розміщення (дублювання)
+    const dupCheckbox = document.getElementById('adDuplicateCheckbox');
+    const dupBlock = document.getElementById('adDuplicateBlock');
+    dupCheckbox.addEventListener('change', () => {
+      dupBlock.style.display = dupCheckbox.checked ? 'block' : 'none';
+      if (dupCheckbox.checked) {
+        if (!dupSecSelect.value || dupSecSelect.value === secSelect.value) {
+          dupSecSelect.value = secSelect.value === 'Головна' ? 'Соціум' : 'Головна';
+        }
+        updateDupCardOptions(dupSecSelect.value);
+        updateDupLocationOptions();
+      }
+      recalcAdOrderPrice();
+    });
+
+    dupSecSelect.addEventListener('change', () => {
+      updateDupCardOptions(dupSecSelect.value);
+      updateDupLocationOptions();
+      recalcAdOrderPrice();
+    });
+
+    document.getElementById('adDupCardSelect').addEventListener('change', () => {
+      updateDupLocationOptions();
+      recalcAdOrderPrice();
+    });
+
+    document.getElementById('adDupLocationSelect').addEventListener('change', () => {
+      recalcAdOrderPrice();
+    });
+
+    // Подія зміни терміну
+    termSelect.addEventListener('change', () => {
+      recalcAdOrderPrice();
+    });
+
+    // Вибір способу оплати
+    const paymentOptions = backdrop.querySelectorAll('.ad-payment-option');
+    paymentOptions.forEach(opt => {
+      opt.addEventListener('click', () => {
+        paymentOptions.forEach(o => o.classList.remove('active'));
+        opt.classList.add('active');
+        const radio = opt.querySelector('input[type="radio"]');
+        if (radio) radio.checked = true;
+        recalcAdOrderPrice();
+      });
+    });
+
+    // Лічильники та живе прев'ю
+    const nameInput = document.getElementById('adSiteName');
+    const urlInput = document.getElementById('adSiteUrl');
+    const descInput = document.getElementById('adSiteDesc');
+
+    nameInput.addEventListener('input', () => {
+      const len = nameInput.value.length;
+      const counter = document.getElementById('adNameCounter');
+      counter.textContent = `${len} / 25`;
+      counter.className = 'ad-char-counter' + (len >= 25 ? ' danger' : len >= 22 ? ' warning' : '');
+      updateLivePreview();
+    });
+
+    urlInput.addEventListener('input', () => {
+      updateLivePreview();
+    });
+
+    descInput.addEventListener('input', () => {
+      const len = descInput.value.length;
+      const counter = document.getElementById('adDescCounter');
+      counter.textContent = `${len} / 150`;
+      counter.className = 'ad-char-counter' + (len >= 150 ? ' danger' : len >= 135 ? ' warning' : '');
+      updateLivePreview();
+    });
+
+    // Застосування промокоду
+    const promoBtn = document.getElementById('adApplyPromoBtn');
+    const promoInput = document.getElementById('adPromoInput');
+    const promoFeedback = document.getElementById('adPromoFeedback');
+
+    promoBtn.addEventListener('click', () => {
+      const now = Date.now();
+      if (adPromoState.blockedUntil > now) {
+        const secLeft = Math.ceil((adPromoState.blockedUntil - now) / 1000);
+        promoFeedback.className = 'ad-promo-feedback error';
+        promoFeedback.textContent = `Забагато спроб. Зачекайте ще ${secLeft} сек.`;
+        return;
+      }
+
+      const rawCode = promoInput.value.trim().toUpperCase().replace(/\s+/g, '');
+      if (!rawCode) {
+        adPromoState.appliedCode = "";
+        adPromoState.discountPercent = 0;
+        promoFeedback.textContent = "";
+        recalcAdOrderPrice();
+        return;
+      }
+
+      if (AD_CONFIG.promoCodes[rawCode]) {
+        adPromoState.appliedCode = rawCode;
+        adPromoState.discountPercent = AD_CONFIG.promoCodes[rawCode].discount;
+        adPromoState.failedAttempts = 0;
+        promoFeedback.className = 'ad-promo-feedback success';
+        promoFeedback.innerHTML = `<i class="fas fa-check-circle"></i> Промокод застосовано: -${adPromoState.discountPercent}% (${AD_CONFIG.promoCodes[rawCode].name})`;
+      } else {
+        adPromoState.appliedCode = "";
+        adPromoState.discountPercent = 0;
+        adPromoState.failedAttempts++;
+        if (adPromoState.failedAttempts >= 5) {
+          adPromoState.blockedUntil = now + (2 * 60 * 1000);
+          promoFeedback.className = 'ad-promo-feedback error';
+          promoFeedback.textContent = '5 невірних спроб. Поле заблоковано на 2 хвилини.';
+        } else {
+          promoFeedback.className = 'ad-promo-feedback error';
+          promoFeedback.textContent = `Недійсний промокод. Залишилось спроб: ${5 - adPromoState.failedAttempts}`;
+        }
+      }
+      recalcAdOrderPrice();
+    });
+
+    // Натискання Enter у полі промокоду
+    promoInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        promoBtn.click();
+      }
+    });
+
+    // Фінальне сабміт-замовлення (перехід на Крок 2)
+    document.getElementById('adSubmitOrderBtn').addEventListener('click', submitAdOrder);
+
+    // Кнопка назад (редагування)
+    document.getElementById('adActionBackBtn').addEventListener('click', () => {
+      document.getElementById('adStep2').style.display = 'none';
+      document.getElementById('adStep1').style.display = 'block';
+    });
+
+    // Кнопка копіювання тексту замовлення
+    document.getElementById('adActionCopyBtn').addEventListener('click', () => {
+      if (window.currentAdOrderText) {
+        copyToClipboard(window.currentAdOrderText, document.getElementById('adActionCopyBtn'), 'Скопійовано! ✅');
+      }
+    });
+  }
+
+  // Скидання на Крок 1 при відкритті
+  document.getElementById('adStep1').style.display = 'block';
+  document.getElementById('adStep2').style.display = 'none';
+  document.getElementById('adFormError').style.display = 'none';
+
+  // Скидання чекбоксу дублювання
+  const dupCheckboxReset = document.getElementById('adDuplicateCheckbox');
+  if (dupCheckboxReset) {
+    dupCheckboxReset.checked = false;
+    document.getElementById('adDuplicateBlock').style.display = 'none';
+  }
+
+  // Встановлення переданого розділу та картки
+  const initialSection = opts.section && SECTIONS_CATALOG[opts.section] ? opts.section : getCurrentSiteSection();
+  const secSelect = document.getElementById('adSectionSelect');
+  secSelect.value = initialSection;
+  updateCardOptions(initialSection, opts.card);
+  updateLocationOptions();
+  recalcAdOrderPrice();
+  updateLivePreview();
+
+  backdrop.classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeAdOrderModal() {
+  const backdrop = document.getElementById('adOrderModalBackdrop');
+  if (backdrop) {
+    backdrop.classList.remove('show');
+    if (!document.querySelector('.cl-modal-backdrop.show')) {
+      document.body.style.overflow = '';
+    }
+  }
+}
+
+function updateCardOptions(section, preferredCard = '') {
+  const cardSelect = document.getElementById('adCardSelect');
+  cardSelect.innerHTML = '';
+
+  const isHome = section === 'Головна';
+  const baseRate = getSectionBasePrice(section);
+  const vipPrice = isHome 
+    ? AD_CONFIG.basePriceUah * AD_CONFIG.multipliers.home_vip 
+    : baseRate * AD_CONFIG.multipliers.section_vip;
+  const vipTitle = isHome ? '⭐ Рекомендації Сайту (VIP)' : '⭐ Рекомендації Розділу (VIP)';
+  
+  // Додаємо опцію VIP з ціною
+  const vipOpt = document.createElement('option');
+  vipOpt.value = vipTitle;
+  vipOpt.textContent = `${vipTitle} — ${vipPrice} грн/міс`;
+  cardSelect.appendChild(vipOpt);
+
+  const cards = SECTIONS_CATALOG[section] || [];
+  cards.forEach(c => {
+    const opt = document.createElement('option');
+    opt.value = c;
+    opt.textContent = c;
+    cardSelect.appendChild(opt);
+  });
+
+  if (preferredCard) {
+    // Якщо передано назву картки
+    for (let i = 0; i < cardSelect.options.length; i++) {
+      if (cardSelect.options[i].value.toLowerCase().includes(preferredCard.toLowerCase())) {
+        cardSelect.selectedIndex = i;
+        break;
+      }
+    }
+  }
+}
+
+function updateLocationOptions() {
+  const section = document.getElementById('adSectionSelect')?.value || 'Головна';
+  const cardSelect = document.getElementById('adCardSelect');
+  const locSelect = document.getElementById('adLocationSelect');
+  const isHome = section === 'Головна';
+  const baseRate = getSectionBasePrice(section);
+  const isVipCard = cardSelect && cardSelect.value.includes('Рекомендаці');
+
+  locSelect.innerHTML = '';
+
+  if (isVipCard) {
+    const vipPrice = isHome 
+      ? AD_CONFIG.basePriceUah * AD_CONFIG.multipliers.home_vip 
+      : baseRate * AD_CONFIG.multipliers.section_vip;
+    const opt = document.createElement('option');
+    opt.value = 'vip';
+    opt.textContent = `⭐ VIP Рекомендація — ${vipPrice} грн/міс`;
+    locSelect.appendChild(opt);
+    locSelect.value = 'vip';
+    locSelect.disabled = true;
+  } else {
+    locSelect.disabled = false;
+    const topPrice = isHome 
+      ? AD_CONFIG.basePriceUah * AD_CONFIG.multipliers.home_top 
+      : baseRate * AD_CONFIG.multipliers.other_top;
+    const bottomPrice = isHome 
+      ? AD_CONFIG.basePriceUah * AD_CONFIG.multipliers.home_bottom 
+      : baseRate * AD_CONFIG.multipliers.other_bottom;
+
+    const topOpt = document.createElement('option');
+    topOpt.value = 'top';
+    topOpt.textContent = `🔝 Вгорі картки (ТОП) — ${topPrice} грн/міс`;
+
+    const bottomOpt = document.createElement('option');
+    bottomOpt.value = 'bottom';
+    bottomOpt.textContent = `📍 Внизу картки (Стандарт) — ${bottomPrice} грн/міс`;
+
+    locSelect.appendChild(topOpt);
+    locSelect.appendChild(bottomOpt);
+    locSelect.value = 'bottom';
+  }
+}
+
+function updateDupCardOptions(section, preferredCard = '') {
+  const cardSelect = document.getElementById('adDupCardSelect');
+  if (!cardSelect) return;
+  cardSelect.innerHTML = '';
+  const isHome = section === 'Головна';
+  const baseRate = getSectionBasePrice(section);
+  const vipPrice = isHome 
+    ? AD_CONFIG.basePriceUah * AD_CONFIG.multipliers.home_vip 
+    : baseRate * AD_CONFIG.multipliers.section_vip;
+  const vipTitle = isHome ? '⭐ Рекомендації Сайту (VIP)' : '⭐ Рекомендації Розділу (VIP)';
+  
+  const vipOpt = document.createElement('option');
+  vipOpt.value = vipTitle;
+  vipOpt.textContent = `${vipTitle} — ${vipPrice} грн/міс`;
+  cardSelect.appendChild(vipOpt);
+
+  const cards = SECTIONS_CATALOG[section] || [];
+  cards.forEach(c => {
+    const opt = document.createElement('option');
+    opt.value = c;
+    opt.textContent = c;
+    cardSelect.appendChild(opt);
+  });
+
+  if (preferredCard) {
+    for (let i = 0; i < cardSelect.options.length; i++) {
+      if (cardSelect.options[i].value.toLowerCase().includes(preferredCard.toLowerCase())) {
+        cardSelect.selectedIndex = i;
+        break;
+      }
+    }
+  }
+}
+
+function updateDupLocationOptions() {
+  const section = document.getElementById('adDupSectionSelect')?.value || 'Головна';
+  const cardSelect = document.getElementById('adDupCardSelect');
+  const locSelect = document.getElementById('adDupLocationSelect');
+  if (!cardSelect || !locSelect) return;
+  const isHome = section === 'Головна';
+  const baseRate = getSectionBasePrice(section);
+  const isVipCard = cardSelect.value.includes('Рекомендаці');
+
+  locSelect.innerHTML = '';
+  if (isVipCard) {
+    const vipPrice = isHome 
+      ? AD_CONFIG.basePriceUah * AD_CONFIG.multipliers.home_vip 
+      : baseRate * AD_CONFIG.multipliers.section_vip;
+    const opt = document.createElement('option');
+    opt.value = 'vip';
+    opt.textContent = `⭐ VIP Рекомендація — ${vipPrice} грн/міс`;
+    locSelect.appendChild(opt);
+    locSelect.value = 'vip';
+    locSelect.disabled = true;
+  } else {
+    locSelect.disabled = false;
+    const topPrice = isHome 
+      ? AD_CONFIG.basePriceUah * AD_CONFIG.multipliers.home_top 
+      : baseRate * AD_CONFIG.multipliers.other_top;
+    const bottomPrice = isHome 
+      ? AD_CONFIG.basePriceUah * AD_CONFIG.multipliers.home_bottom 
+      : baseRate * AD_CONFIG.multipliers.other_bottom;
+
+    const topOpt = document.createElement('option');
+    topOpt.value = 'top';
+    topOpt.textContent = `🔝 Вгорі картки (ТОП) — ${topPrice} грн/міс`;
+
+    const bottomOpt = document.createElement('option');
+    bottomOpt.value = 'bottom';
+    bottomOpt.textContent = `📍 Внизу картки (Стандарт) — ${bottomPrice} грн/міс`;
+
+    locSelect.appendChild(topOpt);
+    locSelect.appendChild(bottomOpt);
+    locSelect.value = 'bottom';
+  }
+}
+
+function updateLivePreview() {
+  const nameInput = document.getElementById('adSiteName');
+  const urlInput = document.getElementById('adSiteUrl');
+  const descInput = document.getElementById('adSiteDesc');
+  const locSelect = document.getElementById('adLocationSelect');
+
+  const titleEl = document.getElementById('adPreviewTitleText');
+  const faviconEl = document.getElementById('adPreviewFavicon');
+  const beaconEl = document.getElementById('adPreviewBeacon');
+  const descEl = document.getElementById('adPreviewDescText');
+
+  titleEl.textContent = nameInput.value.trim() || 'Назва Вашого Ресурсу';
+
+  const rawUrl = urlInput.value.trim();
+  if (rawUrl) {
+    try {
+      const parsed = new URL(rawUrl.startsWith('http') ? rawUrl : 'https://' + rawUrl);
+      faviconEl.src = `https://www.google.com/s2/favicons?domain=${parsed.hostname}&sz=32`;
+    } catch (e) {
+      faviconEl.src = 'favicon.ico';
+    }
+  } else {
+    faviconEl.src = 'favicon.ico';
+  }
+
+  beaconEl.style.display = (locSelect.value === 'vip') ? 'inline-block' : 'none';
+  descEl.textContent = descInput.value.trim() || 'Тут відображатиметься короткий опис вашого сайту при наведенні чи кліку...';
+}
+
+function recalcAdOrderPrice() {
+  const section = document.getElementById('adSectionSelect').value;
+  const card = document.getElementById('adCardSelect').value;
+  const location = document.getElementById('adLocationSelect').value;
+  const termId = document.getElementById('adTermSelect').value;
+  const paymentMethod = document.querySelector('input[name="adPaymentMethod"]:checked')?.value || 'mono';
+
+  // Перевірка чекбоксу дублювання
+  const dupCheckbox = document.getElementById('adDuplicateCheckbox');
+  let duplicateOpt = null;
+  if (dupCheckbox && dupCheckbox.checked) {
+    const dupSec = document.getElementById('adDupSectionSelect')?.value;
+    const dupCrd = document.getElementById('adDupCardSelect')?.value;
+    const dupLoc = document.getElementById('adDupLocationSelect')?.value;
+    duplicateOpt = {
+      enabled: true,
+      section: dupSec,
+      card: dupCrd,
+      location: dupLoc
+    };
+  }
+
+  const p = calculateAdPricing(section, card, location, termId, paymentMethod, duplicateOpt);
+
+  // Оновлення нижнього розгорнутого блоку підрахунку
+  if (p.isForever) {
+    if (p.hasDuplicate) {
+      document.getElementById('adCalcBaseRate').textContent = `${p.monthlyRate} грн / міс (${p.primaryMonthlyRate} + ${p.dupMonthlyRate} грн/міс за 2 розділи; розрахунок як 10 років = ${p.baseCost} грн)`;
+    } else {
+      document.getElementById('adCalcBaseRate').textContent = `${p.monthlyRate} грн / міс (розрахунок як 10 років = ${p.baseCost} грн)`;
+    }
+  } else {
+    if (p.hasDuplicate) {
+      document.getElementById('adCalcBaseRate').textContent = `${p.monthlyRate} грн / міс (${p.primaryMonthlyRate} грн осн. + ${p.dupMonthlyRate} грн дубль)`;
+    } else {
+      document.getElementById('adCalcBaseRate').textContent = `${p.monthlyRate} грн / міс` + (p.isVip ? ' (VIP)' : '');
+    }
+  }
+  document.getElementById('adCalcPeriod').textContent = p.termLabel;
+
+  // Відображення плашки гарантії для тарифів від 3 років та Назавжди
+  const guaranteeNotice = document.getElementById('adGuaranteeNotice');
+  if (guaranteeNotice) {
+    guaranteeNotice.style.display = p.hasGuarantee ? 'flex' : 'none';
+  }
+
+  const termRow = document.getElementById('adCalcTermDiscountRow');
+  if (p.termDiscountAmount > 0) {
+    termRow.style.display = 'flex';
+    document.getElementById('adCalcTermDiscountVal').textContent = `-${p.termDiscountAmount} грн (-${p.termDiscountPercent}%)`;
+  } else {
+    termRow.style.display = 'none';
+  }
+
+  const promoRow = document.getElementById('adCalcPromoDiscountRow');
+  if (p.promoDiscountAmount > 0) {
+    promoRow.style.display = 'flex';
+    document.getElementById('adCalcPromoDiscountVal').textContent = `-${p.promoDiscountAmount} грн (-${p.promoDiscountPercent}%)`;
+  } else {
+    promoRow.style.display = 'none';
+  }
+
+  const cryptoRow = document.getElementById('adCalcCryptoDiscountRow');
+  if (p.cryptoDiscountAmount > 0) {
+    cryptoRow.style.display = 'flex';
+    document.getElementById('adCalcCryptoDiscountVal').textContent = `-${p.cryptoDiscountAmount} грн (-10%)`;
+  } else {
+    cryptoRow.style.display = 'none';
+  }
+
+  document.getElementById('adCalcTotalUah').textContent = `${p.finalUah} грн`;
+  document.getElementById('adCalcTotalUsdt').textContent = `~ $${p.finalUsdt} USDT`;
+
+  // === ОНОВЛЕННЯ ПЛАВАЮЧОГО БАРУ ВАРТОСТІ (ЗАВЖДИ ВИДИМИЙ ПРИ СКРОЛІ) ===
+  const stickyUah = document.getElementById('adStickyPriceUah');
+  const stickyUsdt = document.getElementById('adStickyPriceUsdt');
+  const stickyTariff = document.getElementById('adStickyTariffBadge');
+  const stickyDiscount = document.getElementById('adStickyDiscountBadge');
+
+  if (stickyUah) {
+    stickyUah.textContent = `${p.finalUah} грн`;
+    stickyUah.classList.remove('price-flash');
+    void stickyUah.offsetWidth; // перезапуск анімації спалаху
+    stickyUah.classList.add('price-flash');
+    setTimeout(() => stickyUah.classList.remove('price-flash'), 300);
+  }
+  if (stickyUsdt) {
+    stickyUsdt.textContent = `(~ $${p.finalUsdt} USDT)`;
+  }
+  if (stickyTariff) {
+    if (p.isForever) {
+      stickyTariff.textContent = p.hasDuplicate ? 'Назавжди (2 розділи, -50%)' : 'Назавжди (-50%)';
+    } else if (p.hasDuplicate) {
+      stickyTariff.textContent = `${p.monthlyRate} грн/міс (2 розділи)`;
+    } else {
+      stickyTariff.textContent = `${p.monthlyRate} грн/міс` + (p.isVip ? ' (VIP)' : '');
+    }
+  }
+  if (stickyDiscount) {
+    const totalDiscountPercent = p.termDiscountPercent + p.promoDiscountPercent + (paymentMethod === 'crypto' ? 10 : 0);
+    if (totalDiscountPercent > 0) {
+      stickyDiscount.style.display = 'inline-block';
+      stickyDiscount.textContent = `Знижка -${totalDiscountPercent}%`;
+    } else {
+      stickyDiscount.style.display = 'none';
+    }
+  }
+
+  return p;
+}
+
+function submitAdOrder() {
+  const name = document.getElementById('adSiteName').value.trim();
+  const url = document.getElementById('adSiteUrl').value.trim();
+  const desc = document.getElementById('adSiteDesc').value.trim();
+  const email = document.getElementById('adContactEmail').value.trim();
+  const tg = document.getElementById('adContactTg').value.trim();
+  const phone = document.getElementById('adContactPhone').value.trim();
+
+  const errorEl = document.getElementById('adFormError');
+  errorEl.style.display = 'none';
+
+  if (!name) {
+    errorEl.textContent = 'Будь ласка, вкажіть назву вашого ресурсу (до 25 символів).';
+    errorEl.style.display = 'block';
+    document.getElementById('adSiteName').focus();
+    return;
+  }
+  if (!url) {
+    errorEl.textContent = 'Будь ласка, вкажіть посилання на ваш ресурс (URL сайту або Telegram).';
+    errorEl.style.display = 'block';
+    document.getElementById('adSiteUrl').focus();
+    return;
+  }
+  if (!desc) {
+    errorEl.textContent = 'Будь ласка, додайте короткий опис вашого ресурсу (до 150 символів).';
+    errorEl.style.display = 'block';
+    document.getElementById('adSiteDesc').focus();
+    return;
+  }
+  if (!email || !email.includes('@')) {
+    errorEl.textContent = 'Будь ласка, вкажіть коректний контактний E-Mail для зв\'язку.';
+    errorEl.style.display = 'block';
+    document.getElementById('adContactEmail').focus();
+    return;
+  }
+
+  const section = document.getElementById('adSectionSelect').value;
+  const card = document.getElementById('adCardSelect').value;
+  const location = document.getElementById('adLocationSelect').value;
+  const termId = document.getElementById('adTermSelect').value;
+  const paymentMethod = document.querySelector('input[name="adPaymentMethod"]:checked')?.value || 'mono';
+
+  const pricing = recalcAdOrderPrice();
+  const orderId = generateAdOrderId();
+
+  // Дані дублювання
+  const dupCheckbox = document.getElementById('adDuplicateCheckbox');
+  let duplicateInfo = null;
+  if (dupCheckbox && dupCheckbox.checked) {
+    const dupSec = document.getElementById('adDupSectionSelect').value;
+    const dupCrd = document.getElementById('adDupCardSelect').value;
+    const dupLocVal = document.getElementById('adDupLocationSelect').value;
+    duplicateInfo = {
+      section: dupSec,
+      card: dupCrd,
+      location: dupLocVal === 'vip' ? 'VIP Рекомендація' : dupLocVal === 'top' ? 'Вгорі картки (ТОП)' : 'Внизу картки (Стандарт)'
+    };
+  }
+
+  const orderPayload = {
+    orderId,
+    timestamp: new Date().toISOString(),
+    siteName: name,
+    siteUrl: url,
+    siteDesc: desc,
+    section,
+    card,
+    location: location === 'vip' ? 'VIP Рекомендація' : location === 'top' ? 'Вгорі картки (ТОП)' : 'Внизу картки (Стандарт)',
+    secondPlacement: duplicateInfo,
+    term: pricing.termLabel,
+    months: pricing.months,
+    hasGuarantee: !!pricing.hasGuarantee,
+    promoCode: adPromoState.appliedCode || 'Немає',
+    paymentMethod,
+    totalUah: pricing.finalUah,
+    totalUsdt: pricing.finalUsdt,
+    clientEmail: email,
+    clientTg: tg || 'Не вказано',
+    clientPhone: phone || 'Не вказано'
+  };
+
+  // Збереження на сервері та локально
+  try {
+    fetch('/api/orders', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(orderPayload)
+    }).catch(err => console.log('Ad order local buffer:', err));
+    localStorage.setItem('topz_last_ad_order', JSON.stringify(orderPayload));
+  } catch (e) {}
+
+  // Заповнення Кроку 2
+  document.getElementById('adSuccessOrderId').textContent = `#${orderId}`;
+  document.getElementById('adRecNoteOrderId').textContent = `#${orderId}`;
+  document.getElementById('adRecSite').innerHTML = `<strong>${name}</strong> (<a href="${url}" target="_blank">${url}</a>)`;
+  
+  let recPlacementHtml = `<strong>1:</strong> ${section} → ${card} (${orderPayload.location})`;
+  if (duplicateInfo) {
+    recPlacementHtml += `<br><strong>2 (дубль):</strong> ${duplicateInfo.section} → ${duplicateInfo.card} (${duplicateInfo.location})`;
+  }
+  document.getElementById('adRecPlacement').innerHTML = recPlacementHtml;
+  
+  let recTermHtml = pricing.termLabel;
+  if (pricing.hasGuarantee) {
+    recTermHtml += `<br><span class="badge bg-success text-white" style="font-size:0.75rem;"><i class="fas fa-shield-alt"></i> Гарантія: 1 зміна URL/назви на рік</span>`;
+  }
+  document.getElementById('adRecTerm').innerHTML = recTermHtml;
+  document.getElementById('adRecContact').textContent = `${email}${tg ? ' / ' + tg : ''}`;
+  document.getElementById('adRecAmount').textContent = `${pricing.finalUah} грн (~ $${pricing.finalUsdt} USDT)`;
+
+  // Генерація реквізитів
+  renderRequisitesBox(paymentMethod, pricing, orderId);
+
+  // Формування тексту для Telegram і копіювання
+  let placementTgText = `📍 Розміщення 1: ${section} > ${card} (${orderPayload.location})`;
+  if (duplicateInfo) {
+    placementTgText += `\n📍 Розміщення 2: ${duplicateInfo.section} > ${duplicateInfo.card} (${duplicateInfo.location})`;
+  }
+  const guaranteeTgText = pricing.hasGuarantee ? `\n🛡️ Гарантія: 1 безкоштовна зміна URL/назви на рік включена` : '';
+
+  const orderSummaryText = 
+`🔔 Замовлення на розміщення на ТОП ЗАКЛАДКИ:
+🆔 Номер: #${orderId}
+🔗 Ресурс: ${name} (${url})
+📝 Опис: ${desc}
+${placementTgText}
+⏱️ Термін: ${pricing.termLabel}${guaranteeTgText}
+💳 Оплата: ${paymentMethod === 'mono' ? 'Монобанк' : paymentMethod === 'privat' ? 'ПриватБанк' : 'Криптовалюта'}
+💰 До сплати: ${pricing.finalUah} грн (~ $${pricing.finalUsdt} USDT)
+📧 Контакти: ${email}${tg ? ' | ' + tg : ''}${phone ? ' | ' + phone : ''}
+----------------------------------------
+Надсилаю підтвердження замовлення.`;
+
+  window.currentAdOrderText = orderSummaryText;
+
+  // Посилання на Telegram
+  const tgBtn = document.getElementById('adActionTgBtn');
+  tgBtn.href = `https://t.me/WeberSIS?text=${encodeURIComponent(orderSummaryText)}`;
+
+  // Посилання на Email
+  const emailBtn = document.getElementById('adActionEmailBtn');
+  emailBtn.href = `mailto:weber515sis@gmail.com?subject=${encodeURIComponent('Оплата замовлення #' + orderId)}&body=${encodeURIComponent(orderSummaryText)}`;
+
+  // Перемикання екрана
+  document.getElementById('adStep1').style.display = 'none';
+  document.getElementById('adStep2').style.display = 'block';
+  document.querySelector('.ad-modal-body').scrollTop = 0;
+}
+
+function renderRequisitesBox(method, pricing, orderId) {
+  const box = document.getElementById('adRequisiteBox');
+  box.innerHTML = '';
+
+  if (method === 'mono') {
+    const mono = AD_CONFIG.wallets.mono;
+    box.innerHTML = `
+      <div class="ad-requisite-title"><i class="fas fa-wallet"></i> Реквізити для оплати: Монобанк (Банка)</div>
+      <p style="font-size: 0.88rem; margin-bottom: 10px; color: var(--text-muted, #64748b);">Оплатіть у 1 клік через Банку Monobank (Apple Pay / Google Pay) або за номером картки Банки:</p>
+      
+      <div style="margin-bottom: 12px;">
+        <a href="${mono.url}" target="_blank" class="btn btn-primary btn-block" style="font-weight: 700; padding: 10px; display: inline-flex; align-items: center; justify-content: center; gap: 8px;">
+          <i class="fas fa-external-link-alt"></i> Перейти до Банки Монобанку (send.monobank.ua)
+        </a>
+      </div>
+
+      <div class="ad-label" style="margin-bottom: 4px;">Номер картки Банки:</div>
+      <div class="ad-copy-field">
+        <span class="ad-copy-val">${mono.card}</span>
+        <button type="button" class="ad-copy-btn" onclick="copyToClipboard('${mono.cardRaw}', this)"><i class="fas fa-copy"></i> Копіювати</button>
+      </div>
+    `;
+  } else if (method === 'privat') {
+    const privat = AD_CONFIG.wallets.privat;
+    box.innerHTML = `
+      <div class="ad-requisite-title"><i class="fas fa-wallet" style="color: #16a34a;"></i> Реквізити для оплати: ПриватБанк (Конверт)</div>
+      <p style="font-size: 0.88rem; margin-bottom: 10px; color: var(--text-muted, #64748b);">Миттєве поповнення Конверта у додатку Приват24 або за номером картки Конверта:</p>
+      
+      <div style="margin-bottom: 12px;">
+        <a href="${privat.url}" target="_blank" class="btn btn-success btn-block" style="font-weight: 700; padding: 10px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: #16a34a; border-color: #16a34a;">
+          <i class="fas fa-external-link-alt"></i> Відкрити Конверт у Приват24 (privat24.ua)
+        </a>
+      </div>
+
+      <div class="ad-label" style="margin-bottom: 4px;">Номер картки Конверта:</div>
+      <div class="ad-copy-field">
+        <span class="ad-copy-val">${privat.card}</span>
+        <button type="button" class="ad-copy-btn" onclick="copyToClipboard('${privat.cardRaw}', this)"><i class="fas fa-copy"></i> Копіювати</button>
+      </div>
+    `;
+  } else if (method === 'crypto') {
+    const coins = AD_CONFIG.wallets.crypto;
+    let coinsOptionsHtml = coins.map((c, i) => `<option value="${c.id}" ${i === 0 ? 'selected' : ''}>${c.name} ${c.badge ? ' - ' + c.badge : ''}</option>`).join('');
+    
+    box.innerHTML = `
+      <div class="ad-requisite-title"><i class="fas fa-coins" style="color: #0284c7;"></i> Оплата Криптовалютою (Знижка 10% врахована!)</div>
+      <p style="font-size: 0.88rem; margin-bottom: 10px; color: var(--text-muted, #64748b);">
+        Сума до сплати: <strong style="color: #10b981; font-size: 1.05rem;">~ $${pricing.finalUsdt} USDT</strong> (${pricing.finalUah} грн). Оберіть зручну криптовалюту та мережу:
+      </p>
+
+      <div class="ad-form-group mb-2">
+        <select id="adCryptoCoinSelect" class="ad-select">
+          ${coinsOptionsHtml}
+        </select>
+      </div>
+
+      <div class="ad-label" style="margin-bottom: 4px;">Адреса гаманця для переказу:</div>
+      <div class="ad-copy-field">
+        <span class="ad-copy-val" id="adCryptoAddressVal">${coins[0].address}</span>
+        <button type="button" class="ad-copy-btn" id="adCryptoCopyBtn"><i class="fas fa-copy"></i> Копіювати</button>
+      </div>
+    `;
+
+    const coinSelect = box.querySelector('#adCryptoCoinSelect');
+    const addrVal = box.querySelector('#adCryptoAddressVal');
+    const copyBtn = box.querySelector('#adCryptoCopyBtn');
+
+    coinSelect.addEventListener('change', () => {
+      const selected = coins.find(c => c.id === coinSelect.value) || coins[0];
+      addrVal.textContent = selected.address;
+    });
+
+    copyBtn.addEventListener('click', () => {
+      copyToClipboard(addrVal.textContent.trim(), copyBtn);
+    });
+  }
+}
+
+function copyToClipboard(text, btnElement, successMsg = 'Скопійовано! ✅') {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(() => {
+      handleCopySuccess(btnElement, successMsg);
+    }).catch(() => fallbackCopy(text, btnElement, successMsg));
+  } else {
+    fallbackCopy(text, btnElement, successMsg);
+  }
+}
+
+function fallbackCopy(text, btnElement, successMsg) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.left = '-9999px';
+  document.body.appendChild(ta);
+  ta.focus();
+  ta.select();
+  try {
+    document.execCommand('copy');
+    handleCopySuccess(btnElement, successMsg);
+  } catch (err) {}
+  document.body.removeChild(ta);
+}
+
+function handleCopySuccess(btnElement, successMsg) {
+  if (!btnElement) return;
+  const originalHtml = btnElement.innerHTML;
+  btnElement.classList.add('copied');
+  btnElement.innerHTML = successMsg;
+  setTimeout(() => {
+    btnElement.classList.remove('copied');
+    btnElement.innerHTML = originalHtml;
+  }, 2000);
+}
