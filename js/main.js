@@ -2216,13 +2216,11 @@ function getSectionBasePrice(section) {
 
 function getSinglePlacementRate(sec, crd, loc) {
   const isHome = sec === 'Головна';
-  const isVip = (crd && (crd.includes('Партнери') || crd.includes('Рекомендаці'))) || loc === 'vip';
+  const isVip = (crd && (crd.includes('Партнери') || crd.includes('Рекомендаці'))) || loc === 'vip' || (loc && loc.startsWith('vip'));
   const baseRate = getSectionBasePrice(sec);
 
   if (isVip) {
-    return isHome 
-      ? (AD_CONFIG.basePriceUah * AD_CONFIG.multipliers.home_vip) // 700 грн
-      : (baseRate * AD_CONFIG.multipliers.section_vip); // 450 грн (комерційний) або 300 грн (стандарт)
+    return isHome ? 700 : (baseRate * 3);
   }
   if (isHome) {
     return loc === 'top' 
@@ -2230,27 +2228,114 @@ function getSinglePlacementRate(sec, crd, loc) {
       : (AD_CONFIG.basePriceUah * AD_CONFIG.multipliers.home_bottom); // 200 грн
   }
   return loc === 'top' 
-    ? (baseRate * AD_CONFIG.multipliers.other_top) // 300 грн (комерційний) або 200 грн (стандарт)
-    : (baseRate * AD_CONFIG.multipliers.other_bottom); // 150 грн (комерційний) або 100 грн (стандарт)
+    ? (baseRate * AD_CONFIG.multipliers.other_top) // 200 грн (комерційний 300 грн)
+    : (baseRate * AD_CONFIG.multipliers.other_bottom); // 100 грн (комерційний 150 грн)
 }
 
-function calculateAdPricing(section, card, location, termId, paymentMethod, duplicateOpt = null) {
-  const isHome = section === 'Головна';
-  const isVip = (card && (card.includes('Партнери') || card.includes('Рекомендаці'))) || location === 'vip';
-  const primaryMonthlyRate = getSinglePlacementRate(section, card, location);
+function getActivePlacements() {
+  const placements = [];
+  
+  const sec1 = document.getElementById('adSectionSelect')?.value;
 
-  let hasDuplicate = false;
-  let dupMonthlyRate = 0;
-  if (duplicateOpt && duplicateOpt.enabled && duplicateOpt.section && duplicateOpt.card) {
-    hasDuplicate = true;
-    dupMonthlyRate = getSinglePlacementRate(duplicateOpt.section, duplicateOpt.card, duplicateOpt.location);
+  // 1. VIP-партнерський Add-on для Розділу 1 (якщо увімкнено)
+  const partner1Check = document.getElementById('adPartnerAddon1Checkbox');
+  if (partner1Check && partner1Check.checked && sec1) {
+    const isHome1 = sec1 === 'Головна';
+    const pCard1 = isHome1 ? 'Партнери Сайту' : 'Партнери Розділу';
+    const pRate1 = getSinglePlacementRate(sec1, pCard1, 'vip');
+    placements.push({
+      slot: 1,
+      type: 'partner',
+      title: isHome1 ? '💎 Партнери Сайту (Головна)' : `🔥 Партнери Розділу (${sec1})`,
+      section: sec1,
+      card: pCard1,
+      location: 'partner',
+      locationLabel: 'Партнерське місце',
+      isVip: true,
+      monthlyRate: pRate1,
+      badge: getAdResourceBadge(sec1, pCard1, 'vip')
+    });
   }
 
-  const monthlyRate = primaryMonthlyRate + dupMonthlyRate;
+  // 2. Слот 1: Тематична картка (лише якщо увімкнено чекбокс тематичної картки)
+  const thematic1Check = document.getElementById('adThematic1Checkbox');
+  const isThematic1Active = thematic1Check ? thematic1Check.checked : true;
+  const crd1 = document.getElementById('adCardSelect')?.value;
+  const loc1 = document.getElementById('adLocationSelect')?.value || 'bottom';
+  if (isThematic1Active && sec1 && crd1) {
+    const rate1 = getSinglePlacementRate(sec1, crd1, loc1);
+    placements.push({
+      slot: 1,
+      type: 'thematic',
+      title: `Локація 1 (Тематична)`,
+      section: sec1,
+      card: crd1,
+      location: loc1,
+      locationLabel: loc1 === 'top' ? 'Вгорі картки (ТОП)' : 'Внизу картки (Стандарт)',
+      isVip: false,
+      monthlyRate: rate1,
+      badge: getAdResourceBadge(sec1, crd1, loc1)
+    });
+  }
+
+  // 3. Слот 2 (Додаткова локація)
+  const slot2Box = document.getElementById('adSlot2Box');
+  const isSlot2Active = slot2Box && slot2Box.style.display !== 'none';
+  if (isSlot2Active) {
+    const sec2 = document.getElementById('adSlot2SectionSelect')?.value;
+
+    // VIP-партнерський Add-on для Розділу 2
+    const partner2Check = document.getElementById('adPartnerAddon2Checkbox');
+    if (partner2Check && partner2Check.checked && sec2) {
+      const isHome2 = sec2 === 'Головна';
+      const pCard2 = isHome2 ? 'Партнери Сайту' : 'Партнери Розділу';
+      const pRate2 = getSinglePlacementRate(sec2, pCard2, 'vip');
+      placements.push({
+        slot: 2,
+        type: 'partner',
+        title: isHome2 ? '💎 Партнери Сайту (Головна)' : `🔥 Партнери Розділу (${sec2})`,
+        section: sec2,
+        card: pCard2,
+        location: 'partner',
+        locationLabel: 'Партнерське місце',
+        isVip: true,
+        monthlyRate: pRate2,
+        badge: getAdResourceBadge(sec2, pCard2, 'vip')
+      });
+    }
+
+    // Тематична картка для Розділу 2
+    const thematic2Check = document.getElementById('adThematic2Checkbox');
+    const isThematic2Active = thematic2Check ? thematic2Check.checked : true;
+    const crd2 = document.getElementById('adSlot2CardSelect')?.value;
+    const loc2 = document.getElementById('adSlot2LocationSelect')?.value || 'bottom';
+    if (isThematic2Active && sec2 && crd2) {
+      const rate2 = getSinglePlacementRate(sec2, crd2, loc2);
+      placements.push({
+        slot: 2,
+        type: 'thematic',
+        title: `Локація 2 (Тематична)`,
+        section: sec2,
+        card: crd2,
+        location: loc2,
+        locationLabel: loc2 === 'top' ? 'Вгорі картки (ТОП)' : 'Внизу картки (Стандарт)',
+        isVip: false,
+        monthlyRate: rate2,
+        badge: getAdResourceBadge(sec2, crd2, loc2)
+      });
+    }
+  }
+
+  return placements;
+}
+
+function calculateAdPricing(termId, paymentMethod) {
+  const placements = getActivePlacements();
+  const monthlyRate = placements.reduce((sum, p) => sum + p.monthlyRate, 0);
   const termObj = AD_CONFIG.terms.find(t => t.id === termId) || AD_CONFIG.terms[0];
   const months = termObj.months;
   const baseCost = monthlyRate * months;
-  
+
   // Знижка за термін
   const termDiscountAmount = Math.round(baseCost * (termObj.discount / 100));
   const costAfterTerm = baseCost - termDiscountAmount;
@@ -2270,13 +2355,14 @@ function calculateAdPricing(section, card, location, termId, paymentMethod, dupl
   const finalUah = costAfterPromo - cryptoDiscountAmount;
   const finalUsdt = (finalUah / AD_CONFIG.usdRate).toFixed(2);
 
+  const hasVip = placements.some(p => p.isVip);
+
   return {
-    isVip,
+    placements,
+    count: placements.length,
+    isVip: hasVip,
     isForever: !!termObj.isForever,
     hasGuarantee: !!termObj.hasGuarantee,
-    primaryMonthlyRate,
-    hasDuplicate,
-    dupMonthlyRate,
     monthlyRate,
     months,
     termLabel: termObj.label,
@@ -2299,32 +2385,17 @@ function openAdOrderModal(opts = {}) {
     backdrop.className = 'cl-modal-backdrop';
     backdrop.innerHTML = `
       <div class="cl-modal ad-order-modal" role="dialog" aria-modal="true">
-        <div class="cl-modal-header">
-          <h5 class="cl-modal-title"><i class="fas fa-bullhorn text-primary"></i> Розміщення ресурсу / Додати сайт</h5>
-          <button type="button" class="btn btn-secondary btn-sm cl-modal-close" aria-label="Закрити">
-            <span>Закрити</span>
-            <span class="cl-modal-close-sep"></span>
-            <span class="cl-modal-close-x">&times;</span>
-          </button>
+        <div class="ad-sticky-close-wrapper">
+          <button type="button" class="cl-modal-close ad-sticky-close-btn" aria-label="Закрити" title="Закрити">&times;</button>
+        </div>
+        <div class="cl-modal-header ad-modal-header">
+          <h5 class="cl-modal-title"><i class="fas fa-bullhorn text-primary"></i> Додати сайт</h5>
         </div>
         <div class="cl-modal-body ad-modal-body">
           
           <!-- КРОК 1: ФОРМА ЗАПОВНЕННЯ ТА КАЛЬКУЛЯТОР -->
           <div id="adStep1">
             
-            <!-- ПЛАВАЮЧИЙ БАР ВАРТОСТІ (ЗАВЖДИ НА ВИДУ ПРИ СКРОЛІ) -->
-            <div class="ad-sticky-price-bar" id="adStickyPriceBar">
-              <div class="ad-sticky-price-left">
-                <span class="ad-sticky-price-title"><i class="fas fa-coins text-warning me-1"></i> До сплати:</span>
-                <span class="ad-sticky-price-uah" id="adStickyPriceUah">100 грн</span>
-                <span class="ad-sticky-price-usdt" id="adStickyPriceUsdt">(~ $2.41 USDT)</span>
-              </div>
-              <div class="ad-sticky-price-right">
-                <span class="ad-sticky-badge" id="adStickyTariffBadge">100 грн/міс</span>
-                <span class="ad-discount-badge" id="adStickyDiscountBadge" style="display:none;">-10%</span>
-              </div>
-            </div>
-
             <!-- Пояснення черги 6 місць -->
             <div class="ad-badge-rule-box">
               <i class="fas fa-info-circle me-1"></i> <strong>Правило черги та розміщення:</strong> В одній картці допускається до 6 рекламних місць. Перше замовлення займає верхню позицію в обраній зоні, послідуючі - нижчі рядки. Діє автоматичне просування вгору після завершення терміну попереднього партнера.
@@ -2333,53 +2404,124 @@ function openAdOrderModal(opts = {}) {
             <!-- БЛОК 1: Локація на сайті -->
             <div class="ad-section-block">
               <div class="ad-block-title"><i class="fas fa-map-marker-alt text-primary"></i> 1. Вибір місця розташування</div>
-              <div class="ad-form-grid-3">
+              
+              <!-- СЛОТ 1: Основне розміщення -->
+              <div class="ad-slot-box" id="adSlot1Box">
+                <div class="ad-slot-header">
+                  <div class="ad-slot-title">
+                    <span class="ad-slot-number">1</span>
+                    <span>Основна локація:</span>
+                  </div>
+                </div>
+                
                 <div class="ad-form-group">
                   <div class="ad-label-row"><label class="ad-label" for="adSectionSelect">Розділ сайту:</label></div>
                   <select id="adSectionSelect" class="ad-select"></select>
                 </div>
-                <div class="ad-form-group">
-                  <div class="ad-label-row"><label class="ad-label" for="adCardSelect">Картка / Тематика:</label></div>
-                  <select id="adCardSelect" class="ad-select"></select>
+
+                <!-- VIP-партнерський Add-on для Розділу 1 (одразу після вибору розділу) -->
+                <div class="ad-partner-addon-wrap" id="adPartnerAddon1Wrap">
+                  <label class="ad-partner-addon-label" for="adPartnerAddon1Checkbox">
+                    <input type="checkbox" id="adPartnerAddon1Checkbox" class="ad-partner-checkbox">
+                    <span class="ad-partner-addon-content">
+                      <span class="ad-partner-addon-text" id="adPartnerAddon1Text">
+                        <i class="fas fa-gem text-warning me-1"></i> <strong>Додати в «Партнери Сайту»</strong>
+                      </span>
+                      <span class="ad-partner-addon-price" id="adPartnerAddon1Price">700 грн/міс</span>
+                    </span>
+                  </label>
                 </div>
-                <div class="ad-form-group">
-                  <div class="ad-label-row"><label class="ad-label" for="adLocationSelect">Зона в картці:</label></div>
-                  <select id="adLocationSelect" class="ad-select">
-                    <option value="top">🔝 Вгорі картки (ТОП)</option>
-                    <option value="bottom" selected>📍 Внизу картки (Стандарт)</option>
-                    <option value="vip" id="adLocVipOption" style="display:none;">⭐ Рекомендація (VIP)</option>
-                  </select>
+
+                <!-- Чекбокс активації тематичної картки для Розділу 1 -->
+                <div class="ad-thematic-addon-wrap" id="adThematicAddon1Wrap">
+                  <label class="ad-thematic-addon-label" for="adThematic1Checkbox">
+                    <input type="checkbox" id="adThematic1Checkbox" class="ad-thematic-checkbox" checked>
+                    <span class="ad-thematic-addon-content">
+                      <span class="ad-thematic-addon-text">
+                        <i class="fas fa-th-list text-primary me-1"></i> <strong>Додати в тематичну картку</strong>
+                      </span>
+                      <span class="ad-thematic-addon-price" id="adThematic1PriceBadge">від 200 грн/міс</span>
+                    </span>
+                  </label>
+                </div>
+
+                <!-- Поля вибору тематичної картки (активні лише коли увімкнено чекбокс вище) -->
+                <div class="ad-form-grid-2" id="adThematic1FieldsBox">
+                  <div class="ad-form-group">
+                    <div class="ad-label-row"><label class="ad-label" for="adCardSelect">Картка / Тематика:</label></div>
+                    <select id="adCardSelect" class="ad-select"></select>
+                  </div>
+                  <div class="ad-form-group">
+                    <div class="ad-label-row"><label class="ad-label" for="adLocationSelect">Зона в картці:</label></div>
+                    <select id="adLocationSelect" class="ad-select">
+                      <option value="top">🔝 Вгорі картки (ТОП)</option>
+                      <option value="bottom" selected>📍 Внизу картки (Стандарт)</option>
+                    </select>
+                  </div>
                 </div>
               </div>
 
-              <!-- Опція мульти-розміщення (Продублювати в суміжний розділ) -->
-              <div class="ad-dup-toggle-wrapper">
-                <label class="ad-dup-checkbox-label" for="adDuplicateCheckbox">
-                  <input type="checkbox" id="adDuplicateCheckbox" class="ad-dup-checkbox">
-                  <span class="ad-dup-checkbox-text">
-                    <i class="fas fa-layer-group text-primary me-1"></i> <strong>Продублювати в суміжний розділ</strong> (додаткове друге розміщення)
-                  </span>
-                </label>
+              <!-- Кнопка додавання другої локації -->
+              <div class="ad-add-slot-wrapper" id="adAddSlot2Wrapper">
+                <button type="button" id="adAddSlot2Btn" class="ad-add-slot-btn">
+                  <i class="fas fa-plus-circle me-1"></i> Додати ще одну локацію (до 2 місць)
+                </button>
               </div>
-              <div id="adDuplicateBlock" class="ad-dup-block" style="display: none;">
-                <div class="ad-dup-subtitle">
-                  <i class="fas fa-plus-circle text-success me-1"></i> Оберіть другий розділ та картку (вартість сумується):
+
+              <!-- СЛОТ 2: Додаткове розміщення (приховано за замовчуванням) -->
+              <div class="ad-slot-box ad-slot-box-second" id="adSlot2Box" style="display:none;">
+                <div class="ad-slot-header">
+                  <div class="ad-slot-title">
+                    <span class="ad-slot-number ad-slot-number-second">2</span>
+                    <span>Додаткова локація:</span>
+                  </div>
+                  <button type="button" id="adRemoveSlot2Btn" class="ad-remove-slot-btn" title="Прибрати додаткову локацію">
+                    <i class="fas fa-times me-1"></i> Прибрати
+                  </button>
                 </div>
-                <div class="ad-form-grid-3">
+                
+                <div class="ad-form-group">
+                  <div class="ad-label-row"><label class="ad-label" for="adSlot2SectionSelect">Другий розділ:</label></div>
+                  <select id="adSlot2SectionSelect" class="ad-select"></select>
+                </div>
+
+                <!-- VIP-партнерський Add-on для Розділу 2 (одразу після вибору другого розділу) -->
+                <div class="ad-partner-addon-wrap" id="adPartnerAddon2Wrap">
+                  <label class="ad-partner-addon-label" for="adPartnerAddon2Checkbox">
+                    <input type="checkbox" id="adPartnerAddon2Checkbox" class="ad-partner-checkbox">
+                    <span class="ad-partner-addon-content">
+                      <span class="ad-partner-addon-text" id="adPartnerAddon2Text">
+                        <i class="fas fa-fire text-danger me-1"></i> <strong>Додати в «Партнери Розділу»</strong>
+                      </span>
+                      <span class="ad-partner-addon-price" id="adPartnerAddon2Price">300 грн/міс</span>
+                    </span>
+                  </label>
+                </div>
+
+                <!-- Чекбокс активації тематичної картки для Розділу 2 -->
+                <div class="ad-thematic-addon-wrap" id="adThematicAddon2Wrap">
+                  <label class="ad-thematic-addon-label" for="adThematic2Checkbox">
+                    <input type="checkbox" id="adThematic2Checkbox" class="ad-thematic-checkbox" checked>
+                    <span class="ad-thematic-addon-content">
+                      <span class="ad-thematic-addon-text">
+                        <i class="fas fa-th-list text-primary me-1"></i> <strong>Додати в тематичну картку</strong>
+                      </span>
+                      <span class="ad-thematic-addon-price" id="adThematic2PriceBadge">від 200 грн/міс</span>
+                    </span>
+                  </label>
+                </div>
+
+                <!-- Поля вибору тематичної картки (активні лише коли увімкнено чекбокс вище) -->
+                <div class="ad-form-grid-2" id="adThematic2FieldsBox">
                   <div class="ad-form-group">
-                    <div class="ad-label-row"><label class="ad-label" for="adDupSectionSelect">Другий розділ:</label></div>
-                    <select id="adDupSectionSelect" class="ad-select"></select>
+                    <div class="ad-label-row"><label class="ad-label" for="adSlot2CardSelect">Картка / Тематика:</label></div>
+                    <select id="adSlot2CardSelect" class="ad-select"></select>
                   </div>
                   <div class="ad-form-group">
-                    <div class="ad-label-row"><label class="ad-label" for="adDupCardSelect">Картка в розділі:</label></div>
-                    <select id="adDupCardSelect" class="ad-select"></select>
-                  </div>
-                  <div class="ad-form-group">
-                    <div class="ad-label-row"><label class="ad-label" for="adDupLocationSelect">Зона в картці:</label></div>
-                    <select id="adDupLocationSelect" class="ad-select">
+                    <div class="ad-label-row"><label class="ad-label" for="adSlot2LocationSelect">Зона в картці:</label></div>
+                    <select id="adSlot2LocationSelect" class="ad-select">
                       <option value="top">🔝 Вгорі картки (ТОП)</option>
                       <option value="bottom" selected>📍 Внизу картки (Стандарт)</option>
-                      <option value="vip" id="adDupLocVipOption" style="display:none;">⭐ Рекомендація (VIP)</option>
                     </select>
                   </div>
                 </div>
@@ -2542,8 +2684,14 @@ function openAdOrderModal(opts = {}) {
             <!-- РЕГЛАМЕНТ РОЗМІЩЕННЯ, ГАРАНТІЙ ТА МОДЕРАЦІЇ -->
             <details id="adRegulationsDetails" class="ad-regulations-box">
               <summary class="ad-regulations-summary">
-                <span><i class="fas fa-file-contract text-primary me-2"></i><strong>Регламент розміщення, гарантій та модерації</strong></span>
-                <span class="text-primary fs-6"><i class="fas fa-chevron-down"></i></span>
+                <div class="ad-regulations-title-wrap">
+                  <i class="fas fa-file-contract text-primary ad-regulations-icon"></i>
+                  <div class="ad-regulations-text-wrap">
+                    <span class="ad-regulations-title-main">РЕГЛАМЕНТ РОЗМІЩЕННЯ</span>
+                    <span class="ad-regulations-title-sub">(Гарантії та модерації)</span>
+                  </div>
+                </div>
+                <span class="text-primary fs-6 ad-regulations-arrow"><i class="fas fa-chevron-down"></i></span>
               </summary>
               <div class="ad-regulations-body">
                 <ol class="ad-rules-list">
@@ -2575,10 +2723,23 @@ function openAdOrderModal(opts = {}) {
               <i class="fas fa-shield-alt text-success me-1"></i> Натискаючи кнопку нижче, ви погоджуєтеся з <a href="javascript:void(0)" id="adToggleRulesBtn" class="ad-terms-link">Регламентом розміщення та модерації</a>.
             </div>
 
+            <!-- ПЛАВАЮЧИЙ БАР ВАРТОСТІ (ВНИЗУ ВІКНА) -->
+            <div class="ad-sticky-price-bar" id="adStickyPriceBar">
+              <div class="ad-sticky-price-left">
+                <span class="ad-sticky-price-title"><i class="fas fa-coins text-warning me-1"></i> До сплати:</span>
+                <span class="ad-sticky-price-uah" id="adStickyPriceUah">100 грн</span>
+                <span class="ad-sticky-price-usdt" id="adStickyPriceUsdt">(~ $2.41 USDT)</span>
+              </div>
+              <div class="ad-sticky-price-right">
+                <span class="ad-sticky-badge" id="adStickyTariffBadge">100 грн/міс</span>
+                <span class="ad-discount-badge" id="adStickyDiscountBadge" style="display:none;">-10%</span>
+              </div>
+            </div>
+
             <!-- Кнопка фінального кроку -->
             <button type="button" id="adSubmitOrderBtn" class="ad-submit-btn">
-              <span>Сформувати замовлення та отримати реквізити</span>
-              <i class="fas fa-arrow-right"></i>
+              <span class="ad-submit-btn-main">СФОРМУВАТИ ЗАМОВЛЕННЯ</span>
+              <span class="ad-submit-btn-sub">(Отримати реквізити)</span>
             </button>
           </div>
 
@@ -2661,23 +2822,23 @@ function openAdOrderModal(opts = {}) {
 
     // Наповнення селектів розділів і термінів
     const secSelect = document.getElementById('adSectionSelect');
+    const slot2SecSelect = document.getElementById('adSlot2SectionSelect');
+    secSelect.innerHTML = '';
+    slot2SecSelect.innerHTML = '';
     Object.keys(SECTIONS_CATALOG).forEach(s => {
-      const opt = document.createElement('option');
-      opt.value = s;
-      opt.textContent = s;
-      secSelect.appendChild(opt);
-    });
+      const opt1 = document.createElement('option');
+      opt1.value = s;
+      opt1.textContent = s;
+      secSelect.appendChild(opt1);
 
-    // Селект для другого розділу (мульти-розміщення)
-    const dupSecSelect = document.getElementById('adDupSectionSelect');
-    Object.keys(SECTIONS_CATALOG).forEach(s => {
-      const opt = document.createElement('option');
-      opt.value = s;
-      opt.textContent = s;
-      dupSecSelect.appendChild(opt);
+      const opt2 = document.createElement('option');
+      opt2.value = s;
+      opt2.textContent = s;
+      slot2SecSelect.appendChild(opt2);
     });
 
     const termSelect = document.getElementById('adTermSelect');
+    termSelect.innerHTML = '';
     AD_CONFIG.terms.forEach(t => {
       const opt = document.createElement('option');
       opt.value = t.id;
@@ -2685,53 +2846,137 @@ function openAdOrderModal(opts = {}) {
       termSelect.appendChild(opt);
     });
 
-    // Подія зміни розділу
+    // Подія зміни розділу (Слот 1)
     secSelect.addEventListener('change', () => {
       updateCardOptions(secSelect.value);
       updateLocationOptions();
+      updatePartnerAddon(1);
+      updateThematicAddon(1);
+      const slot2Box = document.getElementById('adSlot2Box');
+      if (slot2Box && slot2Box.style.display !== 'none') {
+        updateSlot2CardOptions();
+        updatePartnerAddon(2);
+        updateThematicAddon(2);
+      }
       recalcAdOrderPrice();
+      updateLivePreview();
     });
 
-    // Подія зміни картки
+    // Подія зміни картки (Слот 1)
     document.getElementById('adCardSelect').addEventListener('change', () => {
       updateLocationOptions();
+      const slot2Box = document.getElementById('adSlot2Box');
+      if (slot2Box && slot2Box.style.display !== 'none') {
+        updateSlot2CardOptions();
+      }
       recalcAdOrderPrice();
+      updateLivePreview();
     });
 
-    // Подія зміни локації
+    // Подія зміни локації (Слот 1)
     document.getElementById('adLocationSelect').addEventListener('change', () => {
       recalcAdOrderPrice();
       updateLivePreview();
     });
 
-    // Обробники мульти-розміщення (дублювання)
-    const dupCheckbox = document.getElementById('adDuplicateCheckbox');
-    const dupBlock = document.getElementById('adDuplicateBlock');
-    dupCheckbox.addEventListener('change', () => {
-      dupBlock.style.display = dupCheckbox.checked ? 'block' : 'none';
-      if (dupCheckbox.checked) {
-        if (!dupSecSelect.value || dupSecSelect.value === secSelect.value) {
-          dupSecSelect.value = secSelect.value === 'Головна' ? 'Соціум' : 'Головна';
-        }
-        updateDupCardOptions(dupSecSelect.value);
-        updateDupLocationOptions();
+    // VIP-партнерський Add-on для Слота 1
+    const partner1Checkbox = document.getElementById('adPartnerAddon1Checkbox');
+    partner1Checkbox.addEventListener('change', () => {
+      const slot2Box = document.getElementById('adSlot2Box');
+      if (slot2Box && slot2Box.style.display !== 'none') {
+        updatePartnerAddon(2);
       }
       recalcAdOrderPrice();
+      updateLivePreview();
     });
 
-    dupSecSelect.addEventListener('change', () => {
-      updateDupCardOptions(dupSecSelect.value);
-      updateDupLocationOptions();
+    // Чекбокс тематичної картки для Слота 1
+    const thematic1Checkbox = document.getElementById('adThematic1Checkbox');
+    const thematic1FieldsBox = document.getElementById('adThematic1FieldsBox');
+    thematic1Checkbox.addEventListener('change', () => {
+      thematic1FieldsBox.style.display = thematic1Checkbox.checked ? 'grid' : 'none';
+      const slot2Box = document.getElementById('adSlot2Box');
+      if (slot2Box && slot2Box.style.display !== 'none') {
+        updateSlot2CardOptions();
+      }
       recalcAdOrderPrice();
+      updateLivePreview();
     });
 
-    document.getElementById('adDupCardSelect').addEventListener('change', () => {
-      updateDupLocationOptions();
+    // Кнопка додавання другої локації
+    const addSlot2Btn = document.getElementById('adAddSlot2Btn');
+    const addSlot2Wrap = document.getElementById('adAddSlot2Wrapper');
+    const slot2Box = document.getElementById('adSlot2Box');
+    const removeSlot2Btn = document.getElementById('adRemoveSlot2Btn');
+
+    addSlot2Btn.addEventListener('click', () => {
+      slot2Box.style.display = 'block';
+      addSlot2Wrap.style.display = 'none';
+      if (!slot2SecSelect.value) {
+        slot2SecSelect.value = secSelect.value;
+      }
+      const thematic2Check = document.getElementById('adThematic2Checkbox');
+      const thematic2Fields = document.getElementById('adThematic2FieldsBox');
+      if (thematic2Check) thematic2Check.checked = true;
+      if (thematic2Fields) thematic2Fields.style.display = 'grid';
+      const partner2Check = document.getElementById('adPartnerAddon2Checkbox');
+      if (partner2Check) partner2Check.checked = false;
+      updateSlot2CardOptions();
+      updateSlot2LocationOptions();
+      updatePartnerAddon(2);
+      updateThematicAddon(2);
       recalcAdOrderPrice();
+      updateLivePreview();
     });
 
-    document.getElementById('adDupLocationSelect').addEventListener('change', () => {
+    // Кнопка видалення другої локації
+    removeSlot2Btn.addEventListener('click', () => {
+      slot2Box.style.display = 'none';
+      addSlot2Wrap.style.display = 'block';
+      const partner2Check = document.getElementById('adPartnerAddon2Checkbox');
+      if (partner2Check) partner2Check.checked = false;
+      const thematic2Check = document.getElementById('adThematic2Checkbox');
+      if (thematic2Check) thematic2Check.checked = false;
       recalcAdOrderPrice();
+      updateLivePreview();
+    });
+
+    // Подія зміни розділу (Слот 2)
+    slot2SecSelect.addEventListener('change', () => {
+      updateSlot2CardOptions();
+      updateSlot2LocationOptions();
+      updatePartnerAddon(2);
+      updateThematicAddon(2);
+      recalcAdOrderPrice();
+      updateLivePreview();
+    });
+
+    // Подія зміни картки (Слот 2)
+    document.getElementById('adSlot2CardSelect').addEventListener('change', () => {
+      recalcAdOrderPrice();
+      updateLivePreview();
+    });
+
+    // Подія зміни локації (Слот 2)
+    document.getElementById('adSlot2LocationSelect').addEventListener('change', () => {
+      recalcAdOrderPrice();
+      updateLivePreview();
+    });
+
+    // VIP-партнерський Add-on для Слота 2
+    const partner2Checkbox = document.getElementById('adPartnerAddon2Checkbox');
+    partner2Checkbox.addEventListener('change', () => {
+      recalcAdOrderPrice();
+      updateLivePreview();
+    });
+
+    // Чекбокс тематичної картки для Слота 2
+    const thematic2Checkbox = document.getElementById('adThematic2Checkbox');
+    const thematic2FieldsBox = document.getElementById('adThematic2FieldsBox');
+    thematic2Checkbox.addEventListener('change', () => {
+      thematic2FieldsBox.style.display = thematic2Checkbox.checked ? 'grid' : 'none';
+      recalcAdOrderPrice();
+      updateLivePreview();
     });
 
     // Подія зміни терміну
@@ -2851,6 +3096,8 @@ function openAdOrderModal(opts = {}) {
     document.getElementById('adActionBackBtn').addEventListener('click', () => {
       document.getElementById('adStep2').style.display = 'none';
       document.getElementById('adStep1').style.display = 'block';
+      const modalBox = backdrop.querySelector('.ad-order-modal');
+      if (modalBox) modalBox.scrollTop = 0;
     });
 
     // Кнопка копіювання тексту замовлення
@@ -2866,24 +3113,50 @@ function openAdOrderModal(opts = {}) {
   document.getElementById('adStep2').style.display = 'none';
   document.getElementById('adFormError').style.display = 'none';
 
-  // Скидання чекбоксу дублювання
-  const dupCheckboxReset = document.getElementById('adDuplicateCheckbox');
-  if (dupCheckboxReset) {
-    dupCheckboxReset.checked = false;
-    document.getElementById('adDuplicateBlock').style.display = 'none';
-  }
+  // Скидання Слот 2
+  const slot2BoxReset = document.getElementById('adSlot2Box');
+  const addSlot2WrapReset = document.getElementById('adAddSlot2Wrapper');
+  if (slot2BoxReset) slot2BoxReset.style.display = 'none';
+  if (addSlot2WrapReset) addSlot2WrapReset.style.display = 'block';
+  const partner2CheckReset = document.getElementById('adPartnerAddon2Checkbox');
+  if (partner2CheckReset) partner2CheckReset.checked = false;
+  const thematic2CheckReset = document.getElementById('adThematic2Checkbox');
+  if (thematic2CheckReset) thematic2CheckReset.checked = true;
+  const thematic2FieldsReset = document.getElementById('adThematic2FieldsBox');
+  if (thematic2FieldsReset) thematic2FieldsReset.style.display = 'grid';
 
   // Встановлення переданого розділу та картки
   const initialSection = opts.section && SECTIONS_CATALOG[opts.section] ? opts.section : getCurrentSiteSection();
   const secSelect = document.getElementById('adSectionSelect');
   secSelect.value = initialSection;
-  updateCardOptions(initialSection, opts.card);
+
+  const isVipClick = opts.card && (opts.card.includes('Партнери') || opts.card.includes('Рекомендаці'));
+  const partner1Check = document.getElementById('adPartnerAddon1Checkbox');
+  const thematic1Check = document.getElementById('adThematic1Checkbox');
+  const thematic1Fields = document.getElementById('adThematic1FieldsBox');
+
+  if (isVipClick) {
+    if (partner1Check) partner1Check.checked = true;
+    if (thematic1Check) thematic1Check.checked = false;
+    if (thematic1Fields) thematic1Fields.style.display = 'none';
+    updateCardOptions(initialSection);
+  } else {
+    if (partner1Check) partner1Check.checked = false;
+    if (thematic1Check) thematic1Check.checked = true;
+    if (thematic1Fields) thematic1Fields.style.display = 'grid';
+    updateCardOptions(initialSection, opts.card);
+  }
+
   updateLocationOptions();
+  updatePartnerAddon(1);
+  updateThematicAddon(1);
   recalcAdOrderPrice();
   updateLivePreview();
 
   backdrop.classList.add('show');
   document.body.style.overflow = 'hidden';
+  const modalBox = backdrop.querySelector('.ad-order-modal');
+  if (modalBox) modalBox.scrollTop = 0;
 }
 
 function closeAdOrderModal() {
@@ -2896,23 +3169,11 @@ function closeAdOrderModal() {
   }
 }
 
+// Наповнення карток для Слота 1 (виключно тематичні картки розділу, без VIP)
 function updateCardOptions(section, preferredCard = '') {
   const cardSelect = document.getElementById('adCardSelect');
   cardSelect.innerHTML = '';
 
-  const isHome = section === 'Головна';
-  const baseRate = getSectionBasePrice(section);
-  const vipPrice = isHome 
-    ? AD_CONFIG.basePriceUah * AD_CONFIG.multipliers.home_vip 
-    : baseRate * AD_CONFIG.multipliers.section_vip;
-  const vipTitle = isHome ? 'Партнери Сайту (VIP)' : 'Партнери Розділу (VIP)';
-  
-  // Додаємо опцію VIP з ціною
-  const vipOpt = document.createElement('option');
-  vipOpt.value = vipTitle;
-  vipOpt.textContent = `${vipTitle} - ${vipPrice} грн/міс`;
-  cardSelect.appendChild(vipOpt);
-
   const cards = SECTIONS_CATALOG[section] || [];
   cards.forEach(c => {
     const opt = document.createElement('option');
@@ -2922,7 +3183,6 @@ function updateCardOptions(section, preferredCard = '') {
   });
 
   if (preferredCard) {
-    // Якщо передано назву картки
     for (let i = 0; i < cardSelect.options.length; i++) {
       if (cardSelect.options[i].value.toLowerCase().includes(preferredCard.toLowerCase())) {
         cardSelect.selectedIndex = i;
@@ -2932,133 +3192,160 @@ function updateCardOptions(section, preferredCard = '') {
   }
 }
 
+// Оновлення зон для Слота 1
 function updateLocationOptions() {
   const section = document.getElementById('adSectionSelect')?.value || 'Головна';
-  const cardSelect = document.getElementById('adCardSelect');
   const locSelect = document.getElementById('adLocationSelect');
   const isHome = section === 'Головна';
   const baseRate = getSectionBasePrice(section);
-  const isVipCard = cardSelect && (cardSelect.value.includes('Партнери') || cardSelect.value.includes('Рекомендаці'));
 
+  const curVal = locSelect.value || 'bottom';
   locSelect.innerHTML = '';
+  locSelect.disabled = false;
 
-  if (isVipCard) {
-    const vipPrice = isHome 
-      ? AD_CONFIG.basePriceUah * AD_CONFIG.multipliers.home_vip 
-      : baseRate * AD_CONFIG.multipliers.section_vip;
-    const opt = document.createElement('option');
-    opt.value = 'vip';
-    opt.textContent = isHome ? `Партнери Сайту - ${vipPrice} грн/міс` : `Партнери Розділу - ${vipPrice} грн/міс`;
-    locSelect.appendChild(opt);
-    locSelect.value = 'vip';
-    locSelect.disabled = true;
-  } else {
-    locSelect.disabled = false;
-    const topPrice = isHome 
-      ? AD_CONFIG.basePriceUah * AD_CONFIG.multipliers.home_top 
-      : baseRate * AD_CONFIG.multipliers.other_top;
-    const bottomPrice = isHome 
-      ? AD_CONFIG.basePriceUah * AD_CONFIG.multipliers.home_bottom 
-      : baseRate * AD_CONFIG.multipliers.other_bottom;
+  const topPrice = isHome 
+    ? AD_CONFIG.basePriceUah * AD_CONFIG.multipliers.home_top 
+    : baseRate * AD_CONFIG.multipliers.other_top;
+  const bottomPrice = isHome 
+    ? AD_CONFIG.basePriceUah * AD_CONFIG.multipliers.home_bottom 
+    : baseRate * AD_CONFIG.multipliers.other_bottom;
 
-    const topOpt = document.createElement('option');
-    topOpt.value = 'top';
-    topOpt.textContent = `🔝 Вгорі картки (ТОП) - ${topPrice} грн/міс`;
+  const topOpt = document.createElement('option');
+  topOpt.value = 'top';
+  topOpt.textContent = `🔝 Вгорі картки (ТОП) - ${topPrice} грн/міс`;
 
-    const bottomOpt = document.createElement('option');
-    bottomOpt.value = 'bottom';
-    bottomOpt.textContent = `📍 Внизу картки (Стандарт) - ${bottomPrice} грн/міс`;
+  const bottomOpt = document.createElement('option');
+  bottomOpt.value = 'bottom';
+  bottomOpt.textContent = `📍 Внизу картки (Стандарт) - ${bottomPrice} грн/міс`;
 
-    locSelect.appendChild(topOpt);
-    locSelect.appendChild(bottomOpt);
-    locSelect.value = 'bottom';
-  }
+  locSelect.appendChild(topOpt);
+  locSelect.appendChild(bottomOpt);
+  locSelect.value = curVal === 'top' ? 'top' : 'bottom';
 }
 
-function updateDupCardOptions(section, preferredCard = '') {
-  const cardSelect = document.getElementById('adDupCardSelect');
-  if (!cardSelect) return;
-  cardSelect.innerHTML = '';
-  const isHome = section === 'Головна';
-  const baseRate = getSectionBasePrice(section);
-  const vipPrice = isHome 
-    ? AD_CONFIG.basePriceUah * AD_CONFIG.multipliers.home_vip 
-    : baseRate * AD_CONFIG.multipliers.section_vip;
-  const vipTitle = isHome ? 'Партнери Сайту (VIP)' : 'Партнери Розділу (VIP)';
-  
-  const vipOpt = document.createElement('option');
-  vipOpt.value = vipTitle;
-  vipOpt.textContent = `${vipTitle} - ${vipPrice} грн/міс`;
-  cardSelect.appendChild(vipOpt);
+// Наповнення карток для Слота 2 (з виключенням дублювання однієї і тієї ж картки)
+function updateSlot2CardOptions(preferredCard = '') {
+  const slot1Sec = document.getElementById('adSectionSelect')?.value;
+  const slot1Card = document.getElementById('adCardSelect')?.value;
+  const slot2Sec = document.getElementById('adSlot2SectionSelect')?.value;
+  const slot2CardSelect = document.getElementById('adSlot2CardSelect');
+  if (!slot2CardSelect || !slot2Sec) return;
 
-  const cards = SECTIONS_CATALOG[section] || [];
-  cards.forEach(c => {
+  const currentChoice = preferredCard || slot2CardSelect.value;
+  slot2CardSelect.innerHTML = '';
+
+  const slot1ThematicActive = document.getElementById('adThematic1Checkbox')?.checked;
+  const allCards = SECTIONS_CATALOG[slot2Sec] || [];
+  allCards.forEach(c => {
+    // ПРАВИЛО: не можна двічі подати ресурс в одну і ту ж картку
+    if (slot1ThematicActive && slot1Sec === slot2Sec && c === slot1Card) {
+      return;
+    }
     const opt = document.createElement('option');
     opt.value = c;
     opt.textContent = c;
-    cardSelect.appendChild(opt);
+    slot2CardSelect.appendChild(opt);
   });
 
-  if (preferredCard) {
-    for (let i = 0; i < cardSelect.options.length; i++) {
-      if (cardSelect.options[i].value.toLowerCase().includes(preferredCard.toLowerCase())) {
-        cardSelect.selectedIndex = i;
-        break;
-      }
-    }
+  if (currentChoice && Array.from(slot2CardSelect.options).some(o => o.value === currentChoice)) {
+    slot2CardSelect.value = currentChoice;
+  } else if (slot2CardSelect.options.length > 0) {
+    slot2CardSelect.selectedIndex = 0;
   }
 }
 
-function updateDupLocationOptions() {
-  const section = document.getElementById('adDupSectionSelect')?.value || 'Головна';
-  const cardSelect = document.getElementById('adDupCardSelect');
-  const locSelect = document.getElementById('adDupLocationSelect');
-  if (!cardSelect || !locSelect) return;
+// Оновлення зон для Слота 2
+function updateSlot2LocationOptions() {
+  const section = document.getElementById('adSlot2SectionSelect')?.value || 'Головна';
+  const locSelect = document.getElementById('adSlot2LocationSelect');
+  if (!locSelect) return;
   const isHome = section === 'Головна';
   const baseRate = getSectionBasePrice(section);
-  const isVipCard = cardSelect && (cardSelect.value.includes('Партнери') || cardSelect.value.includes('Рекомендаці'));
 
+  const curVal = locSelect.value || 'bottom';
   locSelect.innerHTML = '';
-  if (isVipCard) {
-    const vipPrice = isHome 
-      ? AD_CONFIG.basePriceUah * AD_CONFIG.multipliers.home_vip 
-      : baseRate * AD_CONFIG.multipliers.section_vip;
-    const opt = document.createElement('option');
-    opt.value = 'vip';
-    opt.textContent = isHome ? `Партнери Сайту - ${vipPrice} грн/міс` : `Партнери Розділу - ${vipPrice} грн/міс`;
-    locSelect.appendChild(opt);
-    locSelect.value = 'vip';
-    locSelect.disabled = true;
+  locSelect.disabled = false;
+
+  const topPrice = isHome 
+    ? AD_CONFIG.basePriceUah * AD_CONFIG.multipliers.home_top 
+    : baseRate * AD_CONFIG.multipliers.other_top;
+  const bottomPrice = isHome 
+    ? AD_CONFIG.basePriceUah * AD_CONFIG.multipliers.home_bottom 
+    : baseRate * AD_CONFIG.multipliers.other_bottom;
+
+  const topOpt = document.createElement('option');
+  topOpt.value = 'top';
+  topOpt.textContent = `🔝 Вгорі картки (ТОП) - ${topPrice} грн/міс`;
+
+  const bottomOpt = document.createElement('option');
+  bottomOpt.value = 'bottom';
+  bottomOpt.textContent = `📍 Внизу картки (Стандарт) - ${bottomPrice} грн/міс`;
+
+  locSelect.appendChild(topOpt);
+  locSelect.appendChild(bottomOpt);
+  locSelect.value = curVal === 'top' ? 'top' : 'bottom';
+}
+
+// Оновлення партнерського VIP-блоку (Add-on)
+function updatePartnerAddon(slotNum) {
+  const isSlot1 = slotNum === 1;
+  const secSelect = document.getElementById(isSlot1 ? 'adSectionSelect' : 'adSlot2SectionSelect');
+  const section = secSelect ? secSelect.value : 'Головна';
+  const isHome = section === 'Головна';
+  const baseRate = getSectionBasePrice(section);
+
+  const wrapEl = document.getElementById(isSlot1 ? 'adPartnerAddon1Wrap' : 'adPartnerAddon2Wrap');
+  const textEl = document.getElementById(isSlot1 ? 'adPartnerAddon1Text' : 'adPartnerAddon2Text');
+  const priceEl = document.getElementById(isSlot1 ? 'adPartnerAddon1Price' : 'adPartnerAddon2Price');
+  const checkEl = document.getElementById(isSlot1 ? 'adPartnerAddon1Checkbox' : 'adPartnerAddon2Checkbox');
+
+  if (!wrapEl) return;
+
+  // Якщо це Слот 2 і в цьому ж розділі вже обрано партнерську картку у Слот 1
+  if (!isSlot1) {
+    const slot1Sec = document.getElementById('adSectionSelect')?.value;
+    const slot1PartnerCheck = document.getElementById('adPartnerAddon1Checkbox')?.checked;
+    if (slot1Sec === section && slot1PartnerCheck) {
+      wrapEl.style.display = 'none';
+      if (checkEl) checkEl.checked = false;
+      return;
+    }
+  }
+
+  wrapEl.style.display = 'block';
+
+  if (isHome) {
+    textEl.innerHTML = `<i class="fas fa-gem text-warning me-1"></i> <strong>Додати в «Партнери Сайту»</strong>`;
+    priceEl.textContent = `700 грн/міс`;
   } else {
-    locSelect.disabled = false;
-    const topPrice = isHome 
-      ? AD_CONFIG.basePriceUah * AD_CONFIG.multipliers.home_top 
-      : baseRate * AD_CONFIG.multipliers.other_top;
-    const bottomPrice = isHome 
-      ? AD_CONFIG.basePriceUah * AD_CONFIG.multipliers.home_bottom 
-      : baseRate * AD_CONFIG.multipliers.other_bottom;
+    const rate = baseRate * 3;
+    textEl.innerHTML = `<i class="fas fa-fire text-danger me-1"></i> <strong>Додати в «Партнери Розділу»</strong> (${section})`;
+    priceEl.textContent = `${rate} грн/міс`;
+  }
+}
 
-    const topOpt = document.createElement('option');
-    topOpt.value = 'top';
-    topOpt.textContent = `🔝 Вгорі картки (ТОП) - ${topPrice} грн/міс`;
+// Оновлення блоку тематичної картки
+function updateThematicAddon(slotNum) {
+  const isSlot1 = slotNum === 1;
+  const secSelect = document.getElementById(isSlot1 ? 'adSectionSelect' : 'adSlot2SectionSelect');
+  const section = secSelect ? secSelect.value : 'Головна';
+  const isHome = section === 'Головна';
+  const baseRate = getSectionBasePrice(section);
+  const bottomPrice = isHome ? (AD_CONFIG.basePriceUah * AD_CONFIG.multipliers.home_bottom) : (baseRate * AD_CONFIG.multipliers.other_bottom);
 
-    const bottomOpt = document.createElement('option');
-    bottomOpt.value = 'bottom';
-    bottomOpt.textContent = `📍 Внизу картки (Стандарт) - ${bottomPrice} грн/міс`;
-
-    locSelect.appendChild(topOpt);
-    locSelect.appendChild(bottomOpt);
-    locSelect.value = 'bottom';
+  const priceBadge = document.getElementById(isSlot1 ? 'adThematic1PriceBadge' : 'adThematic2PriceBadge');
+  if (priceBadge) {
+    priceBadge.textContent = `від ${bottomPrice} грн/міс`;
   }
 }
 
 function getAdResourceBadge(section, card, location) {
   const isHome = section === 'Головна';
-  const isVip = (card && (card.includes('Партнери') || card.includes('Рекомендаці'))) || location === 'vip';
+  const isVip = (card && (card.includes('Партнери') || card.includes('Рекомендаці'))) || location === 'vip' || (location && location.startsWith('vip'));
   if (isVip && isHome) {
     return { icon: '💎', name: 'Партнери Сайту (Головна)' };
   } else if (isVip && !isHome) {
-    return { icon: '🔥', name: 'Партнери Розділу' };
+    return { icon: '🔥', name: `Партнери Розділу (${section})` };
   } else {
     return { icon: '⚡️', name: 'Рекламне розміщення в картці' };
   }
@@ -3068,10 +3355,6 @@ function updateLivePreview() {
   const nameInput = document.getElementById('adSiteName');
   const urlInput = document.getElementById('adSiteUrl');
   const descInput = document.getElementById('adSiteDesc');
-  const locSelect = document.getElementById('adLocationSelect');
-  const secSelect = document.getElementById('adSectionSelect');
-  const cardSelect = document.getElementById('adCardSelect');
-
   const titleEl = document.getElementById('adPreviewTitleText');
   const badgeEl = document.getElementById('adPreviewBadgeIcon');
   const faviconEl = document.getElementById('adPreviewFavicon');
@@ -3079,15 +3362,19 @@ function updateLivePreview() {
 
   titleEl.textContent = nameInput.value.trim() || 'Назва Вашого Ресурсу';
 
-  // Визначення відповідного партнерського значка
-  const currentSec = secSelect?.value || 'Головна';
-  const currentCard = cardSelect?.value || '';
-  const currentLoc = locSelect?.value || 'bottom';
-  const badgeInfo = getAdResourceBadge(currentSec, currentCard, currentLoc);
+  // Визначення відповідного партнерського значка серед активних локацій
+  const placements = getActivePlacements();
+  let highestBadge = { icon: '⚡️', name: 'Рекламне розміщення в картці' };
+  if (placements.some(p => p.badge.icon === '💎')) {
+    highestBadge = { icon: '💎', name: 'Партнери Сайту (Головна)' };
+  } else if (placements.some(p => p.badge.icon === '🔥')) {
+    const vipSec = placements.find(p => p.badge.icon === '🔥')?.section || '';
+    highestBadge = { icon: '🔥', name: `Партнери Розділу (${vipSec})` };
+  }
 
   if (badgeEl) {
-    badgeEl.textContent = badgeInfo.icon;
-    badgeEl.title = badgeInfo.name;
+    badgeEl.textContent = highestBadge.icon;
+    badgeEl.title = highestBadge.name;
   }
 
   const rawUrl = urlInput.value.trim();
@@ -3106,42 +3393,19 @@ function updateLivePreview() {
 }
 
 function recalcAdOrderPrice() {
-  const section = document.getElementById('adSectionSelect').value;
-  const card = document.getElementById('adCardSelect').value;
-  const location = document.getElementById('adLocationSelect').value;
   const termId = document.getElementById('adTermSelect').value;
   const paymentMethod = document.querySelector('input[name="adPaymentMethod"]:checked')?.value || 'mono';
 
-  // Перевірка чекбоксу дублювання
-  const dupCheckbox = document.getElementById('adDuplicateCheckbox');
-  let duplicateOpt = null;
-  if (dupCheckbox && dupCheckbox.checked) {
-    const dupSec = document.getElementById('adDupSectionSelect')?.value;
-    const dupCrd = document.getElementById('adDupCardSelect')?.value;
-    const dupLoc = document.getElementById('adDupLocationSelect')?.value;
-    duplicateOpt = {
-      enabled: true,
-      section: dupSec,
-      card: dupCrd,
-      location: dupLoc
-    };
-  }
-
-  const p = calculateAdPricing(section, card, location, termId, paymentMethod, duplicateOpt);
+  const p = calculateAdPricing(termId, paymentMethod);
 
   // Оновлення нижнього розгорнутого блоку підрахунку
-  if (p.isForever) {
-    if (p.hasDuplicate) {
-      document.getElementById('adCalcBaseRate').textContent = `${p.monthlyRate} грн / міс (${p.primaryMonthlyRate} + ${p.dupMonthlyRate} грн/міс за 2 розділи; розрахунок як 10 років = ${p.baseCost} грн)`;
-    } else {
-      document.getElementById('adCalcBaseRate').textContent = `${p.monthlyRate} грн / міс (розрахунок як 10 років = ${p.baseCost} грн)`;
-    }
+  const placementDetails = p.placements.map(pl => `${pl.card} (${pl.monthlyRate} грн)`).join(' + ');
+  if (p.count === 0) {
+    document.getElementById('adCalcBaseRate').textContent = '0 грн / міс (оберіть розміщення)';
+  } else if (p.isForever) {
+    document.getElementById('adCalcBaseRate').textContent = `${p.monthlyRate} грн / міс (${p.count} місць: ${placementDetails}; розрахунок як 10 років = ${p.baseCost} грн)`;
   } else {
-    if (p.hasDuplicate) {
-      document.getElementById('adCalcBaseRate').textContent = `${p.monthlyRate} грн / міс (${p.primaryMonthlyRate} грн осн. + ${p.dupMonthlyRate} грн дубль)`;
-    } else {
-      document.getElementById('adCalcBaseRate').textContent = `${p.monthlyRate} грн / міс` + (p.isVip ? ' (VIP)' : '');
-    }
+    document.getElementById('adCalcBaseRate').textContent = `${p.monthlyRate} грн / міс` + (p.count > 1 ? ` (${p.count} місць: ${placementDetails})` : (p.isVip ? ' (VIP)' : ''));
   }
   document.getElementById('adCalcPeriod').textContent = p.termLabel;
 
@@ -3178,7 +3442,7 @@ function recalcAdOrderPrice() {
   document.getElementById('adCalcTotalUah').textContent = `${p.finalUah} грн`;
   document.getElementById('adCalcTotalUsdt').textContent = `~ $${p.finalUsdt} USDT`;
 
-  // === ОНОВЛЕННЯ ПЛАВАЮЧОГО БАРУ ВАРТОСТІ (ЗАВЖДИ ВИДИМИЙ ПРИ СКРОЛІ) ===
+  // === ОНОВЛЕННЯ ПЛАВАЮЧОГО БАРУ ВАРТОСТІ ===
   const stickyUah = document.getElementById('adStickyPriceUah');
   const stickyUsdt = document.getElementById('adStickyPriceUsdt');
   const stickyTariff = document.getElementById('adStickyTariffBadge');
@@ -3187,7 +3451,7 @@ function recalcAdOrderPrice() {
   if (stickyUah) {
     stickyUah.textContent = `${p.finalUah} грн`;
     stickyUah.classList.remove('price-flash');
-    void stickyUah.offsetWidth; // перезапуск анімації спалаху
+    void stickyUah.offsetWidth;
     stickyUah.classList.add('price-flash');
     setTimeout(() => stickyUah.classList.remove('price-flash'), 300);
   }
@@ -3195,12 +3459,15 @@ function recalcAdOrderPrice() {
     stickyUsdt.textContent = `(~ $${p.finalUsdt} USDT)`;
   }
   if (stickyTariff) {
-    if (p.isForever) {
-      stickyTariff.textContent = p.hasDuplicate ? 'Назавжди (2 розділи, -50%)' : 'Назавжди (-50%)';
-    } else if (p.hasDuplicate) {
-      stickyTariff.textContent = `${p.monthlyRate} грн/міс (2 розділи)`;
+    if (p.count === 0) {
+      stickyTariff.textContent = 'Оберіть місце';
     } else {
-      stickyTariff.textContent = `${p.monthlyRate} грн/міс` + (p.isVip ? ' (VIP)' : '');
+      const placesLabel = p.count === 1 ? '1 картка' : `${p.count} місця`;
+      if (p.isForever) {
+        stickyTariff.textContent = `Назавжди (${placesLabel}, -50%)`;
+      } else {
+        stickyTariff.textContent = `${p.monthlyRate} грн/міс (${placesLabel})`;
+      }
     }
   }
   if (stickyDiscount) {
@@ -3252,52 +3519,56 @@ function submitAdOrder() {
     return;
   }
 
-  const section = document.getElementById('adSectionSelect').value;
-  const card = document.getElementById('adCardSelect').value;
-  const location = document.getElementById('adLocationSelect').value;
+  // Перевірка на дублювання однакової картки у Слот 1 і Слот 2
+  const slot2Box = document.getElementById('adSlot2Box');
+  const isSlot2Active = slot2Box && slot2Box.style.display !== 'none';
+  const isThematic1Active = document.getElementById('adThematic1Checkbox')?.checked;
+  const isThematic2Active = document.getElementById('adThematic2Checkbox')?.checked;
+  const sec1 = document.getElementById('adSectionSelect')?.value;
+  const crd1 = document.getElementById('adCardSelect')?.value;
+  const sec2 = document.getElementById('adSlot2SectionSelect')?.value;
+  const crd2 = document.getElementById('adSlot2CardSelect')?.value;
+
+  if (isSlot2Active && isThematic1Active && isThematic2Active && sec1 === sec2 && crd1 === crd2) {
+    errorEl.textContent = 'Неможливо розмістити ресурс двічі в одну і ту ж картку. Будь ласка, оберіть різні картки.';
+    errorEl.style.display = 'block';
+    return;
+  }
+
+  const placements = getActivePlacements();
+  if (placements.length === 0) {
+    errorEl.textContent = 'Будь ласка, оберіть хоча б одне місце для розміщення ресурсу (партнерське або тематичне).';
+    errorEl.style.display = 'block';
+    return;
+  }
+
   const termId = document.getElementById('adTermSelect').value;
   const paymentMethod = document.querySelector('input[name="adPaymentMethod"]:checked')?.value || 'mono';
 
   const pricing = recalcAdOrderPrice();
   const orderId = generateAdOrderId();
 
-  // Дані дублювання
-  const dupCheckbox = document.getElementById('adDuplicateCheckbox');
-  let duplicateInfo = null;
-  if (dupCheckbox && dupCheckbox.checked) {
-    const dupSec = document.getElementById('adDupSectionSelect').value;
-    const dupCrd = document.getElementById('adDupCardSelect').value;
-    const dupLocVal = document.getElementById('adDupLocationSelect').value;
-    const isDupHome = dupSec === 'Головна';
-    duplicateInfo = {
-      section: dupSec,
-      card: dupCrd,
-      location: dupLocVal === 'vip' ? (isDupHome ? 'Партнери Сайту (VIP)' : 'Партнери Розділу (VIP)') : dupLocVal === 'top' ? 'Вгорі картки (ТОП)' : 'Внизу картки (Стандарт)'
-    };
-  }
-
-  const primaryBadge = getAdResourceBadge(section, card, location);
-  let secondBadge = null;
-  if (duplicateInfo) {
-    secondBadge = getAdResourceBadge(duplicateInfo.section, duplicateInfo.card, duplicateInfo.location.includes('VIP') || duplicateInfo.location.includes('Партнери') ? 'vip' : duplicateInfo.location.includes('ТОП') ? 'top' : 'bottom');
-  }
-
+  const primaryPlacement = placements[0];
   const orderPayload = {
     orderId,
     timestamp: new Date().toISOString(),
     siteName: name,
-    siteNameWithBadge: `${name} ${primaryBadge.icon}`,
-    badgeIcon: primaryBadge.icon,
-    badgeName: primaryBadge.name,
+    siteNameWithBadge: `${name} ${primaryPlacement.badge.icon}`,
+    badgeIcon: primaryPlacement.badge.icon,
+    badgeName: primaryPlacement.badge.name,
     siteUrl: url,
     siteDesc: desc,
-    section,
-    card,
-    location: location === 'vip' ? (isHome ? 'Партнери Сайту (VIP)' : 'Партнери Розділу (VIP)') : location === 'top' ? 'Вгорі картки (ТОП)' : 'Внизу картки (Стандарт)',
-    secondPlacement: duplicateInfo ? {
-      ...duplicateInfo,
-      badgeIcon: secondBadge ? secondBadge.icon : '⚡️'
-    } : null,
+    placementsCount: placements.length,
+    placements: placements.map(p => ({
+      slot: p.slot,
+      type: p.type,
+      title: p.title,
+      section: p.section,
+      card: p.card,
+      location: p.locationLabel,
+      monthlyRate: p.monthlyRate,
+      badgeIcon: p.badge.icon
+    })),
     term: pricing.termLabel,
     months: pricing.months,
     hasGuarantee: !!pricing.hasGuarantee,
@@ -3323,12 +3594,12 @@ function submitAdOrder() {
   // Заповнення Кроку 2
   document.getElementById('adSuccessOrderId').textContent = `#${orderId}`;
   document.getElementById('adRecNoteOrderId').textContent = `#${orderId}`;
-  document.getElementById('adRecSite').innerHTML = `<strong>${name} ${primaryBadge.icon}</strong> (<a href="${url}" target="_blank">${url}</a>)`;
+  document.getElementById('adRecSite').innerHTML = `<strong>${name} ${primaryPlacement.badge.icon}</strong> (<a href="${url}" target="_blank">${url}</a>)`;
   
-  let recPlacementHtml = `<strong>1:</strong> ${section} → ${card} (${orderPayload.location})`;
-  if (duplicateInfo) {
-    recPlacementHtml += `<br><strong>2 (дубль):</strong> ${duplicateInfo.section} → ${duplicateInfo.card} (${duplicateInfo.location})`;
-  }
+  let recPlacementHtml = '';
+  placements.forEach((p, idx) => {
+    recPlacementHtml += `<div><strong>${idx + 1}. ${p.badge.icon} ${p.section}:</strong> «${p.card}» (${p.locationLabel}) <span class="text-muted ms-1">[${p.monthlyRate} грн/міс]</span></div>`;
+  });
   document.getElementById('adRecPlacement').innerHTML = recPlacementHtml;
   
   let recTermHtml = pricing.termLabel;
@@ -3343,17 +3614,15 @@ function submitAdOrder() {
   renderRequisitesBox(paymentMethod, pricing, orderId);
 
   // Формування тексту для Telegram і копіювання
-  let placementTgText = `📍 Розміщення 1: ${section} > ${card} (${orderPayload.location})`;
-  if (duplicateInfo) {
-    placementTgText += `\n📍 Розміщення 2: ${duplicateInfo.section} > ${duplicateInfo.card} (${duplicateInfo.location})`;
-  }
+  let placementTgText = placements.map((p, idx) => `📍 Локація ${idx + 1}: ${p.badge.icon} ${p.section} > ${p.card} (${p.locationLabel}) [${p.monthlyRate} грн/міс]`).join('\n');
   const guaranteeTgText = pricing.hasGuarantee ? `\n🛡️ Гарантія: 1 безкоштовна зміна URL/назви на рік включена` : '';
 
   const orderSummaryText = 
 `🔔 Замовлення на розміщення на ТОП ЗАКЛАДКИ:
 🆔 Номер: #${orderId}
-🔗 Ресурс: ${name} ${primaryBadge.icon} (${url})
+🔗 Ресурс: ${name} (${url})
 📝 Опис: ${desc}
+Кількість обраних місць: ${placements.length}
 ${placementTgText}
 ⏱️ Термін: ${pricing.termLabel}${guaranteeTgText}
 💳 Оплата: ${paymentMethod === 'mono' ? 'Монобанк' : paymentMethod === 'privat' ? 'ПриватБанк' : 'Криптовалюта'}
@@ -3375,7 +3644,8 @@ ${placementTgText}
   // Перемикання екрана
   document.getElementById('adStep1').style.display = 'none';
   document.getElementById('adStep2').style.display = 'block';
-  document.querySelector('.ad-modal-body').scrollTop = 0;
+  const modalBox = document.querySelector('.ad-order-modal') || document.querySelector('.ad-modal-body');
+  if (modalBox) modalBox.scrollTop = 0;
 }
 
 function renderRequisitesBox(method, pricing, orderId) {
