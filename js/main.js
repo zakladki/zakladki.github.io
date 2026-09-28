@@ -20,7 +20,8 @@
            str.indexOf("auro wallet") !== -1 ||
            str.indexOf("phantom") !== -1 ||
            str.indexOf("coinbase") !== -1 ||
-           str.indexOf("evm") !== -1;
+           str.indexOf("evm") !== -1 ||
+           str.indexOf("resizeobserver") !== -1;
   }
 
   var origError = console.error;
@@ -2095,22 +2096,57 @@ const AD_CONFIG = {
       note: "Оплата в 1 клік через Apple Pay / Google Pay або картку будь-якого банку"
     },
     crypto: [
-      { id: "trx", name: "TRX (USDT & USDC)", address: "TZ3cHFT4T5Sv6FruDQsonJvykPLoTLHje2", isUsdt: true },
-      { id: "sol", name: "SOL (USDT & USDC)", address: "2tRrdkzJfHyRocQvqDpzGAc56vuKZQW2Jpb5imaT8EH5", isUsdt: true },
-      { id: "gram", name: "GRAM (USDT & USDC)", address: "UQBv5ZgXlNl6eyCGs4q-COY9ya_RTdOdeAmpm2j3oLEaG3cq", isUsdt: true },
-      { id: "near", name: "NEAR (USDT & USDC)", address: "weber515sis.near", isUsdt: true },
+      { 
+        id: "trx", 
+        name: "TRX (USDT / USDC)", 
+        nativeTicker: "TRX",
+        nativeName: "TRX (Tron)",
+        binanceSymbol: "TRXUSDT",
+        address: "TZ3cHFT4T5Sv6FruDQsonJvykPLoTLHje2", 
+        hasUsdt: true 
+      },
+      { 
+        id: "sol", 
+        name: "SOL (USDT / USDC)", 
+        nativeTicker: "SOL",
+        nativeName: "SOL (Solana)",
+        binanceSymbol: "SOLUSDT",
+        address: "2tRrdkzJfHyRocQvqDpzGAc56vuKZQW2Jpb5imaT8EH5", 
+        hasUsdt: true 
+      },
       { 
         id: "eth", 
-        name: "ETH (USDT & USDC)", 
+        name: "ETH (USDT / USDC)", 
+        nativeTicker: "ETH",
+        nativeName: "ETH (Ethereum)",
+        binanceSymbol: "ETHUSDT",
         networks: ["Ethereum", "Arbitrum", "Polygon", "BNB Smart Chain", "Avalanche", "Base"],
         address: "0x40C7AC3d39913606f854dF40d8386bbF2b22D87B", 
-        isUsdt: true 
+        hasUsdt: true 
       },
-      { id: "btc", name: "BTC", ticker: "BTC", binanceSymbol: "BTCUSDT", address: "bc1q2pxyrsx7z3d7dc83k880mujmlpqykg7hmsrkqa", isUsdt: false },
-      { id: "ltc", name: "LTC", ticker: "LTC", binanceSymbol: "LTCUSDT", address: "ltc1qtfaehd4errc3rzpuusne2kd4zu9r7y9hsvc6xt", isUsdt: false },
-      { id: "xrp", name: "XRP", ticker: "XRP", binanceSymbol: "XRPUSDT", address: "rBCqF1MT8B3pEn1MG3FZPg2em97fZ2ZvC6", isUsdt: false },
-      { id: "doge", name: "DOGE", ticker: "DOGE", binanceSymbol: "DOGEUSDT", address: "DDy3sfatTConkRUQ1vdwGW1joM1JXUYLn3", isUsdt: false },
-      { id: "atom", name: "ATOM", ticker: "ATOM", binanceSymbol: "ATOMUSDT", address: "cosmos1wz8jr4j9w83vpvxrlgh9uhn2n4e7u3ttevn8ag", isUsdt: false }
+      { 
+        id: "gram", 
+        name: "GRAM (USDT)", 
+        nativeTicker: "TON",
+        nativeName: "TON / Gram",
+        binanceSymbol: "TONUSDT",
+        address: "UQBv5ZgXlNl6eyCGs4q-COY9ya_RTdOdeAmpm2j3oLEaG3cq", 
+        hasUsdt: true 
+      },
+      { 
+        id: "near", 
+        name: "NEAR (USDT / USDC)", 
+        nativeTicker: "NEAR",
+        nativeName: "NEAR Protocol",
+        binanceSymbol: "NEARUSDT",
+        address: "weber515sis.near", 
+        hasUsdt: true 
+      },
+      { id: "btc", name: "BTC (Bitcoin)", nativeTicker: "BTC", nativeName: "Bitcoin", binanceSymbol: "BTCUSDT", address: "bc1q2pxyrsx7z3d7dc83k880mujmlpqykg7hmsrkqa", hasUsdt: false },
+      { id: "ltc", name: "LTC (Litecoin)", nativeTicker: "LTC", nativeName: "Litecoin", binanceSymbol: "LTCUSDT", address: "ltc1qtfaehd4errc3rzpuusne2kd4zu9r7y9hsvc6xt", hasUsdt: false },
+      { id: "xrp", name: "XRP (Ripple)", nativeTicker: "XRP", nativeName: "Ripple", binanceSymbol: "XRPUSDT", address: "rBCqF1MT8B3pEn1MG3FZPg2em97fZ2ZvC6", hasUsdt: false },
+      { id: "doge", name: "DOGE (Dogecoin)", nativeTicker: "DOGE", nativeName: "Dogecoin", binanceSymbol: "DOGEUSDT", address: "DDy3sfatTConkRUQ1vdwGW1joM1JXUYLn3", hasUsdt: false },
+      { id: "atom", name: "ATOM (Cosmos)", nativeTicker: "ATOM", nativeName: "Cosmos", binanceSymbol: "ATOMUSDT", address: "cosmos1wz8jr4j9w83vpvxrlgh9uhn2n4e7u3ttevn8ag", hasUsdt: false }
     ]
   }
 };
@@ -2430,9 +2466,13 @@ function openAdOrderModal(opts = {}) {
                     <input type="checkbox" id="adPartnerAddon1Checkbox" class="ad-partner-checkbox">
                     <span class="ad-partner-addon-content">
                       <span class="ad-partner-addon-text" id="adPartnerAddon1Text">
-                        <i class="fas fa-gem text-warning me-1"></i> <strong>Додати в «Партнери Сайту»</strong>
+                        <span class="ad-addon-title-prefix"><i class="fas fa-gem text-warning me-1"></i> Додати в</span>
+                        <strong class="ad-addon-title-main">«Партнери Сайту»</strong>
                       </span>
-                      <span class="ad-partner-addon-price" id="adPartnerAddon1Price">700 грн/міс</span>
+                      <span class="ad-partner-addon-price" id="adPartnerAddon1Price">
+                        <span class="ad-price-amount">700</span>
+                        <span class="ad-price-unit">грн/міс</span>
+                      </span>
                     </span>
                   </label>
                 </div>
@@ -2443,9 +2483,13 @@ function openAdOrderModal(opts = {}) {
                     <input type="checkbox" id="adThematic1Checkbox" class="ad-thematic-checkbox" checked>
                     <span class="ad-thematic-addon-content">
                       <span class="ad-thematic-addon-text">
-                        <i class="fas fa-th-list text-primary me-1"></i> <strong>Додати в тематичну картку</strong>
+                        <span class="ad-addon-title-prefix"><i class="fas fa-th-list text-primary me-1"></i> Додати в</span>
+                        <strong class="ad-addon-title-main">«Тематичну Картку»</strong>
                       </span>
-                      <span class="ad-thematic-addon-price" id="adThematic1PriceBadge">від 200 грн/міс</span>
+                      <span class="ad-thematic-addon-price" id="adThematic1PriceBadge">
+                        <span class="ad-price-amount">від 200</span>
+                        <span class="ad-price-unit">грн/міс</span>
+                      </span>
                     </span>
                   </label>
 
@@ -2469,7 +2513,7 @@ function openAdOrderModal(opts = {}) {
               <!-- Кнопка додавання другої локації -->
               <div class="ad-add-slot-wrapper" id="adAddSlot2Wrapper">
                 <button type="button" id="adAddSlot2Btn" class="ad-add-slot-btn">
-                  <i class="fas fa-plus-circle me-1"></i> Додати ще одну локацію (до 2 місць)
+                  <i class="fas fa-plus-circle me-1"></i> Додати ще локацію (до 2 місць)
                 </button>
               </div>
 
@@ -2497,9 +2541,13 @@ function openAdOrderModal(opts = {}) {
                     <input type="checkbox" id="adPartnerAddon2Checkbox" class="ad-partner-checkbox">
                     <span class="ad-partner-addon-content">
                       <span class="ad-partner-addon-text" id="adPartnerAddon2Text">
-                        <i class="fas fa-fire text-danger me-1"></i> <strong>Додати в «Партнери Розділу»</strong>
+                        <span class="ad-addon-title-prefix"><i class="fas fa-fire text-danger me-1"></i> Додати в</span>
+                        <strong class="ad-addon-title-main">«Партнери Розділу»</strong>
                       </span>
-                      <span class="ad-partner-addon-price" id="adPartnerAddon2Price">300 грн/міс</span>
+                      <span class="ad-partner-addon-price" id="adPartnerAddon2Price">
+                        <span class="ad-price-amount">300</span>
+                        <span class="ad-price-unit">грн/міс</span>
+                      </span>
                     </span>
                   </label>
                 </div>
@@ -2510,9 +2558,13 @@ function openAdOrderModal(opts = {}) {
                     <input type="checkbox" id="adThematic2Checkbox" class="ad-thematic-checkbox" checked>
                     <span class="ad-thematic-addon-content">
                       <span class="ad-thematic-addon-text">
-                        <i class="fas fa-th-list text-primary me-1"></i> <strong>Додати в тематичну картку</strong>
+                        <span class="ad-addon-title-prefix"><i class="fas fa-th-list text-primary me-1"></i> Додати в</span>
+                        <strong class="ad-addon-title-main">«Тематичну Картку»</strong>
                       </span>
-                      <span class="ad-thematic-addon-price" id="adThematic2PriceBadge">від 200 грн/міс</span>
+                      <span class="ad-thematic-addon-price" id="adThematic2PriceBadge">
+                        <span class="ad-price-amount">від 200</span>
+                        <span class="ad-price-unit">грн/міс</span>
+                      </span>
                     </span>
                   </label>
 
@@ -2781,9 +2833,20 @@ function openAdOrderModal(opts = {}) {
           <!-- КРОК 2: ЕЛЕКТРОННИЙ ЧЕК ТА РЕКВІЗИТИ ДЛЯ ОПЛАТИ -->
           <div id="adStep2" class="ad-step2-wrapper" style="display:none;">
             <div class="ad-order-success-banner">
-              <div class="ad-order-success-title"><i class="fas fa-check-circle"></i> Замовлення успішно сформовано!</div>
-              <div>Номер Вашого замовлення:</div>
-              <div class="ad-order-id-display" id="adSuccessOrderId">#TZ-000000-0000</div>
+              <div class="ad-order-success-title"><i class="fas fa-check-circle"></i> Замовлення  сформовано!</div>
+              <div class="ad-order-id-row">
+                <span class="ad-order-id-label">Номер Вашого замовлення:</span>
+                <span class="ad-order-id-display" id="adSuccessOrderId">#TZ-000000-0000</span>
+                <button type="button" class="ad-order-copy-icon-btn" id="adCopyOrderIdBtn" title="Скопіювати текст замовлення" aria-label="Скопіювати текст замовлення">
+                  <i class="far fa-copy"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Повідомлення перед оплатою -->
+            <div class="ad-order-recommendation-box">
+              <i class="fas fa-info-circle text-primary me-1"></i>
+              <strong>Зверніть увагу:</strong> оскільки на сайті немає особистого кабінету, замовлення фіксується та бронюється виключно після його <strong>надсилання в Telegram або на Email у режимі діалогу</strong>. Будь ласка, надішліть сформовані деталі замовлення адміністратору прямо зараз, а оплату проводьте після підтвердження розміщення.
             </div>
 
             <!-- Деталі замовлення (Електронний чек) -->
@@ -2793,6 +2856,11 @@ function openAdOrderModal(opts = {}) {
                 <div class="ad-receipt-item" id="adRecSiteRow">
                   <div class="ad-receipt-label">Ресурс:</div>
                   <div class="ad-receipt-val" id="adRecSite"></div>
+                </div>
+
+                <div class="ad-receipt-item" id="adRecUrlRow">
+                  <div class="ad-receipt-label">Адреса посилання:</div>
+                  <div class="ad-receipt-val" id="adRecUrl"></div>
                 </div>
 
                 <div class="ad-receipt-item" id="adRecDescRow" style="display:none;">
@@ -2840,47 +2908,47 @@ function openAdOrderModal(opts = {}) {
 
             <!-- Кнопки швидких дій -->
             <div class="ad-action-btns-grid">
-              <!-- 1. Скопіювати текст замовлення -->
-              <button type="button" id="adActionCopyBtn" class="ad-action-btn ad-btn-copy-all">
-                <i class="fas fa-copy"></i> Скопіювати текст замовлення
-              </button>
+              <!-- 1. Надіслати в Telegram -->
+              <a href="#" id="adActionTgBtn" target="_blank" class="ad-action-btn ad-btn-tg">
+                <i class="fab fa-telegram-plane"></i> Надіслати в Telegram
+              </a>
 
               <!-- 2. Надіслати на Email -->
-              <div class="ad-action-item-wrap">
-                <a href="#" id="adActionEmailBtn" class="ad-action-btn ad-btn-email">
-                  <i class="far fa-envelope"></i> Надіслати на Email
-                </a>
-                <div class="ad-action-sub-copy">
-                  <span class="ad-sub-copy-label">Email:</span>
-                  <span class="ad-sub-copy-value">weber515sis@gmail.com</span>
-                  <button type="button" class="ad-sub-copy-btn" onclick="copyToClipboard('weber515sis@gmail.com', this)">
-                    <i class="fas fa-copy"></i> Копіювати
-                  </button>
-                </div>
-              </div>
+              <a href="#" id="adActionEmailBtn" class="ad-action-btn ad-btn-email">
+                <i class="far fa-envelope"></i> Надіслати на Email
+              </a>
 
-              <!-- 3. Надіслати в Telegram -->
-              <div class="ad-action-item-wrap">
-                <a href="#" id="adActionTgBtn" target="_blank" class="ad-action-btn ad-btn-tg">
-                  <i class="fab fa-telegram-plane"></i> Надіслати в Telegram
-                </a>
-                <div class="ad-action-sub-copy">
-                  <span class="ad-sub-copy-label">Telegram:</span>
-                  <span class="ad-sub-copy-value">@WeberSIS</span>
-                  <button type="button" class="ad-sub-copy-btn" onclick="copyToClipboard('@WeberSIS', this)">
-                    <i class="fas fa-copy"></i> Копіювати
-                  </button>
-                </div>
-              </div>
-
-              <!-- 4. Змінити замовлення -->
+              <!-- 3. Змінити замовлення -->
               <button type="button" id="adActionBackBtn" class="ad-action-btn ad-btn-back">
                 <i class="fas fa-arrow-left"></i> Змінити замовлення
               </button>
             </div>
 
-            <div class="ad-legal-iban-note">
-              Потрібен офіційний рахунок IBAN або договір для юридичних осіб / ФОП? Зв'яжіться з адміністратором у Telegram <a href="https://t.me/WeberSIS" target="_blank">@WeberSIS</a> або поштою <a href="mailto:weber515sis@gmail.com">weber515sis@gmail.com</a>.
+            <!-- Блок офіційного рахунку та контактів адміністратора -->
+            <div class="ad-admin-contacts-card">
+              <div class="ad-admin-contacts-header">
+                <i class="fas fa-file-contract text-primary"></i> Потрібен офіційний рахунок IBAN або договір для юридичних осіб / ФОП? Зв'яжіться з адміністратором:
+              </div>
+              <div class="ad-admin-contact-row">
+                <div class="ad-contact-left">
+                  <i class="far fa-envelope text-muted"></i>
+                  <span class="ad-contact-label">Email:</span>
+                  <a href="mailto:weber515sis@gmail.com" class="ad-contact-value">weber515sis@gmail.com</a>
+                </div>
+                <button type="button" class="ad-sub-copy-btn" onclick="copyToClipboard('weber515sis@gmail.com', this)" title="Копіювати Email">
+                  <i class="far fa-copy"></i> <span class="ad-copy-btn-text">Копіювати</span>
+                </button>
+              </div>
+              <div class="ad-admin-contact-row">
+                <div class="ad-contact-left">
+                  <i class="fab fa-telegram-plane text-info"></i>
+                  <span class="ad-contact-label">Telegram:</span>
+                  <a href="https://t.me/WeberSIS" target="_blank" class="ad-contact-value">@WeberSIS</a>
+                </div>
+                <button type="button" class="ad-sub-copy-btn" onclick="copyToClipboard('@WeberSIS', this)" title="Копіювати Telegram">
+                  <i class="far fa-copy"></i> <span class="ad-copy-btn-text">Копіювати</span>
+                </button>
+              </div>
             </div>
 
           </div>
@@ -3182,12 +3250,24 @@ function openAdOrderModal(opts = {}) {
       if (modalBox) modalBox.scrollTop = 0;
     });
 
-    // Кнопка копіювання тексту замовлення
-    document.getElementById('adActionCopyBtn').addEventListener('click', () => {
-      if (window.currentAdOrderText) {
-        copyToClipboard(window.currentAdOrderText, document.getElementById('adActionCopyBtn'), 'Скопійовано! ✅');
-      }
-    });
+    // Кнопка копіювання тексту замовлення біля номера замовлення
+    const copyOrderIdBtn = document.getElementById('adCopyOrderIdBtn');
+    if (copyOrderIdBtn) {
+      copyOrderIdBtn.addEventListener('click', () => {
+        if (window.currentAdOrderText) {
+          copyToClipboard(window.currentAdOrderText, copyOrderIdBtn, 'Скопійовано! ✅');
+        }
+      });
+    }
+
+    const actionCopyBtn = document.getElementById('adActionCopyBtn');
+    if (actionCopyBtn) {
+      actionCopyBtn.addEventListener('click', () => {
+        if (window.currentAdOrderText) {
+          copyToClipboard(window.currentAdOrderText, actionCopyBtn, 'Скопійовано! ✅');
+        }
+      });
+    }
   }
 
   // Скидання на Крок 1 при відкритті
@@ -3397,12 +3477,12 @@ function updatePartnerAddon(slotNum) {
   wrapEl.style.display = 'block';
 
   if (isHome) {
-    textEl.innerHTML = `<i class="fas fa-gem text-warning me-1"></i> <strong>Додати в «Партнери Сайту»</strong>`;
-    priceEl.textContent = `700 грн/міс`;
+    textEl.innerHTML = `<span class="ad-addon-title-prefix"><i class="fas fa-gem text-warning me-1"></i> Додати в</span><strong class="ad-addon-title-main">«Партнери Сайту»</strong>`;
+    priceEl.innerHTML = `<span class="ad-price-amount">700</span><span class="ad-price-unit">грн/міс</span>`;
   } else {
     const rate = baseRate * 3;
-    textEl.innerHTML = `<i class="fas fa-fire text-danger me-1"></i> <strong>Додати в «Партнери Розділу»</strong> (${section})`;
-    priceEl.textContent = `${rate} грн/міс`;
+    textEl.innerHTML = `<span class="ad-addon-title-prefix"><i class="fas fa-fire text-danger me-1"></i> Додати в</span><strong class="ad-addon-title-main">«Партнери Розділу»</strong>`;
+    priceEl.innerHTML = `<span class="ad-price-amount">${rate}</span><span class="ad-price-unit">грн/міс</span>`;
   }
 }
 
@@ -3417,7 +3497,7 @@ function updateThematicAddon(slotNum) {
 
   const priceBadge = document.getElementById(isSlot1 ? 'adThematic1PriceBadge' : 'adThematic2PriceBadge');
   if (priceBadge) {
-    priceBadge.textContent = `від ${bottomPrice} грн/міс`;
+    priceBadge.innerHTML = `<span class="ad-price-amount">від ${bottomPrice}</span><span class="ad-price-unit">грн/міс</span>`;
   }
 }
 
@@ -3717,7 +3797,12 @@ function submitAdOrder() {
   // Заповнення Кроку 2
   document.getElementById('adSuccessOrderId').textContent = `#${orderId}`;
   document.getElementById('adRecNoteOrderId').textContent = `#${orderId}`;
-  document.getElementById('adRecSite').innerHTML = `<strong>${name} ${primaryPlacement.badge.icon}</strong> (<a href="${url}" target="_blank">${url}</a>)`;
+  document.getElementById('adRecSite').innerHTML = `<strong>${name} ${primaryPlacement.badge.icon}</strong>`;
+
+  const recUrlEl = document.getElementById('adRecUrl');
+  if (recUrlEl) {
+    recUrlEl.innerHTML = `<a href="${url}" target="_blank" class="ad-receipt-url-link">${url} <i class="fas fa-external-link-alt" style="font-size:0.75rem;"></i></a>`;
+  }
 
   const recDescRow = document.getElementById('adRecDescRow');
   const recDesc = document.getElementById('adRecDesc');
@@ -3758,21 +3843,45 @@ function submitAdOrder() {
   let placementTgText = placements.map((p, idx) => `📍 Локація ${idx + 1}: ${p.badge.icon} ${p.section} > ${p.card} (${p.locationLabel}) [${p.monthlyRate} грн/міс]`).join('\n');
   const guaranteeTgText = pricing.hasGuarantee ? `\n🛡️ Гарантія: 1 безкоштовна зміна URL/назви на рік включена` : '';
 
+  let paymentMethodLabel = '';
+  let paymentRequisiteDetails = '';
+  if (paymentMethod === 'mono') {
+    paymentMethodLabel = 'Монобанк (Банка)';
+    paymentRequisiteDetails = `Посилання на Банку: ${AD_CONFIG.wallets.mono.url} | Картка: ${AD_CONFIG.wallets.mono.card}`;
+  } else if (paymentMethod === 'privat') {
+    paymentMethodLabel = 'ПриватБанк (Конверт)';
+    paymentRequisiteDetails = `Посилання на Конверт: ${AD_CONFIG.wallets.privat.url} | Номер картки: ${AD_CONFIG.wallets.privat.card}`;
+  } else {
+    const defaultCoin = AD_CONFIG.wallets.crypto[0];
+    paymentMethodLabel = `Криптовалюта (${defaultCoin.name} - USDT) [~$${pricing.finalUsdt} USDT]`;
+    paymentRequisiteDetails = `Адреса гаманця (${defaultCoin.nativeName}): ${defaultCoin.address}`;
+  }
+
   const orderSummaryText = 
 `🔔 Замовлення на розміщення на ТОП ЗАКЛАДКИ:
 🆔 Номер: #${orderId}
-🔗 Ресурс: ${name} (${url})
-📝 Опис: ${desc}
-Кількість обраних місць: ${placements.length}
+🔗 Назва ресурсу: ${name}
+🌐 Адреса посилання: ${url}
+${desc ? `📝 Опис: ${desc}\n` : ''}Кількість обраних місць: ${placements.length}
 ${placementTgText}
 ⏱️ Термін: ${pricing.termLabel}${guaranteeTgText}
-💳 Оплата: ${paymentMethod === 'mono' ? 'Монобанк' : paymentMethod === 'privat' ? 'ПриватБанк' : 'Криптовалюта'}
+💳 Спосіб оплати: ${paymentMethodLabel}
+🏦 Реквізити для оплати: ${paymentRequisiteDetails}
 💰 До сплати: ${pricing.finalUah} грн (~ $${pricing.finalUsdt} USDT)
-📧 Контакти: ${email}${tg ? ' | ' + tg : ''}${phone ? ' | ' + phone : ''}
+📧 Контакти клієнта: ${email}${tg ? ' | ' + tg : ''}${phone ? ' | ' + phone : ''}
 ----------------------------------------
-Надсилаю підтвердження замовлення.`;
+📌 Статус: Очікує надсилання в діалог та підтвердження адміністратором.
+💡 Важливо: Замовлення остаточно фіксується та бронюється лише після надсилання цього повідомлення в Telegram @WeberSIS або на Email. Оплату здійснюйте після підтвердження розміщення.`;
 
   window.currentAdOrderText = orderSummaryText;
+
+  // Кнопка копіювання замовлення біля номера замовлення вгорі
+  const copyOrderIdBtn = document.getElementById('adCopyOrderIdBtn');
+  if (copyOrderIdBtn) {
+    copyOrderIdBtn.onclick = function() {
+      copyToClipboard(window.currentAdOrderText, copyOrderIdBtn, 'Скопійовано! ✅');
+    };
+  }
 
   // Посилання на Telegram
   const tgBtn = document.getElementById('adActionTgBtn');
@@ -3808,7 +3917,9 @@ function renderRequisitesBox(method, pricing, orderId) {
       <div class="ad-label" style="margin-bottom: 4px;">Номер картки Банки:</div>
       <div class="ad-copy-field">
         <span class="ad-copy-val">${mono.card}</span>
-        <button type="button" class="ad-copy-btn" onclick="copyToClipboard('${mono.cardRaw}', this)"><i class="fas fa-copy"></i> Копіювати</button>
+        <button type="button" class="ad-sub-copy-btn" onclick="copyToClipboard('${mono.cardRaw}', this)" title="Копіювати номер картки">
+          <i class="far fa-copy"></i> <span class="ad-copy-btn-text">Копіювати</span>
+        </button>
       </div>
     `;
   } else if (method === 'privat') {
@@ -3826,19 +3937,21 @@ function renderRequisitesBox(method, pricing, orderId) {
       <div class="ad-label" style="margin-bottom: 4px;">Номер картки Конверта:</div>
       <div class="ad-copy-field">
         <span class="ad-copy-val">${privat.card}</span>
-        <button type="button" class="ad-copy-btn" onclick="copyToClipboard('${privat.cardRaw}', this)"><i class="fas fa-copy"></i> Копіювати</button>
+        <button type="button" class="ad-sub-copy-btn" onclick="copyToClipboard('${privat.cardRaw}', this)" title="Копіювати номер картки">
+          <i class="far fa-copy"></i> <span class="ad-copy-btn-text">Копіювати</span>
+        </button>
       </div>
     `;
   } else if (method === 'crypto') {
     const coins = AD_CONFIG.wallets.crypto;
-    const usdtCoins = coins.filter(c => c.isUsdt);
-    const otherCoins = coins.filter(c => !c.isUsdt);
+    const usdtCoins = coins.filter(c => c.hasUsdt);
+    const otherCoins = coins.filter(c => !c.hasUsdt);
 
     let coinsOptionsHtml = `
-      <optgroup label="🟢 Оплата в USDT & USDC:">
+      <optgroup label="🌐 Оплата в USDT / USDC або монетах мережі:">
         ${usdtCoins.map((c, i) => `<option value="${c.id}" ${i === 0 ? 'selected' : ''}>🟢 ${c.name}</option>`).join('')}
       </optgroup>
-      <optgroup label="💰 Інші криптовалюти:">
+      <optgroup label="💰 Інші криптовалюти (оплата монетами за курсом):">
         ${otherCoins.map(c => `<option value="${c.id}">⚪ ${c.name}</option>`).join('')}
       </optgroup>
     `;
@@ -3860,7 +3973,9 @@ function renderRequisitesBox(method, pricing, orderId) {
       <div class="ad-label" style="margin-bottom: 4px;">Адреса гаманця для переказу:</div>
       <div class="ad-copy-field">
         <span class="ad-copy-val" id="adCryptoAddressVal">${coins[0].address}</span>
-        <button type="button" class="ad-copy-btn" id="adCryptoCopyBtn"><i class="fas fa-copy"></i> Копіювати</button>
+        <button type="button" class="ad-sub-copy-btn" id="adCryptoCopyBtn" title="Копіювати адресу гаманця">
+          <i class="far fa-copy"></i> <span class="ad-copy-btn-text">Копіювати</span>
+        </button>
       </div>
     `;
 
@@ -3869,24 +3984,87 @@ function renderRequisitesBox(method, pricing, orderId) {
     const copyBtn = box.querySelector('#adCryptoCopyBtn');
     const detailsBox = box.querySelector('#adCryptoDetailsBox');
 
-    function updateCoinUI(selected) {
-      addrVal.textContent = selected.address;
-      
-      if (selected.id === 'eth') {
-        detailsBox.style.display = 'block';
-        detailsBox.innerHTML = `
-          <div class="ad-crypto-eth-card">
-            <div class="ad-crypto-eth-title">
-              <i class="fas fa-network-wired" style="color: #3b82f6;"></i> Доступні мережі для переказу (USDT / USDC):
+    let currentPayType = 'usdt'; // 'usdt' or 'native'
+
+    function fetchAndRenderCoinRate(selected, targetEl, badgeEl) {
+      if (!selected.binanceSymbol) return;
+      fetch(`https://api.binance.com/api/v3/ticker/price?symbol=${selected.binanceSymbol}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data && data.price && coinSelect.value === selected.id) {
+            const coinPrice = parseFloat(data.price);
+            if (coinPrice > 0) {
+              const usdtAmount = parseFloat(pricing.finalUsdt);
+              const estimated = usdtAmount / coinPrice;
+              let formatted = '';
+              if (estimated < 0.1) formatted = estimated.toFixed(6);
+              else if (estimated < 10) formatted = estimated.toFixed(4);
+              else if (estimated < 1000) formatted = estimated.toFixed(2);
+              else formatted = Math.round(estimated).toLocaleString('uk-UA');
+
+              const rateSub = coinPrice < 1 ? coinPrice.toFixed(4) : coinPrice.toLocaleString('uk-UA', {maximumFractionDigits: 2});
+
+              if (targetEl) {
+                targetEl.innerHTML = `<strong>Орієнтовно:</strong> <span class="ad-volatile-amount">~ ${formatted} ${selected.nativeTicker}</span> <span class="ad-volatile-rate-sub">(курс: 1 ${selected.nativeTicker} ≈ $${rateSub})</span>`;
+              }
+              if (badgeEl) {
+                badgeEl.textContent = `~ ${formatted} ${selected.nativeTicker}`;
+              }
+            }
+          }
+        })
+        .catch(() => {
+          if (targetEl) {
+            targetEl.innerHTML = `Оплата за біржовим курсом еквівалента <strong>$${pricing.finalUsdt} USDT</strong> на момент переказу.`;
+          }
+        });
+    }
+
+    function renderCoinContent(selected) {
+      if (selected.hasUsdt) {
+        if (currentPayType === 'usdt') {
+          if (selected.id === 'eth') {
+            return `
+              <div class="ad-crypto-eth-card">
+                <div class="ad-crypto-eth-title">
+                  <i class="fas fa-network-wired" style="color: #3b82f6;"></i> Доступні EVM-мережі для переказу USDT / USDC:
+                </div>
+                <div class="ad-crypto-eth-tags">
+                  ${(selected.networks || []).map(n => `<span class="ad-net-tag">${n}</span>`).join('')}
+                </div>
+                <div class="ad-crypto-net-note" style="margin-top: 6px; font-size: 0.8rem; color: #1e40af;">
+                  Сума переказу: <strong style="color:#10b981;">$${pricing.finalUsdt} USDT / USDC</strong> на вказану нижче адресу.
+                </div>
+              </div>
+            `;
+          } else {
+            return `
+              <div class="ad-crypto-stable-info">
+                <i class="fas fa-check-circle" style="color: #10b981;"></i> Переказ у <strong>USDT / USDC</strong> (${selected.nativeName}): точна сума <strong style="color: #10b981;">$${pricing.finalUsdt} USDT</strong> на вказану нижче адресу.
+              </div>
+            `;
+          }
+        } else {
+          return `
+            <div class="ad-crypto-volatile-card">
+              <div class="ad-volatile-title">
+                <i class="fas fa-calculator" style="color: #f59e0b;"></i> Оплата нативною монетою <strong>${selected.nativeName}</strong>:
+              </div>
+              <div class="ad-volatile-desc">
+                Вартість замовлення еквівалентна <strong style="color: #10b981;">$${pricing.finalUsdt} USDT</strong> (${pricing.finalUah} грн).
+                Сума в монетах розраховується за біржовим курсом на момент переказу на ту ж саму адресу.
+              </div>
+              <div id="adCryptoLiveCalcBox" class="ad-volatile-calc-box">
+                <i class="fas fa-circle-notch fa-spin"></i> Розрахунок орієнтовної кількості ${selected.nativeTicker}...
+              </div>
+              <div class="ad-volatile-tg-hint">
+                💬 Для точного узгодження кількості монет напишіть нам у <a href="https://t.me/WeberSIS" target="_blank">Telegram @WeberSIS</a>.
+              </div>
             </div>
-            <div class="ad-crypto-eth-tags">
-              ${(selected.networks || []).map(n => `<span class="ad-net-tag">${n}</span>`).join('')}
-            </div>
-          </div>
-        `;
-      } else if (!selected.isUsdt) {
-        detailsBox.style.display = 'block';
-        detailsBox.innerHTML = `
+          `;
+        }
+      } else {
+        return `
           <div class="ad-crypto-volatile-card">
             <div class="ad-volatile-title">
               <i class="fas fa-calculator" style="color: #f59e0b;"></i> Оплата в <strong>${selected.name}</strong>:
@@ -3896,46 +4074,89 @@ function renderRequisitesBox(method, pricing, orderId) {
               Кількість монет розраховується за біржовим курсом на момент здійснення переказу.
             </div>
             <div id="adCryptoLiveCalcBox" class="ad-volatile-calc-box">
-              <i class="fas fa-circle-notch fa-spin"></i> Розрахунок орієнтовної кількості ${selected.name}...
+              <i class="fas fa-circle-notch fa-spin"></i> Розрахунок орієнтовної кількості ${selected.nativeTicker}...
             </div>
             <div class="ad-volatile-tg-hint">
               💬 Для точного узгодження кількості монет напишіть нам у <a href="https://t.me/WeberSIS" target="_blank">Telegram @WeberSIS</a>.
             </div>
           </div>
         `;
+      }
+    }
 
-        if (selected.binanceSymbol) {
-          fetch(`https://api.binance.com/api/v3/ticker/price?symbol=${selected.binanceSymbol}`)
-            .then(res => res.json())
-            .then(data => {
-              if (data && data.price && coinSelect.value === selected.id) {
-                const coinPrice = parseFloat(data.price);
-                if (coinPrice > 0) {
-                  const usdtAmount = parseFloat(pricing.finalUsdt);
-                  const estimated = usdtAmount / coinPrice;
-                  let formatted = '';
-                  if (estimated < 0.1) formatted = estimated.toFixed(6);
-                  else if (estimated < 10) formatted = estimated.toFixed(4);
-                  else if (estimated < 1000) formatted = estimated.toFixed(2);
-                  else formatted = Math.round(estimated).toLocaleString('uk-UA');
+    function updateCoinUI(selected) {
+      addrVal.textContent = selected.address;
+      detailsBox.style.display = 'block';
 
-                  const calcBox = detailsBox.querySelector('#adCryptoLiveCalcBox');
-                  if (calcBox) {
-                    calcBox.innerHTML = `<strong>Орієнтовно:</strong> <span class="ad-volatile-amount">~ ${formatted} ${selected.ticker || selected.name}</span> <span class="ad-volatile-rate-sub">(курс: 1 ${selected.ticker} ≈ $${coinPrice < 1 ? coinPrice.toFixed(4) : coinPrice.toLocaleString('uk-UA', {maximumFractionDigits: 2})})</span>`;
-                  }
-                }
+      if (selected.hasUsdt) {
+        detailsBox.innerHTML = `
+          <div class="ad-crypto-choice-box">
+            <div class="ad-crypto-choice-header">
+              <i class="fas fa-hand-holding-usd" style="color: #3b82f6;"></i> Оберіть, чим зручніше сплатити на цю адресу:
+            </div>
+            <div class="ad-crypto-type-toggle">
+              <button type="button" class="ad-crypto-tab-btn ${currentPayType === 'usdt' ? 'active' : ''}" data-type="usdt">
+                <i class="fas fa-dollar-sign" style="color: #10b981;"></i> USDT / USDC <strong>($${pricing.finalUsdt})</strong>
+              </button>
+              <button type="button" class="ad-crypto-tab-btn ${currentPayType === 'native' ? 'active' : ''}" data-type="native">
+                <i class="fas fa-coins" style="color: #f59e0b;"></i> Монета ${selected.nativeTicker} <span id="adTabNativeRate" style="font-weight: 500; font-size: 0.74rem;">(за курсом)</span>
+              </button>
+            </div>
+            <div id="adCryptoTabContainer">
+              ${renderCoinContent(selected)}
+            </div>
+          </div>
+        `;
+
+        const tabBtns = detailsBox.querySelectorAll('.ad-crypto-tab-btn');
+        tabBtns.forEach(btn => {
+          btn.addEventListener('click', () => {
+            currentPayType = btn.getAttribute('data-type');
+            tabBtns.forEach(b => b.classList.toggle('active', b === btn));
+            const container = detailsBox.querySelector('#adCryptoTabContainer');
+            if (container) {
+              container.innerHTML = renderCoinContent(selected);
+              if (currentPayType === 'native') {
+                const calcBox = container.querySelector('#adCryptoLiveCalcBox');
+                fetchAndRenderCoinRate(selected, calcBox, null);
               }
-            })
-            .catch(() => {
-              const calcBox = detailsBox.querySelector('#adCryptoLiveCalcBox');
-              if (calcBox) {
-                calcBox.innerHTML = `Оплата за біржовим курсом еквівалента <strong>$${pricing.finalUsdt} USDT</strong> на момент переказу.`;
-              }
-            });
-        }
+            }
+            syncOrderText(selected);
+          });
+        });
+
+        // Завантажуємо прев'ю курсу монети для кнопки та якщо обрано нативну монету
+        const nativeBadge = detailsBox.querySelector('#adTabNativeRate');
+        const calcBox = detailsBox.querySelector('#adCryptoLiveCalcBox');
+        fetchAndRenderCoinRate(selected, calcBox, nativeBadge);
+
       } else {
-        detailsBox.style.display = 'none';
-        detailsBox.innerHTML = '';
+        currentPayType = 'native';
+        detailsBox.innerHTML = renderCoinContent(selected);
+        const calcBox = detailsBox.querySelector('#adCryptoLiveCalcBox');
+        fetchAndRenderCoinRate(selected, calcBox, null);
+      }
+
+      syncOrderText(selected);
+    }
+
+    function syncOrderText(selected) {
+      if (window.currentAdOrderText) {
+        let cryptoPaymentLabel = '';
+        let cryptoRequisites = `Адреса гаманця (${selected.nativeName}): ${selected.address}`;
+        if (selected.hasUsdt && currentPayType === 'usdt') {
+          cryptoPaymentLabel = `Криптовалюта (${selected.name} - USDT) [$${pricing.finalUsdt} USDT]`;
+        } else {
+          cryptoPaymentLabel = `Криптовалюта (монета ${selected.nativeTicker}) [еквівалент ~$${pricing.finalUsdt} USDT за біржовим курсом]`;
+        }
+        let updatedSummary = window.currentAdOrderText
+          .replace(/💳 Спосіб оплати: .*/, `💳 Спосіб оплати: ${cryptoPaymentLabel}`)
+          .replace(/🏦 Реквізити для оплати: .*/, `🏦 Реквізити для оплати: ${cryptoRequisites}`);
+        window.currentAdOrderText = updatedSummary;
+        const tgBtn = document.getElementById('adActionTgBtn');
+        if (tgBtn) tgBtn.href = `https://t.me/WeberSIS?text=${encodeURIComponent(updatedSummary)}`;
+        const emailBtn = document.getElementById('adActionEmailBtn');
+        if (emailBtn) emailBtn.href = `mailto:weber515sis@gmail.com?subject=${encodeURIComponent('Оплата замовлення #' + orderId)}&body=${encodeURIComponent(updatedSummary)}`;
       }
     }
 

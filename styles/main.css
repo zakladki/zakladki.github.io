@@ -4156,17 +4156,97 @@ body.dark-mode .ad-calc-total-usdt {
   font-weight: 800;
   margin-bottom: 4px;
 }
+.ad-order-id-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 6px;
+  flex-wrap: wrap;
+}
+.ad-order-id-label {
+  font-size: 0.92rem;
+  font-weight: 500;
+  opacity: 0.95;
+}
 .ad-order-id-display {
   display: inline-block;
   background: rgba(0, 0, 0, 0.25);
   font-family: monospace;
-  font-size: 1.15rem;
+  font-size: 1.12rem;
   font-weight: 800;
-  padding: 4px 12px;
+  padding: 4px 10px;
   border-radius: 6px;
   letter-spacing: 1px;
-  margin-top: 4px;
   user-select: all;
+}
+.ad-order-copy-icon-btn {
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  color: #ffffff;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.15s ease;
+}
+.ad-order-copy-icon-btn:hover {
+  background: #ffffff;
+  color: #059669;
+  border-color: #ffffff;
+  transform: scale(1.05);
+}
+.ad-order-copy-icon-btn.copied {
+  background: #ffffff !important;
+  color: #059669 !important;
+}
+
+.ad-order-recommendation-box {
+  background: rgba(59, 130, 246, 0.08);
+  border: 1px solid rgba(59, 130, 246, 0.25);
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin-bottom: 14px;
+  display: block;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: var(--text-main, #1e293b);
+}
+body.dark-mode .ad-order-recommendation-box {
+  background: rgba(30, 58, 138, 0.25);
+  border-color: rgba(96, 165, 250, 0.35);
+  color: #cbd5e1;
+}
+.ad-order-recommendation-box i {
+  color: #2563eb;
+  margin-right: 4px;
+}
+body.dark-mode .ad-order-recommendation-box i {
+  color: #60a5fa;
+}
+
+.ad-receipt-url-link {
+  color: #0284c7;
+  font-weight: 600;
+  text-decoration: none;
+  word-break: break-all;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.ad-receipt-url-link:hover {
+  text-decoration: underline;
+  color: #0369a1;
+}
+body.dark-mode .ad-receipt-url-link {
+  color: #38bdf8;
+}
+body.dark-mode .ad-receipt-url-link:hover {
+  color: #7dd3fc;
 }
 .ad-receipt-list {
   display: flex;
@@ -4324,6 +4404,88 @@ body.dark-mode .ad-requisite-title {
 .ad-crypto-details-box {
   margin-top: 6px;
   margin-bottom: 12px;
+}
+.ad-crypto-choice-box {
+  background: var(--card-bg, #ffffff);
+  border: 1px solid var(--border-color, rgba(0, 0, 0, 0.08));
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-bottom: 10px;
+}
+body.dark-mode .ad-crypto-choice-box {
+  background: rgba(15, 23, 42, 0.4);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+.ad-crypto-choice-header {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-main, #1e293b);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+body.dark-mode .ad-crypto-choice-header {
+  color: #f1f5f9;
+}
+.ad-crypto-type-toggle {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.ad-crypto-tab-btn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 10px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  border-radius: 7px;
+  border: 1.5px solid #cbd5e1;
+  background: var(--card-bg, #ffffff);
+  color: var(--text-muted, #475569);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.ad-crypto-tab-btn:hover {
+  border-color: #94a3b8;
+  color: var(--text-main, #1e293b);
+}
+.ad-crypto-tab-btn.active {
+  border-color: #3b82f6;
+  background: rgba(59, 130, 246, 0.1);
+  color: #1d4ed8;
+  box-shadow: 0 1px 3px rgba(59, 130, 246, 0.2);
+}
+body.dark-mode .ad-crypto-tab-btn {
+  background: #1e293b;
+  border-color: #334155;
+  color: #94a3b8;
+}
+body.dark-mode .ad-crypto-tab-btn:hover {
+  border-color: #475569;
+  color: #f1f5f9;
+}
+body.dark-mode .ad-crypto-tab-btn.active {
+  border-color: #60a5fa;
+  background: rgba(59, 130, 246, 0.25);
+  color: #93c5fd;
+}
+.ad-crypto-stable-info {
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  border-radius: 7px;
+  padding: 8px 12px;
+  font-size: 0.82rem;
+  color: #065f46;
+  line-height: 1.35;
+}
+body.dark-mode .ad-crypto-stable-info {
+  background: rgba(6, 78, 59, 0.3);
+  border-color: rgba(52, 211, 153, 0.3);
+  color: #a7f3d0;
 }
 .ad-crypto-eth-card {
   background: rgba(59, 130, 246, 0.08);
@@ -4585,16 +4747,18 @@ body.dark-mode .ad-sub-copy-value {
   background: #eff6ff;
   border: 1px solid #bfdbfe;
   color: #2563eb;
-  border-radius: 4px;
-  font-size: 0.72rem;
+  border-radius: 5px;
+  font-size: 0.78rem;
   font-weight: 700;
-  padding: 2px 8px;
+  padding: 4px 10px;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 5px;
   transition: all 0.15s ease;
   line-height: 1.3;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 body.dark-mode .ad-sub-copy-btn {
   background: rgba(30, 58, 138, 0.35);
@@ -4632,18 +4796,76 @@ body.dark-mode .ad-select optgroup {
   color: #38bdf8;
   background: #1e293b;
 }
-.ad-legal-iban-note {
-  font-size: 0.8rem;
-  line-height: 1.4;
-  color: var(--text-muted, #64748b);
-  border-top: 1px solid var(--border-color, rgba(0, 0, 0, 0.08));
-  padding-top: 12px;
-  margin-top: 16px;
-  text-align: center;
+
+/* Блок офіційного рахунку та контактів адміністратора внизу */
+.ad-admin-contacts-card {
+  background: var(--card-bg, #ffffff);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin-top: 14px;
 }
-body.dark-mode .ad-legal-iban-note {
-  border-top-color: rgba(255, 255, 255, 0.08);
+body.dark-mode .ad-admin-contacts-card {
+  background: rgba(15, 23, 42, 0.5);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+.ad-admin-contacts-header {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-main, #1e293b);
+  margin-bottom: 8px;
+  line-height: 1.4;
+  display: block;
+}
+.ad-admin-contacts-header i {
+  color: #2563eb;
+  margin-right: 5px;
+}
+body.dark-mode .ad-admin-contacts-header {
+  color: #f1f5f9;
+}
+body.dark-mode .ad-admin-contacts-header i {
+  color: #60a5fa;
+}
+.ad-admin-contact-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 0;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  gap: 12px;
+}
+body.dark-mode .ad-admin-contact-row {
+  border-top-color: rgba(255, 255, 255, 0.06);
+}
+.ad-contact-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.86rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ad-contact-label {
+  font-weight: 700;
+  color: var(--text-muted, #64748b);
+}
+body.dark-mode .ad-contact-label {
   color: #94a3b8;
+}
+.ad-contact-value {
+  font-weight: 700;
+  color: #2563eb;
+  text-decoration: none;
+  font-family: monospace;
+  font-size: 0.9rem;
+}
+.ad-contact-value:hover {
+  text-decoration: underline;
+}
+body.dark-mode .ad-contact-value {
+  color: #60a5fa;
 }
 
 /* Динамічні слоти розміщення та партнерські Add-on */
@@ -4796,25 +5018,62 @@ body.dark-mode .ad-partner-addon-wrap {
   flex-grow: 1;
   font-size: 0.8rem;
 }
-.ad-partner-addon-text {
+.ad-partner-addon-text,
+.ad-thematic-addon-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
   color: var(--text-main, #1e293b);
 }
-body.dark-mode .ad-partner-addon-text {
+body.dark-mode .ad-partner-addon-text,
+body.dark-mode .ad-thematic-addon-text {
   color: #f1f5f9;
 }
-.ad-partner-addon-price {
-  font-size: 0.74rem;
+.ad-addon-title-prefix {
+  font-size: 0.76rem;
+  font-weight: 500;
+  color: var(--text-muted, #64748b);
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  line-height: 1.2;
+}
+body.dark-mode .ad-addon-title-prefix {
+  color: #94a3b8;
+}
+.ad-addon-title-main {
+  font-size: 0.85rem;
   font-weight: 700;
+  color: var(--text-main, #1e293b);
+  line-height: 1.25;
+}
+body.dark-mode .ad-addon-title-main {
+  color: #f1f5f9;
+}
+.ad-partner-addon-price,
+.ad-thematic-addon-price {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  line-height: 1.15;
+  white-space: nowrap;
+  padding: 3px 8px;
+  border-radius: 6px;
+  margin-left: 6px;
+  flex-shrink: 0;
+  min-width: 58px;
+}
+.ad-partner-addon-price {
   color: #b45309;
   background: rgba(245, 158, 11, 0.15);
-  padding: 2px 6px;
-  border-radius: 4px;
-  white-space: nowrap;
-  margin-left: 6px;
+  border: 1px solid rgba(245, 158, 11, 0.25);
 }
 body.dark-mode .ad-partner-addon-price {
   color: #fbbf24;
   background: rgba(245, 158, 11, 0.2);
+  border-color: rgba(245, 158, 11, 0.35);
 }
 .ad-thematic-addon-wrap {
   margin-top: 0;
@@ -4851,25 +5110,25 @@ body.dark-mode .ad-thematic-addon-wrap {
   flex-grow: 1;
   font-size: 0.8rem;
 }
-.ad-thematic-addon-text {
-  color: var(--text-main, #1e293b);
-}
-body.dark-mode .ad-thematic-addon-text {
-  color: #f1f5f9;
-}
 .ad-thematic-addon-price {
-  font-size: 0.74rem;
-  font-weight: 700;
   color: #1d4ed8;
   background: rgba(37, 99, 235, 0.12);
-  padding: 2px 6px;
-  border-radius: 4px;
-  white-space: nowrap;
-  margin-left: 6px;
+  border: 1px solid rgba(37, 99, 235, 0.25);
 }
 body.dark-mode .ad-thematic-addon-price {
   color: #93c5fd;
   background: rgba(37, 99, 235, 0.2);
+  border-color: rgba(37, 99, 235, 0.35);
+}
+.ad-price-amount {
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: -0.2px;
+}
+.ad-price-unit {
+  font-size: 0.65rem;
+  font-weight: 600;
+  opacity: 0.88;
 }
 .ad-thematic-fields-box {
   margin-top: 8px;
@@ -5287,6 +5546,32 @@ body.dark-mode .ad-terms-link {
   }
   .ad-calc-total-usdt {
     font-size: 0.76rem;
+  }
+  .ad-crypto-type-toggle {
+    flex-direction: column;
+    gap: 6px;
+  }
+  .ad-crypto-tab-btn {
+    padding: 7px 10px;
+    font-size: 0.8rem;
+  }
+  .ad-copy-btn-text {
+    display: none;
+  }
+  .ad-sub-copy-btn {
+    padding: 6px 8px;
+    font-size: 0.85rem;
+    min-width: 32px;
+    justify-content: center;
+  }
+  .ad-admin-contact-row {
+    padding: 8px 0;
+  }
+  .ad-contact-left {
+    font-size: 0.82rem;
+  }
+  .ad-contact-value {
+    font-size: 0.84rem;
   }
 }
 
