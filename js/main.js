@@ -2127,8 +2127,8 @@ const AD_CONFIG = {
       { 
         id: "gram", 
         name: "GRAM (USDT)", 
-        nativeTicker: "TON",
-        nativeName: "TON / Gram",
+        nativeTicker: "GRAM",
+        nativeName: "GRAM",
         binanceSymbol: "TONUSDT",
         address: "UQBv5ZgXlNl6eyCGs4q-COY9ya_RTdOdeAmpm2j3oLEaG3cq", 
         hasUsdt: true 
