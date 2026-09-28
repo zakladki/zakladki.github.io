@@ -139,7 +139,7 @@ body {
   
   .theme-toggle-btn {
     position: absolute !important;
-    left: 12px !important;
+    left: 48px !important;
     right: auto !important;
     top: 50% !important;
     transform: translateY(-50%) !important;
@@ -869,7 +869,7 @@ footer.footer .btn-primary:active {
       position: absolute;
       top: 50%;                     
       transform: translateY(-50%); 
-      left: 12px;                  
+      left: 48px;                  
       z-index: 1050;                
       margin: 0;                    
       width: 30px !important;
@@ -3208,7 +3208,7 @@ body.dark-mode .maintenance-progress-bar {
 @media (min-width: 1230px) {
   .notice-bell-btn {
     position: absolute !important;
-    left: 48px !important;
+    left: 84px !important;
     right: auto !important;
     top: 50% !important;
     transform: translateY(-50%) !important;
@@ -3225,7 +3225,7 @@ body.dark-mode .maintenance-progress-bar {
     position: absolute !important;
     top: 50% !important;
     transform: translateY(-50%) !important;
-    left: 48px !important;
+    left: 84px !important;
     right: auto !important;
     z-index: 1050 !important;
     margin: 0 !important;
@@ -5573,6 +5573,754 @@ body.dark-mode .ad-terms-link {
   .ad-contact-value {
     font-size: 0.84rem;
   }
+}
+
+/* ==========================================================================
+   ОСОБИСТИЙ КАБІНЕТ ТА АДМІН-ПАНЕЛЬ (FIREBASE AUTH & FIRESTORE)
+   ========================================================================== */
+
+.user-auth-btn {
+  position: absolute !important;
+  left: 12px !important;
+  right: auto !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  height: 30px !important;
+  border-radius: 7px !important;
+  background: rgba(255, 255, 255, 0.16) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  color: #ffffff !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 8px !important;
+  margin: 0 !important;
+  cursor: pointer;
+  z-index: 1050 !important;
+  font-size: 0.95rem;
+  line-height: 1;
+  outline: none;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+.user-auth-btn:hover {
+  background: rgba(255, 255, 255, 0.28) !important;
+  transform: translateY(-50%) scale(1.05) !important;
+}
+.user-auth-btn.logged-in {
+  padding: 0 6px !important;
+  gap: 5px;
+}
+.user-auth-avatar {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+}
+.user-auth-admin-crown {
+  color: #f59e0b;
+  font-size: 0.72rem;
+  margin-left: 2px;
+}
+
+/* Модальне вікно кабінету */
+.user-cabinet-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(4px);
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  animation: fadeIn 0.2s ease;
+}
+.user-cabinet-modal {
+  background: var(--card-bg, #ffffff);
+  color: var(--text-main, #1e293b);
+  border-radius: 14px;
+  width: 100%;
+  max-width: 720px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35);
+  border: 1px solid var(--border-color, rgba(0, 0, 0, 0.1));
+  overflow: hidden;
+  animation: slideUp 0.25s ease;
+}
+body.dark-mode .user-cabinet-modal {
+  background: #1e293b;
+  color: #f1f5f9;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.cabinet-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border-color, rgba(0, 0, 0, 0.08));
+  background: rgba(0, 0, 0, 0.02);
+}
+body.dark-mode .cabinet-header {
+  background: rgba(255, 255, 255, 0.03);
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+.cabinet-header-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+.cabinet-close-btn {
+  background: transparent;
+  border: none;
+  font-size: 1.6rem;
+  line-height: 1;
+  color: var(--text-muted, #64748b);
+  cursor: pointer;
+  padding: 0 4px;
+  transition: color 0.15s ease;
+}
+.cabinet-close-btn:hover {
+  color: #ef4444;
+}
+
+.cabinet-body {
+  padding: 18px 20px;
+  overflow-y: auto;
+  flex-grow: 1;
+}
+
+/* Вітання для гостей та кнопка входу через Google */
+.cabinet-welcome-box {
+  text-align: center;
+  padding: 10px 0 20px 0;
+}
+.cabinet-welcome-icon {
+  font-size: 3rem;
+  color: #3b82f6;
+  margin-bottom: 12px;
+}
+.cabinet-welcome-title {
+  font-size: 1.35rem;
+  font-weight: 800;
+  margin-bottom: 8px;
+}
+.cabinet-welcome-desc {
+  font-size: 0.92rem;
+  color: var(--text-muted, #64748b);
+  max-width: 480px;
+  margin: 0 auto 20px auto;
+  line-height: 1.5;
+}
+body.dark-mode .cabinet-welcome-desc {
+  color: #94a3b8;
+}
+
+.cabinet-features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  margin-bottom: 24px;
+  text-align: left;
+}
+.cabinet-feature-item {
+  background: rgba(59, 130, 246, 0.05);
+  border: 1px solid rgba(59, 130, 246, 0.15);
+  border-radius: 10px;
+  padding: 14px;
+}
+body.dark-mode .cabinet-feature-item {
+  background: rgba(30, 58, 138, 0.2);
+  border-color: rgba(96, 165, 250, 0.25);
+}
+.cabinet-feature-icon {
+  font-size: 1.4rem;
+  color: #2563eb;
+  margin-bottom: 8px;
+}
+body.dark-mode .cabinet-feature-icon {
+  color: #60a5fa;
+}
+.cabinet-feature-title {
+  font-size: 0.88rem;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.cabinet-feature-desc {
+  font-size: 0.78rem;
+  color: var(--text-muted, #64748b);
+  line-height: 1.4;
+  margin: 0;
+}
+body.dark-mode .cabinet-feature-desc {
+  color: #94a3b8;
+}
+
+.google-auth-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: #ffffff;
+  color: #1f2937;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 10px 24px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  transition: all 0.2s ease;
+  margin-bottom: 12px;
+}
+.google-auth-btn:hover {
+  background: #f9fafb;
+  border-color: #9ca3af;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  transform: translateY(-1px);
+}
+body.dark-mode .google-auth-btn {
+  background: #0f172a;
+  color: #f1f5f9;
+  border-color: #334155;
+}
+body.dark-mode .google-auth-btn:hover {
+  background: #1e293b;
+  border-color: #475569;
+}
+
+.cabinet-privacy-note {
+  font-size: 0.75rem;
+  color: var(--text-muted, #64748b);
+  max-width: 440px;
+  margin: 0 auto;
+  line-height: 1.4;
+}
+
+/* Профіль користувача у верхній частині кабінету */
+.cabinet-user-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: rgba(0, 0, 0, 0.03);
+  border-radius: 10px;
+  margin-bottom: 16px;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+body.dark-mode .cabinet-user-bar {
+  background: rgba(255, 255, 255, 0.04);
+}
+.cabinet-user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.cabinet-avatar-lg {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #3b82f6;
+}
+.cabinet-user-names {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.3;
+}
+.cabinet-user-name {
+  font-weight: 800;
+  font-size: 0.96rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.cabinet-user-email {
+  font-size: 0.8rem;
+  color: var(--text-muted, #64748b);
+}
+body.dark-mode .cabinet-user-email {
+  color: #94a3b8;
+}
+.cabinet-role-badge {
+  font-size: 0.7rem;
+  font-weight: 800;
+  padding: 2px 7px;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+.cabinet-role-admin {
+  background: #f59e0b;
+  color: #000;
+}
+.cabinet-role-user {
+  background: #e2e8f0;
+  color: #334155;
+}
+body.dark-mode .cabinet-role-user {
+  background: #334155;
+  color: #e2e8f0;
+}
+
+/* Вкладки кабінету */
+.cabinet-tabs-nav {
+  display: flex;
+  gap: 6px;
+  border-bottom: 2px solid var(--border-color, rgba(0, 0, 0, 0.08));
+  margin-bottom: 16px;
+  overflow-x: auto;
+}
+body.dark-mode .cabinet-tabs-nav {
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+.cabinet-tab-btn {
+  background: transparent;
+  border: none;
+  padding: 8px 14px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text-muted, #64748b);
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.cabinet-tab-btn:hover {
+  color: #2563eb;
+}
+.cabinet-tab-btn.active {
+  color: #2563eb;
+  border-bottom-color: #2563eb;
+}
+body.dark-mode .cabinet-tab-btn {
+  color: #94a3b8;
+}
+body.dark-mode .cabinet-tab-btn:hover,
+body.dark-mode .cabinet-tab-btn.active {
+  color: #60a5fa;
+  border-bottom-color: #60a5fa;
+}
+
+/* Картки замовлень */
+.cabinet-order-card {
+  background: var(--card-bg, #ffffff);
+  border: 1px solid var(--border-color, rgba(0, 0, 0, 0.08));
+  border-radius: 10px;
+  padding: 14px;
+  margin-bottom: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+body.dark-mode .cabinet-order-card {
+  background: rgba(15, 23, 42, 0.45);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+.cabinet-order-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.cabinet-order-id {
+  font-family: monospace;
+  font-weight: 800;
+  font-size: 0.95rem;
+  color: #2563eb;
+}
+body.dark-mode .cabinet-order-id {
+  color: #60a5fa;
+}
+.cabinet-order-date {
+  font-size: 0.76rem;
+  color: var(--text-muted, #64748b);
+}
+.cabinet-status-pill {
+  font-size: 0.74rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 5px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.status-pending {
+  background: rgba(245, 158, 11, 0.15);
+  color: #b45309;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+.status-paid {
+  background: rgba(37, 99, 235, 0.15);
+  color: #1d4ed8;
+  border: 1px solid rgba(37, 99, 235, 0.3);
+}
+.status-active {
+  background: rgba(16, 185, 129, 0.15);
+  color: #047857;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+.status-completed {
+  background: rgba(100, 116, 139, 0.15);
+  color: #475569;
+  border: 1px solid rgba(100, 116, 139, 0.3);
+}
+.status-cancelled {
+  background: rgba(239, 68, 68, 0.15);
+  color: #b91c1c;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+body.dark-mode .status-pending { color: #fbbf24; }
+body.dark-mode .status-paid { color: #93c5fd; }
+body.dark-mode .status-active { color: #34d399; }
+body.dark-mode .status-completed { color: #cbd5e1; }
+body.dark-mode .status-cancelled { color: #f87171; }
+
+.cabinet-order-details {
+  font-size: 0.84rem;
+  line-height: 1.45;
+  margin-bottom: 10px;
+}
+.cabinet-order-row {
+  margin-bottom: 3px;
+}
+.cabinet-order-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  padding-top: 10px;
+  align-items: center;
+}
+body.dark-mode .cabinet-order-actions {
+  border-top-color: rgba(255, 255, 255, 0.06);
+}
+
+/* Статистика для адміністратора */
+.cabinet-admin-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.cabinet-admin-stat-card {
+  background: rgba(0, 0, 0, 0.03);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 8px;
+  padding: 10px 12px;
+  text-align: center;
+}
+body.dark-mode .cabinet-admin-stat-card {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+.cabinet-stat-val {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #2563eb;
+  line-height: 1.1;
+}
+body.dark-mode .cabinet-stat-val {
+  color: #60a5fa;
+}
+.cabinet-stat-lbl {
+  font-size: 0.74rem;
+  color: var(--text-muted, #64748b);
+  margin-top: 3px;
+}
+body.dark-mode .cabinet-stat-lbl {
+  color: #94a3b8;
+}
+
+.cabinet-admin-filter-bar {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+.cabinet-search-input {
+  flex-grow: 1;
+  min-width: 200px;
+  padding: 7px 12px;
+  font-size: 0.85rem;
+  border-radius: 6px;
+  border: 1px solid var(--border-color, #cbd5e1);
+  background: var(--card-bg, #ffffff);
+  color: var(--text-main, #1e293b);
+}
+body.dark-mode .cabinet-search-input {
+  background: #0f172a;
+  color: #f1f5f9;
+  border-color: #334155;
+}
+
+.cabinet-status-select {
+  padding: 4px 8px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  border-radius: 5px;
+  border: 1px solid var(--border-color, #cbd5e1);
+  background: var(--card-bg, #ffffff);
+  color: var(--text-main, #1e293b);
+  cursor: pointer;
+}
+body.dark-mode .cabinet-status-select {
+  background: #1e293b;
+  color: #f1f5f9;
+  border-color: #475569;
+}
+
+/* Форма закладок */
+.cabinet-bookmark-add-form {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+.cabinet-bookmark-input {
+  padding: 7px 12px;
+  font-size: 0.85rem;
+  border-radius: 6px;
+  border: 1px solid var(--border-color, #cbd5e1);
+  background: var(--card-bg, #ffffff);
+  color: var(--text-main, #1e293b);
+  flex-grow: 1;
+}
+body.dark-mode .cabinet-bookmark-input {
+  background: #0f172a;
+  color: #f1f5f9;
+  border-color: #334155;
+}
+.cabinet-bookmark-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: rgba(0, 0, 0, 0.02);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 7px;
+  margin-bottom: 6px;
+  gap: 10px;
+}
+body.dark-mode .cabinet-bookmark-item {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.06);
+}
+.cabinet-bookmark-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-main, #1e293b);
+  text-decoration: none;
+  font-size: 0.88rem;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cabinet-bookmark-link:hover {
+  color: #2563eb;
+  text-decoration: underline;
+}
+body.dark-mode .cabinet-bookmark-link {
+  color: #f1f5f9;
+}
+body.dark-mode .cabinet-bookmark-link:hover {
+  color: #60a5fa;
+}
+.cabinet-del-btn {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 2px 6px;
+  font-size: 0.85rem;
+  transition: color 0.15s ease;
+}
+.cabinet-del-btn:hover {
+  color: #ef4444;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Банери статусу авторизації у модальному вікні замовлення */
+.ad-auth-banner-wrap {
+  margin-bottom: 14px;
+}
+.ad-auth-banner {
+  border-radius: 10px;
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.ad-auth-banner.logged-in {
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+}
+body.dark-mode .ad-auth-banner.logged-in {
+  background: rgba(6, 78, 59, 0.25);
+  border-color: rgba(52, 211, 153, 0.3);
+}
+.ad-auth-banner.guest {
+  background: rgba(59, 130, 246, 0.06);
+  border: 1px solid rgba(59, 130, 246, 0.22);
+}
+body.dark-mode .ad-auth-banner.guest {
+  background: rgba(30, 58, 138, 0.2);
+  border-color: rgba(96, 165, 250, 0.25);
+}
+.ad-auth-banner-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-grow: 1;
+}
+.ad-auth-banner-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #10b981;
+  flex-shrink: 0;
+}
+.ad-auth-banner-icon {
+  font-size: 1.6rem;
+  color: #2563eb;
+  flex-shrink: 0;
+}
+body.dark-mode .ad-auth-banner-icon {
+  color: #60a5fa;
+}
+.ad-auth-banner-title {
+  font-size: 0.88rem;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--text-main, #1e293b);
+}
+body.dark-mode .ad-auth-banner-title {
+  color: #f1f5f9;
+}
+.ad-auth-banner-sub {
+  font-size: 0.77rem;
+  color: var(--text-muted, #64748b);
+  line-height: 1.35;
+  margin-top: 2px;
+}
+body.dark-mode .ad-auth-banner-sub {
+  color: #94a3b8;
+}
+.ad-auth-banner-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+@media (max-width: 575.98px) {
+  .ad-auth-banner-actions {
+    width: 100%;
+    align-items: flex-start;
+  }
+}
+.ad-auth-google-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: #ffffff;
+  color: #1f2937;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  padding: 6px 14px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+.ad-auth-google-btn:hover {
+  background: #f9fafb;
+  border-color: #9ca3af;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+  transform: translateY(-1px);
+}
+body.dark-mode .ad-auth-google-btn {
+  background: #0f172a;
+  color: #f1f5f9;
+  border-color: #334155;
+}
+body.dark-mode .ad-auth-google-btn:hover {
+  background: #1e293b;
+  border-color: #475569;
+}
+.ad-auth-guest-note {
+  font-size: 0.7rem;
+  color: var(--text-muted, #64748b);
+  font-style: italic;
+}
+body.dark-mode .ad-auth-guest-note {
+  color: #94a3b8;
+}
+
+/* Блок збереження замовлення на Кроці 2 */
+.ad-order-claim-box {
+  background: rgba(59, 130, 246, 0.08);
+  border: 1px solid rgba(59, 130, 246, 0.25);
+  border-radius: 8px;
+  padding: 10px 14px;
+}
+body.dark-mode .ad-order-claim-box {
+  background: rgba(30, 58, 138, 0.22);
+  border-color: rgba(96, 165, 250, 0.3);
+}
+.ad-order-claim-box.success {
+  background: rgba(16, 185, 129, 0.08);
+  border-color: rgba(16, 185, 129, 0.3);
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+body.dark-mode .ad-order-claim-box.success {
+  background: rgba(6, 78, 59, 0.25);
+  border-color: rgba(52, 211, 153, 0.3);
+}
+.ad-order-claim-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.ad-order-claim-title {
+  font-size: 0.86rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+.ad-order-claim-desc {
+  font-size: 0.77rem;
+  line-height: 1.35;
+  margin-top: 2px;
 }
 
 

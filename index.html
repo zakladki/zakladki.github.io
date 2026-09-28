@@ -132,15 +132,32 @@
       @media (min-width: 1230px) {
         .mobile-navbar-title { display: none !important; }
       }
-      .theme-toggle-btn {
+      .user-auth-btn {
         position: absolute !important; left: 12px !important; right: auto !important; top: 50% !important;
+        transform: translateY(-50%) !important; min-width: 30px !important; height: 30px !important; border-radius: 7px !important;
+        background: rgba(255, 255, 255, 0.16) !important; border: 1px solid rgba(255, 255, 255, 0.3) !important;
+        color: #ffffff !important; display: inline-flex !important; align-items: center !important; justify-content: center !important;
+        padding: 0 6px !important; margin: 0 !important; cursor: pointer; z-index: 1050 !important; font-size: 0.95rem; line-height: 1; outline: none;
+        transition: all 0.2s ease;
+      }
+      .user-auth-btn:hover {
+        background: rgba(255, 255, 255, 0.28) !important;
+      }
+      .user-auth-avatar {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        object-fit: cover;
+      }
+      .theme-toggle-btn {
+        position: absolute !important; left: 48px !important; right: auto !important; top: 50% !important;
         transform: translateY(-50%) !important; width: 30px !important; height: 30px !important; border-radius: 7px !important;
         background: rgba(255, 255, 255, 0.16) !important; border: 1px solid rgba(255, 255, 255, 0.3) !important;
         color: #ffffff !important; display: inline-flex !important; align-items: center !important; justify-content: center !important;
         padding: 0 !important; margin: 0 !important; cursor: pointer; z-index: 1050 !important; font-size: 0.95rem; line-height: 1; outline: none;
       }
       .notice-bell-btn {
-        position: absolute !important; left: 48px !important; right: auto !important; top: 50% !important;
+        position: absolute !important; left: 84px !important; right: auto !important; top: 50% !important;
         transform: translateY(-50%) !important; width: 30px !important; height: 30px !important; border-radius: 7px !important;
         background: rgba(255, 255, 255, 0.16) !important; border: 1px solid rgba(255, 255, 255, 0.3) !important;
         color: #ffffff !important; display: inline-flex !important; align-items: center !important; justify-content: center !important;
@@ -178,6 +195,7 @@
                           <li class="nav-item"><a class="nav-link" href="./programs.html">Soft</a></li>
             </ul>
         </div>
+        <button id="userAuthNavBtn" class="user-auth-btn" aria-label="Особистий кабінет" title="Особистий кабінет / Вхід"><i class="far fa-user-circle"></i></button>
         <button id="themeToggle" class="theme-toggle-btn" aria-label="Переключити тему" title="Переключити тему (світла/темна)"><i class="fas fa-moon"></i></button>
         <button id="noticeBellBtn" class="notice-bell-btn" aria-label="Оголошення" title="Оголошення"><i class="fas fa-bell"></i><span class="notice-bell-badge-dot"></span></button>
       </nav>
@@ -835,6 +853,10 @@
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
+    <!-- Firebase App, Auth & Firestore SDKs (v10.12.0 Compat for static hosting) -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
     <script src="js/main.js"></script>
   
     <script>

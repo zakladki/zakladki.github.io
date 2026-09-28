@@ -2437,6 +2437,9 @@ function openAdOrderModal(opts = {}) {
           <!-- КРОК 1: ФОРМА ЗАПОВНЕННЯ ТА КАЛЬКУЛЯТОР -->
           <div id="adStep1">
             
+            <!-- Блок статусу входу або вибору швидкого оформлення / з кабінетом -->
+            <div id="adAuthPromptBanner" class="ad-auth-banner-wrap"></div>
+
             <!-- Пояснення черги 6 місць -->
             <div class="ad-badge-rule-box">
               <i class="fas fa-info-circle me-1"></i> <strong>Правило черги та розміщення:</strong> В одній картці допускається до 6 рекламних місць. Перше замовлення займає верхню позицію в обраній зоні, послідуючі - нижчі рядки. Діє автоматичне просування вгору після завершення терміну попереднього партнера.
@@ -2843,10 +2846,13 @@ function openAdOrderModal(opts = {}) {
               </div>
             </div>
 
+            <!-- Блок збереження замовлення у кабінет для гостей -->
+            <div id="adOrderClaimWrap" class="mb-3"></div>
+
             <!-- Повідомлення перед оплатою -->
             <div class="ad-order-recommendation-box">
               <i class="fas fa-info-circle text-primary me-1"></i>
-              <strong>Зверніть увагу:</strong> оскільки на сайті немає особистого кабінету, замовлення фіксується та бронюється виключно після його <strong>надсилання в Telegram або на Email у режимі діалогу</strong>. Будь ласка, надішліть сформовані деталі замовлення адміністратору прямо зараз, а оплату проводьте після підтвердження розміщення.
+              <strong>Зверніть увагу:</strong> замовлення остаточно фіксується та бронюється виключно після його <strong>надсилання в Telegram або на Email у режимі діалогу</strong>. Будь ласка, надішліть сформовані деталі замовлення адміністратору прямо зараз, а оплату проводьте після підтвердження розміщення.
             </div>
 
             <!-- Деталі замовлення (Електронний чек) -->
@@ -3314,6 +3320,15 @@ function openAdOrderModal(opts = {}) {
   updateThematicAddon(1);
   recalcAdOrderPrice();
   updateLivePreview();
+
+  renderAdAuthPromptBanner();
+
+  if (currentUser && currentUser.email) {
+    const emailInput = document.getElementById('adEmailInput');
+    if (emailInput && !emailInput.value) {
+      emailInput.value = currentUser.email;
+    }
+  }
 
   backdrop.classList.add('show');
   document.body.style.overflow = 'hidden';
@@ -3891,6 +3906,24 @@ ${placementTgText}
   const emailBtn = document.getElementById('adActionEmailBtn');
   emailBtn.href = `mailto:weber515sis@gmail.com?subject=${encodeURIComponent('Оплата замовлення #' + orderId)}&body=${encodeURIComponent(orderSummaryText)}`;
 
+  // Автоматичне збереження замовлення у Cloud Firestore базі даних
+  saveOrderToFirestore({
+    orderId,
+    name,
+    url,
+    desc,
+    placements,
+    pricing,
+    paymentMethod,
+    email,
+    tg,
+    phone,
+    orderSummaryText
+  });
+
+  // Відображення блоку збереження замовлення у кабінет
+  renderAdOrderClaimWrap(orderId);
+
   // Перемикання екрана
   document.getElementById('adStep1').style.display = 'none';
   document.getElementById('adStep2').style.display = 'block';
@@ -4208,3 +4241,955 @@ function handleCopySuccess(btnElement, successMsg) {
     btnElement.innerHTML = originalHtml;
   }, 2000);
 }
+
+/* ==========================================================================
+   ІНТЕГРАЦІЯ FIREBASE: АВТОРИЗАЦІЯ GOOGLE, ОСОБИСТИЙ КАБІНЕТ ТА АДМІН-ПАНЕЛЬ
+   ========================================================================== */
+
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyAa5xWkaFpEc9DQ2UhSdNZ8eSeWq2UTpD0",
+  authDomain: "top-zakladki.firebaseapp.com",
+  projectId: "top-zakladki",
+  storageBucket: "top-zakladki.firebasestorage.app",
+  messagingSenderId: "325861597854",
+  appId: "1:325861597854:web:3926cfdbf7c4313899d18f",
+  measurementId: "G-MDG5D3YTN9"
+};
+
+const ADMIN_EMAILS = ["weber515sis@gmail.com"];
+
+let firebaseApp = null;
+let firebaseAuth = null;
+let firebaseDb = null;
+let currentUser = null;
+let currentCabinetTab = 'orders';
+let adminSearchQuery = '';
+let adminStatusFilter = 'all';
+
+// Завантаження Firebase SDK якщо скрипти не підключені в HTML
+function loadExternalScript(src) {
+  return new Promise((resolve, reject) => {
+    if (document.querySelector(`script[src="${src}"]`)) return resolve();
+    const s = document.createElement('script');
+    s.src = src;
+    s.onload = resolve;
+    s.onerror = reject;
+    document.head.appendChild(s);
+  });
+}
+
+async function ensureFirebaseLoaded() {
+  if (window.firebase && window.firebase.auth && window.firebase.firestore) return true;
+  try {
+    if (!window.firebase) {
+      await loadExternalScript("https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js");
+    }
+    if (!window.firebase.auth) {
+      await loadExternalScript("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js");
+    }
+    if (!window.firebase.firestore) {
+      await loadExternalScript("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js");
+    }
+    return true;
+  } catch (e) {
+    console.warn("Помилка завантаження бібліотек Firebase:", e);
+    return false;
+  }
+}
+
+async function initFirebaseAuthAndDb() {
+  await ensureFirebaseLoaded();
+  if (window.firebase) {
+    try {
+      if (!firebase.apps.length) {
+        firebaseApp = firebase.initializeApp(FIREBASE_CONFIG);
+      } else {
+        firebaseApp = firebase.app();
+      }
+      firebaseAuth = firebase.auth();
+      firebaseDb = firebase.firestore();
+
+      firebaseAuth.onAuthStateChanged((user) => {
+        currentUser = user;
+        updateUserNavButton();
+        if (currentUser && firebaseDb) {
+          firebaseDb.collection('users').doc(currentUser.uid).set({
+            uid: currentUser.uid,
+            email: currentUser.email || '',
+            displayName: currentUser.displayName || '',
+            photoURL: currentUser.photoURL || '',
+            lastLoginAt: new Date().toISOString()
+          }, { merge: true }).catch(() => {});
+        }
+        const cabinetBackdrop = document.getElementById('userCabinetBackdrop');
+        if (cabinetBackdrop && cabinetBackdrop.classList.contains('show')) {
+          renderUserCabinetContent();
+        }
+      });
+    } catch (err) {
+      console.warn("Помилка ініціалізації Firebase:", err);
+    }
+  }
+  ensureAuthNavButton();
+}
+
+function ensureAuthNavButton() {
+  let btn = document.getElementById('userAuthNavBtn');
+  if (!btn) {
+    const themeBtn = document.getElementById('themeToggle');
+    const bell = document.getElementById('noticeBellBtn');
+    const target = themeBtn || bell;
+    if (!target) return;
+    btn = document.createElement('button');
+    btn.id = 'userAuthNavBtn';
+    btn.className = 'user-auth-btn';
+    btn.setAttribute('aria-label', 'Особистий кабінет');
+    btn.setAttribute('title', 'Особистий кабінет / Вхід');
+    target.parentNode.insertBefore(btn, target);
+  }
+  btn.onclick = () => openUserCabinetModal();
+  updateUserNavButton();
+}
+
+function isAdminUser() {
+  if (!currentUser || !currentUser.email) return false;
+  return ADMIN_EMAILS.includes(currentUser.email.toLowerCase().trim());
+}
+
+function updateUserNavButton() {
+  const btn = document.getElementById('userAuthNavBtn');
+  if (!btn) return;
+
+  if (currentUser) {
+    btn.classList.add('logged-in');
+    const isAdmin = isAdminUser();
+    let avatarHtml = '';
+    if (currentUser.photoURL) {
+      avatarHtml = `<img src="${currentUser.photoURL}" class="user-auth-avatar" alt="Avatar" referrerpolicy="no-referrer">`;
+    } else {
+      avatarHtml = `<i class="fas fa-user-circle text-primary"></i>`;
+    }
+    const crownHtml = isAdmin ? `<i class="fas fa-crown user-auth-admin-crown" title="Адміністратор сайту"></i>` : '';
+    btn.innerHTML = `${avatarHtml}${crownHtml}`;
+    btn.setAttribute('title', `${currentUser.displayName || currentUser.email} (${isAdmin ? 'Адміністратор' : 'Кабінет'})`);
+  } else {
+    btn.classList.remove('logged-in');
+    btn.innerHTML = `<i class="far fa-user-circle"></i>`;
+    btn.setAttribute('title', 'Особистий кабінет / Вхід через Google');
+  }
+}
+
+// Вхід через Google
+async function loginWithGoogle() {
+  await ensureFirebaseLoaded();
+  if (!firebaseAuth) {
+    alert("Сервіс Google Auth завантажується, спробуйте ще раз через секунду.");
+    return;
+  }
+  const provider = new firebase.auth.GoogleAuthProvider();
+  provider.addScope('profile');
+  provider.addScope('email');
+  try {
+    const res = await firebaseAuth.signInWithPopup(provider);
+    currentUser = res.user;
+    updateUserNavButton();
+    renderUserCabinetContent();
+  } catch (err) {
+    console.warn("Google sign-in popup:", err);
+    if (err.code === 'auth/popup-blocked') {
+      firebaseAuth.signInWithRedirect(provider);
+    } else if (err.code !== 'auth/popup-closed-by-user') {
+      alert("Не вдалося увійти через Google: " + (err.message || err.code));
+    }
+  }
+}
+
+// Вихід з акаунта
+async function logoutUser() {
+  if (firebaseAuth) {
+    await firebaseAuth.signOut();
+    currentUser = null;
+    updateUserNavButton();
+    renderUserCabinetContent();
+  }
+}
+
+// Збереження замовлення у базі Cloud Firestore
+async function saveOrderToFirestore(orderData) {
+  await ensureFirebaseLoaded();
+  if (!firebaseDb) {
+    console.warn("Firestore недоступний, замовлення збережено локально.");
+    return;
+  }
+  try {
+    const cleanId = orderData.orderId.replace('#', '').trim();
+    await firebaseDb.collection('orders').doc(cleanId).set({
+      orderId: orderData.orderId,
+      userId: currentUser ? currentUser.uid : null,
+      userEmail: currentUser ? currentUser.email : (orderData.email || ''),
+      userName: currentUser ? (currentUser.displayName || '') : (orderData.name || ''),
+      userPhoto: currentUser ? (currentUser.photoURL || '') : null,
+      siteName: orderData.name,
+      siteUrl: orderData.url,
+      siteDesc: orderData.desc || '',
+      placements: orderData.placements || [],
+      pricing: {
+        finalUah: orderData.pricing.finalUah,
+        finalUsdt: orderData.pricing.finalUsdt,
+        termMonths: orderData.pricing.termMonths,
+        termLabel: orderData.pricing.termLabel,
+        hasGuarantee: !!orderData.pricing.hasGuarantee
+      },
+      paymentMethod: orderData.paymentMethod,
+      contacts: {
+        email: orderData.email || '',
+        tg: orderData.tg || '',
+        phone: orderData.phone || ''
+      },
+      status: 'pending', // pending, paid, active, completed, cancelled
+      statusLabel: 'Очікує узгодження та оплати',
+      orderSummaryText: orderData.orderSummaryText || '',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    });
+    console.log("Замовлення збережено у Firestore:", cleanId);
+  } catch (err) {
+    console.warn("Не вдалося записати замовлення в Firestore:", err);
+  }
+}
+
+// Відкриття модального вікна Кабінету
+function openUserCabinetModal(tab) {
+  let backdrop = document.getElementById('userCabinetBackdrop');
+  if (!backdrop) {
+    backdrop = document.createElement('div');
+    backdrop.id = 'userCabinetBackdrop';
+    backdrop.className = 'user-cabinet-backdrop';
+    backdrop.innerHTML = `
+      <div class="user-cabinet-modal" role="dialog" aria-modal="true">
+        <div class="cabinet-header">
+          <h5 class="cabinet-header-title">
+            <i class="fas fa-user-circle text-primary"></i> Особистий кабінет
+          </h5>
+          <button type="button" class="cabinet-close-btn" id="cabinetCloseBtn" aria-label="Закрити">&times;</button>
+        </div>
+        <div class="cabinet-body" id="cabinetBody">
+          <!-- Динамічний вміст -->
+        </div>
+      </div>
+    `;
+    document.body.appendChild(backdrop);
+
+    backdrop.addEventListener('click', (e) => {
+      if (e.target === backdrop) closeUserCabinetModal();
+    });
+    backdrop.querySelector('#cabinetCloseBtn').addEventListener('click', closeUserCabinetModal);
+  }
+
+  if (tab) {
+    currentCabinetTab = tab;
+  } else if (isAdminUser()) {
+    currentCabinetTab = 'admin';
+  } else {
+    currentCabinetTab = 'orders';
+  }
+
+  renderUserCabinetContent();
+  backdrop.style.display = 'flex';
+  backdrop.classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeUserCabinetModal() {
+  const backdrop = document.getElementById('userCabinetBackdrop');
+  if (backdrop) {
+    backdrop.style.display = 'none';
+    backdrop.classList.remove('show');
+    if (!document.querySelector('.cl-modal-backdrop.show')) {
+      document.body.style.overflow = '';
+    }
+  }
+}
+
+// Рендеринг вмісту кабінету
+function renderUserCabinetContent() {
+  const body = document.getElementById('cabinetBody');
+  if (!body) return;
+
+  if (!currentUser) {
+    // Екран для гостя (вхід через Google)
+    body.innerHTML = `
+      <div class="cabinet-welcome-box">
+        <div class="cabinet-welcome-icon"><i class="fas fa-shield-alt"></i></div>
+        <h4 class="cabinet-welcome-title">Особистий кабінет ТОП ЗАКЛАДКИ</h4>
+        <p class="cabinet-welcome-desc">
+          Увійдіть через акаунт Google, щоб отримати доступ до персональної історії замовлень, управління рекламою та хмарних закладок:
+        </p>
+        <div class="cabinet-features-grid">
+          <div class="cabinet-feature-item">
+            <div class="cabinet-feature-icon"><i class="fas fa-bullhorn"></i></div>
+            <div class="cabinet-feature-title">Мої замовлення реклами</div>
+            <p class="cabinet-feature-desc">Контролюйте статус розміщення сайту, терміни, реквізити та подовжуйте в 1 клік.</p>
+          </div>
+          <div class="cabinet-feature-item">
+            <div class="cabinet-feature-icon"><i class="fas fa-star"></i></div>
+            <div class="cabinet-feature-title">Хмарні закладки</div>
+            <p class="cabinet-feature-desc">Зберігайте персональні сайти з синхронізацією між смартфоном і комп'ютером.</p>
+          </div>
+          <div class="cabinet-feature-item">
+            <div class="cabinet-feature-icon"><i class="fab fa-google"></i></div>
+            <div class="cabinet-feature-title">Вхід в один клік</div>
+            <p class="cabinet-feature-desc">Миттєва та безпечна авторизація через захищений сервіс Google без створення паролів.</p>
+          </div>
+        </div>
+        <button type="button" class="google-auth-btn" id="btnCabinetGoogleLogin">
+          <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+          Увійти через Google
+        </button>
+        <div class="cabinet-privacy-note text-muted">
+          🔒 Вхід захищено сервісом Google Identity. Ми отримуємо лише публічне ім'я, аватарку та email.
+        </div>
+      </div>
+    `;
+    const btn = document.getElementById('btnCabinetGoogleLogin');
+    if (btn) btn.onclick = loginWithGoogle;
+    return;
+  }
+
+  // Екран для авторизованого користувача
+  const isAdmin = isAdminUser();
+  const avatarSrc = currentUser.photoURL || 'https://www.gravatar.com/avatar/?d=mp';
+
+  body.innerHTML = `
+    <!-- Профіль користувача вгорі -->
+    <div class="cabinet-user-bar">
+      <div class="cabinet-user-info">
+        <img src="${avatarSrc}" class="cabinet-avatar-lg" alt="Аватарка" referrerpolicy="no-referrer">
+        <div class="cabinet-user-names">
+          <div class="cabinet-user-name">
+            ${currentUser.displayName || 'Користувач'}
+            <span class="cabinet-role-badge ${isAdmin ? 'cabinet-role-admin' : 'cabinet-role-user'}">
+              ${isAdmin ? '<i class="fas fa-crown"></i> Адміністратор' : '<i class="fas fa-user"></i> Клієнт'}
+            </span>
+          </div>
+          <div class="cabinet-user-email">${currentUser.email}</div>
+        </div>
+      </div>
+      <button type="button" class="btn btn-outline-danger btn-sm" id="btnCabinetLogout">
+        <i class="fas fa-sign-out-alt me-1"></i> Вийти
+      </button>
+    </div>
+
+    <!-- Вкладки кабінету -->
+    <div class="cabinet-tabs-nav">
+      ${isAdmin ? `
+        <button type="button" class="cabinet-tab-btn ${currentCabinetTab === 'admin' ? 'active' : ''}" data-tab="admin">
+          <i class="fas fa-crown text-warning"></i> Всі замовлення (Адмін)
+        </button>
+      ` : ''}
+      <button type="button" class="cabinet-tab-btn ${currentCabinetTab === 'orders' ? 'active' : ''}" data-tab="orders">
+        <i class="fas fa-bullhorn"></i> Мої замовлення реклами
+      </button>
+      <button type="button" class="cabinet-tab-btn ${currentCabinetTab === 'bookmarks' ? 'active' : ''}" data-tab="bookmarks">
+        <i class="fas fa-star text-warning"></i> Мої закладки
+      </button>
+    </div>
+
+    <!-- Контейнер для вмісту обраної вкладки -->
+    <div id="cabinetTabContent">
+      <div class="text-center py-4 text-muted"><i class="fas fa-spinner fa-spin fa-2x"></i></div>
+    </div>
+  `;
+
+  // Обробники кнопок
+  document.getElementById('btnCabinetLogout').onclick = logoutUser;
+  body.querySelectorAll('.cabinet-tab-btn').forEach(btn => {
+    btn.onclick = () => {
+      currentCabinetTab = btn.getAttribute('data-tab');
+      renderUserCabinetContent();
+    };
+  });
+
+  // Завантаження вмісту обраної вкладки
+  if (currentCabinetTab === 'admin' && isAdmin) {
+    renderAdminOrdersTab();
+  } else if (currentCabinetTab === 'bookmarks') {
+    renderUserBookmarksTab();
+  } else {
+    renderUserOrdersTab();
+  }
+}
+
+// 1. Вкладка: Мої замовлення
+async function renderUserOrdersTab() {
+  const container = document.getElementById('cabinetTabContent');
+  if (!container || !currentUser) return;
+
+  if (!firebaseDb) {
+    container.innerHTML = `<div class="alert alert-warning">База даних завантажується...</div>`;
+    return;
+  }
+
+  try {
+    // Запит замовлень за email
+    const snap = await firebaseDb.collection('orders')
+      .where('userEmail', '==', currentUser.email)
+      .get();
+
+    let orders = [];
+    snap.forEach(doc => {
+      orders.push(doc.data());
+    });
+
+    // Сортування за датою (нові зверху)
+    orders.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+
+    if (orders.length === 0) {
+      container.innerHTML = `
+        <div class="text-center py-5">
+          <div style="font-size: 2.5rem; color: #cbd5e1; margin-bottom: 12px;"><i class="fas fa-clipboard-list"></i></div>
+          <h5>У Вас поки немає активних замовлень</h5>
+          <p class="text-muted small" style="max-width: 400px; margin: 0 auto 16px auto;">
+            Ви можете оформити розміщення свого сайту у тематичних картках або партнерських блоках каталогу.
+          </p>
+          <button type="button" class="btn btn-primary font-weight-bold" id="btnCabinetNewAd" style="border-radius: 8px;">
+            <i class="fas fa-plus-circle me-1"></i> Оформити розміщення
+          </button>
+        </div>
+      `;
+      const newAdBtn = document.getElementById('btnCabinetNewAd');
+      if (newAdBtn) {
+        newAdBtn.onclick = () => {
+          closeUserCabinetModal();
+          openAdOrderModal();
+        };
+      }
+      return;
+    }
+
+    let html = `
+      <div class="d-flex align-items-center justify-content-between mb-3">
+        <h6 class="font-weight-bold mb-0">Ваші замовлення (${orders.length}):</h6>
+        <button type="button" class="btn btn-sm btn-outline-primary" id="btnCabinetNewAdTop">
+          <i class="fas fa-plus"></i> Нове замовлення
+        </button>
+      </div>
+      <div class="cabinet-orders-list">
+    `;
+
+    orders.forEach(order => {
+      const dateStr = order.createdAt ? new Date(order.createdAt).toLocaleDateString('uk-UA', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '';
+      const statusPill = getStatusPillHtml(order.status, order.statusLabel);
+
+      let placementsListHtml = '';
+      if (order.placements && order.placements.length) {
+        placementsListHtml = order.placements.map(p => `• ${p.section || ''} > ${p.card || ''} (${p.locationLabel || ''})`).join('<br>');
+      }
+
+      html += `
+        <div class="cabinet-order-card">
+          <div class="cabinet-order-header">
+            <div>
+              <span class="cabinet-order-id">${order.orderId}</span>
+              <span class="cabinet-order-date ms-2">• ${dateStr}</span>
+            </div>
+            ${statusPill}
+          </div>
+          <div class="cabinet-order-details">
+            <div class="cabinet-order-row"><strong>Ресурс:</strong> ${order.siteName} — <a href="${order.siteUrl}" target="_blank" class="text-primary font-weight-bold">${order.siteUrl} <i class="fas fa-external-link-alt" style="font-size:0.7rem;"></i></a></div>
+            ${placementsListHtml ? `<div class="cabinet-order-row"><strong>Локації:</strong><br><span class="text-muted small">${placementsListHtml}</span></div>` : ''}
+            <div class="cabinet-order-row mt-1">
+              <strong>Сума:</strong> <span class="text-primary font-weight-bold">${order.pricing ? order.pricing.finalUah : ''} грн</span> (~ $${order.pricing ? order.pricing.finalUsdt : ''} USDT)
+              <span class="text-muted small ms-2">• Термін: ${order.pricing ? order.pricing.termLabel : ''}</span>
+            </div>
+          </div>
+          <div class="cabinet-order-actions">
+            <button type="button" class="ad-sub-copy-btn" onclick="copyOrderDetails('${order.orderId}', this)">
+              <i class="far fa-copy"></i> Копіювати чек
+            </button>
+            <a href="https://t.me/WeberSIS?text=${encodeURIComponent('Вітаю! Моє замовлення ' + order.orderId)}" target="_blank" class="btn btn-sm btn-outline-info font-weight-bold" style="border-radius: 5px; font-size: 0.78rem;">
+              <i class="fab fa-telegram-plane"></i> Написати в Telegram
+            </a>
+          </div>
+        </div>
+      `;
+    });
+
+    html += `</div>`;
+    container.innerHTML = html;
+
+    const newAdTopBtn = document.getElementById('btnCabinetNewAdTop');
+    if (newAdTopBtn) {
+      newAdTopBtn.onclick = () => {
+        closeUserCabinetModal();
+        openAdOrderModal();
+      };
+    }
+  } catch (err) {
+    container.innerHTML = `<div class="alert alert-danger">Помилка завантаження замовлень: ${err.message}</div>`;
+  }
+}
+
+// 2. Вкладка: Мої закладки (Хмарна синхронізація)
+async function renderUserBookmarksTab() {
+  const container = document.getElementById('cabinetTabContent');
+  if (!container || !currentUser) return;
+
+  if (!firebaseDb) {
+    container.innerHTML = `<div class="alert alert-warning">База даних завантажується...</div>`;
+    return;
+  }
+
+  try {
+    const userDoc = await firebaseDb.collection('users').doc(currentUser.uid).get();
+    const userData = userDoc.exists ? userDoc.data() : {};
+    userBookmarksList = userData.bookmarks || [];
+
+    let bookmarksHtml = '';
+    if (userBookmarksList.length === 0) {
+      bookmarksHtml = `
+        <div class="text-center py-4 text-muted">
+          <i class="far fa-star fa-2x mb-2" style="opacity: 0.5;"></i>
+          <p class="small mb-0">У Вас ще немає доданих закладок. Додайте улюблені сайти нижче, і вони будуть доступні на будь-якому Вашому пристрої!</p>
+        </div>
+      `;
+    } else {
+      userBookmarksList.forEach((bm, idx) => {
+        let domain = '';
+        try { domain = new URL(bm.url).hostname; } catch (e) { domain = 'example.com'; }
+        const faviconUrl = `https://www.google.com/s2/favicons?domain=${domain}&sz=32`;
+
+        bookmarksHtml += `
+          <div class="cabinet-bookmark-item">
+            <a href="${bm.url}" target="_blank" class="cabinet-bookmark-link">
+              <img src="${faviconUrl}" width="18" height="18" alt="" style="border-radius:3px;">
+              <span>${bm.name}</span>
+              <small class="text-muted" style="font-weight: normal; margin-left: 4px;">(${domain})</small>
+            </a>
+            <button type="button" class="cabinet-del-btn" onclick="deleteUserBookmark(${idx})" title="Видалити закладку">
+              <i class="far fa-trash-alt"></i>
+            </button>
+          </div>
+        `;
+      });
+    }
+
+    container.innerHTML = `
+      <div class="mb-3">
+        <h6 class="font-weight-bold mb-1"><i class="fas fa-plus-circle text-primary me-1"></i> Додати власну закладку:</h6>
+        <div class="cabinet-bookmark-add-form">
+          <input type="text" id="bmNameInput" class="cabinet-bookmark-input" placeholder="Назва (напр. Мій Google Диск)" style="flex: 1 1 180px;">
+          <input type="url" id="bmUrlInput" class="cabinet-bookmark-input" placeholder="Посилання https://..." style="flex: 2 1 240px;">
+          <button type="button" class="btn btn-primary font-weight-bold px-3" id="bmAddBtn" style="border-radius: 6px; font-size: 0.85rem;">
+            Додати
+          </button>
+        </div>
+      </div>
+      <div>
+        <h6 class="font-weight-bold mb-2">Збережені закладки (${userBookmarksList.length}):</h6>
+        <div class="cabinet-bookmarks-list">
+          ${bookmarksHtml}
+        </div>
+      </div>
+    `;
+
+    document.getElementById('bmAddBtn').onclick = addUserBookmark;
+  } catch (err) {
+    container.innerHTML = `<div class="alert alert-danger">Помилка завантаження закладок: ${err.message}</div>`;
+  }
+}
+
+async function addUserBookmark() {
+  const nameEl = document.getElementById('bmNameInput');
+  const urlEl = document.getElementById('bmUrlInput');
+  if (!nameEl || !urlEl || !currentUser || !firebaseDb) return;
+
+  const name = nameEl.value.trim();
+  let url = urlEl.value.trim();
+  if (!name || !url) {
+    alert("Будь ласка, введіть назву та посилання сайту.");
+    return;
+  }
+  if (!url.startsWith('http://') && !url.startsWith('https://')) {
+    url = 'https://' + url;
+  }
+
+  userBookmarksList.push({ name, url, createdAt: new Date().toISOString() });
+
+  try {
+    await firebaseDb.collection('users').doc(currentUser.uid).set({
+      bookmarks: userBookmarksList
+    }, { merge: true });
+    renderUserBookmarksTab();
+  } catch (err) {
+    alert("Не вдалося зберегти закладку: " + err.message);
+  }
+}
+
+async function deleteUserBookmark(index) {
+  if (!currentUser || !firebaseDb) return;
+  userBookmarksList.splice(index, 1);
+  try {
+    await firebaseDb.collection('users').doc(currentUser.uid).set({
+      bookmarks: userBookmarksList
+    }, { merge: true });
+    renderUserBookmarksTab();
+  } catch (err) {
+    alert("Помилка видалення: " + err.message);
+  }
+}
+
+// 3. Вкладка: 👑 Панель Адміністратора (для weber515sis@gmail.com)
+async function renderAdminOrdersTab() {
+  const container = document.getElementById('cabinetTabContent');
+  if (!container || !isAdminUser()) return;
+
+  if (!firebaseDb) {
+    container.innerHTML = `<div class="alert alert-warning">База даних завантажується...</div>`;
+    return;
+  }
+
+  try {
+    const snap = await firebaseDb.collection('orders').get();
+    adminOrdersList = [];
+    snap.forEach(doc => {
+      adminOrdersList.push(doc.data());
+    });
+
+    // Сортування від найновіших до старіших
+    adminOrdersList.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+
+    // Розрахунок статистики
+    const totalOrders = adminOrdersList.length;
+    const pendingOrders = adminOrdersList.filter(o => o.status === 'pending' || !o.status).length;
+    const paidOrders = adminOrdersList.filter(o => o.status === 'paid').length;
+    const activeOrders = adminOrdersList.filter(o => o.status === 'active').length;
+    const totalUah = adminOrdersList.reduce((acc, o) => acc + (o.pricing ? (Number(o.pricing.finalUah) || 0) : 0), 0);
+
+    // Фільтрація
+    let filtered = adminOrdersList.filter(o => {
+      if (adminStatusFilter !== 'all') {
+        const st = o.status || 'pending';
+        if (st !== adminStatusFilter) return false;
+      }
+      if (adminSearchQuery) {
+        const q = adminSearchQuery.toLowerCase();
+        const str = `${o.orderId} ${o.siteName} ${o.siteUrl} ${o.userEmail} ${o.contacts ? o.contacts.email : ''} ${o.contacts ? o.contacts.tg : ''}`.toLowerCase();
+        if (!str.includes(q)) return false;
+      }
+      return true;
+    });
+
+    let ordersHtml = '';
+    if (filtered.length === 0) {
+      ordersHtml = `<div class="text-center py-4 text-muted">Замовлень за вказаними фільтрами не знайдено.</div>`;
+    } else {
+      filtered.forEach(order => {
+        const dateStr = order.createdAt ? new Date(order.createdAt).toLocaleDateString('uk-UA', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '';
+        const currentStatus = order.status || 'pending';
+
+        let placementsListHtml = '';
+        if (order.placements && order.placements.length) {
+          placementsListHtml = order.placements.map(p => `• ${p.section || ''} > ${p.card || ''} (${p.locationLabel || ''}) [${p.monthlyRate || ''} грн]`).join('<br>');
+        }
+
+        ordersHtml += `
+          <div class="cabinet-order-card" style="border-left: 4px solid #3b82f6;">
+            <div class="cabinet-order-header">
+              <div>
+                <span class="cabinet-order-id">${order.orderId}</span>
+                <span class="cabinet-order-date ms-2">• ${dateStr}</span>
+              </div>
+              <div class="d-flex align-items-center gap-2">
+                <span class="text-muted small">Статус:</span>
+                <select class="cabinet-status-select" onchange="changeOrderStatus('${order.orderId}', this.value)">
+                  <option value="pending" ${currentStatus === 'pending' ? 'selected' : ''}>🟡 Очікує оплати</option>
+                  <option value="paid" ${currentStatus === 'paid' ? 'selected' : ''}>🔵 Оплачено (перевірити)</option>
+                  <option value="active" ${currentStatus === 'active' ? 'selected' : ''}>🟢 Розміщено (активно)</option>
+                  <option value="completed" ${currentStatus === 'completed' ? 'selected' : ''}>⚪ Завершено</option>
+                  <option value="cancelled" ${currentStatus === 'cancelled' ? 'selected' : ''}>🔴 Скасовано</option>
+                </select>
+              </div>
+            </div>
+            <div class="cabinet-order-details">
+              <div class="cabinet-order-row">
+                <strong>Клієнт:</strong> 
+                <span class="text-primary font-weight-bold">${order.userEmail || (order.contacts ? order.contacts.email : '')}</span>
+                ${order.contacts && order.contacts.tg ? ` | TG: <a href="https://t.me/${order.contacts.tg.replace('@', '')}" target="_blank">@${order.contacts.tg.replace('@', '')}</a>` : ''}
+                ${order.contacts && order.contacts.phone ? ` | Тел: ${order.contacts.phone}` : ''}
+              </div>
+              <div class="cabinet-order-row">
+                <strong>Сайт:</strong> ${order.siteName} — <a href="${order.siteUrl}" target="_blank" class="text-primary font-weight-bold">${order.siteUrl} <i class="fas fa-external-link-alt" style="font-size:0.7rem;"></i></a>
+              </div>
+              ${order.siteDesc ? `<div class="cabinet-order-row text-muted small"><strong>Опис:</strong> ${order.siteDesc}</div>` : ''}
+              ${placementsListHtml ? `<div class="cabinet-order-row mt-1"><strong>Обрані місця:</strong><br><span class="text-muted small">${placementsListHtml}</span></div>` : ''}
+              <div class="cabinet-order-row mt-1">
+                <strong>До сплати:</strong> <span class="text-success font-weight-bold">${order.pricing ? order.pricing.finalUah : ''} грн</span> (~ $${order.pricing ? order.pricing.finalUsdt : ''} USDT)
+                <span class="text-muted small ms-2">• Термін: ${order.pricing ? order.pricing.termLabel : ''}</span>
+                <span class="text-muted small ms-2">• Оплата: ${order.paymentMethod || ''}</span>
+              </div>
+            </div>
+            <div class="cabinet-order-actions">
+              <button type="button" class="ad-sub-copy-btn" onclick="copyOrderDetails('${order.orderId}', this)">
+                <i class="far fa-copy"></i> Скопіювати чек
+              </button>
+              ${order.contacts && order.contacts.tg ? `
+                <a href="https://t.me/${order.contacts.tg.replace('@', '')}" target="_blank" class="btn btn-sm btn-outline-info font-weight-bold" style="border-radius: 5px; font-size: 0.78rem;">
+                  <i class="fab fa-telegram-plane"></i> Написати клієнту
+                </a>
+              ` : ''}
+              <a href="mailto:${order.userEmail || (order.contacts ? order.contacts.email : '')}?subject=${encodeURIComponent('Розміщення сайту ' + order.siteName + ' (Замовлення ' + order.orderId + ')')}" class="btn btn-sm btn-outline-secondary font-weight-bold" style="border-radius: 5px; font-size: 0.78rem;">
+                <i class="far fa-envelope"></i> Email клієнту
+              </a>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    container.innerHTML = `
+      <!-- Статистичні блоки -->
+      <div class="cabinet-admin-stats-grid">
+        <div class="cabinet-admin-stat-card">
+          <div class="cabinet-stat-val">${totalOrders}</div>
+          <div class="cabinet-stat-lbl">Всього замовлень</div>
+        </div>
+        <div class="cabinet-admin-stat-card">
+          <div class="cabinet-stat-val text-warning">${pendingOrders}</div>
+          <div class="cabinet-stat-lbl">Очікують</div>
+        </div>
+        <div class="cabinet-admin-stat-card">
+          <div class="cabinet-stat-val text-info">${paidOrders}</div>
+          <div class="cabinet-stat-lbl">Оплачено</div>
+        </div>
+        <div class="cabinet-admin-stat-card">
+          <div class="cabinet-stat-val text-success">${activeOrders}</div>
+          <div class="cabinet-stat-lbl">Активні</div>
+        </div>
+        <div class="cabinet-admin-stat-card">
+          <div class="cabinet-stat-val">${totalUah.toLocaleString('uk-UA')} ₴</div>
+          <div class="cabinet-stat-lbl">Загальний оборот</div>
+        </div>
+      </div>
+
+      <!-- Пошук та фільтр -->
+      <div class="cabinet-admin-filter-bar">
+        <input type="text" id="adminSearchInput" class="cabinet-search-input" placeholder="🔍 Пошук за номером, сайтом або клієнтом..." value="${adminSearchQuery}">
+        <select id="adminStatusFilterSelect" class="cabinet-status-select" style="padding: 7px 10px;">
+          <option value="all" ${adminStatusFilter === 'all' ? 'selected' : ''}>Всі статуси (${totalOrders})</option>
+          <option value="pending" ${adminStatusFilter === 'pending' ? 'selected' : ''}>🟡 Очікують (${pendingOrders})</option>
+          <option value="paid" ${adminStatusFilter === 'paid' ? 'selected' : ''}>🔵 Оплачено (${paidOrders})</option>
+          <option value="active" ${adminStatusFilter === 'active' ? 'selected' : ''}>🟢 Активні (${activeOrders})</option>
+          <option value="completed" ${adminStatusFilter === 'completed' ? 'selected' : ''}>⚪ Завершені</option>
+        </select>
+        <button type="button" class="btn btn-sm btn-outline-primary" id="adminRefreshBtn" title="Оновити список">
+          <i class="fas fa-sync-alt"></i>
+        </button>
+      </div>
+
+      <!-- Список замовлень -->
+      <div class="cabinet-admin-orders-list">
+        ${ordersHtml}
+      </div>
+    `;
+
+    document.getElementById('adminSearchInput').oninput = (e) => {
+      adminSearchQuery = e.target.value;
+      renderAdminOrdersTab();
+    };
+    document.getElementById('adminStatusFilterSelect').onchange = (e) => {
+      adminStatusFilter = e.target.value;
+      renderAdminOrdersTab();
+    };
+    document.getElementById('adminRefreshBtn').onclick = () => renderAdminOrdersTab();
+  } catch (err) {
+    container.innerHTML = `<div class="alert alert-danger">Помилка завантаження адмін-панелі: ${err.message}</div>`;
+  }
+}
+
+// Зміна статусу замовлення адміністратором
+window.changeOrderStatus = async function(orderId, newStatus) {
+  if (!firebaseDb || !isAdminUser()) return;
+  const statusLabels = {
+    pending: 'Очікує узгодження та оплати',
+    paid: 'Оплачено (перевірити)',
+    active: 'Розміщено (активно)',
+    completed: 'Завершено',
+    cancelled: 'Скасовано'
+  };
+  try {
+    const cleanId = orderId.replace('#', '').trim();
+    await firebaseDb.collection('orders').doc(cleanId).update({
+      status: newStatus,
+      statusLabel: statusLabels[newStatus] || newStatus,
+      updatedAt: new Date().toISOString()
+    });
+    renderAdminOrdersTab();
+  } catch (err) {
+    alert("Помилка оновлення статусу: " + err.message);
+  }
+};
+
+// Допоміжні функції статусу та копіювання
+function getStatusPillHtml(status, label) {
+  const st = status || 'pending';
+  let cssClass = 'status-pending';
+  let defaultLabel = '🟡 Очікує узгодження';
+
+  if (st === 'paid') {
+    cssClass = 'status-paid';
+    defaultLabel = '🔵 Оплачено';
+  } else if (st === 'active') {
+    cssClass = 'status-active';
+    defaultLabel = '🟢 Активно розміщено';
+  } else if (st === 'completed') {
+    cssClass = 'status-completed';
+    defaultLabel = '⚪ Завершено';
+  } else if (st === 'cancelled') {
+    cssClass = 'status-cancelled';
+    defaultLabel = '🔴 Скасовано';
+  }
+
+  return `<span class="cabinet-status-pill ${cssClass}">${label || defaultLabel}</span>`;
+}
+
+window.copyOrderDetails = async function(orderId, btn) {
+  if (!firebaseDb) return;
+  try {
+    const cleanId = orderId.replace('#', '').trim();
+    const doc = await firebaseDb.collection('orders').doc(cleanId).get();
+    if (doc.exists && doc.data().orderSummaryText) {
+      copyToClipboard(doc.data().orderSummaryText, btn, 'Скопійовано! ✅');
+    } else {
+      copyToClipboard('Замовлення #' + cleanId, btn, 'Скопійовано! ✅');
+    }
+  } catch (err) {
+    copyToClipboard('Замовлення #' + orderId, btn, 'Скопійовано! ✅');
+  }
+};
+
+// Рендеринг банера вибору: швидке оформлення або з Особистим кабінетом
+function renderAdAuthPromptBanner() {
+  const container = document.getElementById('adAuthPromptBanner');
+  if (!container) return;
+
+  if (currentUser) {
+    const avatarSrc = currentUser.photoURL || 'https://www.gravatar.com/avatar/?d=mp';
+    container.innerHTML = `
+      <div class="ad-auth-banner logged-in">
+        <div class="ad-auth-banner-info">
+          <img src="${avatarSrc}" class="ad-auth-banner-avatar" alt="Avatar" referrerpolicy="no-referrer">
+          <div>
+            <div class="ad-auth-banner-title">
+              Ви увійшли як: <strong>${currentUser.displayName || currentUser.email}</strong>
+            </div>
+            <div class="ad-auth-banner-sub">
+              <i class="fas fa-check-circle text-success me-1"></i> Замовлення буде автоматично збережено у вашому <a href="javascript:void(0)" onclick="openUserCabinetModal('orders')">Особистому кабінеті</a>.
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  } else {
+    container.innerHTML = `
+      <div class="ad-auth-banner guest">
+        <div class="ad-auth-banner-info">
+          <div class="ad-auth-banner-icon"><i class="fas fa-user-shield"></i></div>
+          <div>
+            <div class="ad-auth-banner-title">
+              Оформлення замовлення: <strong>швидке або з Кабінетом</strong>
+            </div>
+            <div class="ad-auth-banner-sub">
+              Бажаєте зберігати чеки, контролювати статус розміщення та подовжувати в 1 клік?
+            </div>
+          </div>
+        </div>
+        <div class="ad-auth-banner-actions">
+          <button type="button" class="ad-auth-google-btn" id="btnAdModalGoogleLogin">
+            <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+            Увійти через Google
+          </button>
+          <div class="ad-auth-guest-note">або заповнюйте поля нижче як гість без реєстрації ↓</div>
+        </div>
+      </div>
+    `;
+
+    const btn = document.getElementById('btnAdModalGoogleLogin');
+    if (btn) {
+      btn.onclick = async () => {
+        await loginWithGoogle();
+        renderAdAuthPromptBanner();
+        if (currentUser && currentUser.email) {
+          const emailInput = document.getElementById('adEmailInput');
+          if (emailInput && !emailInput.value) {
+            emailInput.value = currentUser.email;
+          }
+        }
+      };
+    }
+  }
+}
+
+// Рендеринг блоку збереження замовлення у кабінет на Кроці 2
+function renderAdOrderClaimWrap(orderId) {
+  const container = document.getElementById('adOrderClaimWrap');
+  if (!container) return;
+
+  if (currentUser) {
+    container.innerHTML = `
+      <div class="ad-order-claim-box success">
+        <i class="fas fa-check-circle text-success me-1"></i> Замовлення <strong>${orderId}</strong> збережено у вашому 
+        <a href="javascript:void(0)" onclick="openUserCabinetModal('orders')" class="text-primary font-weight-bold ms-1">Особистому кабінеті <i class="fas fa-arrow-right small"></i></a>
+      </div>
+    `;
+  } else {
+    container.innerHTML = `
+      <div class="ad-order-claim-box" id="adOrderClaimPrompt">
+        <div class="ad-order-claim-content">
+          <div>
+            <div class="ad-order-claim-title">
+              <i class="fas fa-cloud-upload-alt text-primary me-1"></i> <strong>Зберегти це замовлення у свій кабінет?</strong>
+            </div>
+            <div class="ad-order-claim-desc text-muted">
+              Увійдіть через Google в 1 клік, щоб закріпити замовлення ${orderId} за своїм профілем та контролювати статус.
+            </div>
+          </div>
+          <button type="button" class="ad-auth-google-btn" id="btnClaimOrderGoogle">
+            <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+            Зберегти в кабінет
+          </button>
+        </div>
+      </div>
+    `;
+
+    const btn = document.getElementById('btnClaimOrderGoogle');
+    if (btn) {
+      btn.onclick = async () => {
+        await loginWithGoogle();
+        if (currentUser && firebaseDb) {
+          const cleanId = orderId.replace('#', '').trim();
+          try {
+            await firebaseDb.collection('orders').doc(cleanId).update({
+              userId: currentUser.uid,
+              userEmail: currentUser.email,
+              userName: currentUser.displayName || '',
+              userPhoto: currentUser.photoURL || null
+            });
+            renderAdOrderClaimWrap(orderId);
+          } catch (e) {
+            console.warn("Помилка прив'язки замовлення:", e);
+            renderAdOrderClaimWrap(orderId);
+          }
+        }
+      };
+    }
+  }
+}
+
+// Запуск ініціалізації Firebase при старті
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initFirebaseAuthAndDb);
+} else {
+  initFirebaseAuthAndDb();
+}
+
