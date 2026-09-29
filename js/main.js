@@ -2038,20 +2038,27 @@ function topFunction() {
 // АВТОМАТИЗОВАНА СИСТЕМА ЗАМОВЛЕННЯ ТА РОЗМІЩЕННЯ РЕКЛАМИ / РЕСУРСІВ
 // ==========================================================================
 const AD_CONFIG = {
-  basePriceUah: 100,           // Стандартна БВ для звичайних розділів (100 грн/міс)
-  commercialBasePriceUah: 150, // Підвищена БВ для комерційних розділів (150 грн/міс)
-  commercialSections: ["Ринок", "Магазини", "Банкінг", "AI"], // Комерційні розділи з високою віддачею
+  basePriceUah: 100,           // Єдина базова величина для всіх розрахунків (БВ = 100 грн/міс)
+  commercialSections: ["Ринок", "Магазини", "Банкінг", "AI"], // Комерційні розділи
   usdRate: 41.5,               // Орієнтовний курс перерахунку для еквівалента USDT
   cryptoDiscountPercent: 10,   // Постійна знижка 10% при оплаті криптовалютою
   
-  // Множники вартості згідно з правилами та зонами сайту
+  // Множники вартості згідно з правилами та зонами сайту (БВ = 100 грн/міс)
   multipliers: {
-    home_vip: 7,     // Головна -> Партнери Сайту (VIP): БВ × 7 = 700 грн/міс
-    section_vip: 3,  // Інші розділи -> Партнери Розділу (VIP): БВ × 3 = 300 грн/міс
-    home_top: 4,     // Головна -> Вгорі картки: БВ × 4 = 400 грн/міс
-    home_bottom: 2,  // Головна -> Внизу картки: БВ × 2 = 200 грн/міс
-    other_top: 2,    // Інші розділи -> Вгорі картки: БВ × 2 = 200 грн/міс
-    other_bottom: 1  // Інші розділи -> Внизу картки: БВ × 1 = 100 грн/міс
+    // 1. Головна сторінка:
+    home_vip: 10,           // «Партнери Сайту»: БВ × 10 = 1 000 грн/міс
+    home_top: 6,            // Інші карти / верх: БВ × 6 = 600 грн/міс
+    home_bottom: 2,         // Інші карти / низ: БВ × 2 = 200 грн/міс
+
+    // 2. Комерційні розділи («Ринок», «Магазини», «Банкінг», «AI»):
+    commercial_vip: 7.5,    // «Партнери Розділу»: БВ × 7.5 = 750 грн/міс
+    commercial_top: 4.5,    // Інші карти / верх: БВ × 4.5 = 450 грн/міс
+    commercial_bottom: 1.5, // Інші карти / низ: БВ × 1.5 = 150 грн/міс
+
+    // 3. Всі інші (звичайні) розділи:
+    other_vip: 5,           // «Партнери Розділу»: БВ × 5 = 500 грн/міс
+    other_top: 3,           // Інші карти / верх: БВ × 3 = 300 грн/міс
+    other_bottom: 1         // Інші карти / низ: БВ × 1 = 100 грн/міс
   },
 
   // Терміни розміщення та знижки (2 місяці прибрано; 3+ роки мають гарантію)
@@ -2194,6 +2201,7 @@ function getCurrentSiteSection() {
   if (path.includes('others.html')) return 'Інше';
   if (path.includes('ai.html')) return 'AI';
   if (path.includes('programs.html')) return 'Soft';
+  if (path.includes('bookmarks.html')) return 'Закладки';
   return 'Головна';
 }
 
@@ -2249,28 +2257,36 @@ function initAdOrderSystem() {
 }
 
 function getSectionBasePrice(section) {
-  if (AD_CONFIG.commercialSections && AD_CONFIG.commercialSections.includes(section)) {
-    return AD_CONFIG.commercialBasePriceUah; // 150 грн/міс для комерційних розділів
-  }
-  return AD_CONFIG.basePriceUah; // 100 грн/міс для стандартних розділів
+  return AD_CONFIG.basePriceUah; // Єдиний БВ = 100 грн/міс для всієї тарифної сітки
 }
 
 function getSinglePlacementRate(sec, crd, loc) {
   const isHome = sec === 'Головна';
+  const isCommercial = AD_CONFIG.commercialSections && AD_CONFIG.commercialSections.includes(sec);
   const isVip = (crd && (crd.includes('Партнери') || crd.includes('Рекомендаці'))) || loc === 'vip' || (loc && loc.startsWith('vip'));
-  const baseRate = getSectionBasePrice(sec);
+  const base = AD_CONFIG.basePriceUah;
 
   if (isVip) {
-    return isHome ? 700 : (baseRate * 3);
+    if (isHome) return base * AD_CONFIG.multipliers.home_vip;           // 1 000 грн
+    if (isCommercial) return base * AD_CONFIG.multipliers.commercial_vip; // 750 грн
+    return base * AD_CONFIG.multipliers.other_vip;                      // 500 грн
   }
+
   if (isHome) {
     return loc === 'top' 
-      ? (AD_CONFIG.basePriceUah * AD_CONFIG.multipliers.home_top) // 400 грн
-      : (AD_CONFIG.basePriceUah * AD_CONFIG.multipliers.home_bottom); // 200 грн
+      ? (base * AD_CONFIG.multipliers.home_top)      // 600 грн
+      : (base * AD_CONFIG.multipliers.home_bottom);   // 200 грн
   }
+
+  if (isCommercial) {
+    return loc === 'top'
+      ? (base * AD_CONFIG.multipliers.commercial_top)    // 450 грн
+      : (base * AD_CONFIG.multipliers.commercial_bottom); // 150 грн
+  }
+
   return loc === 'top' 
-    ? (baseRate * AD_CONFIG.multipliers.other_top) // 200 грн (комерційний 300 грн)
-    : (baseRate * AD_CONFIG.multipliers.other_bottom); // 100 грн (комерційний 150 грн)
+    ? (base * AD_CONFIG.multipliers.other_top)       // 300 грн
+    : (base * AD_CONFIG.multipliers.other_bottom);    // 100 грн
 }
 
 function getActivePlacements() {
@@ -2473,7 +2489,7 @@ function openAdOrderModal(opts = {}) {
                         <strong class="ad-addon-title-main">«Партнери Сайту»</strong>
                       </span>
                       <span class="ad-partner-addon-price" id="adPartnerAddon1Price">
-                        <span class="ad-price-amount">700</span>
+                        <span class="ad-price-amount">1000</span>
                         <span class="ad-price-unit">грн/міс</span>
                       </span>
                     </span>
@@ -2490,7 +2506,7 @@ function openAdOrderModal(opts = {}) {
                         <strong class="ad-addon-title-main">«Тематичну Картку»</strong>
                       </span>
                       <span class="ad-thematic-addon-price" id="adThematic1PriceBadge">
-                        <span class="ad-price-amount">від 200</span>
+                        <span class="ad-price-amount">200-600</span>
                         <span class="ad-price-unit">грн/міс</span>
                       </span>
                     </span>
@@ -2548,7 +2564,7 @@ function openAdOrderModal(opts = {}) {
                         <strong class="ad-addon-title-main">«Партнери Розділу»</strong>
                       </span>
                       <span class="ad-partner-addon-price" id="adPartnerAddon2Price">
-                        <span class="ad-price-amount">300</span>
+                        <span class="ad-price-amount">500</span>
                         <span class="ad-price-unit">грн/міс</span>
                       </span>
                     </span>
@@ -2565,7 +2581,7 @@ function openAdOrderModal(opts = {}) {
                         <strong class="ad-addon-title-main">«Тематичну Картку»</strong>
                       </span>
                       <span class="ad-thematic-addon-price" id="adThematic2PriceBadge">
-                        <span class="ad-price-amount">від 200</span>
+                        <span class="ad-price-amount">100-300</span>
                         <span class="ad-price-unit">грн/міс</span>
                       </span>
                     </span>
@@ -2668,18 +2684,22 @@ function openAdOrderModal(opts = {}) {
               <div class="ad-payment-grid">
                 <label class="ad-payment-option active" data-method="mono">
                   <input type="radio" name="adPaymentMethod" value="mono" checked>
-                  <div class="ad-payment-icon" style="color: #1e293b;">⚫</div>
                   <div class="ad-payment-text">
-                    <div class="ad-payment-name">Монобанк</div>
+                    <div class="ad-payment-name">
+                      <span class="ad-payment-name-icon" style="color: #1e293b;">⚫</span>
+                      <span>Монобанк</span>
+                    </div>
                     <div class="ad-payment-sub">Банка / Apple & Google Pay</div>
                   </div>
                 </label>
 
                 <label class="ad-payment-option" data-method="privat">
                   <input type="radio" name="adPaymentMethod" value="privat">
-                  <div class="ad-payment-icon" style="color: #16a34a;">🟢</div>
                   <div class="ad-payment-text">
-                    <div class="ad-payment-name">ПриватБанк</div>
+                    <div class="ad-payment-name">
+                      <span class="ad-payment-name-icon" style="color: #16a34a;">🟢</span>
+                      <span>ПриватБанк</span>
+                    </div>
                     <div class="ad-payment-sub">Конверт / Приват24</div>
                   </div>
                 </label>
@@ -2687,9 +2707,11 @@ function openAdOrderModal(opts = {}) {
                 <label class="ad-payment-option" data-method="crypto">
                   <span class="ad-payment-discount-corner">-10%</span>
                   <input type="radio" name="adPaymentMethod" value="crypto">
-                  <div class="ad-payment-icon" style="color: #f59e0b;"><i class="fas fa-coins"></i></div>
                   <div class="ad-payment-text">
-                    <div class="ad-payment-name">Криптовалюта</div>
+                    <div class="ad-payment-name">
+                      <span class="ad-payment-name-icon" style="color: #f59e0b;"><i class="fas fa-coins"></i></span>
+                      <span>Криптовалюта</span>
+                    </div>
                     <div class="ad-payment-sub">USDT, BTC, LTC, SOL, TRX, інші</div>
                   </div>
                 </label>
@@ -3373,19 +3395,14 @@ function updateCardOptions(section, preferredCard = '') {
 function updateLocationOptions() {
   const section = document.getElementById('adSectionSelect')?.value || 'Головна';
   const locSelect = document.getElementById('adLocationSelect');
-  const isHome = section === 'Головна';
-  const baseRate = getSectionBasePrice(section);
+  if (!locSelect) return;
 
   const curVal = locSelect.value || 'bottom';
   locSelect.innerHTML = '';
   locSelect.disabled = false;
 
-  const topPrice = isHome 
-    ? AD_CONFIG.basePriceUah * AD_CONFIG.multipliers.home_top 
-    : baseRate * AD_CONFIG.multipliers.other_top;
-  const bottomPrice = isHome 
-    ? AD_CONFIG.basePriceUah * AD_CONFIG.multipliers.home_bottom 
-    : baseRate * AD_CONFIG.multipliers.other_bottom;
+  const topPrice = getSinglePlacementRate(section, '', 'top');
+  const bottomPrice = getSinglePlacementRate(section, '', 'bottom');
 
   const topOpt = document.createElement('option');
   topOpt.value = 'top';
@@ -3436,19 +3453,13 @@ function updateSlot2LocationOptions() {
   const section = document.getElementById('adSlot2SectionSelect')?.value || 'Головна';
   const locSelect = document.getElementById('adSlot2LocationSelect');
   if (!locSelect) return;
-  const isHome = section === 'Головна';
-  const baseRate = getSectionBasePrice(section);
 
   const curVal = locSelect.value || 'bottom';
   locSelect.innerHTML = '';
   locSelect.disabled = false;
 
-  const topPrice = isHome 
-    ? AD_CONFIG.basePriceUah * AD_CONFIG.multipliers.home_top 
-    : baseRate * AD_CONFIG.multipliers.other_top;
-  const bottomPrice = isHome 
-    ? AD_CONFIG.basePriceUah * AD_CONFIG.multipliers.home_bottom 
-    : baseRate * AD_CONFIG.multipliers.other_bottom;
+  const topPrice = getSinglePlacementRate(section, '', 'top');
+  const bottomPrice = getSinglePlacementRate(section, '', 'bottom');
 
   const topOpt = document.createElement('option');
   topOpt.value = 'top';
@@ -3469,7 +3480,6 @@ function updatePartnerAddon(slotNum) {
   const secSelect = document.getElementById(isSlot1 ? 'adSectionSelect' : 'adSlot2SectionSelect');
   const section = secSelect ? secSelect.value : 'Головна';
   const isHome = section === 'Головна';
-  const baseRate = getSectionBasePrice(section);
 
   const wrapEl = document.getElementById(isSlot1 ? 'adPartnerAddon1Wrap' : 'adPartnerAddon2Wrap');
   const textEl = document.getElementById(isSlot1 ? 'adPartnerAddon1Text' : 'adPartnerAddon2Text');
@@ -3491,13 +3501,14 @@ function updatePartnerAddon(slotNum) {
 
   wrapEl.style.display = 'block';
 
+  const vipPrice = getSinglePlacementRate(section, 'Партнери', 'vip');
+
   if (isHome) {
     textEl.innerHTML = `<span class="ad-addon-title-prefix"><i class="fas fa-gem text-warning me-1"></i> Додати в</span><strong class="ad-addon-title-main">«Партнери Сайту»</strong>`;
-    priceEl.innerHTML = `<span class="ad-price-amount">700</span><span class="ad-price-unit">грн/міс</span>`;
+    priceEl.innerHTML = `<span class="ad-price-amount">${vipPrice}</span><span class="ad-price-unit">грн/міс</span>`;
   } else {
-    const rate = baseRate * 3;
     textEl.innerHTML = `<span class="ad-addon-title-prefix"><i class="fas fa-fire text-danger me-1"></i> Додати в</span><strong class="ad-addon-title-main">«Партнери Розділу»</strong>`;
-    priceEl.innerHTML = `<span class="ad-price-amount">${rate}</span><span class="ad-price-unit">грн/міс</span>`;
+    priceEl.innerHTML = `<span class="ad-price-amount">${vipPrice}</span><span class="ad-price-unit">грн/міс</span>`;
   }
 }
 
@@ -3506,13 +3517,12 @@ function updateThematicAddon(slotNum) {
   const isSlot1 = slotNum === 1;
   const secSelect = document.getElementById(isSlot1 ? 'adSectionSelect' : 'adSlot2SectionSelect');
   const section = secSelect ? secSelect.value : 'Головна';
-  const isHome = section === 'Головна';
-  const baseRate = getSectionBasePrice(section);
-  const bottomPrice = isHome ? (AD_CONFIG.basePriceUah * AD_CONFIG.multipliers.home_bottom) : (baseRate * AD_CONFIG.multipliers.other_bottom);
+  const bottomPrice = getSinglePlacementRate(section, '', 'bottom');
+  const topPrice = getSinglePlacementRate(section, '', 'top');
 
   const priceBadge = document.getElementById(isSlot1 ? 'adThematic1PriceBadge' : 'adThematic2PriceBadge');
   if (priceBadge) {
-    priceBadge.innerHTML = `<span class="ad-price-amount">від ${bottomPrice}</span><span class="ad-price-unit">грн/міс</span>`;
+    priceBadge.innerHTML = `<span class="ad-price-amount">${bottomPrice}-${topPrice}</span><span class="ad-price-unit">грн/міс</span>`;
   }
 }
 
@@ -3906,8 +3916,7 @@ ${placementTgText}
   const emailBtn = document.getElementById('adActionEmailBtn');
   emailBtn.href = `mailto:weber515sis@gmail.com?subject=${encodeURIComponent('Оплата замовлення #' + orderId)}&body=${encodeURIComponent(orderSummaryText)}`;
 
-  // Автоматичне збереження замовлення у Cloud Firestore базі даних
-  saveOrderToFirestore({
+  const orderData = {
     orderId,
     name,
     url,
@@ -3919,7 +3928,13 @@ ${placementTgText}
     tg,
     phone,
     orderSummaryText
-  });
+  };
+
+  // Автоматичне збереження замовлення у Cloud Firestore базі даних
+  saveOrderToFirestore(orderData);
+
+  // Миттєве сповіщення на Email адміністратора (weber515sis@gmail.com) та локальний сервер
+  sendOrderNotifications(orderData);
 
   // Відображення блоку збереження замовлення у кабінет
   renderAdOrderClaimWrap(orderId);
@@ -4312,6 +4327,8 @@ async function initFirebaseAuthAndDb() {
       firebaseAuth.onAuthStateChanged((user) => {
         currentUser = user;
         updateUserNavButton();
+        syncBookmarksNav();
+        renderBookmarksPage();
         if (currentUser && firebaseDb) {
           firebaseDb.collection('users').doc(currentUser.uid).set({
             uid: currentUser.uid,
@@ -4331,6 +4348,8 @@ async function initFirebaseAuthAndDb() {
     }
   }
   ensureAuthNavButton();
+  syncBookmarksNav();
+  renderBookmarksPage();
 }
 
 function ensureAuthNavButton() {
@@ -4367,10 +4386,9 @@ function updateUserNavButton() {
     if (currentUser.photoURL) {
       avatarHtml = `<img src="${currentUser.photoURL}" class="user-auth-avatar" alt="Avatar" referrerpolicy="no-referrer">`;
     } else {
-      avatarHtml = `<i class="fas fa-user-circle text-primary"></i>`;
+      avatarHtml = `<i class="fas fa-user-check text-success"></i>`;
     }
-    const crownHtml = isAdmin ? `<i class="fas fa-crown user-auth-admin-crown" title="Адміністратор сайту"></i>` : '';
-    btn.innerHTML = `${avatarHtml}${crownHtml}`;
+    btn.innerHTML = avatarHtml;
     btn.setAttribute('title', `${currentUser.displayName || currentUser.email} (${isAdmin ? 'Адміністратор' : 'Кабінет'})`);
   } else {
     btn.classList.remove('logged-in');
@@ -4410,6 +4428,8 @@ async function logoutUser() {
     await firebaseAuth.signOut();
     currentUser = null;
     updateUserNavButton();
+    syncBookmarksNav();
+    renderBookmarksPage();
     renderUserCabinetContent();
   }
 }
@@ -4455,6 +4475,55 @@ async function saveOrderToFirestore(orderData) {
     console.log("Замовлення збережено у Firestore:", cleanId);
   } catch (err) {
     console.warn("Не вдалося записати замовлення в Firestore:", err);
+  }
+}
+
+// Миттєве сповіщення адміністратора про нове замовлення реклами
+async function sendOrderNotifications(orderData) {
+  // 1. Збереження замовлення на локальному сервері Node.js /api/orders (orders.json)
+  try {
+    fetch('/api/orders', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(orderData)
+    }).catch(() => {});
+  } catch (e) {}
+
+  // 2. Миттєве сповіщення на Email адміністратора weber515sis@gmail.com через FormSubmit AJAX
+  try {
+    const placementsList = (orderData.placements || []).map((p, i) => `${i + 1}. [${p.section}] ${p.card} (${p.locationLabel}) [${p.monthlyRate} грн/міс]`).join(' | ');
+    const emailPayload = {
+      _subject: `🔔 Нове замовлення реклами #${orderData.orderId} (${orderData.pricing?.finalUah || 0} грн)`,
+      _captcha: 'false',
+      _template: 'table',
+      'Номер замовлення': orderData.orderId,
+      'Назва сайту': orderData.name,
+      'URL посилання': orderData.url,
+      'Опис сайту': orderData.desc || '—',
+      'Локації розміщення': placementsList,
+      'Термін розміщення': orderData.pricing?.termLabel || '—',
+      'До сплати': `${orderData.pricing?.finalUah || 0} грн (~ $${orderData.pricing?.finalUsdt || 0} USDT)`,
+      'Спосіб оплати': orderData.paymentMethod || '—',
+      'Email клієнта': orderData.email || (currentUser ? currentUser.email : '—'),
+      'Telegram клієнта': orderData.tg || '—',
+      'Телефон клієнта': orderData.phone || '—',
+      'Час створення': new Date().toLocaleString('uk-UA', { timeZone: 'Europe/Kyiv' })
+    };
+
+    fetch('https://formsubmit.co/ajax/weber515sis@gmail.com', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify(emailPayload)
+    }).then(res => res.json()).then(data => {
+      console.log('Сповіщення про замовлення надіслано на Email:', data);
+    }).catch(err => {
+      console.warn('Помилка відправки сповіщення на Email:', err);
+    });
+  } catch (err) {
+    console.warn('Помилка формування email-сповіщення:', err);
   }
 }
 
@@ -4525,7 +4594,19 @@ function renderUserCabinetContent() {
         <p class="cabinet-welcome-desc">
           Увійдіть через акаунт Google, щоб отримати доступ до персональної історії замовлень, управління рекламою та хмарних закладок:
         </p>
-        <div class="cabinet-features-grid">
+
+        <!-- Кнопка входу Google та примітка вгорі -->
+        <div class="cabinet-top-auth-wrap">
+          <button type="button" class="google-auth-btn" id="btnCabinetGoogleLogin">
+            <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+            Увійти через Google
+          </button>
+          <div class="cabinet-privacy-note text-muted">
+            <em>🔒 Вхід захищено сервісом Google Identity. Ми отримуємо лише публічне ім'я, аватарку та email.</em>
+          </div>
+        </div>
+
+        <div class="cabinet-features-grid mt-4">
           <div class="cabinet-feature-item">
             <div class="cabinet-feature-icon"><i class="fas fa-bullhorn"></i></div>
             <div class="cabinet-feature-title">Мої замовлення реклами</div>
@@ -4541,13 +4622,6 @@ function renderUserCabinetContent() {
             <div class="cabinet-feature-title">Вхід в один клік</div>
             <p class="cabinet-feature-desc">Миттєва та безпечна авторизація через захищений сервіс Google без створення паролів.</p>
           </div>
-        </div>
-        <button type="button" class="google-auth-btn" id="btnCabinetGoogleLogin">
-          <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
-          Увійти через Google
-        </button>
-        <div class="cabinet-privacy-note text-muted">
-          🔒 Вхід захищено сервісом Google Identity. Ми отримуємо лише публічне ім'я, аватарку та email.
         </div>
       </div>
     `;
@@ -4775,6 +4849,11 @@ async function renderUserBookmarksTab() {
     }
 
     container.innerHTML = `
+      <div class="mb-3 p-2 text-center" style="background: rgba(225, 29, 72, 0.08); border: 1px solid rgba(225, 29, 72, 0.25); border-radius: 8px;">
+        <span class="small font-weight-bold text-danger"><i class="fas fa-heart"></i> Окремий розділ:</span>
+        <span class="small text-muted ms-1">зручно керуйте всіма сайтами на сторінці:</span>
+        <a href="./bookmarks.html" class="btn btn-sm btn-danger ms-2 font-weight-bold" style="font-size: 0.76rem; border-radius: 6px;" onclick="closeUserCabinetModal()">Відкрити «❤️ Закладки» ↗</a>
+      </div>
       <div class="mb-3">
         <h6 class="font-weight-bold mb-1"><i class="fas fa-plus-circle text-primary me-1"></i> Додати власну закладку:</h6>
         <div class="cabinet-bookmark-add-form">
@@ -4821,6 +4900,7 @@ async function addUserBookmark() {
       bookmarks: userBookmarksList
     }, { merge: true });
     renderUserBookmarksTab();
+    renderBookmarksPage();
   } catch (err) {
     alert("Не вдалося зберегти закладку: " + err.message);
   }
@@ -4834,9 +4914,261 @@ async function deleteUserBookmark(index) {
       bookmarks: userBookmarksList
     }, { merge: true });
     renderUserBookmarksTab();
+    renderBookmarksPage();
   } catch (err) {
     alert("Помилка видалення: " + err.message);
   }
+}
+
+// Синхронізація вкладки «❤️ Закладки» у навігаційній панелі
+function syncBookmarksNav() {
+  const navLists = document.querySelectorAll('.navbar-nav');
+  navLists.forEach(navList => {
+    let item = navList.querySelector('#navItemBookmarks');
+    const isBookmarksPage = window.location.pathname.includes('bookmarks.html');
+
+    if (currentUser || isBookmarksPage) {
+      if (!item) {
+        item = document.createElement('li');
+        item.id = 'navItemBookmarks';
+        item.className = 'nav-item nav-item-bookmarks';
+        item.innerHTML = `
+          <a class="nav-link nav-link-bookmarks ${isBookmarksPage ? 'active' : ''}" href="./bookmarks.html" title="Мої персональні закладки">
+            <span class="nav-heart-icon">❤️</span> <span class="nav-bookmarks-title">Закладки</span>
+          </a>
+        `;
+        navList.appendChild(item);
+      } else {
+        const link = item.querySelector('a');
+        if (link) {
+          if (isBookmarksPage) link.classList.add('active');
+          else link.classList.remove('active');
+        }
+      }
+    } else {
+      if (item && !isBookmarksPage) {
+        item.remove();
+      }
+    }
+  });
+}
+
+// ==========================================================================
+// ОКРЕМИЙ ПОВНОЦІННИЙ РОЗДІЛ «❤️ ЗАКЛАДКИ» (bookmarks.html)
+// ==========================================================================
+let bookmarksSearchQuery = '';
+
+async function renderBookmarksPage() {
+  const pageContainer = document.getElementById('bookmarksPageContainer');
+  const loadingEl = document.getElementById('bookmarksPageLoading');
+  if (!pageContainer) return; // Не на сторінці bookmarks.html
+
+  if (!currentUser) {
+    if (loadingEl) loadingEl.style.display = 'none';
+    pageContainer.style.display = 'block';
+    pageContainer.innerHTML = `
+      <div class="bm-guest-card">
+        <div class="bm-guest-icon">❤️</div>
+        <h2 class="bm-guest-title">Персональний розділ «Мої Закладки»</h2>
+        <p class="bm-guest-desc">
+          Зберігайте будь-які улюблені сайти, корисні посилання та онлайн-сервіси в одному місці. Завдяки хмарній синхронізації ваші закладки автоматично доступні на всіх ваших пристроях.
+        </p>
+        <button type="button" class="bm-guest-btn" id="btnBookmarksPageLogin">
+          <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+          Увійти через Google в 1 клік
+        </button>
+      </div>
+    `;
+    const loginBtn = document.getElementById('btnBookmarksPageLogin');
+    if (loginBtn) {
+      loginBtn.onclick = async () => {
+        await loginWithGoogle();
+        renderBookmarksPage();
+      };
+    }
+    return;
+  }
+
+  // Якщо користувач увійшов
+  await ensureFirebaseLoaded();
+  if (!firebaseDb) {
+    if (loadingEl) loadingEl.style.display = 'none';
+    pageContainer.style.display = 'block';
+    pageContainer.innerHTML = `<div class="alert alert-warning">Синхронізація з базою даних...</div>`;
+    return;
+  }
+
+  try {
+    const userDoc = await firebaseDb.collection('users').doc(currentUser.uid).get();
+    const userData = userDoc.exists ? userDoc.data() : {};
+    userBookmarksList = userData.bookmarks || [];
+
+    if (loadingEl) loadingEl.style.display = 'none';
+    pageContainer.style.display = 'block';
+
+    const avatarUrl = currentUser.photoURL || 'https://www.gravatar.com/avatar/?d=mp';
+    const userName = currentUser.displayName || currentUser.email || 'Користувач';
+
+    // Фільтрація за пошуком
+    let filtered = userBookmarksList;
+    if (bookmarksSearchQuery) {
+      const q = bookmarksSearchQuery.toLowerCase().trim();
+      filtered = userBookmarksList.filter(bm => (bm.name && bm.name.toLowerCase().includes(q)) || (bm.url && bm.url.toLowerCase().includes(q)));
+    }
+
+    let cardsHtml = '';
+    if (filtered.length === 0) {
+      if (userBookmarksList.length === 0) {
+        cardsHtml = `
+          <div class="bm-empty-box col-12">
+            <div style="font-size: 2.2rem; margin-bottom: 8px;">🌟</div>
+            <h5 class="font-weight-bold">У вас поки немає збережених сайтів</h5>
+            <p class="small mb-0">Додайте улюблені інтернет-ресурси через форму вище, і вони завжди будуть у вас під рукою!</p>
+          </div>
+        `;
+      } else {
+        cardsHtml = `
+          <div class="bm-empty-box col-12">
+            <h6 class="font-weight-bold mb-1">За вашим запитом нічого не знайдено</h6>
+            <p class="small mb-0">Спробуйте змінити слово або очистити пошук.</p>
+          </div>
+        `;
+      }
+    } else {
+      filtered.forEach((bm) => {
+        const originalIndex = userBookmarksList.findIndex(x => x.url === bm.url && x.name === bm.name);
+        let domain = '';
+        try { domain = new URL(bm.url).hostname; } catch (e) { domain = 'веб-сайт'; }
+        const faviconUrl = `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
+
+        cardsHtml += `
+          <div class="bm-card">
+            <a href="${bm.url}" target="_blank" rel="noopener noreferrer" class="bm-card-main" title="${bm.name} (${bm.url})">
+              <img src="${faviconUrl}" class="bm-card-favicon" alt="" onerror="this.src='favicon.ico'">
+              <div class="bm-card-info">
+                <div class="bm-card-name">${bm.name}</div>
+                <div class="bm-card-domain"><i class="fas fa-link small me-1"></i>${domain}</div>
+              </div>
+            </a>
+            <div class="bm-card-actions">
+              <a href="${bm.url}" target="_blank" rel="noopener noreferrer" class="bm-action-btn" title="Відкрити у новій вкладці">
+                <i class="fas fa-external-link-alt"></i>
+              </a>
+              <button type="button" class="bm-action-btn" onclick="copyToClipboard('${bm.url}', this, 'Скопійовано!')" title="Скопіювати посилання">
+                <i class="far fa-copy"></i>
+              </button>
+              <button type="button" class="bm-action-btn btn-del" onclick="deleteUserBookmarkFromPage(${originalIndex})" title="Видалити закладку">
+                <i class="far fa-trash-alt"></i>
+              </button>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    pageContainer.innerHTML = `
+      <!-- Картка статусу користувача -->
+      <div class="bm-hero-card">
+        <div class="bm-hero-user">
+          <img src="${avatarUrl}" class="bm-hero-avatar" alt="Avatar" referrerpolicy="no-referrer">
+          <div class="bm-hero-info">
+            <h4>${userName}</h4>
+            <div class="bm-hero-sub">
+              <i class="fas fa-shield-alt text-success me-1"></i> Хмарна синхронізація активна • <strong>${currentUser.email}</strong>
+            </div>
+          </div>
+        </div>
+        <div class="bm-hero-stats">
+          <span class="bm-stat-badge">
+            <i class="fas fa-bookmark"></i> Закладок: ${userBookmarksList.length}
+          </span>
+          <button type="button" class="btn btn-outline-secondary btn-sm" onclick="openUserCabinetModal()" title="Відкрити особистий кабінет" style="border-radius: 8px;">
+            <i class="far fa-user-circle me-1"></i> Кабінет
+          </button>
+        </div>
+      </div>
+
+      <!-- Картка додавання нової закладки -->
+      <div class="bm-add-card">
+        <div class="bm-add-title">
+          <i class="fas fa-plus-circle text-danger"></i> Додати новий сайт у власні закладки:
+        </div>
+        <form id="bmPageAddForm" class="bm-add-form" onsubmit="return false;">
+          <input type="text" id="bmPageNameInput" class="bm-input" placeholder="Назва (напр. Мій Google Диск)" required style="flex: 1 1 200px;">
+          <input type="url" id="bmPageUrlInput" class="bm-input" placeholder="Адреса https://..." required style="flex: 2 1 280px;">
+          <button type="submit" id="bmPageAddBtn" class="bm-btn-add">
+            <i class="fas fa-save me-1"></i> Зберегти
+          </button>
+        </form>
+      </div>
+
+      <!-- Інструменти: Пошук та інформація -->
+      <div class="bm-tools-row">
+        <div class="bm-search-wrap">
+          <i class="fas fa-search bm-search-icon"></i>
+          <input type="text" id="bmPageSearchInput" class="bm-search-input" placeholder="Пошук серед збережених закладок..." value="${bookmarksSearchQuery}">
+        </div>
+        <div class="text-muted small">
+          Показано: <strong>${filtered.length}</strong> з ${userBookmarksList.length}
+        </div>
+      </div>
+
+      <!-- Сітка закладок -->
+      <div class="bm-grid">
+        ${cardsHtml}
+      </div>
+    `;
+
+    // Слухач на додавання
+    const addBtn = document.getElementById('bmPageAddBtn');
+    if (addBtn) {
+      addBtn.onclick = async () => {
+        const nameInput = document.getElementById('bmPageNameInput');
+        const urlInput = document.getElementById('bmPageUrlInput');
+        if (!nameInput || !urlInput) return;
+        const name = nameInput.value.trim();
+        let url = urlInput.value.trim();
+        if (!name || !url) {
+          alert('Будь ласка, заповніть назву та адресу сайту.');
+          return;
+        }
+        if (!url.startsWith('http://') && !url.startsWith('https://')) {
+          url = 'https://' + url;
+        }
+        userBookmarksList.push({ name, url, createdAt: new Date().toISOString() });
+        try {
+          await firebaseDb.collection('users').doc(currentUser.uid).set({
+            bookmarks: userBookmarksList
+          }, { merge: true });
+          renderBookmarksPage();
+          renderUserBookmarksTab();
+        } catch (err) {
+          alert('Помилка збереження: ' + err.message);
+        }
+      };
+    }
+
+    // Слухач на пошук
+    const searchInput = document.getElementById('bmPageSearchInput');
+    if (searchInput) {
+      searchInput.addEventListener('input', (e) => {
+        bookmarksSearchQuery = e.target.value;
+        renderBookmarksPage();
+      });
+    }
+
+  } catch (err) {
+    if (loadingEl) loadingEl.style.display = 'none';
+    pageContainer.style.display = 'block';
+    pageContainer.innerHTML = `<div class="alert alert-danger">Помилка: ${err.message}</div>`;
+  }
+}
+
+// Видалення зі сторінки закладок
+async function deleteUserBookmarkFromPage(index) {
+  if (!confirm('Видалити цей сайт із ваших закладок?')) return;
+  await deleteUserBookmark(index);
+  renderBookmarksPage();
 }
 
 // 3. Вкладка: 👑 Панель Адміністратора (для weber515sis@gmail.com)
@@ -5093,15 +5425,12 @@ function renderAdAuthPromptBanner() {
   } else {
     container.innerHTML = `
       <div class="ad-auth-banner guest">
-        <div class="ad-auth-banner-info">
-          <div class="ad-auth-banner-icon"><i class="fas fa-user-shield"></i></div>
-          <div>
-            <div class="ad-auth-banner-title">
-              Оформлення замовлення: <strong>швидке або з Кабінетом</strong>
-            </div>
-            <div class="ad-auth-banner-sub">
-              Бажаєте зберігати чеки, контролювати статус розміщення та подовжувати в 1 клік?
-            </div>
+        <div class="ad-auth-banner-header">
+          <div class="ad-auth-banner-title">
+            <i class="fas fa-user-shield ad-auth-shield-icon"></i> Оформлення замовлення з КАБІНЕТОМ
+          </div>
+          <div class="ad-auth-banner-sub">
+            Якщо бажаєте зберігати та контролювати статус розміщення, здійсніть вхід в 1 клік:
           </div>
         </div>
         <div class="ad-auth-banner-actions">
@@ -5109,7 +5438,9 @@ function renderAdAuthPromptBanner() {
             <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
             Увійти через Google
           </button>
-          <div class="ad-auth-guest-note">або заповнюйте поля нижче як гість без реєстрації ↓</div>
+          <div class="ad-auth-guest-note">
+            або <strong>ШВИДКЕ замовлення (без входу)</strong>, де заповнюйте поля нижче як гість без реєстрації, і всі дані зберігаєте у себе на пристрої ↓
+          </div>
         </div>
       </div>
     `;

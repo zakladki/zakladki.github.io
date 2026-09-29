@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="uk">
+  <head>
+    <!-- Пригнічення помилок сторонніх розширень браузера (MetaMask тощо) -->
+    <script>
+      (function(){function e(t){if(!t)return!1;var r="";try{r=typeof t=="string"?t:typeof t=="object"?(t.message||"")+" "+(t.stack||"")+" "+(t.reason||"")+" "+(t.name||"")+" "+String(t):String(t)}catch(n){r=String(t)}return r=r.toLowerCase(),r.indexOf("metamask")!==-1||r.indexOf("failed to connect")!==-1||r.indexOf("auro wallet")!==-1||r.indexOf("phantom")!==-1||r.indexOf("coinbase")!==-1||r.indexOf("evm")!==-1}var o=console.error;console.error=function(){for(var t=0;t<arguments.length;t++)if(e(arguments[t]))return;return o.apply(console,arguments)};var a=console.warn;console.warn=function(){for(var t=0;t<arguments.length;t++)if(e(arguments[t]))return;return a.apply(console,arguments)};window.addEventListener("unhandledrejection",function(t){e(t.reason)&&(t.preventDefault(),t.stopImmediatePropagation())},!0);window.addEventListener("error",function(t){(e(t.error)||e(t.message))&&(t.preventDefault(),t.stopImmediatePropagation())},!0);var n=window.onerror;window.onerror=function(t,r,o,a,c){return e(t)||e(c)||(n?n.apply(this,arguments):void 0)}})();
+    </script>
+    <!-- Google AdSense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3065705668384801" crossorigin="anonymous"></script>
+    <!-- Global site tag (gtag.js) - Google Analytics-->
+    <script async="" src="https://www.googletagmanager.com/gtag/js?id=UA-55202239-3"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag('js', new Date());
+      gtag('config', 'UA-55202239-3');
+    </script>
+    <!-- Required meta tags-->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="author" content="WebSIS &amp; Company">
+    <meta name="keywords" content="мої закладки, персональні закладки, збережені сайти, обрані сайти онлайн, хмарні закладки, топ закладки">
+    <meta name="description" content="Мої Закладки на ТОП ЗАКЛАДКИ – персональний розділ для збереження та швидкого доступу до ваших улюблених сайтів з будь-якого пристрою.">
+    <meta name="application-name" content="ТОП Закладки">
+    <meta name="apple-mobile-web-app-title" content="ТОП Закладки">
+    <link rel="canonical" href="https://zakladki.github.io/bookmarks.html">
+    <meta property="og:site_name" content="ТОП Закладки - ТОП Сайтів України">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="uk_UA">
+    <meta property="og:url" content="https://zakladki.github.io/bookmarks.html">
+    <meta property="og:title" content="❤️ Мої Закладки – Персональні сайти користувача | ЗАКЛАДКИ">
+    <meta property="og:description" content="Персональний розділ збережених сайтів з хмарною синхронізацією на будь-якому комп'ютері чи смартфоні.">
+    <meta property="og:image" content="https://zakladki.github.io/favicon.ico">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="❤️ Мої Закладки – Персональні сайти користувача | ЗАКЛАДКИ">
+    <meta name="twitter:description" content="Персональний розділ збережених сайтів з хмарною синхронізацією на будь-якому комп'ютері чи смартфоні.">
+    <meta name="twitter:image" content="https://zakladki.github.io/favicon.ico">
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" href="favicon.ico">
+    
+    <!-- Bootstrap CSS-->
+    <link href="styles/bootstrap.min.css" rel="stylesheet">
+    <link href="styles/all.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link href="styles/base64.css" rel="stylesheet">
+    <link href="styles/main.css" rel="stylesheet">
+    <link href="styles/hamburgers.min.css" rel="stylesheet">
+    <link href="styles/animation.css" rel="stylesheet">
+    <link href="styles/menu_button.css" rel="stylesheet">
+    <title>❤️ Мої Закладки – Персональні сайти користувача | ЗАКЛАДКИ</title>
+
+    <!-- Critical CSS for instant Navbar rendering without layout shift / FOUC -->
+    <style>
+      .navbar, .nav-container { position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; background-color: #1e293b; }
+      @media (max-width: 1229.98px) {
+        .navbar, .nav-container { height: 42px; display: block; }
+        .mobile-navbar-title {
+          position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+          color: #ffffff; font-weight: 600; font-size: 0.9rem; background-color: rgba(255, 255, 255, 0.08);
+          padding: 3px 10px; border-radius: 6px; white-space: nowrap; z-index: 1040; letter-spacing: 0.02em; display: block !important;
+        }
+      }
+      @media (min-width: 1230px) {
+        .mobile-navbar-title { display: none !important; }
+      }
+      .user-auth-btn {
+        position: absolute !important; left: 12px !important; right: auto !important; top: 50% !important;
+        transform: translateY(-50%) !important; width: 30px !important; height: 30px !important; min-width: 30px !important; max-width: 30px !important; border-radius: 7px !important;
+        background: rgba(255, 255, 255, 0.16) !important; border: 1px solid rgba(255, 255, 255, 0.3) !important;
+        color: #ffffff !important; display: inline-flex !important; align-items: center !important; justify-content: center !important;
+        padding: 0 !important; margin: 0 !important; cursor: pointer; z-index: 1050 !important; font-size: 0.95rem; line-height: 1; outline: none;
+        transition: all 0.2s ease; overflow: hidden !important;
+      }
+      .hamburger {
+        position: absolute !important; top: 50% !important; transform: translateY(-50%) scale(0.7) !important;
+        right: 12px !important; z-index: 1050 !important; transform-origin: right center !important; padding: 6px !important; margin: 0 !important;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container nav-container">
+      <nav class="navbar navbar-expand-md fixed-top navbar-dark d-flex justify-content-between px-3">
+        <div class="hamburger hamburger--spring navbar-toggler" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+          <div class="hamburger-box">
+            <div class="hamburger-inner"></div>
+          </div>
+        </div>
+        <div class="mobile-navbar-title">❤️ ЗАКЛАДКИ</div>
+        <div class="collapse navbar-collapse text-center justify-content-center flex-grow-1" id="navbarCollapse">
+          <ul class="nav nav-pills mb-0 navbar-nav mx-auto justify-content-center">
+            <li class="nav-item"><a class="nav-link" href="./">Головна</a></li>
+            <li class="nav-item"><a class="nav-link" href="./social.html">Соціум</a></li>
+            <li class="nav-item"><a class="nav-link" href="./news.html">Новини</a></li>
+            <li class="nav-item"><a class="nav-link" href="./media.html">Медіа</a></li>
+            <li class="nav-item"><a class="nav-link" href="./games.html">Ігри</a></li>
+            <li class="nav-item"><a class="nav-link" href="./communal.html">Комуналка</a></li>
+            <li class="nav-item"><a class="nav-link" href="./bank.html">Банкінг</a></li>
+            <li class="nav-item"><a class="nav-link" href="./market.html">Ринок</a></li>
+            <li class="nav-item"><a class="nav-link" href="./shops.html">Магазини</a></li>
+            <li class="nav-item"><a class="nav-link" href="./others.html">Інше</a></li>
+            <li class="nav-item"><a class="nav-link" href="./city.html">Місто</a></li>
+            <li class="nav-item"><a class="nav-link" href="./ai.html">AI</a></li>
+            <li class="nav-item"><a class="nav-link" href="./programs.html">Soft</a></li>
+            <li class="nav-item nav-item-bookmarks" id="navItemBookmarks">
+              <a class="nav-link active nav-link-bookmarks" href="./bookmarks.html" title="Мої збережені закладки">
+                <span class="nav-heart-icon">❤️</span> <span class="nav-bookmarks-title">Закладки</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+        <button id="themeToggle" class="theme-toggle-btn" aria-label="Переключити тему" title="Переключити тему (світла/темна)"><i class="fas fa-moon"></i></button>
+        <button id="noticeBellBtn" class="notice-bell-btn" aria-label="Оголошення" title="Оголошення"><i class="fas fa-bell"></i><span class="notice-bell-badge-dot"></span></button>
+      </nav>
+    </div>
+
+    <main class="container-fluid main" id="main-content" role="main" style="padding-top: 54px; min-height: 80vh;">
+      <h1 class="sr-only">❤️ Мої Закладки – Персональні сайти користувача</h1>
+      
+      <!-- Головний динамічний контейнер сторінки закладок -->
+      <div class="container" id="bookmarksPageApp">
+        <div id="bookmarksPageLoading" class="text-center py-5">
+          <div class="spinner-border text-danger mb-3" role="status" style="width: 3rem; height: 3rem;">
+            <span class="sr-only">Завантаження...</span>
+          </div>
+          <h5 class="text-muted">Завантаження персональних закладок...</h5>
+        </div>
+        <div id="bookmarksPageContainer" style="display: none;"></div>
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="container">
+        <div class="row">
+          <div class="col-sm footer-col d-flex justify-content-center">
+            <div class="copy font-weight-bold">
+              <a href="https://zakladki.github.io/" class="copy-url-link">ЗАКЛАДКИ</a> 
+              <span>&copy; 2014 &ndash; 2026</span>
+              <a href="CHANGELOG.md" class="changelog-link" title="Хронологія оновлень (CHANGELOG.md)">Що нового?</a>
+            </div>
+          </div>
+          <div class="col-sm footer-col d-flex justify-content-center">
+            <div class="mycounter-wrapper">
+              <!-- MyCounter v.2.0 -->
+              <script type="text/javascript"
+                src="https://get.mycounter.ua/counter2.0.js">
+              </script><noscript>
+              <a target="_blank" href="https://mycounter.ua/"><img
+              src="https://get.mycounter.ua/counter.php?id=168151"
+              title="MyCounter - счётчик и статистика"
+              alt="MyCounter - счётчик и статистика"
+              width="88" height="31" border="0" /></a></noscript>
+              <!--/ MyCounter -->
+            </div>
+          </div>
+          <div class="col-sm footer-col d-flex justify-content-center">
+            <div class="kolobok d-flex align-items-center gap-3">
+              <a href="mailto:musichitbit@gmail.com" target="_blank" title="E-mail: musichitbit@gmail.com / Написати адміністратору / Зворотний зв'язок"><i class="far fa-envelope fa-lg" aria-hidden="true"></i> E-mail</a>
+              <a href="https://youtu.be/BdZQy6upWFc" target="_blank" title="Відеоінструкція: як зробити сайт стартовою сторінкою браузера (налаштування автозапуска)"><i class="fas fa-play-circle fa-lg coloriconfuter" aria-hidden="true"></i> Інструкція</a>
+              <a href="#" class="badges-legend-link" title="Умовні позначки та індикатори на сайті (розшифровка значків)"><i class="fas fa-info-circle fa-lg coloriconfuter" aria-hidden="true"></i></a>
+              <a href="https://docs.google.com/document/d/15S2XrUxYaj1uu68wtfqww3Gkqa-Lq2Ra-P20AHWqKgs" target="_blank" title="Співпраця з нами, умови та прайс на послуги сайту"><i class="fas fa-handshake fa-lg coloriconfuter" aria-hidden="true"></i></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
+    <script src="js/main.js"></script>
+  </body>
+</html>
