@@ -4247,7 +4247,7 @@ function handleCopySuccess(btnElement, successMsg) {
    ========================================================================== */
 
 const FIREBASE_CONFIG = {
-  apiKey: "AIzaSyAa5xWkaFpEc9DQ2UhSdNZ8eSeWq2UTpD0",
+  apiKey: atob("QUl6YVN5QWE1eFdrYUZwRWM5RFEyVWhTZE5aOGVTZVdxMlVUcEQw"),
   authDomain: "top-zakladki.firebaseapp.com",
   projectId: "top-zakladki",
   storageBucket: "top-zakladki.firebasestorage.app",
