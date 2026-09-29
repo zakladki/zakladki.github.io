@@ -106,15 +106,34 @@
       @media (min-width: 1230px) {
         .mobile-navbar-title { display: none !important; }
       }
-      .theme-toggle-btn {
+      .user-auth-btn {
         position: absolute !important; left: 12px !important; right: auto !important; top: 50% !important;
+        transform: translateY(-50%) !important; width: 30px !important; height: 30px !important; min-width: 30px !important; max-width: 30px !important; border-radius: 7px !important;
+        background: rgba(255, 255, 255, 0.16) !important; border: 1px solid rgba(255, 255, 255, 0.3) !important;
+        color: #ffffff !important; display: inline-flex !important; align-items: center !important; justify-content: center !important;
+        padding: 0 !important; margin: 0 !important; cursor: pointer; z-index: 1050 !important; font-size: 0.95rem; line-height: 1; outline: none;
+        transition: all 0.2s ease; overflow: hidden !important;
+      }
+      .user-auth-btn:hover {
+        background: rgba(255, 255, 255, 0.28) !important;
+      }
+      .user-auth-avatar {
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 1px solid rgba(255, 255, 255, 0.9);
+        display: block;
+      }
+      .theme-toggle-btn {
+        position: absolute !important; left: 48px !important; right: auto !important; top: 50% !important;
         transform: translateY(-50%) !important; width: 30px !important; height: 30px !important; border-radius: 7px !important;
         background: rgba(255, 255, 255, 0.16) !important; border: 1px solid rgba(255, 255, 255, 0.3) !important;
         color: #ffffff !important; display: inline-flex !important; align-items: center !important; justify-content: center !important;
         padding: 0 !important; margin: 0 !important; cursor: pointer; z-index: 1050 !important; font-size: 0.95rem; line-height: 1; outline: none;
       }
       .notice-bell-btn {
-        position: absolute !important; left: 48px !important; right: auto !important; top: 50% !important;
+        position: absolute !important; left: 84px !important; right: auto !important; top: 50% !important;
         transform: translateY(-50%) !important; width: 30px !important; height: 30px !important; border-radius: 7px !important;
         background: rgba(255, 255, 255, 0.16) !important; border: 1px solid rgba(255, 255, 255, 0.3) !important;
         color: #ffffff !important; display: inline-flex !important; align-items: center !important; justify-content: center !important;
@@ -152,6 +171,7 @@
             <li class="nav-item"><a class="nav-link" href="./programs.html">Soft</a></li>
           </ul>
         </div>
+        <button id="userAuthNavBtn" class="user-auth-btn" aria-label="Особистий кабінет" title="Особистий кабінет / Вхід"><i class="far fa-user-circle"></i></button>
         <button id="themeToggle" class="theme-toggle-btn" aria-label="Переключити тему" title="Переключити тему (світла/темна)"><i class="fas fa-moon"></i></button>
         <button id="noticeBellBtn" class="notice-bell-btn" aria-label="Оголошення" title="Оголошення"><i class="fas fa-bell"></i><span class="notice-bell-badge-dot"></span></button>
       </nav>
