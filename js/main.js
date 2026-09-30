@@ -742,8 +742,8 @@ document.addEventListener("DOMContentLoaded", () => {
     .site-description {
       font-size: 12.5px;
       color: #6b7280;
-      margin-top: -1px;
-      padding-left: 24px;
+      margin-top: 1px;
+      padding-left: 2px;
       padding-bottom: 2px;
       line-height: 1.45;
       word-break: break-word;
@@ -753,6 +753,12 @@ document.addEventListener("DOMContentLoaded", () => {
       transition: opacity 0.2s ease-in-out;
       width: 100% !important;
       flex-basis: 100%;
+      box-sizing: border-box !important;
+    }
+    .site-description.show-desc {
+      display: flex !important;
+      align-items: flex-start !important;
+      gap: 6px !important;
     }
     .dark-mode .site-description {
       color: #a1a1aa;
@@ -844,10 +850,31 @@ document.addEventListener("DOMContentLoaded", () => {
         // Створюємо контейнер для опису
         const descDiv = document.createElement('div');
         descDiv.className = 'site-description';
-        descDiv.textContent = description;
+
+        // Кнопка сердечка для швидкого додавання у власні закладки
+        const heartBtn = document.createElement('button');
+        heartBtn.type = 'button';
+        heartBtn.className = 'desc-heart-add-btn';
+        heartBtn.setAttribute('title', 'Додати сайт у «❤️ Закладки»');
+        heartBtn.setAttribute('aria-label', 'Додати сайт у «❤️ Закладки»');
+        heartBtn.innerHTML = '<i class="far fa-heart"></i>';
+
+        // Текст опису
+        const descText = document.createElement('div');
+        descText.className = 'desc-text';
+        descText.textContent = description;
+
+        descDiv.appendChild(heartBtn);
+        descDiv.appendChild(descText);
 
         // Вставляємо опис у li
         li.appendChild(descDiv);
+
+        heartBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          handleQuickBookmarkClick(link, description, heartBtn);
+        });
 
         // Функція для перемикання відображення
         toggleBtn.addEventListener('click', (e) => {
@@ -865,6 +892,7 @@ document.addEventListener("DOMContentLoaded", () => {
                   const otherDesc = parentLi.querySelector('.site-description');
                   if (otherDesc) {
                     otherDesc.style.opacity = '0';
+                    otherDesc.classList.remove('show-desc');
                     otherDesc.style.display = 'none';
                   }
                 }
@@ -872,7 +900,8 @@ document.addEventListener("DOMContentLoaded", () => {
             });
 
             // Показати поточний опис
-            descDiv.style.display = 'block';
+            descDiv.classList.add('show-desc');
+            descDiv.style.display = 'flex';
             // Невеликий тайм-аут, щоб спрацював transition opacity
             setTimeout(() => {
               descDiv.style.opacity = '1';
@@ -883,6 +912,7 @@ document.addEventListener("DOMContentLoaded", () => {
             descDiv.style.opacity = '0';
             const onTransitionEnd = () => {
               descDiv.style.display = 'none';
+              descDiv.classList.remove('show-desc');
               descDiv.removeEventListener('transitionend', onTransitionEnd);
             };
             descDiv.addEventListener('transitionend', onTransitionEnd);
@@ -890,6 +920,7 @@ document.addEventListener("DOMContentLoaded", () => {
             setTimeout(() => {
               if (descDiv.style.opacity === '0') {
                 descDiv.style.display = 'none';
+                descDiv.classList.remove('show-desc');
               }
             }, 250);
             toggleBtn.classList.remove('active');
@@ -4324,10 +4355,17 @@ async function initFirebaseAuthAndDb() {
       firebaseAuth = firebase.auth();
       firebaseDb = firebase.firestore();
 
-      firebaseAuth.onAuthStateChanged((user) => {
+      firebaseAuth.onAuthStateChanged(async (user) => {
         currentUser = user;
         updateUserNavButton();
         syncBookmarksNav();
+        if (currentUser) {
+          await loadUserBookmarksData();
+        } else {
+          userBookmarksList = [];
+          userBookmarkCards = ['📌 Основні закладки'];
+        }
+        syncAllCatalogHeartButtons();
         renderBookmarksPage();
         if (currentUser && firebaseDb) {
           firebaseDb.collection('users').doc(currentUser.uid).set({
@@ -4349,6 +4387,7 @@ async function initFirebaseAuthAndDb() {
   }
   ensureAuthNavButton();
   syncBookmarksNav();
+  syncAllCatalogHeartButtons();
   renderBookmarksPage();
 }
 
@@ -4904,7 +4943,435 @@ function syncBookmarksNav() {
 // ==========================================================================
 // ОКРЕМИЙ ПОВНОЦІННИЙ РОЗДІЛ «❤️ ЗАКЛАДКИ» (bookmarks.html)
 // ==========================================================================
-let bookmarksSearchQuery = '';
+let userBookmarkCards = ['📌 Основні закладки'];
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+function normalizeUrl(u) {
+  if (!u) return '';
+  try {
+    const parsed = new URL(u);
+    return (parsed.origin + parsed.pathname).toLowerCase().replace(/\/$/, '');
+  } catch (e) {
+    return String(u).trim().toLowerCase().replace(/\/$/, '');
+  }
+}
+
+function isUrlInBookmarks(url) {
+  if (!userBookmarksList || !url) return false;
+  const targetNorm = normalizeUrl(url);
+  return userBookmarksList.some(bm => normalizeUrl(bm.url) === targetNorm);
+}
+
+function showQuickToast(msg, type = 'info') {
+  let toast = document.getElementById('customQuickToast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'customQuickToast';
+    toast.className = 'custom-quick-toast';
+    document.body.appendChild(toast);
+  }
+  toast.className = `custom-quick-toast ${type} show`;
+  toast.innerHTML = `<span>${msg}</span>`;
+  clearTimeout(toast._timer);
+  toast._timer = setTimeout(() => {
+    toast.classList.remove('show');
+  }, 3200);
+}
+
+function showCustomModal({ title, bodyHtml, footerHtml }) {
+  let modalWrap = document.getElementById('universalActionModal');
+  if (!modalWrap) {
+    modalWrap = document.createElement('div');
+    modalWrap.id = 'universalActionModal';
+    modalWrap.style.cssText = 'position: fixed; inset: 0; z-index: 10050; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.65); padding: 16px; backdrop-filter: blur(2px);';
+    document.body.appendChild(modalWrap);
+  }
+  modalWrap.innerHTML = `
+    <div style="background: var(--card-bg, #ffffff); color: var(--text-main, #0f172a); border: 1px solid var(--border-color, #cbd5e1); border-radius: 14px; width: 100%; max-width: 440px; box-shadow: 0 15px 35px rgba(0,0,0,0.3); overflow: hidden; animation: fadeIn 0.2s ease;">
+      <div style="padding: 12px 18px; border-bottom: 1px solid var(--border-color, #e2e8f0); display: flex; align-items: center; justify-content: space-between; background: linear-gradient(135deg, #1e293b, #334155); color: #fff;">
+        <h6 style="margin: 0; font-weight: 700; font-size: 0.95rem; color: #fff;">${title}</h6>
+        <button type="button" style="background: transparent; border: none; color: #fff; font-size: 1.3rem; cursor: pointer; padding: 0; line-height: 1;" onclick="closeCustomModal()">&times;</button>
+      </div>
+      <div style="padding: 16px 18px;">
+        ${bodyHtml}
+      </div>
+      ${footerHtml ? `<div style="padding: 10px 18px; border-top: 1px solid var(--border-color, #e2e8f0); display: flex; justify-content: flex-end; gap: 8px; background: rgba(0,0,0,0.02);">${footerHtml}</div>` : ''}
+    </div>
+  `;
+  modalWrap.style.display = 'flex';
+}
+
+function closeCustomModal() {
+  const modalWrap = document.getElementById('universalActionModal');
+  if (modalWrap) modalWrap.style.display = 'none';
+}
+
+async function loadUserBookmarksData() {
+  if (!currentUser || !firebaseDb) return;
+  try {
+    const userDoc = await firebaseDb.collection('users').doc(currentUser.uid).get();
+    if (userDoc.exists) {
+      const data = userDoc.data();
+      userBookmarksList = data.bookmarks || [];
+      if (Array.isArray(data.bookmarkCards) && data.bookmarkCards.length > 0) {
+        userBookmarkCards = data.bookmarkCards;
+      } else {
+        const found = [];
+        userBookmarksList.forEach(bm => {
+          if (bm.card && !found.includes(bm.card)) found.push(bm.card);
+        });
+        userBookmarkCards = found.length > 0 ? found : ['📌 Основні закладки'];
+      }
+    } else {
+      userBookmarksList = [];
+      userBookmarkCards = ['📌 Основні закладки'];
+    }
+  } catch (e) {
+    console.warn("Помилка завантаження закладок користувача:", e);
+  }
+}
+
+async function saveUserBookmarksData() {
+  if (!currentUser || !firebaseDb) return;
+  try {
+    await firebaseDb.collection('users').doc(currentUser.uid).set({
+      bookmarks: userBookmarksList,
+      bookmarkCards: userBookmarkCards
+    }, { merge: true });
+  } catch (e) {
+    console.error("Помилка збереження закладок у Firebase:", e);
+  }
+}
+
+function syncAllCatalogHeartButtons() {
+  const btns = document.querySelectorAll('.desc-heart-add-btn');
+  btns.forEach(btn => {
+    const parentLi = btn.closest('li');
+    if (!parentLi) return;
+    const link = parentLi.querySelector('a');
+    if (!link) return;
+    const inBm = isUrlInBookmarks(link.href);
+    if (inBm) {
+      btn.classList.add('in-bookmarks');
+      btn.innerHTML = '<i class="fas fa-heart text-danger"></i>';
+      btn.title = 'Вже у Ваших «❤️ Закладках» (натисніть щоб керувати)';
+    } else {
+      btn.classList.remove('in-bookmarks');
+      btn.innerHTML = '<i class="far fa-heart"></i>';
+      btn.title = 'Додати сайт у «❤️ Закладки»';
+    }
+  });
+}
+
+async function handleQuickBookmarkClick(link, description, heartBtn) {
+  if (!currentUser) {
+    showQuickToast('Щоб зберігати улюблені сайти у «❤️ Закладки», будь ласка, увійдіть через Google', 'info');
+    openUserCabinetModal();
+    return;
+  }
+
+  await ensureFirebaseLoaded();
+  if (!firebaseDb) {
+    showQuickToast('Завантаження бази даних...', 'warning');
+    return;
+  }
+
+  const cleanUrl = (link.href || '').trim();
+  const linkName = (link.textContent || '').trim().replace(/\s+/g, ' ');
+  if (!cleanUrl) return;
+
+  await loadUserBookmarksData();
+
+  const existingIdx = userBookmarksList.findIndex(bm => normalizeUrl(bm.url) === normalizeUrl(cleanUrl));
+
+  if (existingIdx !== -1) {
+    const bm = userBookmarksList[existingIdx];
+    const card = bm.card || userBookmarkCards[0] || '📌 Основні закладки';
+    if (confirm(`Сайт «${bm.name}» уже є у ваших закладках (Картка: «${card}»).\n\nВидалити його з «❤️ Закладок»?`)) {
+      userBookmarksList.splice(existingIdx, 1);
+      await saveUserBookmarksData();
+      syncAllCatalogHeartButtons();
+      showQuickToast(`«${bm.name}» видалено з «❤️ Закладок»`, 'info');
+    }
+  } else {
+    if (!userBookmarkCards || userBookmarkCards.length <= 1) {
+      const targetCard = (userBookmarkCards && userBookmarkCards[0]) || '📌 Основні закладки';
+      userBookmarksList.push({
+        name: linkName,
+        url: cleanUrl,
+        desc: description || '',
+        card: targetCard,
+        createdAt: new Date().toISOString()
+      });
+      await saveUserBookmarksData();
+      syncAllCatalogHeartButtons();
+      showQuickToast(`❤️ «${linkName}» додано у «${targetCard}»!`, 'success');
+    } else {
+      openChooseCardForBookmarkModal(linkName, cleanUrl, description);
+    }
+  }
+}
+
+function openChooseCardForBookmarkModal(linkName, cleanUrl, description) {
+  const optionsHtml = userBookmarkCards.map(c => `
+    <option value="${escapeHtml(c)}">${escapeHtml(c)}</option>
+  `).join('');
+
+  showCustomModal({
+    title: '❤️ Додати у власні закладки',
+    bodyHtml: `
+      <div class="mb-2">
+        <div class="font-weight-bold" style="font-size: 0.95rem;">${escapeHtml(linkName)}</div>
+        <div class="small text-muted" style="word-break: break-all;">${escapeHtml(cleanUrl)}</div>
+      </div>
+      <div class="mb-3">
+        <label class="small font-weight-bold mb-1">Оберіть картку для розміщення:</label>
+        <select id="quickCardChoiceSelect" class="form-control">
+          ${optionsHtml}
+        </select>
+      </div>
+    `,
+    footerHtml: `
+      <button type="button" class="btn btn-secondary btn-sm" onclick="closeCustomModal()">Скасувати</button>
+      <button type="button" class="btn btn-danger btn-sm font-weight-bold" id="confirmQuickAddCardBtn">Додати у закладки</button>
+    `
+  });
+
+  document.getElementById('confirmQuickAddCardBtn').onclick = async () => {
+    const sel = document.getElementById('quickCardChoiceSelect');
+    const card = sel ? sel.value : userBookmarkCards[0];
+    userBookmarksList.push({
+      name: linkName,
+      url: cleanUrl,
+      desc: description || '',
+      card,
+      createdAt: new Date().toISOString()
+    });
+    await saveUserBookmarksData();
+    closeCustomModal();
+    syncAllCatalogHeartButtons();
+    showQuickToast(`❤️ «${linkName}» додано у картку «${card}»!`, 'success');
+  };
+}
+
+function openCreateCardModal() {
+  showCustomModal({
+    title: '➕ Створити нову картку',
+    bodyHtml: `
+      <p class="small text-muted mb-2">Введіть назву для вашої нової тематичної картки закладок:</p>
+      <input type="text" id="newCardNameInput" class="form-control" placeholder="Наприклад: 💼 Робота, 🛒 Покупки, 🎵 Музика, 📰 Новини" autofocus>
+    `,
+    footerHtml: `
+      <button type="button" class="btn btn-secondary btn-sm" onclick="closeCustomModal()">Скасувати</button>
+      <button type="button" class="btn btn-danger btn-sm font-weight-bold" id="confirmCreateCardBtn">Створити картку</button>
+    `
+  });
+
+  document.getElementById('confirmCreateCardBtn').onclick = async () => {
+    const input = document.getElementById('newCardNameInput');
+    const val = input ? input.value.trim() : '';
+    if (!val) {
+      alert('Будь ласка, введіть назву картки.');
+      return;
+    }
+    if (userBookmarkCards.includes(val)) {
+      alert('Картка з такою назвою вже існує.');
+      return;
+    }
+    userBookmarkCards.push(val);
+    await saveUserBookmarksData();
+    closeCustomModal();
+    renderBookmarksPage();
+    showQuickToast(`Картку «${val}» створено!`, 'success');
+  };
+}
+
+function openAddBookmarkModal(defaultCard = '') {
+  if (!userBookmarkCards || userBookmarkCards.length === 0) {
+    userBookmarkCards = ['📌 Основні закладки'];
+  }
+  const targetCard = defaultCard || userBookmarkCards[0];
+  const optionsHtml = userBookmarkCards.map(c => `
+    <option value="${escapeHtml(c)}" ${c === targetCard ? 'selected' : ''}>${escapeHtml(c)}</option>
+  `).join('');
+
+  showCustomModal({
+    title: '❤️ Додати сайт у закладки',
+    bodyHtml: `
+      <div class="mb-2">
+        <label class="small font-weight-bold mb-1">Назва сайту:</label>
+        <input type="text" id="bmModalNameInput" class="form-control form-control-sm" placeholder="Наприклад: Мій Google Диск">
+      </div>
+      <div class="mb-2">
+        <label class="small font-weight-bold mb-1">Адреса сайту (URL):</label>
+        <input type="url" id="bmModalUrlInput" class="form-control form-control-sm" placeholder="https://...">
+      </div>
+      <div class="mb-2">
+        <label class="small font-weight-bold mb-1">Оберіть картку:</label>
+        <select id="bmModalCardSelect" class="form-control form-control-sm">
+          ${optionsHtml}
+        </select>
+      </div>
+      <div class="mb-1">
+        <label class="small font-weight-bold mb-1">Короткий опис (необов'язково):</label>
+        <textarea id="bmModalDescInput" class="form-control form-control-sm" rows="2" placeholder="Опис сайту..."></textarea>
+      </div>
+    `,
+    footerHtml: `
+      <button type="button" class="btn btn-secondary btn-sm" onclick="closeCustomModal()">Скасувати</button>
+      <button type="button" class="btn btn-danger btn-sm font-weight-bold" id="confirmAddBmBtn">Зберегти закладку</button>
+    `
+  });
+
+  document.getElementById('confirmAddBmBtn').onclick = async () => {
+    const nameEl = document.getElementById('bmModalNameInput');
+    const urlEl = document.getElementById('bmModalUrlInput');
+    const cardEl = document.getElementById('bmModalCardSelect');
+    const descEl = document.getElementById('bmModalDescInput');
+
+    const name = nameEl ? nameEl.value.trim() : '';
+    let url = urlEl ? urlEl.value.trim() : '';
+    const card = cardEl ? cardEl.value : userBookmarkCards[0];
+    const desc = descEl ? descEl.value.trim() : '';
+
+    if (!name || !url) {
+      alert('Будь ласка, введіть назву та посилання сайту.');
+      return;
+    }
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      url = 'https://' + url;
+    }
+
+    userBookmarksList.push({
+      name,
+      url,
+      desc,
+      card,
+      createdAt: new Date().toISOString()
+    });
+
+    await saveUserBookmarksData();
+    closeCustomModal();
+    renderBookmarksPage();
+    syncAllCatalogHeartButtons();
+    showQuickToast(`❤️ «${name}» додано у картку «${card}»!`, 'success');
+  };
+}
+
+function promptRenameCard(oldName) {
+  showCustomModal({
+    title: '✏️ Перейменувати картку',
+    bodyHtml: `
+      <p class="small text-muted mb-2">Поточна назва: <strong>${escapeHtml(oldName)}</strong></p>
+      <input type="text" id="renameCardInput" class="form-control" value="${escapeHtml(oldName)}" autofocus>
+    `,
+    footerHtml: `
+      <button type="button" class="btn btn-secondary btn-sm" onclick="closeCustomModal()">Скасувати</button>
+      <button type="button" class="btn btn-primary btn-sm font-weight-bold" id="confirmRenameCardBtn">Зберегти</button>
+    `
+  });
+
+  document.getElementById('confirmRenameCardBtn').onclick = async () => {
+    const input = document.getElementById('renameCardInput');
+    const newName = input ? input.value.trim() : '';
+    if (!newName) {
+      alert('Назва картки не може бути порожньою.');
+      return;
+    }
+    if (newName === oldName) {
+      closeCustomModal();
+      return;
+    }
+    if (userBookmarkCards.includes(newName)) {
+      alert('Картка з такою назвою вже існує.');
+      return;
+    }
+    const idx = userBookmarkCards.indexOf(oldName);
+    if (idx !== -1) {
+      userBookmarkCards[idx] = newName;
+    }
+    userBookmarksList.forEach(bm => {
+      if (bm.card === oldName) {
+        bm.card = newName;
+      }
+    });
+    await saveUserBookmarksData();
+    closeCustomModal();
+    renderBookmarksPage();
+    showQuickToast(`Картку перейменовано на «${newName}»`, 'success');
+  };
+}
+
+function promptDeleteCard(cardName) {
+  const cardItemsCount = userBookmarksList.filter(bm => (bm.card || userBookmarkCards[0]) === cardName).length;
+  if (!confirm(`Ви дійсно бажаєте видалити картку «${cardName}» та всі її збережені сайти (${cardItemsCount})?`)) {
+    return;
+  }
+  userBookmarkCards = userBookmarkCards.filter(c => c !== cardName);
+  userBookmarksList = userBookmarksList.filter(bm => (bm.card || userBookmarkCards[0]) !== cardName);
+  if (userBookmarkCards.length === 0) {
+    userBookmarkCards = ['📌 Основні закладки'];
+  }
+  saveUserBookmarksData().then(() => {
+    renderBookmarksPage();
+    syncAllCatalogHeartButtons();
+    showQuickToast(`Картку «${cardName}» видалено`, 'info');
+  });
+}
+
+function promptMoveBookmark(bookmarkIndex) {
+  const bm = userBookmarksList[bookmarkIndex];
+  if (!bm) return;
+  const currentCard = bm.card || userBookmarkCards[0];
+  const optionsHtml = userBookmarkCards.map(c => `
+    <option value="${escapeHtml(c)}" ${c === currentCard ? 'selected' : ''}>${escapeHtml(c)}</option>
+  `).join('');
+
+  showCustomModal({
+    title: '⇄ Перемістити закладку',
+    bodyHtml: `
+      <p class="small mb-2">Перемістити сайт <strong>${escapeHtml(bm.name)}</strong> в іншу картку:</p>
+      <select id="moveTargetCardSelect" class="form-control">
+        ${optionsHtml}
+      </select>
+    `,
+    footerHtml: `
+      <button type="button" class="btn btn-secondary btn-sm" onclick="closeCustomModal()">Скасувати</button>
+      <button type="button" class="btn btn-primary btn-sm font-weight-bold" id="confirmMoveBmBtn">Перемістити</button>
+    `
+  });
+
+  document.getElementById('confirmMoveBmBtn').onclick = async () => {
+    const sel = document.getElementById('moveTargetCardSelect');
+    if (!sel) return;
+    const newCard = sel.value;
+    bm.card = newCard;
+    await saveUserBookmarksData();
+    closeCustomModal();
+    renderBookmarksPage();
+    showQuickToast(`«${bm.name}» переміщено у «${newCard}»!`, 'success');
+  };
+}
+
+async function deleteUserBookmarkFromPage(bookmarkIndex) {
+  const bm = userBookmarksList[bookmarkIndex];
+  const name = bm ? bm.name : 'цей сайт';
+  if (!confirm(`Видалити «${name}» із ваших закладок?`)) return;
+  userBookmarksList.splice(bookmarkIndex, 1);
+  await saveUserBookmarksData();
+  renderBookmarksPage();
+  syncAllCatalogHeartButtons();
+  showQuickToast(`«${name}» видалено з закладок`, 'info');
+}
 
 async function renderBookmarksPage() {
   const pageContainer = document.getElementById('bookmarksPageContainer');
@@ -4919,7 +5386,7 @@ async function renderBookmarksPage() {
         <div class="bm-guest-icon">❤️</div>
         <h2 class="bm-guest-title">Персональний розділ «Мої Закладки»</h2>
         <p class="bm-guest-desc">
-          Зберігайте будь-які улюблені сайти, корисні посилання та онлайн-сервіси в одному місці. Завдяки хмарній синхронізації ваші закладки автоматично доступні на всіх ваших пристроях.
+          Створюйте власні тематичні картки, зберігайте улюблені сайти з усього каталогу в 1 клік та керуйте персональними посиланнями з хмарною синхронізацією на всіх пристроях.
         </p>
         <button type="button" class="bm-guest-btn" id="btnBookmarksPageLogin">
           <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
@@ -4947,9 +5414,7 @@ async function renderBookmarksPage() {
   }
 
   try {
-    const userDoc = await firebaseDb.collection('users').doc(currentUser.uid).get();
-    const userData = userDoc.exists ? userDoc.data() : {};
-    userBookmarksList = userData.bookmarks || [];
+    await loadUserBookmarksData();
 
     if (loadingEl) loadingEl.style.display = 'none';
     pageContainer.style.display = 'block';
@@ -4957,62 +5422,111 @@ async function renderBookmarksPage() {
     const avatarUrl = currentUser.photoURL || 'https://www.gravatar.com/avatar/?d=mp';
     const userName = currentUser.displayName || currentUser.email || 'Користувач';
 
-    // Фільтрація за пошуком
-    let filtered = userBookmarksList;
-    if (bookmarksSearchQuery) {
-      const q = bookmarksSearchQuery.toLowerCase().trim();
-      filtered = userBookmarksList.filter(bm => (bm.name && bm.name.toLowerCase().includes(q)) || (bm.url && bm.url.toLowerCase().includes(q)));
+    if (!userBookmarkCards || userBookmarkCards.length === 0) {
+      userBookmarkCards = ['📌 Основні закладки'];
     }
 
-    let cardsHtml = '';
-    if (filtered.length === 0) {
-      if (userBookmarksList.length === 0) {
-        cardsHtml = `
-          <div class="bm-empty-box col-12">
-            <div style="font-size: 2.2rem; margin-bottom: 8px;">🌟</div>
-            <h5 class="font-weight-bold">У вас поки немає збережених сайтів</h5>
-            <p class="small mb-0">Додайте улюблені інтернет-ресурси через форму вище, і вони завжди будуть у вас під рукою!</p>
-          </div>
-        `;
-      } else {
-        cardsHtml = `
-          <div class="bm-empty-box col-12">
-            <h6 class="font-weight-bold mb-1">За вашим запитом нічого не знайдено</h6>
-            <p class="small mb-0">Спробуйте змінити слово або очистити пошук.</p>
-          </div>
-        `;
-      }
-    } else {
-      filtered.forEach((bm) => {
-        const originalIndex = userBookmarksList.findIndex(x => x.url === bm.url && x.name === bm.name);
-        let domain = '';
-        try { domain = new URL(bm.url).hostname; } catch (e) { domain = 'веб-сайт'; }
-        const faviconUrl = `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
+    // Групуємо закладки за картками
+    const cardsMap = {};
+    userBookmarkCards.forEach(cName => {
+      cardsMap[cName] = [];
+    });
 
-        cardsHtml += `
-          <div class="bm-card">
-            <a href="${bm.url}" target="_blank" rel="noopener noreferrer" class="bm-card-main" title="${bm.name} (${bm.url})">
-              <img src="${faviconUrl}" class="bm-card-favicon" alt="" onerror="this.src='favicon.ico'">
-              <div class="bm-card-info">
-                <div class="bm-card-name">${bm.name}</div>
-                <div class="bm-card-domain"><i class="fas fa-link small me-1"></i>${domain}</div>
+    userBookmarksList.forEach((bm, origIdx) => {
+      const cName = bm.card || userBookmarkCards[0] || '📌 Основні закладки';
+      if (!cardsMap[cName]) {
+        cardsMap[cName] = [];
+        if (!userBookmarkCards.includes(cName)) {
+          userBookmarkCards.push(cName);
+        }
+      }
+      cardsMap[cName].push({ ...bm, origIdx });
+    });
+
+    // Розподіляємо картки автоматично у 3 стовпчики
+    const colCards = [[], [], []];
+    userBookmarkCards.forEach((cName, idx) => {
+      colCards[idx % 3].push({
+        name: cName,
+        items: cardsMap[cName] || []
+      });
+    });
+
+    const renderColumnHtml = (cards) => {
+      if (!cards || cards.length === 0) return '';
+      return cards.map(card => {
+        let itemsHtml = '';
+        if (card.items.length === 0) {
+          itemsHtml = `
+            <li class="bm-empty-card-item">
+              <div class="text-center py-3 text-muted small">
+                <div class="mb-1" style="font-size: 1.3rem;">📂</div>
+                Картка порожня.<br>Додайте сайти кнопкою нижче або сердечком <strong>❤️</strong> в описах каталогу.
               </div>
-            </a>
-            <div class="bm-card-actions">
-              <a href="${bm.url}" target="_blank" rel="noopener noreferrer" class="bm-action-btn" title="Відкрити у новій вкладці">
-                <i class="fas fa-external-link-alt"></i>
-              </a>
-              <button type="button" class="bm-action-btn" onclick="copyToClipboard('${bm.url}', this, 'Скопійовано!')" title="Скопіювати посилання">
-                <i class="far fa-copy"></i>
-              </button>
-              <button type="button" class="bm-action-btn btn-del" onclick="deleteUserBookmarkFromPage(${originalIndex})" title="Видалити закладку">
-                <i class="far fa-trash-alt"></i>
+            </li>
+          `;
+        } else {
+          card.items.forEach(bm => {
+            let domain = '';
+            try { domain = new URL(bm.url).hostname; } catch (e) { domain = 'сайт'; }
+            const faviconUrl = `https://www.google.com/s2/favicons?domain=${domain}&sz=32`;
+            itemsHtml += `
+              <li class="bm-link-row">
+                <img src="${faviconUrl}" class="bm-item-favicon" alt="" onerror="this.src='favicon.ico'">
+                <a href="${escapeHtml(bm.url)}" target="_blank" rel="noopener noreferrer" class="bm-item-link" title="${escapeHtml(bm.name)} (${escapeHtml(bm.url)})">
+                  ${escapeHtml(bm.name)}
+                </a>
+                <small class="bm-item-domain">(${escapeHtml(domain)})</small>
+                <div class="bm-item-actions">
+                  <a href="${escapeHtml(bm.url)}" target="_blank" rel="noopener noreferrer" class="bm-icon-btn" title="Відкрити сайт">
+                    <i class="fas fa-external-link-alt"></i>
+                  </a>
+                  <button type="button" class="bm-icon-btn" onclick="copyToClipboard('${escapeHtml(bm.url)}', this, 'Скопійовано!')" title="Скопіювати посилання">
+                    <i class="far fa-copy"></i>
+                  </button>
+                  <button type="button" class="bm-icon-btn" onclick="promptMoveBookmark(${bm.origIdx})" title="Перемістити в іншу картку">
+                    <i class="fas fa-exchange-alt"></i>
+                  </button>
+                  <button type="button" class="bm-icon-btn btn-del" onclick="deleteUserBookmarkFromPage(${bm.origIdx})" title="Видалити закладку">
+                    <i class="far fa-trash-alt"></i>
+                  </button>
+                </div>
+              </li>
+            `;
+          });
+        }
+
+        return `
+          <div class="bm-user-card">
+            <div class="group-title">
+              <span class="bm-card-header-title" title="${escapeHtml(card.name)}">
+                <i class="fas fa-folder text-warning me-1"></i> ${escapeHtml(card.name)}
+                <span class="badge badge-light ms-1" style="font-size: 0.72rem; padding: 2px 6px;">${card.items.length}</span>
+              </span>
+              <div class="bm-card-header-actions">
+                <button type="button" class="bm-head-btn" onclick="openAddBookmarkModal('${escapeHtml(card.name)}')" title="Додати сайт у цю картку">
+                  <i class="fas fa-plus"></i>
+                </button>
+                <button type="button" class="bm-head-btn" onclick="promptRenameCard('${escapeHtml(card.name)}')" title="Перейменувати картку">
+                  <i class="fas fa-pen"></i>
+                </button>
+                <button type="button" class="bm-head-btn btn-del" onclick="promptDeleteCard('${escapeHtml(card.name)}')" title="Видалити картку">
+                  <i class="far fa-trash-alt"></i>
+                </button>
+              </div>
+            </div>
+            <ul class="bm-card-list">
+              ${itemsHtml}
+            </ul>
+            <div class="bm-card-footer">
+              <button type="button" class="bm-card-add-link-btn" onclick="openAddBookmarkModal('${escapeHtml(card.name)}')">
+                <i class="fas fa-plus me-1"></i> Додати сайт у цю картку
               </button>
             </div>
           </div>
         `;
-      });
-    }
+      }).join('');
+    };
 
     pageContainer.innerHTML = `
       <!-- Картка статусу користувача -->
@@ -5020,103 +5534,54 @@ async function renderBookmarksPage() {
         <div class="bm-hero-user">
           <img src="${avatarUrl}" class="bm-hero-avatar" alt="Avatar" referrerpolicy="no-referrer">
           <div class="bm-hero-info">
-            <h4>${userName}</h4>
+            <h4>${escapeHtml(userName)}</h4>
             <div class="bm-hero-sub">
-              <i class="fas fa-shield-alt text-success me-1"></i> Хмарна синхронізація активна • <strong>${currentUser.email}</strong>
+              <i class="fas fa-shield-alt text-success me-1"></i> Хмарна синхронізація активна • <strong>${escapeHtml(currentUser.email)}</strong>
             </div>
           </div>
         </div>
         <div class="bm-hero-stats">
           <span class="bm-stat-badge">
+            <i class="fas fa-folder-open"></i> Карток: ${userBookmarkCards.length}
+          </span>
+          <span class="bm-stat-badge">
             <i class="fas fa-bookmark"></i> Закладок: ${userBookmarksList.length}
           </span>
+          <button type="button" class="btn btn-danger btn-sm font-weight-bold" onclick="openCreateCardModal()" style="border-radius: 8px;">
+            <i class="fas fa-folder-plus me-1"></i> Створити картку
+          </button>
+          <button type="button" class="btn btn-primary btn-sm font-weight-bold" onclick="openAddBookmarkModal()" style="border-radius: 8px;">
+            <i class="fas fa-plus me-1"></i> Додати сайт
+          </button>
           <button type="button" class="btn btn-outline-secondary btn-sm" onclick="openUserCabinetModal()" title="Відкрити особистий кабінет" style="border-radius: 8px;">
             <i class="far fa-user-circle me-1"></i> Кабінет
           </button>
         </div>
       </div>
 
-      <!-- Картка додавання нової закладки -->
-      <div class="bm-add-card">
-        <div class="bm-add-title">
-          <i class="fas fa-plus-circle text-danger"></i> Додати новий сайт у власні закладки:
+      <!-- Інформаційна підказка -->
+      <div class="mb-3 p-2 px-3 d-flex align-items-center justify-content-between flex-wrap gap-2" style="background: rgba(225, 29, 72, 0.06); border: 1px solid rgba(225, 29, 72, 0.2); border-radius: 10px;">
+        <div class="small" style="line-height: 1.4;">
+          <span class="text-danger font-weight-bold"><i class="fas fa-heart"></i> Швидке додавання з каталогу:</span>
+          <span class="text-muted ms-1">Розгорніть опис будь-якого сайту на будь-якій сторінці «ТОП ЗАКЛАДКИ» та натисніть на значок <strong>❤️</strong> ліворуч, щоб миттєво зберегти ресурс у власні картки!</span>
         </div>
-        <form id="bmPageAddForm" class="bm-add-form" onsubmit="return false;">
-          <input type="text" id="bmPageNameInput" class="bm-input" placeholder="Назва (напр. Мій Google Диск)" required style="flex: 1 1 200px;">
-          <input type="url" id="bmPageUrlInput" class="bm-input" placeholder="Адреса https://..." required style="flex: 2 1 280px;">
-          <button type="submit" id="bmPageAddBtn" class="bm-btn-add">
-            <i class="fas fa-save me-1"></i> Зберегти
-          </button>
-        </form>
+        <button type="button" class="btn btn-sm btn-outline-danger font-weight-bold" onclick="openCreateCardModal()" style="font-size: 0.78rem; border-radius: 6px;">
+          + Створити нову картку
+        </button>
       </div>
 
-      <!-- Інструменти: Пошук та інформація -->
-      <div class="bm-tools-row">
-        <div class="bm-search-wrap">
-          <i class="fas fa-search bm-search-icon"></i>
-          <input type="text" id="bmPageSearchInput" class="bm-search-input" placeholder="Пошук серед збережених закладок..." value="${bookmarksSearchQuery}">
-        </div>
-        <div class="text-muted small">
-          Показано: <strong>${filtered.length}</strong> з ${userBookmarksList.length}
-        </div>
-      </div>
-
-      <!-- Сітка закладок -->
-      <div class="bm-grid">
-        ${cardsHtml}
+      <!-- 3 Стовпчика карток (автоматичний розподіл) -->
+      <div class="bm-3columns-grid">
+        <div class="bm-column" id="bmCol0">${renderColumnHtml(colCards[0])}</div>
+        <div class="bm-column" id="bmCol1">${renderColumnHtml(colCards[1])}</div>
+        <div class="bm-column" id="bmCol2">${renderColumnHtml(colCards[2])}</div>
       </div>
     `;
-
-    // Слухач на додавання
-    const addBtn = document.getElementById('bmPageAddBtn');
-    if (addBtn) {
-      addBtn.onclick = async () => {
-        const nameInput = document.getElementById('bmPageNameInput');
-        const urlInput = document.getElementById('bmPageUrlInput');
-        if (!nameInput || !urlInput) return;
-        const name = nameInput.value.trim();
-        let url = urlInput.value.trim();
-        if (!name || !url) {
-          alert('Будь ласка, заповніть назву та адресу сайту.');
-          return;
-        }
-        if (!url.startsWith('http://') && !url.startsWith('https://')) {
-          url = 'https://' + url;
-        }
-        userBookmarksList.push({ name, url, createdAt: new Date().toISOString() });
-        try {
-          await firebaseDb.collection('users').doc(currentUser.uid).set({
-            bookmarks: userBookmarksList
-          }, { merge: true });
-          renderBookmarksPage();
-          renderUserBookmarksTab();
-        } catch (err) {
-          alert('Помилка збереження: ' + err.message);
-        }
-      };
-    }
-
-    // Слухач на пошук
-    const searchInput = document.getElementById('bmPageSearchInput');
-    if (searchInput) {
-      searchInput.addEventListener('input', (e) => {
-        bookmarksSearchQuery = e.target.value;
-        renderBookmarksPage();
-      });
-    }
-
   } catch (err) {
     if (loadingEl) loadingEl.style.display = 'none';
     pageContainer.style.display = 'block';
-    pageContainer.innerHTML = `<div class="alert alert-danger">Помилка: ${err.message}</div>`;
+    pageContainer.innerHTML = `<div class="alert alert-danger">Помилка завантаження: ${err.message}</div>`;
   }
-}
-
-// Видалення зі сторінки закладок
-async function deleteUserBookmarkFromPage(index) {
-  if (!confirm('Видалити цей сайт із ваших закладок?')) return;
-  await deleteUserBookmark(index);
-  renderBookmarksPage();
 }
 
 // 3. Вкладка: 👑 Панель Адміністратора (для weber515sis@gmail.com)

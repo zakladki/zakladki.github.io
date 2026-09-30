@@ -6844,6 +6844,331 @@ body.dark-mode .bm-guest-btn:hover {
   background: #1e293b;
   border-color: #475569;
 }
+/* ==========================================================================
+   КНОПКА ШВИДКОГО ДОДАВАННЯ В ЗАКЛАДКИ «❤️» В ОПИСАХ САЙТІВ КАТАЛОГУ
+   ========================================================================== */
+.desc-heart-add-btn {
+  width: 18px !important;
+  height: 18px !important;
+  min-width: 18px !important;
+  max-width: 18px !important;
+  margin-top: 1px !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  outline: none !important;
+  cursor: pointer !important;
+  color: #94a3b8 !important;
+  font-size: 0.92rem !important;
+  line-height: 1 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+  border-radius: 4px !important;
+  transition: transform 0.2s ease, color 0.2s ease !important;
+}
+.desc-heart-add-btn:hover {
+  color: #e11d48 !important;
+  transform: scale(1.25) !important;
+}
+.desc-heart-add-btn.in-bookmarks {
+  color: #e11d48 !important;
+}
+.desc-heart-add-btn.in-bookmarks i {
+  font-weight: 900 !important;
+}
+body.dark-mode .desc-heart-add-btn {
+  color: #64748b !important;
+}
+body.dark-mode .desc-heart-add-btn:hover {
+  color: #fb7185 !important;
+}
+body.dark-mode .desc-heart-add-btn.in-bookmarks {
+  color: #f43f5e !important;
+}
+
+/* ==========================================================================
+   3 СТОВПЧИКА ТА КАРТКИ КОРИСТУВАЧА В «❤️ ЗАКЛАДКАХ»
+   ========================================================================== */
+.bm-3columns-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  align-items: start;
+  margin-top: 14px;
+  margin-bottom: 30px;
+}
+.bm-column {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+@media (max-width: 1024px) and (min-width: 700px) {
+  .bm-3columns-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .bm-3columns-grid .bm-column:nth-child(3) {
+    grid-column: span 2;
+  }
+}
+@media (max-width: 699.98px) {
+  .bm-3columns-grid {
+    grid-template-columns: 1fr;
+  }
+  .bm-3columns-grid .bm-column:nth-child(3) {
+    grid-column: auto;
+  }
+}
+
+/* Користувацька картка (тематична група закладок) */
+.bm-user-card {
+  background: var(--card-bg, #ffffff);
+  border: 1px solid var(--border-color, #cbd5e1);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+  display: flex;
+  flex-direction: column;
+}
+.bm-user-card:hover {
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+  border-color: #cbd5e1;
+}
+body.dark-mode .bm-user-card {
+  background: #1e293b;
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+}
+body.dark-mode .bm-user-card:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.bm-user-card .group-title {
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+  color: #ffffff;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  border-radius: 11px 11px 0 0;
+}
+body.dark-mode .bm-user-card .group-title {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+.bm-card-header-title {
+  font-weight: 700;
+  font-size: 0.92rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #ffffff;
+}
+.bm-card-header-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+}
+.bm-head-btn {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+  width: 26px;
+  height: 26px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  padding: 0;
+}
+.bm-head-btn:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.15);
+}
+.bm-head-btn.btn-del:hover {
+  color: #f87171;
+  background: rgba(239, 68, 68, 0.2);
+}
+
+.bm-card-list {
+  list-style: none;
+  margin: 0;
+  padding: 6px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex-grow: 1;
+}
+.bm-link-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  transition: background-color 0.15s ease;
+  position: relative;
+}
+.bm-link-row:hover {
+  background-color: rgba(59, 130, 246, 0.08);
+}
+body.dark-mode .bm-link-row:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+.bm-item-favicon {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  flex-shrink: 0;
+  object-fit: cover;
+}
+.bm-item-link {
+  font-weight: 600;
+  font-size: 0.88rem;
+  color: var(--text-main, #1e293b);
+  text-decoration: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 180px;
+}
+.bm-item-link:hover {
+  color: #2563eb;
+  text-decoration: none;
+}
+body.dark-mode .bm-item-link {
+  color: #e2e8f0;
+}
+body.dark-mode .bm-item-link:hover {
+  color: #60a5fa;
+}
+.bm-item-domain {
+  font-size: 0.73rem;
+  color: var(--text-muted, #94a3b8);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.bm-item-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  margin-left: auto;
+  opacity: 0.7;
+  transition: opacity 0.15s ease;
+}
+.bm-link-row:hover .bm-item-actions {
+  opacity: 1;
+}
+.bm-icon-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted, #94a3b8);
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  padding: 0;
+}
+.bm-icon-btn:hover {
+  color: #2563eb;
+  background: rgba(37, 99, 235, 0.1);
+}
+.bm-icon-btn.btn-del:hover {
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.1);
+}
+body.dark-mode .bm-icon-btn:hover {
+  color: #60a5fa;
+  background: rgba(96, 165, 250, 0.15);
+}
+body.dark-mode .bm-icon-btn.btn-del:hover {
+  color: #f87171;
+  background: rgba(248, 113, 113, 0.15);
+}
+
+.bm-card-footer {
+  padding: 6px 10px 8px;
+  border-top: 1px dashed var(--border-color, #e2e8f0);
+}
+body.dark-mode .bm-card-footer {
+  border-top-color: rgba(255, 255, 255, 0.08);
+}
+.bm-card-add-link-btn {
+  background: transparent;
+  border: 1px dashed rgba(225, 29, 72, 0.35);
+  color: #e11d48;
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  width: 100%;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.bm-card-add-link-btn:hover {
+  background: rgba(225, 29, 72, 0.08);
+  border-color: #e11d48;
+}
+body.dark-mode .bm-card-add-link-btn {
+  border-color: rgba(251, 113, 133, 0.35);
+  color: #fda4af;
+}
+body.dark-mode .bm-card-add-link-btn:hover {
+  background: rgba(225, 29, 72, 0.18);
+  border-color: #fb7185;
+}
+
+/* Floating Quick Toast Notification */
+.custom-quick-toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 10000;
+  background: #1e293b;
+  color: #ffffff;
+  padding: 10px 18px;
+  border-radius: 10px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  opacity: 0;
+  transform: translateY(15px);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+.custom-quick-toast.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+.custom-quick-toast.success {
+  border-color: rgba(16, 185, 129, 0.5);
+}
+.custom-quick-toast.info {
+  border-color: rgba(59, 130, 246, 0.5);
+}
+.custom-quick-toast.warning {
+  border-color: rgba(245, 158, 11, 0.5);
+}
 .bm-empty-box {
   background: var(--card-bg, #ffffff);
   border: 2px dashed var(--border-color, #cbd5e1);
