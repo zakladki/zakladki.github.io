@@ -7187,7 +7187,9 @@ body.dark-mode .bm-empty-box {
 
 /* Підказка швидкого додавання в середині hero-картки закладок */
 .bm-hero-hint-line {
-  margin-top: 12px;
+  width: 100% !important;
+  flex: 0 0 100% !important;
+  margin-top: 14px;
   padding-top: 10px;
   border-top: 1px dashed rgba(225, 29, 72, 0.2);
   font-size: 0.82rem;

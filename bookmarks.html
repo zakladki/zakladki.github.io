@@ -153,14 +153,16 @@
       <h1 class="sr-only">❤️ Мої Закладки – Персональні сайти користувача</h1>
       
       <!-- Головний динамічний контейнер сторінки закладок -->
-      <div class="container-fluid px-3 px-md-4" id="bookmarksPageApp" style="padding-bottom: 30px;">
-        <div id="bookmarksPageLoading" class="text-center py-5">
-          <div class="spinner-border text-danger mb-3" role="status" style="width: 3rem; height: 3rem;">
-            <span class="sr-only">Завантаження...</span>
+      <div class="row">
+        <div class="tab-content container" id="bookmarksPageApp" style="padding-bottom: 30px;">
+          <div id="bookmarksPageLoading" class="text-center py-5">
+            <div class="spinner-border text-danger mb-3" role="status" style="width: 3rem; height: 3rem;">
+              <span class="sr-only">Завантаження...</span>
+            </div>
+            <h5 class="text-muted">Завантаження персональних закладок...</h5>
           </div>
-          <h5 class="text-muted">Завантаження персональних закладок...</h5>
+          <div id="bookmarksPageContainer" style="display: none;"></div>
         </div>
-        <div id="bookmarksPageContainer" style="display: none;"></div>
       </div>
     </main>
 
