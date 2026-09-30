@@ -149,11 +149,11 @@
       </nav>
     </div>
 
-    <main class="container-fluid main" id="main-content" role="main" style="padding-top: 54px; min-height: 80vh;">
+    <main class="container-fluid main" id="main-content" role="main">
       <h1 class="sr-only">❤️ Мої Закладки – Персональні сайти користувача</h1>
       
       <!-- Головний динамічний контейнер сторінки закладок -->
-      <div class="container" id="bookmarksPageApp">
+      <div class="container-fluid px-3 px-md-4" id="bookmarksPageApp" style="padding-bottom: 30px;">
         <div id="bookmarksPageLoading" class="text-center py-5">
           <div class="spinner-border text-danger mb-3" role="status" style="width: 3rem; height: 3rem;">
             <span class="sr-only">Завантаження...</span>
@@ -164,19 +164,26 @@
       </div>
     </main>
 
-    <footer class="footer">
+    <footer class="footer mt-auto py-2 ">
       <div class="container">
-        <div class="row">
+        <div class="row align-items-center justify-content-between">
           <div class="col-sm footer-col d-flex justify-content-center">
-            <div class="copy font-weight-bold">
-              <a href="https://zakladki.github.io/" class="copy-url-link">ЗАКЛАДКИ</a> 
-              <span>&copy; 2014 &ndash; 2026</span>
-              <a href="CHANGELOG.md" class="changelog-link" title="Хронологія оновлень (CHANGELOG.md)">Що нового?</a>
+            <div class="kolobok d-flex align-items-center gap-3">
+              <a href="https://t.me/zakladki_top_one" target="_blank" title="Офіційний Telegram-канал із новинами та анонсами сайту"><i class="fab fa-telegram fa-lg" aria-hidden="true"></i> Telegram</a>
+              <a href="https://t.me/+1UKue84k2AVjZDcy" target="_blank" title="Чат для спілкування, запитань, обговорень та опитувань"><i class="fas fa-comments"></i> Чат</a>
+              <a href="CHANGELOG.md" class="changelog-link" target="_blank" title="Журнал змін: історія оновлень на сайті"><i class="fas fa-history"></i> Що нового?</a>
             </div>
           </div>
           <div class="col-sm footer-col d-flex justify-content-center">
-            <div class="mycounter-wrapper">
+            <div class="kolobok d-flex align-items-center gap-3">
+              <a class="btn btn-primary btn-sm" href="https://docs.google.com/document/d/15VLtvFvXNxhkXU_ZH74387e289Rx6If2Zmrp4m8KFAc" title="Фінансова допомога на розвиток та підтримку проекту" role="button" target="_blank">ПІДТРИМАТИ САЙТ</a>
               <!-- MyCounter v.2.0 -->
+              <script type="text/javascript"><!--
+              my_id = 168151;
+              my_width = 88;
+              my_height = 31;
+              my_alt = "MyCounter - счётчик и статистика";
+              //--></script>
               <script type="text/javascript"
                 src="https://get.mycounter.ua/counter2.0.js">
               </script><noscript>
@@ -203,6 +210,11 @@
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
+    <!-- Firebase App, Auth & Firestore SDKs (v10.12.0 Compat for static hosting) -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+    <script src="js/catalog-items.js"></script>
     <script src="js/main.js"></script>
   </body>
 </html>

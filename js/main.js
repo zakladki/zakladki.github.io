@@ -791,7 +791,7 @@ document.addEventListener("DOMContentLoaded", () => {
         recCard.innerHTML = `
           <div class="group-title">
             <span class="badge badge-recommend">Партнери Сайту</span>
-            <a href="https://docs.google.com/document/d/15S2XrUxYaj1uu68wtfqww3Gkqa-Lq2Ra-P20AHWqKgs" target="_blank" class="group-add-btn" title="Вільне Місце. Добавте свій сайт, магазин, сервіс, тощо (посилання і опис)."><i class="fas fa-plus"></i></a>
+            <a href="https://docs.google.com/document/d/15S2XrUxYaj1uu68wtfqww3Gkqa-Lq2Ra-P20AHWqKgs" target="_blank" class="group-add-btn" title="Вільне Місце. Розмістіть свій сайт, магазин, сервіс, тощо (посилання і опис)."><i class="fas fa-plus"></i></a>
           </div>
           <ul>
             <li>
@@ -803,7 +803,7 @@ document.addEventListener("DOMContentLoaded", () => {
         recCard.innerHTML = `
           <div class="group-title">
             <span class="badge badge-recommend">Партнери Розділу</span>
-            <a href="https://docs.google.com/document/d/15S2XrUxYaj1uu68wtfqww3Gkqa-Lq2Ra-P20AHWqKgs" target="_blank" class="group-add-btn" title="Вільне Місце. Добавте свій сайт, магазин, сервіс, тощо (посилання і опис)."><i class="fas fa-plus"></i></a>
+            <a href="https://docs.google.com/document/d/15S2XrUxYaj1uu68wtfqww3Gkqa-Lq2Ra-P20AHWqKgs" target="_blank" class="group-add-btn" title="Вільне Місце. Розмістіть свій сайт, магазин, сервіс, тощо (посилання і опис)."><i class="fas fa-plus"></i></a>
           </div>
           <ul>
             <li>
@@ -823,7 +823,7 @@ document.addEventListener("DOMContentLoaded", () => {
       addBtn.href = 'https://docs.google.com/document/d/15S2XrUxYaj1uu68wtfqww3Gkqa-Lq2Ra-P20AHWqKgs';
       addBtn.target = '_blank';
       addBtn.className = 'group-add-btn';
-      addBtn.title = 'Вільне Місце. Добавте свій сайт, магазин, сервіс, тощо (посилання і опис).';
+      addBtn.title = 'Вільне Місце. Розмістіть свій сайт, магазин, сервіс, тощо (посилання і опис).';
       addBtn.innerHTML = '<i class="fas fa-plus"></i>';
       titleEl.appendChild(addBtn);
     }
@@ -1899,13 +1899,13 @@ function openBadgesModal() {
               <p class="badges-legend-desc">Офіційне партнерське розміщення ресурсу в тематичній картці каталогу (у верхній або стандартній зоні списку).</p>
             </div>
 
-            <!-- 2. Вільне Місце (+) Додати свій сайт -->
+            <!-- 2. Вільне Місце (+) Розмістити сайт -->
             <div class="badges-legend-item">
               <div class="badges-legend-header">
-                <div class="badges-legend-preview" title="Вільне Місце — Додати сайт">
-                  <a href="https://docs.google.com/document/d/15S2XrUxYaj1uu68wtfqww3Gkqa-Lq2Ra-P20AHWqKgs" target="_blank" class="badges-legend-add-btn" title="Вільне Місце. Добавте свій сайт, магазин, сервіс, тощо"><i class="fas fa-plus"></i></a>
+                <div class="badges-legend-preview" title="Вільне Місце - Розмістити сайт">
+                  <a href="https://docs.google.com/document/d/15S2XrUxYaj1uu68wtfqww3Gkqa-Lq2Ra-P20AHWqKgs" target="_blank" class="badges-legend-add-btn" title="Вільне Місце. Розмістіть свій сайт, магазин, сервіс, тощо"><i class="fas fa-plus"></i></a>
                 </div>
-                <div class="badges-legend-title">Кнопка «+» (Вільне Місце)</div>
+                <div class="badges-legend-title">Кнопка «+» (Розмістити сайт)</div>
               </div>
               <p class="badges-legend-desc">Розташована в лівому кутку шапки кожної картки (її колір відповідає забарвленню конкретного розділу). Швидкий перехід для розміщення вашого сайту, інтернет-магазину, сервісу чи авторського проєкту в нашому каталозі (з персональним описом та прямим посиланням у відповідному розділі).</p>
             </div>
@@ -2477,7 +2477,7 @@ function openAdOrderModal(opts = {}) {
           <button type="button" class="cl-modal-close ad-sticky-close-btn" aria-label="Закрити" title="Закрити">&times;</button>
         </div>
         <div class="cl-modal-header ad-modal-header">
-          <h5 class="cl-modal-title"><i class="fas fa-bullhorn text-primary"></i> Додати сайт</h5>
+          <h5 class="cl-modal-title"><i class="fas fa-bullhorn text-primary"></i> Розмістити сайт</h5>
         </div>
         <div class="cl-modal-body ad-modal-body">
           
@@ -5207,6 +5207,18 @@ function openAddBookmarkModal(defaultCard = '') {
   showCustomModal({
     title: '❤️ Додати сайт у закладки',
     bodyHtml: `
+      <!-- Швидкий вибір ресурсу з каталогу ТОП ЗАКЛАДКИ -->
+      <div class="mb-3 p-2 rounded" style="background: rgba(14, 165, 233, 0.08); border: 1px solid rgba(14, 165, 233, 0.25);">
+        <label class="small font-weight-bold mb-1 d-flex align-items-center justify-content-between text-info">
+          <span><i class="fas fa-search me-1"></i> Обрати з каталогу сайту:</span>
+          <span class="text-muted font-weight-normal" style="font-size: 0.72rem;">швидке автозаповнення</span>
+        </label>
+        <div class="position-relative">
+          <input type="text" id="bmCatalogSearchInput" class="form-control form-control-sm" placeholder="🔍 Введіть назву ресурсу (Дія, YouTube, Rozetka, Privat24)..." autocomplete="off">
+          <div id="bmCatalogDropdownResults" class="bm-catalog-results-dropdown" style="display: none;"></div>
+        </div>
+      </div>
+
       <div class="mb-2">
         <label class="small font-weight-bold mb-1">Назва сайту:</label>
         <input type="text" id="bmModalNameInput" class="form-control form-control-sm" placeholder="Наприклад: Мій Google Диск">
@@ -5231,6 +5243,78 @@ function openAddBookmarkModal(defaultCard = '') {
       <button type="button" class="btn btn-danger btn-sm font-weight-bold" id="confirmAddBmBtn">Зберегти закладку</button>
     `
   });
+
+  // Підключення швидкого автопошуку по каталогу
+  const searchInput = document.getElementById('bmCatalogSearchInput');
+  const dropdown = document.getElementById('bmCatalogDropdownResults');
+  const nameInput = document.getElementById('bmModalNameInput');
+  const urlInput = document.getElementById('bmModalUrlInput');
+  const descInput = document.getElementById('bmModalDescInput');
+
+  if (searchInput && dropdown) {
+    const handleSearch = () => {
+      const q = searchInput.value.trim().toLowerCase();
+      if (!q || q.length < 2) {
+        dropdown.style.display = 'none';
+        dropdown.innerHTML = '';
+        return;
+      }
+      const catalog = window.CATALOG_ITEMS || [];
+      const matches = catalog.filter(it => 
+        (it.name && it.name.toLowerCase().includes(q)) ||
+        (it.url && it.url.toLowerCase().includes(q)) ||
+        (it.card && it.card.toLowerCase().includes(q)) ||
+        (it.desc && it.desc.toLowerCase().includes(q))
+      ).slice(0, 15);
+
+      if (matches.length === 0) {
+        dropdown.innerHTML = `<div class="p-2 text-muted small text-center">За запитом «${escapeHtml(searchInput.value)}» нічого не знайдено</div>`;
+        dropdown.style.display = 'block';
+        return;
+      }
+
+      dropdown.innerHTML = matches.map((m, idx) => {
+        let domain = '';
+        try { domain = new URL(m.url).hostname; } catch(e) { domain = ''; }
+        const faviconUrl = `https://www.google.com/s2/favicons?domain=${domain}&sz=32`;
+        return `
+          <div class="bm-catalog-item-result" data-idx="${idx}">
+            <img src="${faviconUrl}" alt="" onerror="this.src='favicon.ico'">
+            <div class="bm-catalog-item-text" style="min-width: 0; flex: 1;">
+              <div class="bm-catalog-item-name">${escapeHtml(m.name)}</div>
+              <div class="bm-catalog-item-domain">${escapeHtml(domain)}</div>
+            </div>
+            ${m.card ? `<span class="bm-catalog-item-card">${escapeHtml(m.card)}</span>` : ''}
+          </div>
+        `;
+      }).join('');
+      dropdown.style.display = 'block';
+
+      dropdown.querySelectorAll('.bm-catalog-item-result').forEach(el => {
+        el.onmousedown = (e) => {
+          e.preventDefault();
+          const idx = parseInt(el.getAttribute('data-idx'), 10);
+          const item = matches[idx];
+          if (item) {
+            nameInput.value = item.name || '';
+            urlInput.value = item.url || '';
+            descInput.value = item.desc || '';
+            dropdown.style.display = 'none';
+            searchInput.value = item.name;
+            showQuickToast(`Підставлено «${item.name}» з каталогу!`, 'info');
+          }
+        };
+      });
+    };
+
+    searchInput.addEventListener('input', handleSearch);
+    searchInput.addEventListener('focus', handleSearch);
+    searchInput.addEventListener('blur', () => {
+      setTimeout(() => {
+        if (dropdown) dropdown.style.display = 'none';
+      }, 250);
+    });
+  }
 
   document.getElementById('confirmAddBmBtn').onclick = async () => {
     const nameEl = document.getElementById('bmModalNameInput');
@@ -5557,17 +5641,10 @@ async function renderBookmarksPage() {
             <i class="far fa-user-circle me-1"></i> Кабінет
           </button>
         </div>
-      </div>
-
-      <!-- Інформаційна підказка -->
-      <div class="mb-3 p-2 px-3 d-flex align-items-center justify-content-between flex-wrap gap-2" style="background: rgba(225, 29, 72, 0.06); border: 1px solid rgba(225, 29, 72, 0.2); border-radius: 10px;">
-        <div class="small" style="line-height: 1.4;">
-          <span class="text-danger font-weight-bold"><i class="fas fa-heart"></i> Швидке додавання з каталогу:</span>
-          <span class="text-muted ms-1">Розгорніть опис будь-якого сайту на будь-якій сторінці «ТОП ЗАКЛАДКИ» та натисніть на значок <strong>❤️</strong> ліворуч, щоб миттєво зберегти ресурс у власні картки!</span>
+        <div class="bm-hero-hint-line">
+          <span class="bm-hint-title"><i class="fas fa-heart text-danger"></i> Швидке додавання з каталогу:</span>
+          <span class="bm-hint-desc">Розгорніть опис будь-якого сайту на будь-якій сторінці «ТОП ЗАКЛАДКИ» та натисніть на значок <strong>❤️</strong> ліворуч, щоб миттєво зберегти ресурс у власні картки!</span>
         </div>
-        <button type="button" class="btn btn-sm btn-outline-danger font-weight-bold" onclick="openCreateCardModal()" style="font-size: 0.78rem; border-radius: 6px;">
-          + Створити нову картку
-        </button>
       </div>
 
       <!-- 3 Стовпчика карток (автоматичний розподіл) -->
