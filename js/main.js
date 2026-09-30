@@ -5207,35 +5207,87 @@ function openAddBookmarkModal(defaultCard = '') {
   showCustomModal({
     title: '❤️ Додати сайт у закладки',
     bodyHtml: `
-      <!-- Швидкий вибір ресурсу з каталогу ТОП ЗАКЛАДКИ -->
-      <div class="mb-3 p-2 rounded" style="background: rgba(14, 165, 233, 0.08); border: 1px solid rgba(14, 165, 233, 0.25);">
-        <label class="small font-weight-bold mb-1 d-flex align-items-center justify-content-between text-info">
-          <span><i class="fas fa-search me-1"></i> Обрати з каталогу сайту:</span>
-          <span class="text-muted font-weight-normal" style="font-size: 0.72rem;">швидке автозаповнення</span>
-        </label>
-        <div class="position-relative">
-          <input type="text" id="bmCatalogSearchInput" class="form-control form-control-sm" placeholder="🔍 Введіть назву ресурсу (Дія, YouTube, Rozetka, Privat24)..." autocomplete="off">
-          <div id="bmCatalogDropdownResults" class="bm-catalog-results-dropdown" style="display: none;"></div>
+      <!-- Пропозиція 1 (вгорі): Додати сайт власноруч -->
+      <div class="bm-add-choice-card" id="bmChoiceManualCard">
+        <div class="bm-choice-header" id="bmChoiceManualHeader" title="Натисніть, щоб розгорнути / згорнути введення власноруч">
+          <div class="bm-choice-title-wrap">
+            <span class="bm-choice-title">
+              <i class="fas fa-edit text-danger"></i> Додати сайт власноруч
+            </span>
+            <span class="bm-choice-sub">Ввести назву та посилання самостійно</span>
+          </div>
+          <i class="fas fa-chevron-down bm-choice-chevron"></i>
+        </div>
+        <div class="bm-choice-body" id="bmChoiceManualBody">
+          <div class="mb-2">
+            <label class="small font-weight-bold mb-1">Назва сайту:</label>
+            <input type="text" id="bmModalNameInput" class="form-control form-control-sm" placeholder="Наприклад: Мій Google Диск">
+          </div>
+          <div class="mb-2">
+            <label class="small font-weight-bold mb-1">Адреса сайту (URL):</label>
+            <input type="url" id="bmModalUrlInput" class="form-control form-control-sm" placeholder="https://...">
+          </div>
+          <div class="mb-2">
+            <label class="small font-weight-bold mb-1">Оберіть картку:</label>
+            <select id="bmModalCardSelect" class="form-control form-control-sm">
+              ${optionsHtml}
+            </select>
+          </div>
+          <div class="mb-1">
+            <label class="small font-weight-bold mb-1">Короткий опис (необов'язково):</label>
+            <textarea id="bmModalDescInput" class="form-control form-control-sm" rows="2" placeholder="Опис сайту..."></textarea>
+          </div>
         </div>
       </div>
 
-      <div class="mb-2">
-        <label class="small font-weight-bold mb-1">Назва сайту:</label>
-        <input type="text" id="bmModalNameInput" class="form-control form-control-sm" placeholder="Наприклад: Мій Google Диск">
+      <!-- Роздільник АБО -->
+      <div class="bm-choice-divider">
+        <span>АБО</span>
       </div>
-      <div class="mb-2">
-        <label class="small font-weight-bold mb-1">Адреса сайту (URL):</label>
-        <input type="url" id="bmModalUrlInput" class="form-control form-control-sm" placeholder="https://...">
-      </div>
-      <div class="mb-2">
-        <label class="small font-weight-bold mb-1">Оберіть картку:</label>
-        <select id="bmModalCardSelect" class="form-control form-control-sm">
-          ${optionsHtml}
-        </select>
-      </div>
-      <div class="mb-1">
-        <label class="small font-weight-bold mb-1">Короткий опис (необов'язково):</label>
-        <textarea id="bmModalDescInput" class="form-control form-control-sm" rows="2" placeholder="Опис сайту..."></textarea>
+
+      <!-- Пропозиція 2 (нижче): Обрати з каталогу сайту -->
+      <div class="bm-add-choice-card catalog-mode" id="bmChoiceCatalogCard">
+        <div class="bm-choice-header" id="bmChoiceCatalogHeader" title="Натисніть, щоб розгорнути / згорнути вибір із каталогу">
+          <div class="bm-choice-title-wrap">
+            <span class="bm-choice-title">
+              <i class="fas fa-search text-info"></i> Обрати з каталогу сайту
+            </span>
+            <span class="bm-choice-sub">Швидкий вибір із готової бази 740+ ресурсів</span>
+          </div>
+          <i class="fas fa-chevron-down bm-choice-chevron"></i>
+        </div>
+        <div class="bm-choice-body" id="bmChoiceCatalogBody">
+          <div class="mb-2 position-relative">
+            <label class="small font-weight-bold mb-1">Пошук у каталозі:</label>
+            <input type="text" id="bmCatalogSearchInput" class="form-control form-control-sm" placeholder="🔍 Введіть назву (Дія, YouTube, Rozetka, Privat24)..." autocomplete="off">
+            <div id="bmCatalogDropdownResults" class="bm-catalog-results-dropdown" style="display: none;"></div>
+          </div>
+
+          <div id="bmCatalogSelectedWrap" style="display: none; background: rgba(14, 165, 233, 0.08); border: 1px solid rgba(14, 165, 233, 0.25); border-radius: 8px;" class="mb-2 p-2">
+            <div class="d-flex align-items-center justify-content-between mb-1">
+              <span class="small font-weight-bold text-success"><i class="fas fa-check-circle me-1"></i> Обрано сайт з каталогу:</span>
+              <button type="button" class="btn btn-link btn-sm p-0 text-muted" id="bmCatalogResetChoiceBtn" style="font-size: 0.73rem;">Обрати інший</button>
+            </div>
+            <div class="d-flex align-items-center gap-2 mb-1">
+              <img id="bmCatalogSelFavicon" src="favicon.ico" style="width: 20px; height: 20px; border-radius: 4px;" alt="">
+              <div style="min-width: 0; flex: 1;">
+                <div id="bmCatalogSelName" class="font-weight-bold small text-truncate"></div>
+                <div id="bmCatalogSelUrl" class="text-muted" style="font-size: 0.72rem; word-break: break-all;"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-2">
+            <label class="small font-weight-bold mb-1">Оберіть картку:</label>
+            <select id="bmCatalogCardSelect" class="form-control form-control-sm">
+              ${optionsHtml}
+            </select>
+          </div>
+          <div class="mb-1">
+            <label class="small font-weight-bold mb-1">Короткий опис (необов'язково):</label>
+            <textarea id="bmCatalogDescInput" class="form-control form-control-sm" rows="2" placeholder="Опис сайту..."></textarea>
+          </div>
+        </div>
       </div>
     `,
     footerHtml: `
@@ -5244,13 +5296,75 @@ function openAddBookmarkModal(defaultCard = '') {
     `
   });
 
-  // Підключення швидкого автопошуку по каталогу
-  const searchInput = document.getElementById('bmCatalogSearchInput');
-  const dropdown = document.getElementById('bmCatalogDropdownResults');
+  // Логіка згортання/розгортання двох пропозицій
+  let activeMode = null; // Початково обидві пропозиції згорнуті
+  let selectedCatalogItem = null;
+
+  const cardManual = document.getElementById('bmChoiceManualCard');
+  const cardCatalog = document.getElementById('bmChoiceCatalogCard');
+  const headerManual = document.getElementById('bmChoiceManualHeader');
+  const headerCatalog = document.getElementById('bmChoiceCatalogHeader');
+
   const nameInput = document.getElementById('bmModalNameInput');
   const urlInput = document.getElementById('bmModalUrlInput');
+  const cardSelectManual = document.getElementById('bmModalCardSelect');
   const descInput = document.getElementById('bmModalDescInput');
 
+  const searchInput = document.getElementById('bmCatalogSearchInput');
+  const dropdown = document.getElementById('bmCatalogDropdownResults');
+  const selectedWrap = document.getElementById('bmCatalogSelectedWrap');
+  const selFavicon = document.getElementById('bmCatalogSelFavicon');
+  const selName = document.getElementById('bmCatalogSelName');
+  const selUrl = document.getElementById('bmCatalogSelUrl');
+  const cardSelectCatalog = document.getElementById('bmCatalogCardSelect');
+  const descCatalogInput = document.getElementById('bmCatalogDescInput');
+  const resetChoiceBtn = document.getElementById('bmCatalogResetChoiceBtn');
+
+  // Синхронізація вибору картки між обома формами
+  if (cardSelectManual && cardSelectCatalog) {
+    cardSelectManual.addEventListener('change', () => {
+      cardSelectCatalog.value = cardSelectManual.value;
+    });
+    cardSelectCatalog.addEventListener('change', () => {
+      cardSelectManual.value = cardSelectCatalog.value;
+    });
+  }
+
+  // Клік на першу пропозицію (Власноруч)
+  if (headerManual) {
+    headerManual.onclick = () => {
+      if (activeMode === 'manual') {
+        activeMode = null;
+        cardManual.classList.remove('active');
+      } else {
+        activeMode = 'manual';
+        cardManual.classList.add('active');
+        cardCatalog.classList.remove('active');
+        setTimeout(() => {
+          if (nameInput) nameInput.focus();
+        }, 100);
+      }
+    };
+  }
+
+  // Клік на другу пропозицію (З каталогу)
+  if (headerCatalog) {
+    headerCatalog.onclick = () => {
+      if (activeMode === 'catalog') {
+        activeMode = null;
+        cardCatalog.classList.remove('active');
+      } else {
+        activeMode = 'catalog';
+        cardCatalog.classList.add('active');
+        cardManual.classList.remove('active');
+        setTimeout(() => {
+          if (searchInput) searchInput.focus();
+        }, 100);
+      }
+    };
+  }
+
+  // Пошук у каталозі
   if (searchInput && dropdown) {
     const handleSearch = () => {
       const q = searchInput.value.trim().toLowerCase();
@@ -5296,12 +5410,18 @@ function openAddBookmarkModal(defaultCard = '') {
           const idx = parseInt(el.getAttribute('data-idx'), 10);
           const item = matches[idx];
           if (item) {
-            nameInput.value = item.name || '';
-            urlInput.value = item.url || '';
-            descInput.value = item.desc || '';
+            selectedCatalogItem = item;
+            let domain = '';
+            try { domain = new URL(item.url).hostname; } catch(e) { domain = ''; }
+            const faviconUrl = `https://www.google.com/s2/favicons?domain=${domain}&sz=32`;
+            if (selFavicon) selFavicon.src = faviconUrl;
+            if (selName) selName.textContent = item.name;
+            if (selUrl) selUrl.textContent = item.url;
+            if (descCatalogInput) descCatalogInput.value = item.desc || '';
+            if (selectedWrap) selectedWrap.style.display = 'block';
             dropdown.style.display = 'none';
             searchInput.value = item.name;
-            showQuickToast(`Підставлено «${item.name}» з каталогу!`, 'info');
+            showQuickToast(`Підставлено «${item.name}»! Оберіть картку та натисніть «Зберегти закладку»`, 'info');
           }
         };
       });
@@ -5316,23 +5436,61 @@ function openAddBookmarkModal(defaultCard = '') {
     });
   }
 
+  // Скидання вибору ресурсу з каталогу
+  if (resetChoiceBtn) {
+    resetChoiceBtn.onclick = (e) => {
+      e.preventDefault();
+      selectedCatalogItem = null;
+      if (selectedWrap) selectedWrap.style.display = 'none';
+      if (searchInput) {
+        searchInput.value = '';
+        searchInput.focus();
+      }
+      if (descCatalogInput) descCatalogInput.value = '';
+    };
+  }
+
+  // Обробка збереження закладки
   document.getElementById('confirmAddBmBtn').onclick = async () => {
-    const nameEl = document.getElementById('bmModalNameInput');
-    const urlEl = document.getElementById('bmModalUrlInput');
-    const cardEl = document.getElementById('bmModalCardSelect');
-    const descEl = document.getElementById('bmModalDescInput');
-
-    const name = nameEl ? nameEl.value.trim() : '';
-    let url = urlEl ? urlEl.value.trim() : '';
-    const card = cardEl ? cardEl.value : userBookmarkCards[0];
-    const desc = descEl ? descEl.value.trim() : '';
-
-    if (!name || !url) {
-      alert('Будь ласка, введіть назву та посилання сайту.');
+    // Якщо жодна пропозиція не розгорнута
+    if (!activeMode) {
+      showQuickToast('Оберіть спосіб: «Додати сайт власноруч» або «Обрати з каталогу сайту»', 'warning');
+      cardManual.classList.add('active');
+      activeMode = 'manual';
+      if (nameInput) nameInput.focus();
       return;
     }
-    if (!url.startsWith('http://') && !url.startsWith('https://')) {
-      url = 'https://' + url;
+
+    let name = '';
+    let url = '';
+    let card = targetCard;
+    let desc = '';
+
+    if (activeMode === 'manual') {
+      name = nameInput ? nameInput.value.trim() : '';
+      url = urlInput ? urlInput.value.trim() : '';
+      card = cardSelectManual ? cardSelectManual.value : targetCard;
+      desc = descInput ? descInput.value.trim() : '';
+
+      if (!name || !url) {
+        alert('Будь ласка, введіть назву та адресу (URL) сайту.');
+        if (nameInput && !name) nameInput.focus();
+        else if (urlInput && !url) urlInput.focus();
+        return;
+      }
+      if (!url.startsWith('http://') && !url.startsWith('https://')) {
+        url = 'https://' + url;
+      }
+    } else if (activeMode === 'catalog') {
+      if (!selectedCatalogItem) {
+        alert('Будь ласка, знайдіть та оберіть потрібний сайт із випадаючого списку каталогу.');
+        if (searchInput) searchInput.focus();
+        return;
+      }
+      name = selectedCatalogItem.name;
+      url = selectedCatalogItem.url;
+      card = cardSelectCatalog ? cardSelectCatalog.value : targetCard;
+      desc = descCatalogInput ? descCatalogInput.value.trim() : (selectedCatalogItem.desc || '');
     }
 
     userBookmarksList.push({
