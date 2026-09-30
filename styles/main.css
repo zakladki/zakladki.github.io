@@ -139,7 +139,7 @@ body {
   
   .theme-toggle-btn {
     position: absolute !important;
-    left: 48px !important;
+    left: 12px !important;
     right: auto !important;
     top: 50% !important;
     transform: translateY(-50%) !important;
@@ -669,7 +669,7 @@ nav.navbar {
 /* Theme Toggle Button */
 .theme-toggle-btn {
   position: absolute !important;
-  left: 48px !important;
+  left: 12px !important;
   right: auto !important;
   top: 50% !important;
   transform: translateY(-50%) !important;
@@ -3214,7 +3214,7 @@ body.dark-mode .maintenance-progress-bar {
 @media (min-width: 1230px) {
   .notice-bell-btn {
     position: absolute !important;
-    left: 84px !important;
+    left: 48px !important;
     right: auto !important;
     top: 50% !important;
     transform: translateY(-50%) !important;
@@ -3231,7 +3231,7 @@ body.dark-mode .maintenance-progress-bar {
     position: absolute !important;
     top: 50% !important;
     transform: translateY(-50%) !important;
-    left: 84px !important;
+    left: 48px !important;
     right: auto !important;
     z-index: 1050 !important;
     margin: 0 !important;
@@ -5591,9 +5591,8 @@ body.dark-mode .ad-terms-link {
 
 .user-auth-btn {
   position: absolute !important;
-  left: 12px !important;
-  right: auto !important;
   top: 50% !important;
+  left: auto !important;
   transform: translateY(-50%) !important;
   width: 30px !important;
   height: 30px !important;
@@ -5615,6 +5614,16 @@ body.dark-mode .ad-terms-link {
   outline: none;
   transition: all 0.2s ease;
   overflow: hidden !important;
+}
+@media (min-width: 1230px) {
+  .user-auth-btn {
+    right: 12px !important;
+  }
+}
+@media (max-width: 1229.98px) {
+  .user-auth-btn {
+    right: 56px !important;
+  }
 }
 .user-auth-btn:hover {
   background: rgba(255, 255, 255, 0.28) !important;
