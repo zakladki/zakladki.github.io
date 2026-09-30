@@ -5015,40 +5015,123 @@ function closeCustomModal() {
   if (modalWrap) modalWrap.style.display = 'none';
 }
 
+function isDefaultCard(cardName) {
+  if (!cardName) return true;
+  const c = cardName.toLowerCase().replace(/^[^\wа-яіїєґА-ЯІЇЄҐ0-9]+/u, '').trim();
+  return c === 'основні закладки' || cardName.includes('Основні закладки');
+}
+
+const getBookmarksStorageKey = (uid) => uid ? `topz_bm_user_${uid}` : 'topz_bm_user_guest';
+const getCardsStorageKey = (uid) => uid ? `topz_bm_cards_${uid}` : 'topz_bm_cards_guest';
+const GENERAL_BM_KEY = 'topz_bm_all_saved';
+const GENERAL_CARDS_KEY = 'topz_bm_cards_all';
+
 async function loadUserBookmarksData() {
+  const uid = currentUser ? currentUser.uid : null;
+
+  // 1. Спочатку миттєво зчитуємо локальний кеш (надійне збереження між сторінками)
+  try {
+    let cachedBm = localStorage.getItem(getBookmarksStorageKey(uid));
+    let cachedCards = localStorage.getItem(getCardsStorageKey(uid));
+    if (!cachedBm) cachedBm = localStorage.getItem(GENERAL_BM_KEY);
+    if (!cachedCards) cachedCards = localStorage.getItem(GENERAL_CARDS_KEY);
+
+    if (cachedBm) {
+      const parsed = JSON.parse(cachedBm);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        userBookmarksList = parsed;
+      }
+    }
+    if (cachedCards) {
+      const parsedCards = JSON.parse(cachedCards);
+      if (Array.isArray(parsedCards) && parsedCards.length > 0) {
+        userBookmarkCards = parsedCards;
+      }
+    }
+  } catch (e) {
+    console.warn("Помилка зчитування з localStorage:", e);
+  }
+
+  // Переконуємось, що системна картка «📌 Основні закладки» завжди присутня першою
+  if (!userBookmarkCards || userBookmarkCards.length === 0 || !userBookmarkCards.some(isDefaultCard)) {
+    userBookmarkCards = ['📌 Основні закладки', ...(userBookmarkCards || []).filter(c => !isDefaultCard(c))];
+  }
+
+  // 2. Хмарна синхронізація через Firebase Firestore (якщо доступно)
   if (!currentUser || !firebaseDb) return;
   try {
     const userDoc = await firebaseDb.collection('users').doc(currentUser.uid).get();
     if (userDoc.exists) {
       const data = userDoc.data();
-      userBookmarksList = data.bookmarks || [];
-      if (Array.isArray(data.bookmarkCards) && data.bookmarkCards.length > 0) {
-        userBookmarkCards = data.bookmarkCards;
-      } else {
-        const found = [];
-        userBookmarksList.forEach(bm => {
-          if (bm.card && !found.includes(bm.card)) found.push(bm.card);
-        });
-        userBookmarkCards = found.length > 0 ? found : ['📌 Основні закладки'];
+      const remoteBm = data.bookmarks;
+      const remoteCards = data.bookmarkCards;
+
+      if (Array.isArray(remoteBm) && remoteBm.length > 0) {
+        if (userBookmarksList.length === 0 || remoteBm.length >= userBookmarksList.length) {
+          userBookmarksList = remoteBm;
+        } else {
+          // Якщо локально збережено новіші/додаткові закладки - оновлюємо хмару
+          await saveUserBookmarksData();
+        }
+      } else if (userBookmarksList.length > 0) {
+        // У хмарі порожньо, але локально є закладки - зберігаємо в хмару
+        await saveUserBookmarksData();
       }
-    } else {
-      userBookmarksList = [];
-      userBookmarkCards = ['📌 Основні закладки'];
+
+      if (Array.isArray(remoteCards) && remoteCards.length > 0) {
+        userBookmarkCards = remoteCards;
+      }
+      if (!userBookmarkCards.some(isDefaultCard)) {
+        userBookmarkCards.unshift('📌 Основні закладки');
+      }
+
+      // Оновлюємо локальний кеш
+      try {
+        const bmJson = JSON.stringify(userBookmarksList);
+        const cardsJson = JSON.stringify(userBookmarkCards);
+        localStorage.setItem(getBookmarksStorageKey(currentUser.uid), bmJson);
+        localStorage.setItem(getCardsStorageKey(currentUser.uid), cardsJson);
+        localStorage.setItem(GENERAL_BM_KEY, bmJson);
+        localStorage.setItem(GENERAL_CARDS_KEY, cardsJson);
+      } catch (e) {}
+    } else if (userBookmarksList.length > 0) {
+      await saveUserBookmarksData();
     }
   } catch (e) {
-    console.warn("Помилка завантаження закладок користувача:", e);
+    console.warn("Firestore sync warning (дані збережено у локальному сховищі):", e);
   }
 }
 
 async function saveUserBookmarksData() {
+  const uid = currentUser ? currentUser.uid : null;
+
+  // Переконуємося, що системна картка «📌 Основні закладки» завжди є
+  if (!userBookmarkCards || userBookmarkCards.length === 0 || !userBookmarkCards.some(isDefaultCard)) {
+    userBookmarkCards = ['📌 Основні закладки', ...(userBookmarkCards || []).filter(c => !isDefaultCard(c))];
+  }
+
+  // 1. ЗАВЖДИ миттєво зберігаємо у localStorage
+  try {
+    const bmJson = JSON.stringify(userBookmarksList);
+    const cardsJson = JSON.stringify(userBookmarkCards);
+    localStorage.setItem(getBookmarksStorageKey(uid), bmJson);
+    localStorage.setItem(getCardsStorageKey(uid), cardsJson);
+    localStorage.setItem(GENERAL_BM_KEY, bmJson);
+    localStorage.setItem(GENERAL_CARDS_KEY, cardsJson);
+  } catch (e) {
+    console.warn("Помилка запису у localStorage:", e);
+  }
+
+  // 2. Паралельно синхронізуємо у Cloud Firestore
   if (!currentUser || !firebaseDb) return;
   try {
     await firebaseDb.collection('users').doc(currentUser.uid).set({
       bookmarks: userBookmarksList,
-      bookmarkCards: userBookmarkCards
+      bookmarkCards: userBookmarkCards,
+      updatedAt: new Date().toISOString()
     }, { merge: true });
   } catch (e) {
-    console.error("Помилка збереження закладок у Firebase:", e);
+    console.warn("Помилка збереження у Firebase (дані в безпеці у localStorage):", e);
   }
 }
 
@@ -5079,11 +5162,7 @@ async function handleQuickBookmarkClick(link, description, heartBtn) {
     return;
   }
 
-  await ensureFirebaseLoaded();
-  if (!firebaseDb) {
-    showQuickToast('Завантаження бази даних...', 'warning');
-    return;
-  }
+  ensureFirebaseLoaded().catch(() => {});
 
   const cleanUrl = (link.href || '').trim();
   const linkName = (link.textContent || '').trim().replace(/\s+/g, ' ');
@@ -5510,6 +5589,11 @@ function openAddBookmarkModal(defaultCard = '') {
 }
 
 function promptRenameCard(oldName) {
+  if (isDefaultCard(oldName)) {
+    alert('Картка «Основні закладки» є системною за замовчуванням. Її не можна перейменувати.');
+    return;
+  }
+
   showCustomModal({
     title: '✏️ Перейменувати картку',
     bodyHtml: `
@@ -5554,6 +5638,11 @@ function promptRenameCard(oldName) {
 }
 
 function promptDeleteCard(cardName) {
+  if (isDefaultCard(cardName)) {
+    alert('Картка «Основні закладки» є системною за замовчуванням. Її не можна видалити.');
+    return;
+  }
+
   const cardItemsCount = userBookmarksList.filter(bm => (bm.card || userBookmarkCards[0]) === cardName).length;
   if (!confirm(`Ви дійсно бажаєте видалити картку «${cardName}» та всі її збережені сайти (${cardItemsCount})?`)) {
     return;
@@ -5738,6 +5827,7 @@ async function renderBookmarksPage() {
           });
         }
 
+        const isDefault = isDefaultCard(card.name);
         return `
           <div class="bm-user-card">
             <div class="group-title">
@@ -5749,12 +5839,14 @@ async function renderBookmarksPage() {
                 <button type="button" class="bm-head-btn" onclick="openAddBookmarkModal('${escapeHtml(card.name)}')" title="Додати сайт у цю картку">
                   <i class="fas fa-plus"></i>
                 </button>
+                ${!isDefault ? `
                 <button type="button" class="bm-head-btn" onclick="promptRenameCard('${escapeHtml(card.name)}')" title="Перейменувати картку">
                   <i class="fas fa-pen"></i>
                 </button>
                 <button type="button" class="bm-head-btn btn-del" onclick="promptDeleteCard('${escapeHtml(card.name)}')" title="Видалити картку">
                   <i class="far fa-trash-alt"></i>
                 </button>
+                ` : ''}
               </div>
             </div>
             <ul class="bm-card-list">
