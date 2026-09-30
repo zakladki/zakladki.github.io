@@ -6423,11 +6423,12 @@ body.dark-mode .ad-order-claim-box.success {
 .nav-link-bookmarks {
   display: inline-flex !important;
   align-items: center !important;
-  gap: 4px !important;
+  justify-content: center !important;
+  padding: 0 10px !important;
   font-weight: 700 !important;
 }
 .nav-heart-icon {
-  font-size: 1rem;
+  font-size: 1.15rem;
   line-height: 1;
   display: inline-block;
   animation: heartBeat 2.5s infinite ease-in-out;
@@ -6438,11 +6439,28 @@ body.dark-mode .ad-order-claim-box.success {
   30% { transform: scale(1); }
   45% { transform: scale(1.18); }
 }
-.nav-link-bookmarks.active,
-.nav-pills .nav-link-bookmarks.active {
-  background: #e11d48 !important;
-  color: #ffffff !important;
-  box-shadow: 0 2px 10px rgba(225, 29, 72, 0.45) !important;
+@media (min-width: 1230px) {
+  nav.navbar .nav-link-bookmarks.active {
+    background-color: rgba(225, 29, 72, 0.28) !important;
+    border-bottom: 3px solid #e11d48 !important;
+    color: #ffffff !important;
+    box-shadow: none !important;
+  }
+  nav.navbar .nav-link-bookmarks:hover {
+    background-color: rgba(225, 29, 72, 0.15) !important;
+    border-bottom: 3px solid rgba(225, 29, 72, 0.5) !important;
+  }
+}
+@media (max-width: 1229.98px) {
+  .nav-link-bookmarks {
+    padding: 7px 6px !important;
+  }
+  .nav-link-bookmarks.active,
+  .nav-pills .nav-link-bookmarks.active {
+    background: #e11d48 !important;
+    color: #ffffff !important;
+    box-shadow: 0 2px 10px rgba(225, 29, 72, 0.45) !important;
+  }
 }
 
 /* Картка профілю та статусу закладок */

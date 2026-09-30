@@ -4809,73 +4809,18 @@ async function renderUserBookmarksTab() {
   const container = document.getElementById('cabinetTabContent');
   if (!container || !currentUser) return;
 
-  if (!firebaseDb) {
-    container.innerHTML = `<div class="alert alert-warning">База даних завантажується...</div>`;
-    return;
-  }
-
-  try {
-    const userDoc = await firebaseDb.collection('users').doc(currentUser.uid).get();
-    const userData = userDoc.exists ? userDoc.data() : {};
-    userBookmarksList = userData.bookmarks || [];
-
-    let bookmarksHtml = '';
-    if (userBookmarksList.length === 0) {
-      bookmarksHtml = `
-        <div class="text-center py-4 text-muted">
-          <i class="far fa-star fa-2x mb-2" style="opacity: 0.5;"></i>
-          <p class="small mb-0">У Вас ще немає доданих закладок. Додайте улюблені сайти нижче, і вони будуть доступні на будь-якому Вашому пристрої!</p>
-        </div>
-      `;
-    } else {
-      userBookmarksList.forEach((bm, idx) => {
-        let domain = '';
-        try { domain = new URL(bm.url).hostname; } catch (e) { domain = 'example.com'; }
-        const faviconUrl = `https://www.google.com/s2/favicons?domain=${domain}&sz=32`;
-
-        bookmarksHtml += `
-          <div class="cabinet-bookmark-item">
-            <a href="${bm.url}" target="_blank" class="cabinet-bookmark-link">
-              <img src="${faviconUrl}" width="18" height="18" alt="" style="border-radius:3px;">
-              <span>${bm.name}</span>
-              <small class="text-muted" style="font-weight: normal; margin-left: 4px;">(${domain})</small>
-            </a>
-            <button type="button" class="cabinet-del-btn" onclick="deleteUserBookmark(${idx})" title="Видалити закладку">
-              <i class="far fa-trash-alt"></i>
-            </button>
-          </div>
-        `;
-      });
-    }
-
-    container.innerHTML = `
-      <div class="mb-3 p-2 text-center" style="background: rgba(225, 29, 72, 0.08); border: 1px solid rgba(225, 29, 72, 0.25); border-radius: 8px;">
-        <span class="small font-weight-bold text-danger"><i class="fas fa-heart"></i> Окремий розділ:</span>
-        <span class="small text-muted ms-1">зручно керуйте всіма сайтами на сторінці:</span>
-        <a href="./bookmarks.html" class="btn btn-sm btn-danger ms-2 font-weight-bold" style="font-size: 0.76rem; border-radius: 6px;" onclick="closeUserCabinetModal()">Відкрити «❤️ Закладки» ↗</a>
-      </div>
-      <div class="mb-3">
-        <h6 class="font-weight-bold mb-1"><i class="fas fa-plus-circle text-primary me-1"></i> Додати власну закладку:</h6>
-        <div class="cabinet-bookmark-add-form">
-          <input type="text" id="bmNameInput" class="cabinet-bookmark-input" placeholder="Назва (напр. Мій Google Диск)" style="flex: 1 1 180px;">
-          <input type="url" id="bmUrlInput" class="cabinet-bookmark-input" placeholder="Посилання https://..." style="flex: 2 1 240px;">
-          <button type="button" class="btn btn-primary font-weight-bold px-3" id="bmAddBtn" style="border-radius: 6px; font-size: 0.85rem;">
-            Додати
-          </button>
-        </div>
-      </div>
-      <div>
-        <h6 class="font-weight-bold mb-2">Збережені закладки (${userBookmarksList.length}):</h6>
-        <div class="cabinet-bookmarks-list">
-          ${bookmarksHtml}
-        </div>
-      </div>
-    `;
-
-    document.getElementById('bmAddBtn').onclick = addUserBookmark;
-  } catch (err) {
-    container.innerHTML = `<div class="alert alert-danger">Помилка завантаження закладок: ${err.message}</div>`;
-  }
+  container.innerHTML = `
+    <div class="my-2 p-3 text-center" style="background: rgba(225, 29, 72, 0.06); border: 1px solid rgba(225, 29, 72, 0.2); border-radius: 12px;">
+      <div style="font-size: 2.2rem; margin-bottom: 8px;">❤️</div>
+      <h6 class="font-weight-bold text-danger mb-2">Окремий розділ «Мої Закладки»</h6>
+      <p class="text-muted small mb-3" style="max-width: 440px; margin-left: auto; margin-right: auto; line-height: 1.45;">
+        Зручно додавайте улюблені сайти, здійснюйте швидкий пошук та керуйте персональними посиланнями на окремій повноформатній сторінці.
+      </p>
+      <a href="./bookmarks.html" class="btn btn-danger font-weight-bold px-4 py-2" style="border-radius: 8px; font-size: 0.88rem;" onclick="closeUserCabinetModal()">
+        Відкрити «❤️ Закладки» ↗
+      </a>
+    </div>
+  `;
 }
 
 async function addUserBookmark() {
@@ -4933,14 +4878,17 @@ function syncBookmarksNav() {
         item.id = 'navItemBookmarks';
         item.className = 'nav-item nav-item-bookmarks';
         item.innerHTML = `
-          <a class="nav-link nav-link-bookmarks ${isBookmarksPage ? 'active' : ''}" href="./bookmarks.html" title="Мої персональні закладки">
-            <span class="nav-heart-icon">❤️</span> <span class="nav-bookmarks-title">Закладки</span>
+          <a class="nav-link nav-link-bookmarks ${isBookmarksPage ? 'active' : ''}" href="./bookmarks.html" title="Мої персональні закладки" aria-label="Мої персональні закладки">
+            <span class="nav-heart-icon">❤️</span>
           </a>
         `;
         navList.appendChild(item);
       } else {
         const link = item.querySelector('a');
         if (link) {
+          link.innerHTML = `<span class="nav-heart-icon">❤️</span>`;
+          link.title = 'Мої персональні закладки';
+          link.setAttribute('aria-label', 'Мої персональні закладки');
           if (isBookmarksPage) link.classList.add('active');
           else link.classList.remove('active');
         }
