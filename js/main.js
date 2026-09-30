@@ -757,7 +757,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     .site-description.show-desc {
       display: flex !important;
-      align-items: flex-start !important;
+      align-items: center !important;
       gap: 6px !important;
     }
     .dark-mode .site-description {
