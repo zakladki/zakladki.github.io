@@ -71,8 +71,8 @@ body {
   break-inside: auto !important;
 }
 
-/* Tablet screen columns (768px - 1229.98px): 2 balanced independent columns */
-@media (min-width: 768px) and (max-width: 1229.98px) {
+/* Tablet screen columns (768px - 1249.98px): 2 balanced independent columns */
+@media (min-width: 768px) and (max-width: 1249.98px) {
   .row.animated.fadeIn {
     display: flex !important;
     flex-direction: row !important;
@@ -100,8 +100,8 @@ body {
   }
 }
 
-/* Large screen columns (>= 1230px): 4 fixed independent columns for all pages */
-@media (min-width: 1230px) {
+/* Large screen columns (>= 1250px): 4 fixed independent columns for all pages */
+@media (min-width: 1250px) {
   .tab-content.container {
     max-width: 1160px;
   }
@@ -132,7 +132,7 @@ body {
 }
 
 /* Header spacing and fully vertical menu styling for desktop */
-@media (min-width: 1230px) {
+@media (min-width: 1250px) {
   .main {
     padding-top: 41px !important;
   }
@@ -798,8 +798,8 @@ footer.footer .btn-primary:active {
 /* ==========================================================================
    7. MOBILE AND RESPONSIVE OVERRIDES
    ========================================================================== */
-@media (max-width: 1229.98px) {
-  /* 0. Перевизначення поведінки розгортання Bootstrap для екранів < 1230px */
+@media (max-width: 1249.98px) {
+  /* 0. Перевизначення поведінки розгортання Bootstrap для екранів < 1250px */
   .navbar-expand-md .navbar-toggler {
     display: block !important;
   }
@@ -1044,8 +1044,8 @@ footer.footer .btn-primary:active {
   overflow: hidden;
 }
 
-/* На мобільних екранах та планшетах (< 1230px) нижній мультиплекс повністю приховується */
-@media (max-width: 1229.98px) {
+/* На мобільних екранах та планшетах (< 1250px) нижній мультиплекс повністю приховується */
+@media (max-width: 1249.98px) {
   .bottom-multiplex-container {
     display: none !important;
     height: 0 !important;
@@ -1161,7 +1161,7 @@ footer.footer .btn-primary:active {
   overflow: hidden !important;
 }
 
-@media (min-width: 1230px) {
+@media (min-width: 1250px) {
   .infeed-ad-mobile-container {
     display: none !important;
     height: 0 !important;
@@ -1171,7 +1171,7 @@ footer.footer .btn-primary:active {
   }
 }
 
-@media (max-width: 1229.98px) {
+@media (max-width: 1249.98px) {
   /* За замовчуванням робимо контейнер майже невидимим і без відступів, щоб не створювати порожніх дірок під час завантаження */
   .infeed-ad-mobile-container {
     display: block !important;
@@ -3211,7 +3211,7 @@ body.dark-mode .maintenance-progress-bar {
   100% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
 }
 
-@media (min-width: 1230px) {
+@media (min-width: 1250px) {
   .notice-bell-btn {
     position: absolute !important;
     left: 48px !important;
@@ -3226,7 +3226,7 @@ body.dark-mode .maintenance-progress-bar {
   }
 }
 
-@media (max-width: 1229.98px) {
+@media (max-width: 1249.98px) {
   .notice-bell-btn {
     position: absolute !important;
     top: 50% !important;
@@ -5615,12 +5615,12 @@ body.dark-mode .ad-terms-link {
   transition: all 0.2s ease;
   overflow: hidden !important;
 }
-@media (min-width: 1230px) {
+@media (min-width: 1250px) {
   .user-auth-btn {
     right: 12px !important;
   }
 }
-@media (max-width: 1229.98px) {
+@media (max-width: 1249.98px) {
   .user-auth-btn {
     right: 56px !important;
   }
@@ -6448,7 +6448,7 @@ body.dark-mode .ad-order-claim-box.success {
   30% { transform: scale(1); }
   45% { transform: scale(1.18); }
 }
-@media (min-width: 1230px) {
+@media (min-width: 1250px) {
   nav.navbar .nav-link-bookmarks.active {
     background-color: rgba(225, 29, 72, 0.28) !important;
     border-bottom: 3px solid #e11d48 !important;
@@ -6460,7 +6460,7 @@ body.dark-mode .ad-order-claim-box.success {
     border-bottom: 3px solid rgba(225, 29, 72, 0.5) !important;
   }
 }
-@media (max-width: 1229.98px) {
+@media (max-width: 1249.98px) {
   .nav-link-bookmarks {
     padding: 7px 6px !important;
   }

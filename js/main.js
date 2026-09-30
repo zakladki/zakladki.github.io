@@ -1095,8 +1095,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // === 2. НИЖНІЙ МУЛЬТИПЛЕКС ПЕРЕД ФУТЕРОМ (На всіх сторінках, окрім Головної, і тільки для ПК екранів >= 1230px) ===
-  if (!isHomepage && screenWidth >= 1230) {
+  // === 2. НИЖНІЙ МУЛЬТИПЛЕКС ПЕРЕД ФУТЕРОМ (На всіх сторінках, окрім Головної, і тільки для ПК екранів >= 1250px) ===
+  if (!isHomepage && screenWidth >= 1250) {
     const footer = document.querySelector('footer.footer');
     if (footer) {
       const multiplexContainer = document.createElement('div');
@@ -1113,8 +1113,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // === 3. ВПРОВАДЖЕННЯ МОБІЛЬНИХ IN-FEED РЕКЛАМНИХ БЛОКІВ МІЖ КАРТКАМИ (Тільки для мобільних екранів < 1230px) ===
-  if (screenWidth < 1230) {
+  // === 3. ВПРОВАДЖЕННЯ МОБІЛЬНИХ IN-FEED РЕКЛАМНИХ БЛОКІВ МІЖ КАРТКАМИ (Тільки для мобільних екранів < 1250px) ===
+  if (screenWidth < 1250) {
     const groups = document.querySelectorAll('.group');
     const totalGroups = groups.length;
 
