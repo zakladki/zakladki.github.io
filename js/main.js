@@ -4312,6 +4312,24 @@ let currentCabinetTab = 'orders';
 let adminSearchQuery = '';
 let adminStatusFilter = 'all';
 
+// Глобальні змінні персональних закладок
+let userBookmarksList = [];
+let userBookmarkCards = ['📌 Основні закладки'];
+
+// Попереднє миттєве завантаження закладок із локального сховища (до старту Firebase)
+try {
+  const initBm = localStorage.getItem('topz_bm_all_saved');
+  const initCards = localStorage.getItem('topz_bm_cards_all');
+  if (initBm) {
+    const parsedBm = JSON.parse(initBm);
+    if (Array.isArray(parsedBm)) userBookmarksList = parsedBm;
+  }
+  if (initCards) {
+    const parsedCards = JSON.parse(initCards);
+    if (Array.isArray(parsedCards) && parsedCards.length > 0) userBookmarkCards = parsedCards;
+  }
+} catch (e) {}
+
 // Завантаження Firebase SDK якщо скрипти не підключені в HTML
 function loadExternalScript(src) {
   return new Promise((resolve, reject) => {
@@ -4943,7 +4961,6 @@ function syncBookmarksNav() {
 // ==========================================================================
 // ОКРЕМИЙ ПОВНОЦІННИЙ РОЗДІЛ «❤️ ЗАКЛАДКИ» (bookmarks.html)
 // ==========================================================================
-let userBookmarkCards = ['📌 Основні закладки'];
 
 function escapeHtml(str) {
   if (!str) return '';
