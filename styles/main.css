@@ -2345,6 +2345,8 @@ body.dark-mode .torrent-badge:hover {
 
 /* Базові властивості для всіх типів мікро-кнопок */
 .group li .telegram-badge, .telegram-badge, .group li .tg-badge, .tg-badge,
+.group li .youtube-badge, .youtube-badge, .group li .yt-badge, .yt-badge,
+.group li .facebook-badge, .facebook-badge, .group li .fb-badge, .fb-badge,
 .group li .app-badge, .app-badge, .group li .mobile-badge, .mobile-badge,
 .group li .chat-badge, .chat-badge, .group li .bot-badge, .bot-badge,
 .group li .mirror-badge, .mirror-badge,
@@ -2357,6 +2359,7 @@ body.dark-mode .torrent-badge:hover {
   width: 24px;
   height: 24px;
   margin-left: auto;
+  margin-right: 4px;
   padding: 0;
   border-radius: 6px;
   background-color: rgba(100, 116, 139, 0.08);
@@ -2375,6 +2378,8 @@ body.dark-mode .torrent-badge:hover {
 }
 
 .group li:hover .telegram-badge, .group li:hover .tg-badge,
+.group li:hover .youtube-badge, .group li:hover .yt-badge,
+.group li:hover .facebook-badge, .group li:hover .fb-badge,
 .group li:hover .app-badge, .group li:hover .mobile-badge,
 .group li:hover .chat-badge, .group li:hover .bot-badge,
 .group li:hover .mirror-badge,
@@ -2386,6 +2391,8 @@ body.dark-mode .torrent-badge:hover {
 
 /* Базовий псевдоелемент векторної маски */
 .group li .telegram-badge::before, .telegram-badge::before, .group li .tg-badge::before, .tg-badge::before,
+.group li .youtube-badge::before, .youtube-badge::before, .group li .yt-badge::before, .yt-badge::before,
+.group li .facebook-badge::before, .facebook-badge::before, .group li .fb-badge::before, .fb-badge::before,
 .group li .app-badge::before, .app-badge::before, .group li .mobile-badge::before, .mobile-badge::before,
 .group li .chat-badge::before, .chat-badge::before, .group li .bot-badge::before, .bot-badge::before,
 .group li .mirror-badge::before, .mirror-badge::before,
@@ -2398,6 +2405,48 @@ body.dark-mode .torrent-badge:hover {
   height: 16px;
   background-color: currentColor;
   transition: transform 0.15s ease;
+}
+
+/* 0a. YouTube-канал або відео (▶️) */
+.group li .youtube-badge::before, .youtube-badge::before,
+.group li .yt-badge::before, .yt-badge::before {
+  width: 17px;
+  height: 15px;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 576 512' fill='currentColor'%3E%3Cpath d='M549.655 124.083c-6.281-23.65-24.787-42.276-48.284-48.597C458.781 64 288 64 288 64S117.22 64 74.629 75.486c-23.497 6.322-42.003 24.947-48.284 48.597-11.412 42.867-11.412 132.305-11.412 132.305s0 89.438 11.412 132.305c6.281 23.65 24.787 41.5 48.284 47.821C117.22 448 288 448 288 448s170.78 0 213.371-11.486c23.497-6.321 42.003-24.171 48.284-47.821 11.412-42.867 11.412-132.305 11.412-132.305s0-89.438-11.412-132.305zm-317.51 213.508V175.185l142.739 81.205-142.739 81.201z'/%3E%3C/svg%3E") no-repeat center / contain;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 576 512' fill='currentColor'%3E%3Cpath d='M549.655 124.083c-6.281-23.65-24.787-42.276-48.284-48.597C458.781 64 288 64 288 64S117.22 64 74.629 75.486c-23.497 6.322-42.003 24.947-48.284 48.597-11.412 42.867-11.412 132.305-11.412 132.305s0 89.438 11.412 132.305c6.281 23.65 24.787 41.5 48.284 47.821C117.22 448 288 448 288 448s170.78 0 213.371-11.486c23.497-6.321 42.003-24.171 48.284-47.821 11.412-42.867 11.412-132.305 11.412-132.305s0-89.438-11.412-132.305zm-317.51 213.508V175.185l142.739 81.205-142.739 81.201z'/%3E%3C/svg%3E") no-repeat center / contain;
+}
+.group li .youtube-badge:hover, .youtube-badge:hover,
+.group li .yt-badge:hover, .yt-badge:hover {
+  opacity: 1;
+  background-color: rgba(239, 68, 68, 0.12);
+  color: #ef4444 !important;
+  border-color: rgba(239, 68, 68, 0.35);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+}
+.group li .youtube-badge:hover::before, .youtube-badge:hover::before,
+.group li .yt-badge:hover::before, .yt-badge:hover::before {
+  transform: scale(1.1);
+}
+
+/* 0b. Facebook-сторінка або група (f) */
+.group li .facebook-badge::before, .facebook-badge::before,
+.group li .fb-badge::before, .fb-badge::before {
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z'/%3E%3C/svg%3E") no-repeat center / contain;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z'/%3E%3C/svg%3E") no-repeat center / contain;
+}
+.group li .facebook-badge:hover, .facebook-badge:hover,
+.group li .fb-badge:hover, .fb-badge:hover {
+  opacity: 1;
+  background-color: rgba(24, 119, 242, 0.12);
+  color: #1877f2 !important;
+  border-color: rgba(24, 119, 242, 0.35);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+}
+.group li .facebook-badge:hover::before, .facebook-badge:hover::before,
+.group li .fb-badge:hover::before, .fb-badge:hover::before {
+  transform: scale(1.1);
 }
 
 /* 1. Telegram-канал або бот (✈️) */
@@ -2677,6 +2726,10 @@ body.dark-mode a:hover .rec-star {
 /* Темна тема (Dark Mode) для мікро-кнопок */
 body.dark-mode .group li .telegram-badge, body.dark-mode .telegram-badge,
 body.dark-mode .group li .tg-badge, body.dark-mode .tg-badge,
+body.dark-mode .group li .youtube-badge, body.dark-mode .youtube-badge,
+body.dark-mode .group li .yt-badge, body.dark-mode .yt-badge,
+body.dark-mode .group li .facebook-badge, body.dark-mode .facebook-badge,
+body.dark-mode .group li .fb-badge, body.dark-mode .fb-badge,
 body.dark-mode .group li .app-badge, body.dark-mode .app-badge,
 body.dark-mode .group li .mobile-badge, body.dark-mode .mobile-badge,
 body.dark-mode .group li .chat-badge, body.dark-mode .chat-badge,
@@ -2695,6 +2748,8 @@ body.dark-mode .group li .sparkle-badge, body.dark-mode .sparkle-badge {
 }
 
 body.dark-mode .group li:hover .telegram-badge, body.dark-mode .group li:hover .tg-badge,
+body.dark-mode .group li:hover .youtube-badge, body.dark-mode .group li:hover .yt-badge,
+body.dark-mode .group li:hover .facebook-badge, body.dark-mode .group li:hover .fb-badge,
 body.dark-mode .group li:hover .app-badge, body.dark-mode .group li:hover .mobile-badge,
 body.dark-mode .group li:hover .chat-badge, body.dark-mode .group li:hover .bot-badge,
 body.dark-mode .group li:hover .mirror-badge,
@@ -2702,6 +2757,24 @@ body.dark-mode .group li:hover .auth-badge, body.dark-mode .group li:hover .lock
 body.dark-mode .group li:hover .opensource-badge, body.dark-mode .group li:hover .free-badge,
 body.dark-mode .group li:hover .like-badge, body.dark-mode .group li:hover .sparkle-badge {
   opacity: 0.85;
+}
+
+body.dark-mode .group li .youtube-badge:hover, body.dark-mode .youtube-badge:hover,
+body.dark-mode .group li .yt-badge:hover, body.dark-mode .yt-badge:hover {
+  opacity: 1;
+  background-color: rgba(239, 68, 68, 0.22);
+  color: #f87171 !important;
+  border-color: rgba(248, 113, 113, 0.45);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-mode .group li .facebook-badge:hover, body.dark-mode .facebook-badge:hover,
+body.dark-mode .group li .fb-badge:hover, body.dark-mode .fb-badge:hover {
+  opacity: 1;
+  background-color: rgba(24, 119, 242, 0.22);
+  color: #60a5fa !important;
+  border-color: rgba(96, 165, 250, 0.45);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
 }
 
 body.dark-mode .group li .telegram-badge:hover, body.dark-mode .telegram-badge:hover,

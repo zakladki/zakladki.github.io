@@ -1932,6 +1932,28 @@ function openBadgesModal() {
               <p class="badges-legend-desc">Для завантаження файлів (фільмів, музики, ігор або програм) із зазначеного сервісу потрібна програма Торрент-клієнт. Натисніть на позначку, щоб безкоштовно завантажити офіційний qBittorrent.</p>
             </div>
 
+            <!-- YouTube-канал або відео -->
+            <div class="badges-legend-item">
+              <div class="badges-legend-header">
+                <div class="badges-legend-preview" title="Офіційний YouTube">
+                  <span class="youtube-badge" style="opacity: 1; margin: 0; pointer-events: none; width: 24px; height: 24px;"></span>
+                </div>
+                <div class="badges-legend-title">Офіційний YouTube-канал або відео</div>
+              </div>
+              <p class="badges-legend-desc">Швидкий перехід до офіційного каналу організації, сервісу чи проєкту на YouTube (відео, трансляції або підбірки).</p>
+            </div>
+
+            <!-- Facebook-сторінка або група -->
+            <div class="badges-legend-item">
+              <div class="badges-legend-header">
+                <div class="badges-legend-preview" title="Офіційний Facebook">
+                  <span class="facebook-badge" style="opacity: 1; margin: 0; pointer-events: none; width: 24px; height: 24px;"></span>
+                </div>
+                <div class="badges-legend-title">Офіційна сторінка або група Facebook</div>
+              </div>
+              <p class="badges-legend-desc">Швидкий перехід до офіційної сторінки, спільноти чи групи організації/сервісу в соціальній мережі Facebook.</p>
+            </div>
+
             <!-- 4. Telegram-канал або бот -->
             <div class="badges-legend-item">
               <div class="badges-legend-header">
