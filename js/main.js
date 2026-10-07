@@ -730,6 +730,15 @@ document.addEventListener("DOMContentLoaded", () => {
       vertical-align: middle;
       flex-shrink: 0;
     }
+    .group li [class*="-badge"] ~ .desc-toggle-btn,
+    .group li .sub-link ~ .desc-toggle-btn,
+    .group li .torrent-badge ~ .desc-toggle-btn,
+    .group li .radio-play-btn ~ .desc-toggle-btn,
+    .group li .radio-live-btn ~ .desc-toggle-btn,
+    .group li .icontoo ~ .desc-toggle-btn {
+      margin-left: 2px !important;
+      margin-right: 0px !important;
+    }
     .dark-mode .desc-toggle-btn {
       color: #4b5563; /* Тонкий, стриманий колір для темної теми */
     }
