@@ -1351,6 +1351,30 @@ document.addEventListener("DOMContentLoaded", () => {
 // ==========================================================================
 const SITE_ANNOUNCEMENTS = [
   {
+    id: "notice_user_cabinet_bookmarks_2026",
+    type: "user", // "user" (синій) або "tech" (бурштиновий)
+    title: "⭐ Особистий Кабінет та Персональні Закладки",
+    text: `Раді повідомити, що на сайті повноцінно діє <strong>Особистий Кабінет</strong> та інтерактивний розділ <a href="bookmarks.html" class="top-announcement-link" style="font-weight:700;"><i class="fas fa-heart text-danger"></i> «Мої Закладки»</a>!
+<br><br>
+<strong>Ключові можливості для користувачів:</strong>
+<ul style="margin: 6px 0 10px 18px; padding: 0; line-height: 1.55;">
+  <li><strong>Швидке додавання з каталогу:</strong> розгорніть опис будь-якого сайту на будь-якій сторінці каталогу та натисніть на значок <strong>❤️</strong> ліворуч — сайт миттєво збережеться у вашу колекцію без необхідності копіювати посилання.</li>
+  <li><strong>Власні картки та посилання:</strong> створюйте персональні тематичні папки та додавайте будь-які вебсайти за адресою URL з автоматичним підтягуванням якісних значків (фавіконок).</li>
+  <li><strong>Зручне сортування (Drag &amp; Drop):</strong> змінюйте розташування карток простим перетягуванням як мишкою на комп'ютері, так і пальцем на смартфоні.</li>
+  <li><strong>Хмарна синхронізація:</strong> авторизуйтеся через Google у Кабінеті (<i class="far fa-user-circle"></i> у верхньому меню), і всі ваші закладки будуть надійно збережені в хмарі та доступні на будь-якому пристрої!</li>
+</ul>
+<div style="margin-top: 10px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center;">
+  <a href="bookmarks.html" class="btn btn-danger btn-sm text-white font-weight-bold" style="border-radius: 8px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px;">
+    <i class="fas fa-heart"></i> Відкрити «Закладки»
+  </a>
+  <button type="button" class="btn btn-outline-primary btn-sm font-weight-bold" onclick="closeAnnouncementsModal(); openUserCabinetModal();" style="border-radius: 8px; display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px;">
+    <i class="far fa-user-circle"></i> Мій Кабінет
+  </button>
+</div>`,
+    startDate: "2026-10-25",
+    endDate: "2028-01-01" // До 2028-01-01 включно
+  },
+  {
     id: "notice_feedback_catalog_2026",
     type: "user", // "user" (синій) або "tech" (бурштиновий)
     title: "💡 Формування каталогу",
@@ -1375,7 +1399,7 @@ function getAnnouncementExpiryInfo(announcement) {
   
   if (announcement.endDate === "unlimited" || !announcement.endDate) {
     return {
-      isActive: now >= start,
+      isActive: true,
       expiryLabel: "Термін дії: необмежений",
       isUnlimited: true,
       endDateObj: new Date("2099-12-31T23:59:59")
@@ -1390,7 +1414,7 @@ function getAnnouncementExpiryInfo(announcement) {
     end = new Date(announcement.endDate + "T23:59:59");
   }
 
-  const isActive = now >= start && now <= end;
+  const isActive = now <= end;
   const formattedEndDate = end.toISOString().split("T")[0];
 
   return {
