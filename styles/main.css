@@ -6999,6 +6999,7 @@ body.dark-mode .desc-heart-add-btn.in-bookmarks {
   flex-direction: column;
   gap: 16px;
   min-width: 0;
+  min-height: 80px;
 }
 @media (max-width: 1024px) and (min-width: 700px) {
   .bm-3columns-grid {
@@ -7072,6 +7073,45 @@ body.dark-mode .bm-user-card .group-title {
   gap: 2px;
   flex-shrink: 0;
 }
+
+/* Drag-and-drop ручка та стани перетягування карток закладок */
+.bm-card-drag-handle {
+  cursor: grab;
+  color: rgba(255, 255, 255, 0.65);
+  padding: 3px 6px;
+  margin-right: 4px;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  transition: all 0.15s ease;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+  flex-shrink: 0;
+}
+.bm-card-drag-handle:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.2);
+}
+.bm-card-drag-handle:active {
+  cursor: grabbing;
+}
+.bm-card-sortable-ghost {
+  opacity: 0.35 !important;
+  border: 2px dashed #3b82f6 !important;
+  background: rgba(59, 130, 246, 0.08) !important;
+  box-shadow: none !important;
+}
+.bm-card-sortable-chosen {
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25) !important;
+}
+.bm-card-sortable-drag {
+  opacity: 0.98 !important;
+  transform: scale(1.02);
+  cursor: grabbing !important;
+}
 .bm-head-btn {
   background: transparent;
   border: none;
@@ -7135,7 +7175,8 @@ body.dark-mode .bm-link-row:hover {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 180px;
+  flex: 1 1 auto;
+  min-width: 0;
 }
 .bm-item-link:hover {
   color: #2563eb;
@@ -7157,9 +7198,10 @@ body.dark-mode .bm-item-link:hover {
 .bm-item-actions {
   display: inline-flex;
   align-items: center;
-  gap: 2px;
+  gap: 4px;
   margin-left: auto;
-  opacity: 0.7;
+  flex-shrink: 0;
+  opacity: 0.75;
   transition: opacity 0.15s ease;
 }
 .bm-link-row:hover .bm-item-actions {

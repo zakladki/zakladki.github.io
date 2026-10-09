@@ -4392,6 +4392,17 @@ async function ensureFirebaseLoaded() {
   }
 }
 
+async function ensureSortableLoaded() {
+  if (window.Sortable) return true;
+  try {
+    await loadExternalScript("https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js");
+    return !!window.Sortable;
+  } catch (e) {
+    console.warn("Помилка завантаження SortableJS:", e);
+    return false;
+  }
+}
+
 async function initFirebaseAuthAndDb() {
   await ensureFirebaseLoaded();
   if (window.firebase) {
@@ -5852,17 +5863,10 @@ async function renderBookmarksPage() {
             itemsHtml += `
               <li class="bm-link-row">
                 <img src="${faviconUrl}" class="bm-item-favicon" alt="" onerror="this.src='favicon.ico'">
-                <a href="${escapeHtml(bm.url)}" target="_blank" rel="noopener noreferrer" class="bm-item-link" title="${escapeHtml(bm.name)} (${escapeHtml(bm.url)})">
+                <a href="${escapeHtml(bm.url)}" target="_blank" rel="noopener noreferrer" class="bm-item-link" title="${escapeHtml(bm.name)}">
                   ${escapeHtml(bm.name)}
                 </a>
-                <small class="bm-item-domain">(${escapeHtml(domain)})</small>
                 <div class="bm-item-actions">
-                  <a href="${escapeHtml(bm.url)}" target="_blank" rel="noopener noreferrer" class="bm-icon-btn" title="Відкрити сайт">
-                    <i class="fas fa-external-link-alt"></i>
-                  </a>
-                  <button type="button" class="bm-icon-btn" onclick="copyToClipboard('${escapeHtml(bm.url)}', this, 'Скопійовано!')" title="Скопіювати посилання">
-                    <i class="far fa-copy"></i>
-                  </button>
                   <button type="button" class="bm-icon-btn" onclick="promptMoveBookmark(${bm.origIdx})" title="Перемістити в іншу картку">
                     <i class="fas fa-exchange-alt"></i>
                   </button>
@@ -5877,12 +5881,17 @@ async function renderBookmarksPage() {
 
         const isDefault = isDefaultCard(card.name);
         return `
-          <div class="bm-user-card">
+          <div class="bm-user-card" data-card-name="${escapeHtml(card.name)}">
             <div class="group-title">
-              <span class="bm-card-header-title" title="${escapeHtml(card.name)}">
-                <i class="fas fa-folder text-warning me-1"></i> ${escapeHtml(card.name)}
-                <span class="badge badge-light ms-1" style="font-size: 0.72rem; padding: 2px 6px;">${card.items.length}</span>
-              </span>
+              <div class="d-flex align-items-center flex-grow-1" style="min-width: 0;">
+                <span class="bm-card-drag-handle" title="Затисніть ліву кнопку миші або утримуйте пальцем і перетягніть для зміни порядку карток">
+                  <i class="fas fa-grip-vertical"></i>
+                </span>
+                <span class="bm-card-header-title text-truncate" title="${escapeHtml(card.name)}">
+                  <i class="fas fa-folder text-warning me-1"></i> ${escapeHtml(card.name)}
+                  <span class="badge badge-light ms-1" style="font-size: 0.72rem; padding: 2px 6px;">${card.items.length}</span>
+                </span>
+              </div>
               <div class="bm-card-header-actions">
                 <button type="button" class="bm-head-btn" onclick="openAddBookmarkModal('${escapeHtml(card.name)}')" title="Додати сайт у цю картку">
                   <i class="fas fa-plus"></i>
@@ -5939,6 +5948,10 @@ async function renderBookmarksPage() {
             <i class="far fa-user-circle me-1"></i> Кабінет
           </button>
         </div>
+        <div class="bm-hero-hint-line mb-1">
+          <span class="bm-hint-title"><i class="fas fa-arrows-alt text-primary"></i> Сортування карток:</span>
+          <span class="bm-hint-desc">Ви можете змінювати порядок карток перетягуванням! Затисніть значок <strong><i class="fas fa-grip-vertical"></i></strong> у заголовку будь-якої картки та перетягніть її на бажане місце (працює мишкою або пальцем на смартфоні). Новий порядок зберігається автоматично.</span>
+        </div>
         <div class="bm-hero-hint-line">
           <span class="bm-hint-title"><i class="fas fa-heart text-danger"></i> Швидке додавання з каталогу:</span>
           <span class="bm-hint-desc">Розгорніть опис будь-якого сайту на будь-якій сторінці «ТОП ЗАКЛАДКИ» та натисніть на значок <strong>❤️</strong> ліворуч, щоб миттєво зберегти ресурс у власні картки!</span>
@@ -5952,11 +5965,64 @@ async function renderBookmarksPage() {
         <div class="bm-column" id="bmCol2">${renderColumnHtml(colCards[2])}</div>
       </div>
     `;
+
+    // Ініціалізуємо перетягування карток (SortableJS)
+    initBookmarksSortable();
   } catch (err) {
     if (loadingEl) loadingEl.style.display = 'none';
     pageContainer.style.display = 'block';
     pageContainer.innerHTML = `<div class="alert alert-danger">Помилка завантаження: ${err.message}</div>`;
   }
+}
+
+// Ініціалізація Drag-and-Drop перетягування та сортування карток
+async function initBookmarksSortable() {
+  await ensureSortableLoaded();
+  if (!window.Sortable) return;
+
+  const colIds = ['bmCol0', 'bmCol1', 'bmCol2'];
+  colIds.forEach(colId => {
+    const el = document.getElementById(colId);
+    if (!el) return;
+
+    if (el._sortableInstance) {
+      try { el._sortableInstance.destroy(); } catch (e) {}
+    }
+
+    el._sortableInstance = new window.Sortable(el, {
+      group: 'bm-user-cards-group',
+      animation: 250,
+      handle: '.bm-card-drag-handle',
+      fallbackOnBody: true,
+      swapThreshold: 0.65,
+      ghostClass: 'bm-card-sortable-ghost',
+      chosenClass: 'bm-card-sortable-chosen',
+      dragClass: 'bm-card-sortable-drag',
+      onEnd: async function () {
+        const col0Cards = Array.from(document.getElementById('bmCol0')?.querySelectorAll('.bm-user-card') || []).map(c => c.getAttribute('data-card-name')).filter(Boolean);
+        const col1Cards = Array.from(document.getElementById('bmCol1')?.querySelectorAll('.bm-user-card') || []).map(c => c.getAttribute('data-card-name')).filter(Boolean);
+        const col2Cards = Array.from(document.getElementById('bmCol2')?.querySelectorAll('.bm-user-card') || []).map(c => c.getAttribute('data-card-name')).filter(Boolean);
+
+        const newOrder = [];
+        const maxLen = Math.max(col0Cards.length, col1Cards.length, col2Cards.length);
+        for (let r = 0; r < maxLen; r++) {
+          if (col0Cards[r] && !newOrder.includes(col0Cards[r])) newOrder.push(col0Cards[r]);
+          if (col1Cards[r] && !newOrder.includes(col1Cards[r])) newOrder.push(col1Cards[r]);
+          if (col2Cards[r] && !newOrder.includes(col2Cards[r])) newOrder.push(col2Cards[r]);
+        }
+        userBookmarkCards.forEach(c => {
+          if (!newOrder.includes(c)) newOrder.push(c);
+        });
+
+        const isDifferent = newOrder.length === userBookmarkCards.length && newOrder.some((c, i) => c !== userBookmarkCards[i]);
+        if (isDifferent) {
+          userBookmarkCards = newOrder;
+          await saveUserBookmarksData();
+          showQuickToast('Порядок карток оновлено та збережено!', 'success');
+        }
+      }
+    });
+  });
 }
 
 // 3. Вкладка: 👑 Панель Адміністратора (для weber515sis@gmail.com)
