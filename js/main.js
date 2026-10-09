@@ -5936,10 +5936,6 @@ async function renderBookmarksPage() {
               </div>
             </div>
           </div>
-          <div class="bm-hero-quick-tip">
-            <span class="bm-hint-title"><i class="fas fa-heart text-danger"></i> Швидке додавання з каталогу:</span>
-            <span class="bm-hint-desc">Розгорніть опис будь-якого сайту на будь-якій сторінці «ТОП ЗАКЛАДКИ» та натисніть на значок <strong>❤️</strong> ліворуч, щоб миттєво зберегти ресурс у власні картки!</span>
-          </div>
         </div>
         <div class="bm-hero-right">
           <div class="bm-hero-badges-row">
@@ -5959,9 +5955,35 @@ async function renderBookmarksPage() {
             </button>
           </div>
         </div>
-        <div class="bm-hero-hint-line">
-          <span class="bm-hint-title"><i class="fas fa-arrows-alt text-primary"></i> Сортування карток:</span>
-          <span class="bm-hint-desc">Ви можете змінювати порядок карток перетягуванням! Затисніть значок <strong><i class="fas fa-grip-vertical"></i></strong> у заголовку будь-якої картки та перетягніть її на бажане місце (працює мишкою або пальцем на смартфоні). Новий порядок зберігається автоматично.</span>
+
+        <!-- Акуратний інтерактивний блок порад та підказок (спойлер з можливістю розгортання) -->
+        <div class="bm-hero-tips-accordion" id="bmTipsAccordion">
+          <button type="button" class="bm-tips-toggle-btn" onclick="toggleBookmarksTipsAccordion()" aria-expanded="false" id="bmTipsToggleBtn">
+            <span class="bm-tips-toggle-left">
+              <span class="bm-tips-toggle-icon"><i class="fas fa-lightbulb"></i></span>
+              <span class="bm-tips-toggle-text">Підказки та корисні поради щодо закладок</span>
+              <span class="bm-tips-toggle-badge">2 поради</span>
+            </span>
+            <span class="bm-tips-toggle-arrow" id="bmTipsToggleArrow"><i class="fas fa-chevron-down"></i></span>
+          </button>
+          <div class="bm-tips-collapse-body" id="bmTipsCollapseBody" style="display: none;">
+            <div class="bm-tips-grid">
+              <div class="bm-tip-card">
+                <div class="bm-tip-icon text-primary"><i class="fas fa-arrows-alt"></i></div>
+                <div class="bm-tip-content">
+                  <div class="bm-tip-title">Сортування та зміна порядку карток</div>
+                  <div class="bm-tip-desc">Ви можете змінювати розташування карток перетягуванням. Затисніть значок <strong><i class="fas fa-grip-vertical"></i></strong> ліворуч у шапці будь-якої картки та перетягніть її на бажане місце (працює мишкою або пальцем на смартфоні). Новий порядок зберігається автоматично!</div>
+                </div>
+              </div>
+              <div class="bm-tip-card">
+                <div class="bm-tip-icon text-danger"><i class="fas fa-heart"></i></div>
+                <div class="bm-tip-content">
+                  <div class="bm-tip-title">Швидке додавання з каталогу «ТОП ЗАКЛАДКИ»</div>
+                  <div class="bm-tip-desc">Розгорніть опис будь-якого сайту на будь-якій сторінці каталогу та натисніть на значок <strong>❤️</strong> ліворуч — сайт миттєво збережеться у ваші картки без необхідності копіювати посилання!</div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -5975,6 +5997,21 @@ async function renderBookmarksPage() {
 
     // Ініціалізуємо перетягування карток (SortableJS)
     initBookmarksSortable();
+
+    // Відновлення стану спойлера порад, якщо користувач відкривав його раніше
+    try {
+      if (localStorage.getItem('zakladki_bm_tips_open') === 'true') {
+        const body = document.getElementById('bmTipsCollapseBody');
+        const btn = document.getElementById('bmTipsToggleBtn');
+        const arrow = document.getElementById('bmTipsToggleArrow');
+        if (body && btn) {
+          body.style.display = 'block';
+          btn.setAttribute('aria-expanded', 'true');
+          btn.classList.add('is-open');
+          if (arrow) arrow.innerHTML = '<i class="fas fa-chevron-up"></i>';
+        }
+      }
+    } catch (e) {}
   } catch (err) {
     if (loadingEl) loadingEl.style.display = 'none';
     pageContainer.style.display = 'block';
@@ -6031,6 +6068,30 @@ async function initBookmarksSortable() {
     });
   });
 }
+
+// Перемикання спойлера підказок у розділі закладок
+function toggleBookmarksTipsAccordion() {
+  const body = document.getElementById('bmTipsCollapseBody');
+  const btn = document.getElementById('bmTipsToggleBtn');
+  const arrow = document.getElementById('bmTipsToggleArrow');
+  if (!body || !btn) return;
+
+  const isHidden = body.style.display === 'none' || !body.style.display;
+  if (isHidden) {
+    body.style.display = 'block';
+    btn.setAttribute('aria-expanded', 'true');
+    btn.classList.add('is-open');
+    if (arrow) arrow.innerHTML = '<i class="fas fa-chevron-up"></i>';
+    try { localStorage.setItem('zakladki_bm_tips_open', 'true'); } catch (e) {}
+  } else {
+    body.style.display = 'none';
+    btn.setAttribute('aria-expanded', 'false');
+    btn.classList.remove('is-open');
+    if (arrow) arrow.innerHTML = '<i class="fas fa-chevron-down"></i>';
+    try { localStorage.setItem('zakladki_bm_tips_open', 'false'); } catch (e) {}
+  }
+}
+window.toggleBookmarksTipsAccordion = toggleBookmarksTipsAccordion;
 
 // 3. Вкладка: 👑 Панель Адміністратора (для weber515sis@gmail.com)
 async function renderAdminOrdersTab() {

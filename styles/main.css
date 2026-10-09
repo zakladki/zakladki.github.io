@@ -6640,26 +6640,6 @@ body.dark-mode .bm-hero-info h4 {
 body.dark-mode .bm-hero-sub {
   color: #94a3b8;
 }
-.bm-hero-quick-tip {
-  font-size: 0.81rem;
-  line-height: 1.45;
-  color: var(--text-color, #334155);
-  background: rgba(225, 29, 72, 0.04);
-  border-left: 3px solid #e11d48;
-  padding: 6px 12px;
-  border-radius: 4px;
-}
-body.dark-mode .bm-hero-quick-tip {
-  background: rgba(225, 29, 72, 0.1);
-  color: #cbd5e1;
-}
-.bm-hero-quick-tip .bm-hint-title {
-  font-weight: 700;
-  margin-right: 5px;
-}
-.bm-hero-quick-tip .bm-hint-desc {
-  opacity: 0.95;
-}
 
 .bm-hero-right {
   display: flex;
@@ -7398,27 +7378,151 @@ body.dark-mode .bm-empty-box {
   color: #94a3b8;
 }
 
-/* Підказка швидкого додавання в середині hero-картки закладок */
-.bm-hero-hint-line {
+/* Інтерактивний спойлер порад та підказок у розділі закладок */
+.bm-hero-tips-accordion {
   width: 100% !important;
   flex: 0 0 100% !important;
   margin-top: 14px;
-  padding-top: 10px;
-  border-top: 1px dashed rgba(225, 29, 72, 0.2);
+  background: rgba(241, 245, 249, 0.65);
+  border: 1px solid rgba(203, 213, 225, 0.7);
+  border-radius: 10px;
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+body.dark-mode .bm-hero-tips-accordion {
+  background: rgba(15, 23, 42, 0.55);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+.bm-tips-toggle-btn {
+  width: 100%;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--text-main, #1e293b);
+  transition: background 0.15s ease, color 0.15s ease;
+  user-select: none;
+}
+body.dark-mode .bm-tips-toggle-btn {
+  color: #e2e8f0;
+}
+.bm-tips-toggle-btn:hover {
+  background: rgba(225, 29, 72, 0.06);
+}
+body.dark-mode .bm-tips-toggle-btn:hover {
+  background: rgba(225, 29, 72, 0.12);
+}
+.bm-tips-toggle-btn.is-open {
+  background: rgba(225, 29, 72, 0.04);
+  border-bottom: 1px dashed rgba(203, 213, 225, 0.6);
+}
+body.dark-mode .bm-tips-toggle-btn.is-open {
+  background: rgba(225, 29, 72, 0.08);
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+.bm-tips-toggle-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.bm-tips-toggle-icon {
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  background: rgba(245, 158, 11, 0.15);
+  color: #d97706;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   font-size: 0.82rem;
-  line-height: 1.45;
-  color: var(--text-color, #334155);
 }
-body.dark-mode .bm-hero-hint-line {
-  border-top-color: rgba(225, 29, 72, 0.3);
-  color: #cbd5e1;
+body.dark-mode .bm-tips-toggle-icon {
+  background: rgba(245, 158, 11, 0.25);
+  color: #fbbf24;
 }
-.bm-hero-hint-line .bm-hint-title {
+.bm-tips-toggle-text {
+  font-size: 0.85rem;
   font-weight: 700;
-  margin-right: 6px;
+  letter-spacing: -0.01em;
 }
-.bm-hero-hint-line .bm-hint-desc {
-  opacity: 0.9;
+.bm-tips-toggle-badge {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 12px;
+  background: rgba(225, 29, 72, 0.1);
+  color: #e11d48;
+}
+body.dark-mode .bm-tips-toggle-badge {
+  background: rgba(225, 29, 72, 0.2);
+  color: #fda4af;
+}
+.bm-tips-toggle-arrow {
+  color: var(--text-muted, #64748b);
+  font-size: 0.82rem;
+  transition: transform 0.2s ease;
+  padding-left: 8px;
+}
+body.dark-mode .bm-tips-toggle-arrow {
+  color: #94a3b8;
+}
+.bm-tips-collapse-body {
+  padding: 12px 14px 14px;
+  animation: fadeInTips 0.2s ease;
+}
+@keyframes fadeInTips {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.bm-tips-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+  gap: 12px;
+}
+.bm-tip-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 10px 14px;
+  background: var(--card-bg, #ffffff);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+}
+body.dark-mode .bm-tip-card {
+  background: #1e293b;
+  border-color: rgba(255, 255, 255, 0.08);
+}
+.bm-tip-icon {
+  font-size: 1.15rem;
+  line-height: 1;
+  padding-top: 3px;
+  flex-shrink: 0;
+}
+.bm-tip-content {
+  flex: 1;
+  min-width: 0;
+}
+.bm-tip-title {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-main, #0f172a);
+  margin-bottom: 3px;
+}
+body.dark-mode .bm-tip-title {
+  color: #f8fafc;
+}
+.bm-tip-desc {
+  font-size: 0.79rem;
+  line-height: 1.45;
+  color: var(--text-muted, #64748b);
+}
+body.dark-mode .bm-tip-desc {
+  color: #cbd5e1;
 }
 
 /* Випадаючий список вибору сайтів з каталогу в модальному вікні закладок */
