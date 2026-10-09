@@ -6028,6 +6028,12 @@ async function renderBookmarksPage() {
           
           <!-- Лицьова сторона: Картка статусу користувача -->
           <div class="bm-hero-flip-front bm-hero-card">
+            <!-- Вертикальна кнопка на лівому краю для перевертання до підказок -->
+            <button type="button" class="bm-hero-edge-flip-btn" onclick="toggleHeroFlip(true)" title="Перевернути панель та відкрити корисні підказки" aria-label="Підказки">
+              <i class="fas fa-sync-alt bm-edge-sync-icon"></i>
+              <span class="bm-edge-btn-text">Підказки</span>
+            </button>
+
             <div class="bm-hero-left">
               <div class="bm-hero-user">
                 <img src="${avatarUrl}" class="bm-hero-avatar" alt="Avatar" referrerpolicy="no-referrer">
@@ -6062,16 +6068,16 @@ async function renderBookmarksPage() {
                 </button>
               </div>
             </div>
-
-            <!-- Вертикальна кнопка на правому краю для перевертання до підказок -->
-            <button type="button" class="bm-hero-edge-flip-btn" onclick="toggleHeroFlip(true)" title="Перевернути панель та відкрити корисні підказки" aria-label="Підказки">
-              <span class="bm-edge-btn-text">Підказки</span>
-              <i class="fas fa-sync-alt bm-edge-sync-icon"></i>
-            </button>
           </div>
 
           <!-- Зворотна сторона: Корисні поради та підказки (без великого заголовка для максимальної компактності) -->
           <div class="bm-hero-flip-back bm-hero-card">
+            <!-- Вертикальна кнопка на лівому краю для повернення назад -->
+            <button type="button" class="bm-hero-edge-flip-btn bm-hero-edge-return-btn" onclick="toggleHeroFlip(false)" title="Повернутися назад до панелі користувача" aria-label="Назад">
+              <i class="fas fa-sync-alt bm-edge-sync-icon"></i>
+              <span class="bm-edge-btn-text">Назад</span>
+            </button>
+
             <div class="bm-tips-grid">
               <div class="bm-tip-card">
                 <div class="bm-tip-icon text-primary"><i class="fas fa-arrows-alt"></i></div>
@@ -6088,12 +6094,6 @@ async function renderBookmarksPage() {
                 </div>
               </div>
             </div>
-
-            <!-- Вертикальна кнопка на правому краю для повернення назад -->
-            <button type="button" class="bm-hero-edge-flip-btn bm-hero-edge-return-btn" onclick="toggleHeroFlip(false)" title="Повернутися назад до панелі користувача" aria-label="Назад">
-              <span class="bm-edge-btn-text">Назад</span>
-              <i class="fas fa-sync-alt bm-edge-sync-icon"></i>
-            </button>
           </div>
 
         </div>

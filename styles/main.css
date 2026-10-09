@@ -7419,7 +7419,8 @@ body.dark-mode .bm-empty-box {
   -webkit-transform: rotateX(0deg);
   min-height: 100%;
   align-items: center;
-  padding-right: 54px; /* Місце під вертикальну кнопку на правому краю */
+  padding-left: 54px; /* Вільний відступ зліва під вертикальну кнопку перевертання */
+  padding-right: 22px;
 }
 
 .bm-hero-flip-back {
@@ -7430,7 +7431,7 @@ body.dark-mode .bm-empty-box {
   flex-direction: column;
   justify-content: center;
   align-items: stretch;
-  padding: 10px 48px 10px 14px; /* Компактні відступи, без зайвого повітря */
+  padding: 10px 20px 10px 54px; /* Вільний відступ зліва під вертикальну кнопку повернення */
 }
 
 /* Приховування неактивної сторони від кліків та фокусу після обертання */
@@ -7454,23 +7455,24 @@ body.dark-mode .bm-empty-box {
   visibility: visible;
 }
 
-/* Вертикальна крайова кнопка перевертання (справа на всю висоту панелі) */
+/* Вертикальна крайова кнопка перевертання (розташована зліва на всю висоту панелі) */
 .bm-hero-edge-flip-btn {
   position: absolute;
   top: 0;
-  right: 0;
+  left: 0;
   bottom: 0;
   width: 36px;
   background: linear-gradient(180deg, rgba(245, 158, 11, 0.12) 0%, rgba(245, 158, 11, 0.05) 100%);
   border: none;
-  border-left: 1px solid rgba(245, 158, 11, 0.28);
-  border-radius: 0 11px 11px 0;
+  border-right: 1px solid rgba(245, 158, 11, 0.28);
+  border-radius: 11px 0 0 11px;
   color: #b45309;
   cursor: pointer;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 8px;
   padding: 8px 2px;
   outline: none;
   transition: all 0.22s ease;
@@ -7480,14 +7482,14 @@ body.dark-mode .bm-empty-box {
 }
 body.dark-mode .bm-hero-edge-flip-btn {
   background: linear-gradient(180deg, rgba(245, 158, 11, 0.18) 0%, rgba(245, 158, 11, 0.06) 100%);
-  border-left-color: rgba(245, 158, 11, 0.35);
+  border-right-color: rgba(245, 158, 11, 0.35);
   color: #fbbf24;
 }
 .bm-hero-edge-flip-btn:hover {
   background: linear-gradient(180deg, #f59e0b 0%, #d97706 100%);
   color: #ffffff;
-  border-left-color: #d97706;
-  box-shadow: -2px 0 10px rgba(245, 158, 11, 0.3);
+  border-right-color: #d97706;
+  box-shadow: 2px 0 10px rgba(245, 158, 11, 0.3);
 }
 .bm-hero-edge-flip-btn:hover .bm-edge-sync-icon {
   color: #ffffff;
@@ -7500,67 +7502,68 @@ body.dark-mode .bm-hero-edge-flip-btn {
 /* Специфічний стиль для крайової кнопки повернення «Назад» на зворотній стороні */
 .bm-hero-edge-return-btn {
   background: linear-gradient(180deg, rgba(59, 130, 246, 0.14) 0%, rgba(59, 130, 246, 0.06) 100%);
-  border-left-color: rgba(59, 130, 246, 0.3);
+  border-right-color: rgba(59, 130, 246, 0.3);
   color: #2563eb;
 }
 body.dark-mode .bm-hero-edge-return-btn {
   background: linear-gradient(180deg, rgba(59, 130, 246, 0.22) 0%, rgba(59, 130, 246, 0.08) 100%);
-  border-left-color: rgba(59, 130, 246, 0.4);
+  border-right-color: rgba(59, 130, 246, 0.4);
   color: #93c5fd;
 }
 .bm-hero-edge-return-btn:hover {
   background: linear-gradient(180deg, #3b82f6 0%, #1d4ed8 100%);
   color: #ffffff;
-  border-left-color: #1d4ed8;
-  box-shadow: -2px 0 10px rgba(59, 130, 246, 0.3);
+  border-right-color: #1d4ed8;
+  box-shadow: 2px 0 10px rgba(59, 130, 246, 0.3);
 }
 .bm-hero-edge-return-btn:hover .bm-edge-sync-icon {
   color: #ffffff;
   transform: rotate(-180deg);
 }
 
+.bm-edge-sync-icon {
+  font-size: 0.78rem;
+  line-height: 1;
+  opacity: 0.9;
+  flex-shrink: 0;
+  display: block;
+  transition: transform 0.45s cubic-bezier(0.34, 1.25, 0.64, 1), color 0.2s ease;
+}
+
 .bm-edge-btn-text {
   writing-mode: vertical-rl;
   -webkit-writing-mode: vertical-rl;
   transform: rotate(180deg);
-  font-size: 0.74rem;
+  font-size: 0.72rem;
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   line-height: 1;
   text-align: center;
-}
-.bm-edge-sync-icon {
-  position: absolute;
-  bottom: 8px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 0.76rem;
-  opacity: 0.85;
-  transition: transform 0.45s cubic-bezier(0.34, 1.25, 0.64, 1), color 0.2s ease;
-  line-height: 1;
+  flex-shrink: 0;
 }
 
 @media (max-width: 768px) {
   .bm-hero-flip-front {
-    padding-right: 42px;
+    padding-left: 42px;
+    padding-right: 14px;
   }
   .bm-hero-flip-back {
-    padding: 8px 42px 8px 10px;
+    padding: 8px 10px 8px 42px;
   }
   .bm-hero-edge-flip-btn {
     width: 32px;
   }
   .bm-edge-btn-text {
-    font-size: 0.7rem;
+    font-size: 0.68rem;
   }
 }
 
 /* Без матрьошок: акуратні чисті інформаційні блоки без рамок і тіней усередині картки */
 .bm-tips-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
-  gap: 12px 20px;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 14px 22px;
   width: 100%;
 }
 .bm-tip-card {
@@ -7571,10 +7574,30 @@ body.dark-mode .bm-hero-edge-return-btn {
   background: transparent;
   border: none;
   box-shadow: none;
+  box-sizing: border-box;
 }
 body.dark-mode .bm-tip-card {
   background: transparent;
   border: none;
+}
+/* Легке ледь помітне розділення рекомендацій */
+.bm-tip-card:first-child {
+  border-right: 1px solid rgba(0, 0, 0, 0.08);
+  padding-right: 18px;
+}
+body.dark-mode .bm-tip-card:first-child {
+  border-right-color: rgba(255, 255, 255, 0.1);
+}
+@media (max-width: 680px) {
+  .bm-tip-card:first-child {
+    border-right: none;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    padding-right: 6px;
+    padding-bottom: 10px;
+  }
+  body.dark-mode .bm-tip-card:first-child {
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+  }
 }
 .bm-tip-icon {
   font-size: 1.1rem;
