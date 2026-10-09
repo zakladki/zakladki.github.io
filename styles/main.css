@@ -7378,129 +7378,204 @@ body.dark-mode .bm-empty-box {
   color: #94a3b8;
 }
 
-/* Інтерактивний спойлер порад та підказок у розділі закладок */
-.bm-hero-tips-accordion {
-  width: 100% !important;
-  flex: 0 0 100% !important;
-  margin-top: 14px;
-  background: rgba(241, 245, 249, 0.65);
-  border: 1px solid rgba(203, 213, 225, 0.7);
-  border-radius: 10px;
-  overflow: hidden;
-  transition: all 0.2s ease;
-}
-body.dark-mode .bm-hero-tips-accordion {
-  background: rgba(15, 23, 42, 0.55);
-  border-color: rgba(255, 255, 255, 0.08);
-}
-.bm-tips-toggle-btn {
+/* 3D Flip Card для панелі користувача та підказок у розділі закладок */
+.bm-hero-flip-container {
+  perspective: 1200px;
+  -webkit-perspective: 1200px;
   width: 100%;
-  padding: 10px 14px;
-  display: flex;
+  margin-bottom: 20px;
+}
+
+.bm-hero-flip-inner {
+  position: relative;
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr;
+  transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
+  transition: transform 0.65s cubic-bezier(0.34, 1.25, 0.64, 1);
+}
+
+.bm-hero-flip-container.is-flipped .bm-hero-flip-inner {
+  transform: rotateX(180deg);
+  -webkit-transform: rotateX(180deg);
+}
+
+.bm-hero-flip-front,
+.bm-hero-flip-back {
+  grid-area: 1 / 1 / 2 / 2;
+  width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 0 !important;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  position: relative;
+  overflow: hidden;
+}
+
+.bm-hero-flip-front {
+  transform: rotateX(0deg);
+  -webkit-transform: rotateX(0deg);
+  min-height: 100%;
   align-items: center;
-  justify-content: space-between;
-  background: transparent;
+  padding-right: 54px; /* Місце під вертикальну кнопку на правому краю */
+}
+
+.bm-hero-flip-back {
+  transform: rotateX(180deg);
+  -webkit-transform: rotateX(180deg);
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: stretch;
+  padding: 10px 48px 10px 14px; /* Компактні відступи, без зайвого повітря */
+}
+
+/* Приховування неактивної сторони від кліків та фокусу після обертання */
+.bm-hero-flip-container:not(.is-flipped) .bm-hero-flip-back {
+  pointer-events: none;
+  visibility: hidden;
+  transition: visibility 0s 0.3s;
+}
+.bm-hero-flip-container.is-flipped .bm-hero-flip-back {
+  pointer-events: auto;
+  visibility: visible;
+}
+
+.bm-hero-flip-container.is-flipped .bm-hero-flip-front {
+  pointer-events: none;
+  visibility: hidden;
+  transition: visibility 0s 0.3s;
+}
+.bm-hero-flip-container:not(.is-flipped) .bm-hero-flip-front {
+  pointer-events: auto;
+  visibility: visible;
+}
+
+/* Вертикальна крайова кнопка перевертання (справа на всю висоту панелі) */
+.bm-hero-edge-flip-btn {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 36px;
+  background: linear-gradient(180deg, rgba(245, 158, 11, 0.12) 0%, rgba(245, 158, 11, 0.05) 100%);
   border: none;
+  border-left: 1px solid rgba(245, 158, 11, 0.28);
+  border-radius: 0 11px 11px 0;
+  color: #b45309;
   cursor: pointer;
-  color: var(--text-main, #1e293b);
-  transition: background 0.15s ease, color 0.15s ease;
-  user-select: none;
-}
-body.dark-mode .bm-tips-toggle-btn {
-  color: #e2e8f0;
-}
-.bm-tips-toggle-btn:hover {
-  background: rgba(225, 29, 72, 0.06);
-}
-body.dark-mode .bm-tips-toggle-btn:hover {
-  background: rgba(225, 29, 72, 0.12);
-}
-.bm-tips-toggle-btn.is-open {
-  background: rgba(225, 29, 72, 0.04);
-  border-bottom: 1px dashed rgba(203, 213, 225, 0.6);
-}
-body.dark-mode .bm-tips-toggle-btn.is-open {
-  background: rgba(225, 29, 72, 0.08);
-  border-bottom-color: rgba(255, 255, 255, 0.08);
-}
-.bm-tips-toggle-left {
   display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-.bm-tips-toggle-icon {
-  width: 26px;
-  height: 26px;
-  border-radius: 6px;
-  background: rgba(245, 158, 11, 0.15);
-  color: #d97706;
-  display: inline-flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-size: 0.82rem;
+  gap: 12px;
+  padding: 8px 2px;
+  outline: none;
+  transition: all 0.22s ease;
+  user-select: none;
+  -webkit-user-select: none;
+  z-index: 10;
 }
-body.dark-mode .bm-tips-toggle-icon {
-  background: rgba(245, 158, 11, 0.25);
+body.dark-mode .bm-hero-edge-flip-btn {
+  background: linear-gradient(180deg, rgba(245, 158, 11, 0.18) 0%, rgba(245, 158, 11, 0.06) 100%);
+  border-left-color: rgba(245, 158, 11, 0.35);
   color: #fbbf24;
 }
-.bm-tips-toggle-text {
-  font-size: 0.85rem;
-  font-weight: 700;
-  letter-spacing: -0.01em;
+.bm-hero-edge-flip-btn:hover {
+  background: linear-gradient(180deg, #f59e0b 0%, #d97706 100%);
+  color: #ffffff;
+  border-left-color: #d97706;
+  box-shadow: -2px 0 10px rgba(245, 158, 11, 0.3);
 }
-.bm-tips-toggle-badge {
-  font-size: 0.72rem;
-  font-weight: 600;
-  padding: 2px 8px;
-  border-radius: 12px;
-  background: rgba(225, 29, 72, 0.1);
-  color: #e11d48;
+.bm-hero-edge-flip-btn:hover .bm-edge-sync-icon {
+  color: #ffffff;
+  transform: rotate(180deg);
 }
-body.dark-mode .bm-tips-toggle-badge {
-  background: rgba(225, 29, 72, 0.2);
-  color: #fda4af;
+.bm-hero-edge-flip-btn:active {
+  transform: scale(0.98);
 }
-.bm-tips-toggle-arrow {
-  color: var(--text-muted, #64748b);
-  font-size: 0.82rem;
-  transition: transform 0.2s ease;
-  padding-left: 8px;
+
+/* Специфічний стиль для крайової кнопки повернення «Назад» на зворотній стороні */
+.bm-hero-edge-return-btn {
+  background: linear-gradient(180deg, rgba(59, 130, 246, 0.14) 0%, rgba(59, 130, 246, 0.06) 100%);
+  border-left-color: rgba(59, 130, 246, 0.3);
+  color: #2563eb;
 }
-body.dark-mode .bm-tips-toggle-arrow {
-  color: #94a3b8;
+body.dark-mode .bm-hero-edge-return-btn {
+  background: linear-gradient(180deg, rgba(59, 130, 246, 0.22) 0%, rgba(59, 130, 246, 0.08) 100%);
+  border-left-color: rgba(59, 130, 246, 0.4);
+  color: #93c5fd;
 }
-.bm-tips-collapse-body {
-  padding: 12px 14px 14px;
-  animation: fadeInTips 0.2s ease;
+.bm-hero-edge-return-btn:hover {
+  background: linear-gradient(180deg, #3b82f6 0%, #1d4ed8 100%);
+  color: #ffffff;
+  border-left-color: #1d4ed8;
+  box-shadow: -2px 0 10px rgba(59, 130, 246, 0.3);
 }
-@keyframes fadeInTips {
-  from { opacity: 0; transform: translateY(-4px); }
-  to { opacity: 1; transform: translateY(0); }
+.bm-hero-edge-return-btn:hover .bm-edge-sync-icon {
+  color: #ffffff;
+  transform: rotate(-180deg);
 }
+
+.bm-edge-btn-text {
+  writing-mode: vertical-rl;
+  -webkit-writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  line-height: 1;
+}
+.bm-edge-sync-icon {
+  font-size: 0.76rem;
+  opacity: 0.85;
+  transition: transform 0.45s cubic-bezier(0.34, 1.25, 0.64, 1), color 0.2s ease;
+  line-height: 1;
+}
+
+@media (max-width: 768px) {
+  .bm-hero-flip-front {
+    padding-right: 42px;
+  }
+  .bm-hero-flip-back {
+    padding: 8px 42px 8px 10px;
+  }
+  .bm-hero-edge-flip-btn {
+    width: 32px;
+  }
+  .bm-edge-btn-text {
+    font-size: 0.7rem;
+  }
+}
+
+/* Без матрьошок: акуратні чисті інформаційні блоки без рамок і тіней усередині картки */
 .bm-tips-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
-  gap: 12px;
+  gap: 12px 20px;
+  width: 100%;
 }
 .bm-tip-card {
   display: flex;
   align-items: flex-start;
-  gap: 12px;
-  padding: 10px 14px;
-  background: var(--card-bg, #ffffff);
-  border: 1px solid var(--border-color, #e2e8f0);
-  border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+  gap: 10px;
+  padding: 4px 6px;
+  background: transparent;
+  border: none;
+  box-shadow: none;
 }
 body.dark-mode .bm-tip-card {
-  background: #1e293b;
-  border-color: rgba(255, 255, 255, 0.08);
+  background: transparent;
+  border: none;
 }
 .bm-tip-icon {
-  font-size: 1.15rem;
+  font-size: 1.1rem;
   line-height: 1;
-  padding-top: 3px;
+  padding-top: 2px;
   flex-shrink: 0;
 }
 .bm-tip-content {
@@ -7508,10 +7583,10 @@ body.dark-mode .bm-tip-card {
   min-width: 0;
 }
 .bm-tip-title {
-  font-size: 0.82rem;
+  font-size: 0.83rem;
   font-weight: 700;
   color: var(--text-main, #0f172a);
-  margin-bottom: 3px;
+  margin-bottom: 2px;
 }
 body.dark-mode .bm-tip-title {
   color: #f8fafc;
