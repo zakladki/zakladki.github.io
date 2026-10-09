@@ -5884,12 +5884,11 @@ async function renderBookmarksPage() {
           <div class="bm-user-card" data-card-name="${escapeHtml(card.name)}">
             <div class="group-title">
               <div class="d-flex align-items-center flex-grow-1" style="min-width: 0;">
-                <span class="bm-card-drag-handle" title="Затисніть ліву кнопку миші або утримуйте пальцем і перетягніть для зміни порядку карток">
+                <span class="bm-card-drag-handle" title="Затисніть і перетягніть для сортування карток">
                   <i class="fas fa-grip-vertical"></i>
                 </span>
                 <span class="bm-card-header-title text-truncate" title="${escapeHtml(card.name)}">
-                  <i class="fas fa-folder text-warning me-1"></i> ${escapeHtml(card.name)}
-                  <span class="badge badge-light ms-1" style="font-size: 0.72rem; padding: 2px 6px;">${card.items.length}</span>
+                  <i class="fas fa-folder text-warning bm-folder-icon"></i> ${escapeHtml(card.name)}
                 </span>
               </div>
               <div class="bm-card-header-actions">
