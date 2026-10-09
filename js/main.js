@@ -5922,39 +5922,47 @@ async function renderBookmarksPage() {
     pageContainer.innerHTML = `
       <!-- Картка статусу користувача -->
       <div class="bm-hero-card">
-        <div class="bm-hero-user">
-          <img src="${avatarUrl}" class="bm-hero-avatar" alt="Avatar" referrerpolicy="no-referrer">
-          <div class="bm-hero-info">
-            <h4>${escapeHtml(userName)}</h4>
-            <div class="bm-hero-sub">
-              <i class="fas fa-shield-alt text-success me-1"></i> Хмарна синхронізація активна • <strong>${escapeHtml(currentUser.email)}</strong>
+        <div class="bm-hero-left">
+          <div class="bm-hero-user">
+            <img src="${avatarUrl}" class="bm-hero-avatar" alt="Avatar" referrerpolicy="no-referrer">
+            <div class="bm-hero-info">
+              <div class="bm-hero-name-row">
+                <h4>${escapeHtml(userName)}</h4>
+                <button type="button" class="btn btn-outline-secondary btn-sm bm-hero-cabinet-btn" onclick="openUserCabinetModal()" title="Відкрити особистий кабінет">
+                  <i class="far fa-user-circle me-1"></i> Мій Кабінет
+                </button>
+              </div>
+              <div class="bm-hero-sub">
+                <i class="fas fa-shield-alt text-success me-1"></i> Хмарна синхронізація активна • <strong>${escapeHtml(currentUser.email)}</strong>
+              </div>
             </div>
           </div>
+          <div class="bm-hero-quick-tip">
+            <span class="bm-hint-title"><i class="fas fa-heart text-danger"></i> Швидке додавання з каталогу:</span>
+            <span class="bm-hint-desc">Розгорніть опис будь-якого сайту на будь-якій сторінці «ТОП ЗАКЛАДКИ» та натисніть на значок <strong>❤️</strong> ліворуч, щоб миттєво зберегти ресурс у власні картки!</span>
+          </div>
         </div>
-        <div class="bm-hero-stats">
-          <span class="bm-stat-badge">
-            <i class="fas fa-folder-open"></i> Карток: ${userBookmarkCards.length}
-          </span>
-          <span class="bm-stat-badge">
-            <i class="fas fa-bookmark"></i> Закладок: ${userBookmarksList.length}
-          </span>
-          <button type="button" class="btn btn-danger btn-sm font-weight-bold" onclick="openCreateCardModal()" style="border-radius: 8px;">
-            <i class="fas fa-folder-plus me-1"></i> Створити картку
-          </button>
-          <button type="button" class="btn btn-primary btn-sm font-weight-bold" onclick="openAddBookmarkModal()" style="border-radius: 8px;">
-            <i class="fas fa-plus me-1"></i> Додати сайт
-          </button>
-          <button type="button" class="btn btn-outline-secondary btn-sm" onclick="openUserCabinetModal()" title="Відкрити особистий кабінет" style="border-radius: 8px;">
-            <i class="far fa-user-circle me-1"></i> Кабінет
-          </button>
-        </div>
-        <div class="bm-hero-hint-line mb-1">
-          <span class="bm-hint-title"><i class="fas fa-arrows-alt text-primary"></i> Сортування карток:</span>
-          <span class="bm-hint-desc">Ви можете змінювати порядок карток перетягуванням! Затисніть значок <strong><i class="fas fa-grip-vertical"></i></strong> у заголовку будь-якої картки та перетягніть її на бажане місце (працює мишкою або пальцем на смартфоні). Новий порядок зберігається автоматично.</span>
+        <div class="bm-hero-right">
+          <div class="bm-hero-badges-row">
+            <span class="bm-stat-badge">
+              <i class="fas fa-folder-open"></i> Карток: ${userBookmarkCards.length}
+            </span>
+            <span class="bm-stat-badge">
+              <i class="fas fa-bookmark"></i> Закладок: ${userBookmarksList.length}
+            </span>
+          </div>
+          <div class="bm-hero-actions-row">
+            <button type="button" class="btn btn-danger btn-sm font-weight-bold" onclick="openCreateCardModal()" style="border-radius: 8px;">
+              <i class="fas fa-folder-plus me-1"></i> Створити картку
+            </button>
+            <button type="button" class="btn btn-primary btn-sm font-weight-bold" onclick="openAddBookmarkModal()" style="border-radius: 8px;">
+              <i class="fas fa-plus me-1"></i> Додати сайт
+            </button>
+          </div>
         </div>
         <div class="bm-hero-hint-line">
-          <span class="bm-hint-title"><i class="fas fa-heart text-danger"></i> Швидке додавання з каталогу:</span>
-          <span class="bm-hint-desc">Розгорніть опис будь-якого сайту на будь-якій сторінці «ТОП ЗАКЛАДКИ» та натисніть на значок <strong>❤️</strong> ліворуч, щоб миттєво зберегти ресурс у власні картки!</span>
+          <span class="bm-hint-title"><i class="fas fa-arrows-alt text-primary"></i> Сортування карток:</span>
+          <span class="bm-hint-desc">Ви можете змінювати порядок карток перетягуванням! Затисніть значок <strong><i class="fas fa-grip-vertical"></i></strong> у заголовку будь-якої картки та перетягніть її на бажане місце (працює мишкою або пальцем на смартфоні). Новий порядок зберігається автоматично.</span>
         </div>
       </div>
 
