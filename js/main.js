@@ -2278,10 +2278,12 @@ function openAboutSiteModal() {
             <span class="cl-modal-close-x">&times;</span>
           </button>
         </div>
-        <div class="cl-modal-body" style="padding: 14px 18px; max-height: calc(85vh - 70px); max-height: calc(85dvh - 70px); overflow-y: auto;">
+        <div class="cl-modal-body about-site-modal-body" id="aboutSiteModalBody">
           <div class="about-site-hero">
-            <div class="about-site-logo">🇺🇦 ⭐ 🌐</div>
-            <h4 class="about-site-heading">ТОП ЗАКЛАДКИ - Головні Сайти України</h4>
+            <div class="about-site-hero-header">
+              <span class="about-site-logo" aria-hidden="true">🇺🇦 ⭐ 🌐</span>
+              <h4 class="about-site-heading">ТОП ЗАКЛАДКИ - Головні Сайти України</h4>
+            </div>
             <p class="about-site-lead">
               Сучасний інформаційний портал, надійний каталог перевірених веб-ресурсів та персональний хмарний менеджер закладок для щоденного комфортного користування.
             </p>
@@ -2292,38 +2294,52 @@ function openAboutSiteModal() {
           </div>
           <div class="about-site-grid">
             <div class="about-site-card">
-              <div class="about-site-card-icon"><i class="fas fa-user-circle"></i></div>
-              <div class="about-site-card-title">Особистий Кабінет</div>
+              <div class="about-site-card-header">
+                <div class="about-site-card-icon"><i class="fas fa-user-circle"></i></div>
+                <div class="about-site-card-title">Особистий Кабінет</div>
+              </div>
               <p class="about-site-card-desc">Безпечна авторизація в 1 клік через Google без паролів. Керування персональними даними, статусами рекламних замовлень та хмарною синхронізацією.</p>
             </div>
             <div class="about-site-card">
-              <div class="about-site-card-icon text-danger"><i class="fas fa-heart"></i></div>
-              <div class="about-site-card-title">Персональні «Мої Закладки»</div>
+              <div class="about-site-card-header">
+                <div class="about-site-card-icon text-danger"><i class="fas fa-heart"></i></div>
+                <div class="about-site-card-title">Персональні «Мої Закладки»</div>
+              </div>
               <p class="about-site-card-desc">Окремий розділ «❤️ Закладки»: створюйте власні тематичні картки (робота, навчання, новини тощо), сортуйте сайти та формуйте власний стартовий екран.</p>
             </div>
             <div class="about-site-card" style="border: 1px solid rgba(245, 158, 11, 0.4); background: linear-gradient(135deg, rgba(245, 158, 11, 0.08), rgba(234, 179, 8, 0.03));">
-              <div class="about-site-card-icon" style="color: #f59e0b;"><i class="fas fa-coins"></i></div>
-              <div class="about-site-card-title text-warning">Система балів та винагород</div>
+              <div class="about-site-card-header">
+                <div class="about-site-card-icon" style="color: #f59e0b;"><i class="fas fa-coins"></i></div>
+                <div class="about-site-card-title text-warning">Система балів та винагород</div>
+              </div>
               <p class="about-site-card-desc">На сайті передбачена накопичувальна система балів (активність, замовлення, використання сервісів тощо). Наприкінці кожного року 10 користувачів (5 найактивніших ТОП-лідерів та 5 відібраних випадково рандомним методом) отримають грошову частку від рекламних замовлень порталу. Докладні правила накопичення та витрат балів буде представлено в окремому розділі.</p>
             </div>
             <div class="about-site-card">
-              <div class="about-site-card-icon text-success"><i class="fas fa-plus-circle"></i></div>
-              <div class="about-site-card-title">Швидке додавання сайтів</div>
+              <div class="about-site-card-header">
+                <div class="about-site-card-icon text-success"><i class="fas fa-plus-circle"></i></div>
+                <div class="about-site-card-title">Швидке додавання сайтів</div>
+              </div>
               <p class="about-site-card-desc">Зберігайте будь-який ресурс із каталогу натисканням на сердечко ❤️ в його описі, або додавайте власні посилання через кнопку [+] у шапці картки.</p>
             </div>
             <div class="about-site-card">
-              <div class="about-site-card-icon text-info"><i class="fas fa-cloud-upload-alt"></i></div>
-              <div class="about-site-card-title">Хмарна Google-синхронізація</div>
+              <div class="about-site-card-header">
+                <div class="about-site-card-icon text-info"><i class="fas fa-cloud-upload-alt"></i></div>
+                <div class="about-site-card-title">Хмарна Google-синхронізація</div>
+              </div>
               <p class="about-site-card-desc">Ваші збережені сайти та тематичні картки автоматично синхронізуються між комп'ютером, ноутбуком і смартфоном через захищену хмару.</p>
             </div>
             <div class="about-site-card">
-              <div class="about-site-card-icon text-warning"><i class="fas fa-arrows-alt"></i></div>
-              <div class="about-site-card-title">Drag & Drop впорядкування</div>
+              <div class="about-site-card-header">
+                <div class="about-site-card-icon text-warning"><i class="fas fa-arrows-alt"></i></div>
+                <div class="about-site-card-title">Drag & Drop впорядкування</div>
+              </div>
               <p class="about-site-card-desc">Зручно змінюйте порядок карток простим перетягуванням за ручку ⠿, переміщуйте сайти між папками в 1 клік.</p>
             </div>
             <div class="about-site-card">
-              <div class="about-site-card-icon" style="color: #6366f1;"><i class="fas fa-shield-alt"></i></div>
-              <div class="about-site-card-title">Дзеркала сайтів та надійність</div>
+              <div class="about-site-card-header">
+                <div class="about-site-card-icon" style="color: #6366f1;"><i class="fas fa-shield-alt"></i></div>
+                <div class="about-site-card-title">Дзеркала сайтів та надійність</div>
+              </div>
               <p class="about-site-card-desc">Для важливих сайтів передбачено швидкі переходи на дзеркала й альтернативні адреси ⇄ на випадок перевантаження або збоїв зв'язку.</p>
             </div>
           </div>
@@ -2333,23 +2349,31 @@ function openAboutSiteModal() {
           </div>
           <div class="about-site-grid">
             <div class="about-site-card">
-              <div class="about-site-card-icon"><i class="fas fa-search"></i></div>
-              <div class="about-site-card-title">Миттєвий інтелектуальний пошук</div>
+              <div class="about-site-card-header">
+                <div class="about-site-card-icon"><i class="fas fa-search"></i></div>
+                <div class="about-site-card-title">Миттєвий інтелектуальний пошук</div>
+              </div>
               <p class="about-site-card-desc">Швидкий пошук за назвами, описами, ключовими словами та тегами серед тисяч перевірених сайтів України.</p>
             </div>
             <div class="about-site-card">
-              <div class="about-site-card-icon text-warning"><i class="fas fa-adjust"></i></div>
-              <div class="about-site-card-title">Темна та світла теми</div>
+              <div class="about-site-card-header">
+                <div class="about-site-card-icon text-warning"><i class="fas fa-adjust"></i></div>
+                <div class="about-site-card-title">Темна та світла теми</div>
+              </div>
               <p class="about-site-card-desc">Комфортна робота в будь-який час доби з автоматичним збереженням обраної теми для ваших очей.</p>
             </div>
             <div class="about-site-card">
-              <div class="about-site-card-icon text-success"><i class="fas fa-music"></i></div>
-              <div class="about-site-card-title">Онлайн-радіо та Музика</div>
+              <div class="about-site-card-header">
+                <div class="about-site-card-icon text-success"><i class="fas fa-music"></i></div>
+                <div class="about-site-card-title">Онлайн-радіо та Музика</div>
+              </div>
               <p class="about-site-card-desc">Вбудовані плеєри українських радіостанцій (LIVE) та добірки популярної музики з автоперемішуванням (Shuffle).</p>
             </div>
             <div class="about-site-card">
-              <div class="about-site-card-icon text-danger"><i class="fas fa-bell"></i></div>
-              <div class="about-site-card-title">Центр сповіщень (Дзвіночок)</div>
+              <div class="about-site-card-header">
+                <div class="about-site-card-icon text-danger"><i class="fas fa-bell"></i></div>
+                <div class="about-site-card-title">Центр сповіщень (Дзвіночок)</div>
+              </div>
               <p class="about-site-card-desc">Завжди будьте в курсі нових можливостей порталу, технічних оновлень та важливих повідомлень адміністрації.</p>
             </div>
           </div>
