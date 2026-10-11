@@ -2119,19 +2119,20 @@ body.dark-mode .cl-modal-body .cl-calendar-prefix {
 
 @media (max-width: 576px) {
   .cl-modal-backdrop {
-    padding: 10px;
-    padding: max(10px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right)) max(10px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left));
+    padding: 6px 8px;
+    padding: max(6px, env(safe-area-inset-top)) max(8px, env(safe-area-inset-right)) max(6px, env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
   }
   .cl-modal {
-    max-height: 100%;
+    max-height: calc(100vh - 12px);
+    max-height: calc(100dvh - 12px);
     height: auto;
-    border-radius: 12px;
+    border-radius: 10px;
   }
   .cl-modal-header {
-    padding: 10px 14px;
+    padding: 8px 12px;
   }
   .cl-modal-body {
-    padding: 12px 14px;
+    padding: 8px 10px;
     font-size: 0.88rem;
   }
   .cl-modal-body ul,
@@ -3354,6 +3355,33 @@ body.dark-mode .maintenance-progress-bar {
 
 .announcements-modal-body {
   padding: 12px !important;
+}
+
+@media (max-width: 576px) {
+  .announcements-modal {
+    max-height: calc(100vh - 12px) !important;
+    max-height: calc(100dvh - 12px) !important;
+    border-radius: 10px;
+  }
+  .announcements-modal-header {
+    padding: 8px 10px !important;
+  }
+  .announcements-modal-body {
+    padding: 8px 8px !important;
+  }
+  .announcement-card-item {
+    padding: 8px 10px !important;
+    margin-bottom: 6px !important;
+  }
+  .announcements-modal-footer-action {
+    padding-top: 4px !important;
+    padding-bottom: 2px !important;
+  }
+}
+
+.announcements-modal-footer-action {
+  padding-top: 8px;
+  padding-bottom: 4px;
 }
 
 .announcement-card-item {
@@ -5799,57 +5827,163 @@ body.dark-mode .user-cabinet-modal {
 
 @media (max-width: 576px) {
   .user-cabinet-backdrop {
-    padding: 4px 6px env(safe-area-inset-bottom, 4px) 6px;
+    padding: 6px;
+    padding: max(6px, env(safe-area-inset-top)) max(6px, env(safe-area-inset-right)) max(6px, env(safe-area-inset-bottom)) max(6px, env(safe-area-inset-left));
   }
   .user-cabinet-modal {
-    max-height: calc(100vh - 8px);
-    max-height: calc(100dvh - 8px);
+    width: 100%;
+    max-width: calc(100vw - 12px);
+    max-height: calc(100vh - 12px);
+    max-height: calc(100dvh - 12px);
     border-radius: 10px;
+    margin: 0 auto;
   }
   .cabinet-header {
-    padding: 8px 12px;
+    padding: 6px 10px;
   }
   .cabinet-header-title {
-    font-size: 1rem;
+    font-size: 0.95rem;
+  }
+  .cabinet-close-btn {
+    font-size: 1.35rem;
+    padding: 0 2px;
   }
   .cabinet-body {
-    padding: 8px 10px;
+    padding: 6px 8px;
   }
-  .cabinet-welcome-box {
-    padding: 4px 0 10px 0;
-  }
-  .cabinet-welcome-icon {
-    font-size: 2.2rem;
-    margin-bottom: 8px;
-  }
-  .cabinet-welcome-title {
-    font-size: 1.15rem;
+  .cabinet-user-bar {
+    padding: 6px 8px;
     margin-bottom: 6px;
-  }
-  .cabinet-welcome-desc {
-    font-size: 0.85rem;
-    margin-bottom: 12px;
-    line-height: 1.4;
-  }
-  .cabinet-top-auth-wrap {
-    margin: 8px 0 14px 0;
-  }
-  .cabinet-features-grid {
     gap: 8px;
-    margin-bottom: 12px;
+    border-radius: 8px;
   }
-  .cabinet-feature-item {
-    padding: 10px 12px;
+  .cabinet-avatar-lg {
+    width: 36px;
+    height: 36px;
+  }
+  .cabinet-user-name {
+    font-size: 0.88rem;
+  }
+  .cabinet-role-badge {
+    font-size: 0.66rem;
+    padding: 1px 6px;
+  }
+  .cabinet-user-email {
+    font-size: 0.73rem;
+  }
+  #btnCabinetLogout {
+    padding: 3px 8px;
+    font-size: 0.75rem;
   }
   .cabinet-section-selector-bar {
-    padding: 5px 8px;
+    padding: 4px 6px;
+    margin-bottom: 8px;
+    gap: 6px;
+    border-radius: 6px;
   }
   .cabinet-menu-picker-btn {
-    padding: 5px 10px;
-    font-size: 0.8rem;
+    padding: 5px 8px;
+    font-size: 0.82rem;
+    border-radius: 6px;
   }
   .cabinet-selected-tab-indicator {
-    font-size: 0.86rem;
+    padding: 3px 6px;
+    font-size: 0.85rem;
+    gap: 6px;
+    min-width: 0;
+    flex-grow: 1;
+  }
+  .cabinet-tab-badge-title {
+    font-size: 0.84rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .cabinet-welcome-box {
+    padding: 4px 0 8px 0;
+  }
+  .cabinet-welcome-icon {
+    font-size: 2rem;
+    margin-bottom: 6px;
+  }
+  .cabinet-welcome-title {
+    font-size: 1.1rem;
+    margin-bottom: 4px;
+  }
+  .cabinet-welcome-desc {
+    font-size: 0.82rem;
+    margin-bottom: 10px;
+    line-height: 1.35;
+  }
+  .cabinet-top-auth-wrap {
+    margin: 6px 0 10px 0;
+  }
+  .cabinet-features-grid {
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+  .cabinet-feature-item {
+    padding: 8px 10px;
+  }
+}
+
+/* Пустий стан у вкладках кабінету */
+.cabinet-empty-state {
+  padding: 18px 10px;
+  text-align: center;
+}
+.cabinet-empty-icon {
+  font-size: 2.2rem;
+  color: #cbd5e1;
+  margin-bottom: 8px;
+}
+body.dark-mode .cabinet-empty-icon {
+  color: #475569;
+}
+.cabinet-empty-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin-bottom: 6px;
+  color: var(--text-main, #0f172a);
+}
+body.dark-mode .cabinet-empty-title {
+  color: #f8fafc;
+}
+.cabinet-empty-desc {
+  max-width: 380px;
+  margin: 0 auto 12px auto;
+  font-size: 0.84rem;
+  line-height: 1.4;
+  color: var(--text-muted, #64748b);
+}
+body.dark-mode .cabinet-empty-desc {
+  color: #94a3b8;
+}
+.cabinet-empty-btn {
+  border-radius: 8px;
+  padding: 8px 18px;
+  font-size: 0.88rem;
+}
+@media (max-width: 576px) {
+  .cabinet-empty-state {
+    padding: 10px 6px;
+  }
+  .cabinet-empty-icon {
+    font-size: 1.85rem;
+    margin-bottom: 5px;
+  }
+  .cabinet-empty-title {
+    font-size: 0.95rem;
+    margin-bottom: 4px;
+  }
+  .cabinet-empty-desc {
+    margin: 0 auto 10px auto;
+    font-size: 0.78rem;
+    line-height: 1.35;
+  }
+  .cabinet-empty-btn {
+    padding: 6px 14px;
+    font-size: 0.82rem;
   }
 }
 
@@ -8158,14 +8292,29 @@ body.dark-mode .announcements-about-banner:hover {
 body.dark-mode .announcements-about-icon {
   color: #60a5fa;
 }
+.announcements-about-texts {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+}
 .announcements-about-title {
   font-size: 0.86rem;
   font-weight: 700;
   color: var(--text-main, #0f172a);
-  line-height: 1.25;
 }
 body.dark-mode .announcements-about-title {
   color: #f1f5f9;
+}
+.announcements-about-sub {
+  font-size: 0.74rem;
+  font-weight: 500;
+  color: var(--text-muted, #64748b);
+  opacity: 0.85;
+  margin-top: 1px;
+}
+body.dark-mode .announcements-about-sub {
+  color: #94a3b8;
+  opacity: 0.8;
 }
 .announcements-about-action-btn {
   flex-shrink: 0;
@@ -8174,6 +8323,36 @@ body.dark-mode .announcements-about-title {
   font-size: 0.78rem;
   padding: 4px 10px;
   white-space: nowrap;
+}
+
+@media (max-width: 576px) {
+  .announcements-about-banner {
+    padding: 6px 8px;
+    margin-bottom: 7px;
+    gap: 6px;
+    border-radius: 8px;
+  }
+  .announcements-about-banner-left {
+    gap: 6px;
+  }
+  .announcements-about-icon {
+    font-size: 1.05rem;
+  }
+  .announcements-about-texts {
+    line-height: 1.2;
+  }
+  .announcements-about-title {
+    font-size: 0.82rem;
+  }
+  .announcements-about-sub {
+    font-size: 0.70rem;
+    margin-top: 0;
+  }
+  .announcements-about-action-btn {
+    padding: 3px 8px;
+    font-size: 0.74rem;
+    border-radius: 6px;
+  }
 }
 
 /* Модальне вікно "Про Сайт" */
@@ -8282,6 +8461,52 @@ body.dark-mode .about-site-card-desc {
 body.dark-mode .about-site-actions-bar {
   border-top-color: rgba(255, 255, 255, 0.08);
 }
+
+@media (max-width: 576px) {
+  .about-site-hero {
+    padding: 6px 4px 10px;
+    margin-bottom: 10px;
+  }
+  .about-site-logo {
+    font-size: 1.8rem;
+    margin-bottom: 4px;
+  }
+  .about-site-heading {
+    font-size: 1.12rem;
+    margin-bottom: 4px;
+  }
+  .about-site-lead {
+    font-size: 0.82rem;
+    line-height: 1.35;
+  }
+  .about-site-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .about-site-card {
+    padding: 8px 10px;
+    border-radius: 8px;
+  }
+  .about-site-card-icon {
+    font-size: 1.15rem;
+    margin-bottom: 4px;
+  }
+  .about-site-card-title {
+    font-size: 0.84rem;
+    margin-bottom: 3px;
+  }
+  .about-site-card-desc {
+    font-size: 0.76rem;
+    line-height: 1.35;
+  }
+  .about-site-actions-bar {
+    padding: 8px 4px 4px;
+    margin-top: 10px;
+    gap: 6px;
+  }
+}
+
 
 
 

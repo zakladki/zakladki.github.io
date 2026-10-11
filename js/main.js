@@ -1573,7 +1573,10 @@ function openAnnouncementsModal() {
           <div class="announcements-about-banner" id="btnNoticeAboutSiteBanner" role="button" tabindex="0" title="Відкрити інформацію про сайт, його можливості та інструкції">
             <div class="announcements-about-banner-left">
               <span class="announcements-about-icon"><i class="fas fa-info-circle"></i></span>
-              <div class="announcements-about-title">Що вміє наш сайт? Огляд можливостей</div>
+              <div class="announcements-about-texts">
+                <div class="announcements-about-title">Що вміє наш сайт?</div>
+                <div class="announcements-about-sub">Огляд можливостей</div>
+              </div>
             </div>
             <button type="button" class="btn btn-primary btn-sm announcements-about-action-btn">
               Про Сайт <i class="fas fa-chevron-right ms-1"></i>
@@ -1583,7 +1586,7 @@ function openAnnouncementsModal() {
           <div id="announcementsContentContainer">
             ${renderAnnouncementsCardsHtml()}
           </div>
-          <div class="text-center pt-2 pb-1">
+          <div class="text-center pt-2 pb-1 announcements-modal-footer-action">
             <button type="button" class="btn btn-primary px-4 cl-modal-close font-weight-bold" style="border-radius: 20px;">
               <i class="fas fa-check mr-1"></i> Зрозуміло
             </button>
@@ -5102,7 +5105,7 @@ function renderUserCabinetContent() {
     <div class="cabinet-section-selector-bar">
       <div class="cabinet-menu-trigger-wrap">
         <button type="button" class="cabinet-menu-picker-btn" id="btnCabinetMenuPicker" aria-haspopup="true" aria-expanded="false" title="Натисніть, щоб обрати розділ меню">
-          <i class="fas fa-bars me-1"></i> Меню <i class="fas fa-chevron-down ms-1 text-light" style="font-size: 0.7rem; opacity: 0.85;"></i>
+          <i class="fas fa-bars"></i><i class="fas fa-chevron-down ms-1 text-light cabinet-picker-arrow" style="font-size: 0.65rem; opacity: 0.9;"></i>
         </button>
       </div>
 
@@ -5219,13 +5222,13 @@ async function renderUserOrdersTab() {
 
     if (orders.length === 0) {
       container.innerHTML = `
-        <div class="text-center py-5">
-          <div style="font-size: 2.5rem; color: #cbd5e1; margin-bottom: 12px;"><i class="fas fa-clipboard-list"></i></div>
-          <h5>У Вас поки немає активних замовлень</h5>
-          <p class="text-muted small" style="max-width: 400px; margin: 0 auto 16px auto;">
+        <div class="cabinet-empty-state text-center">
+          <div class="cabinet-empty-icon"><i class="fas fa-clipboard-list"></i></div>
+          <h6 class="cabinet-empty-title">У Вас поки немає активних замовлень</h6>
+          <p class="cabinet-empty-desc text-muted">
             Ви можете оформити розміщення свого сайту у тематичних картках або партнерських блоках каталогу.
           </p>
-          <button type="button" class="btn btn-primary font-weight-bold" id="btnCabinetNewAd" style="border-radius: 8px;">
+          <button type="button" class="btn btn-primary font-weight-bold cabinet-empty-btn" id="btnCabinetNewAd">
             <i class="fas fa-plus-circle me-1"></i> Оформити розміщення
           </button>
         </div>
@@ -5312,7 +5315,7 @@ async function renderUserBookmarksTab() {
   const bookmarksCount = (userBookmarksList && userBookmarksList.length) ? userBookmarksList.length : 0;
 
   container.innerHTML = `
-    <div class="my-2 p-3 text-center" style="background: rgba(225, 29, 72, 0.06); border: 1px solid rgba(225, 29, 72, 0.2); border-radius: 12px;">
+    <div class="my-1 p-2 text-center cabinet-bookmarks-tab-box" style="background: rgba(225, 29, 72, 0.06); border: 1px solid rgba(225, 29, 72, 0.2); border-radius: 10px;">
       <!-- Суцільний симетричний бейджик статистики з розділенням по центру -->
       <div class="cabinet-bm-unified-stats-wrap mb-2">
         <div class="cabinet-bm-unified-badge">
@@ -5328,12 +5331,12 @@ async function renderUserBookmarksTab() {
         </div>
       </div>
 
-      <div style="font-size: 2.2rem; margin-bottom: 8px;">❤️</div>
-      <h6 class="font-weight-bold text-danger mb-2">Окремий розділ «Мої Закладки»</h6>
-      <p class="text-muted small mb-3" style="max-width: 440px; margin-left: auto; margin-right: auto; line-height: 1.45;">
+      <div style="font-size: 1.9rem; margin-bottom: 6px;">❤️</div>
+      <h6 class="font-weight-bold text-danger mb-1" style="font-size: 0.98rem;">Окремий розділ «Мої Закладки»</h6>
+      <p class="text-muted small mb-2" style="max-width: 420px; margin-left: auto; margin-right: auto; line-height: 1.35; font-size: 0.78rem;">
         Зручно додавайте улюблені сайти, здійснюйте швидкий пошук та керуйте персональними посиланнями на окремій повноформатній сторінці.
       </p>
-      <a href="./bookmarks.html" class="btn btn-danger font-weight-bold px-4 py-2" style="border-radius: 8px; font-size: 0.88rem;" onclick="closeUserCabinetModal()">
+      <a href="./bookmarks.html" class="btn btn-danger font-weight-bold px-3 py-1 text-decoration-none" style="border-radius: 8px; font-size: 0.84rem; display: inline-block;" onclick="closeUserCabinetModal()">
         Відкрити «❤️ Закладки» ↗
       </a>
     </div>
