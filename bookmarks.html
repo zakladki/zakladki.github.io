@@ -3,7 +3,7 @@
   <head>
     <!-- Пригнічення помилок сторонніх розширень браузера (MetaMask тощо) -->
     <script>
-      (function(){function e(t){if(!t)return!1;var r="";try{r=typeof t=="string"?t:typeof t=="object"?(t.message||"")+" "+(t.stack||"")+" "+(t.reason||"")+" "+(t.name||"")+" "+String(t):String(t)}catch(n){r=String(t)}return r=r.toLowerCase(),r.indexOf("metamask")!==-1||r.indexOf("failed to connect")!==-1||r.indexOf("auro wallet")!==-1||r.indexOf("phantom")!==-1||r.indexOf("coinbase")!==-1||r.indexOf("evm")!==-1}var o=console.error;console.error=function(){for(var t=0;t<arguments.length;t++)if(e(arguments[t]))return;return o.apply(console,arguments)};var a=console.warn;console.warn=function(){for(var t=0;t<arguments.length;t++)if(e(arguments[t]))return;return a.apply(console,arguments)};window.addEventListener("unhandledrejection",function(t){e(t.reason)&&(t.preventDefault(),t.stopImmediatePropagation())},!0);window.addEventListener("error",function(t){(e(t.error)||e(t.message))&&(t.preventDefault(),t.stopImmediatePropagation())},!0);var n=window.onerror;window.onerror=function(t,r,o,a,c){return e(t)||e(c)||(n?n.apply(this,arguments):void 0)}})();
+      (function(){function e(t){if(!t)return!1;var r="";try{r=typeof t=="string"?t:typeof t=="object"?(t.message||"")+" "+(t.stack||"")+" "+(t.reason||"")+" "+(t.name||"")+" "+String(t):String(t)}catch(n){r=String(t)}return r=r.toLowerCase(),r.indexOf("could not reach cloud firestore")!==-1||r.indexOf("offline mode")!==-1||r.indexOf("code=unavailable")!==-1||r.indexOf("metamask")!==-1||r.indexOf("failed to connect")!==-1||r.indexOf("auro wallet")!==-1||r.indexOf("phantom")!==-1||r.indexOf("coinbase")!==-1||r.indexOf("evm")!==-1}var o=console.error;console.error=function(){for(var t=0;t<arguments.length;t++)if(e(arguments[t]))return;return o.apply(console,arguments)};var a=console.warn;console.warn=function(){for(var t=0;t<arguments.length;t++)if(e(arguments[t]))return;return a.apply(console,arguments)};window.addEventListener("unhandledrejection",function(t){e(t.reason)&&(t.preventDefault(),t.stopImmediatePropagation())},!0);window.addEventListener("error",function(t){(e(t.error)||e(t.message))&&(t.preventDefault(),t.stopImmediatePropagation())},!0);var n=window.onerror;window.onerror=function(t,r,o,a,c){return e(t)||e(c)||(n?n.apply(this,arguments):void 0)}})();
     </script>
     <!-- Google AdSense -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3065705668384801" crossorigin="anonymous"></script>
@@ -111,8 +111,7 @@
         right: 12px !important; z-index: 1050 !important; transform-origin: right center !important; padding: 6px !important; margin: 0 !important;
       }
     </style>
-  </head>
-  <body>
+  <body class="page-bookmarks">
     <div class="container nav-container">
       <nav class="navbar navbar-expand-md fixed-top navbar-dark d-flex justify-content-between px-3">
         <div class="hamburger hamburger--spring navbar-toggler" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
@@ -154,14 +153,14 @@
       
       <!-- Головний динамічний контейнер сторінки закладок -->
       <div class="row">
-        <div class="tab-content container" id="bookmarksPageApp" style="padding-bottom: 30px;">
-          <div id="bookmarksPageLoading" class="text-center py-5">
+        <div class="tab-content container" id="bookmarksPageApp" style="padding-bottom: 30px; min-height: 75vh;">
+          <div id="bookmarksPageLoading" class="text-center py-5" style="min-height: 380px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
             <div class="spinner-border text-danger mb-3" role="status" style="width: 3rem; height: 3rem;">
               <span class="sr-only">Завантаження...</span>
             </div>
             <h5 class="text-muted">Завантаження персональних закладок...</h5>
           </div>
-          <div id="bookmarksPageContainer" style="display: none;"></div>
+          <div id="bookmarksPageContainer" style="display: none; min-height: 380px;"></div>
         </div>
       </div>
     </main>

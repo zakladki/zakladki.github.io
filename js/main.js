@@ -21,7 +21,10 @@
            str.indexOf("phantom") !== -1 ||
            str.indexOf("coinbase") !== -1 ||
            str.indexOf("evm") !== -1 ||
-           str.indexOf("resizeobserver") !== -1;
+           str.indexOf("resizeobserver") !== -1 ||
+           str.indexOf("could not reach cloud firestore") !== -1 ||
+           str.indexOf("operate in offline mode") !== -1 ||
+           str.indexOf("code=unavailable") !== -1;
   }
 
   var origError = console.error;
@@ -1251,8 +1254,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // === 2. НИЖНІЙ МУЛЬТИПЛЕКС ПЕРЕД ФУТЕРОМ (На всіх сторінках, окрім Головної, і тільки для ПК екранів >= 1250px) ===
-  if (!isHomepage && screenWidth >= 1250) {
+  // === 2. НИЖНІЙ МУЛЬТИПЛЕКС ПЕРЕД ФУТЕРОМ (На всіх сторінках, окрім Головної та «❤️ Закладки», і тільки для ПК екранів >= 1250px) ===
+  const isBookmarksPage = window.location.pathname.includes('bookmarks.html');
+  if (!isHomepage && !isBookmarksPage && screenWidth >= 1250) {
     const footer = document.querySelector('footer.footer');
     if (footer) {
       const multiplexContainer = document.createElement('div');
@@ -2281,8 +2285,8 @@ function openAboutSiteModal() {
         <div class="cl-modal-body about-site-modal-body" id="aboutSiteModalBody">
           <div class="about-site-hero">
             <div class="about-site-hero-header">
-              <span class="about-site-logo" aria-hidden="true">🇺🇦 ⭐ 🌐</span>
-              <h4 class="about-site-heading">ТОП ЗАКЛАДКИ - Головні Сайти України</h4>
+              <span class="about-site-logo" aria-hidden="true">🌐</span>
+              <h4 class="about-site-heading">ТОП ЗАКЛАДКИ 🇺🇦 - Головні Сайти України</h4>
             </div>
             <p class="about-site-lead">
               Сучасний інформаційний портал, надійний каталог перевірених веб-ресурсів та персональний хмарний менеджер закладок для щоденного комфортного користування.
@@ -5571,8 +5575,10 @@ async function loadUserBookmarksData() {
   // 2. Хмарна синхронізація через Firebase Firestore (якщо доступно)
   if (!currentUser || !firebaseDb) return;
   try {
-    const userDoc = await firebaseDb.collection('users').doc(currentUser.uid).get();
-    if (userDoc.exists) {
+    const fetchDocPromise = firebaseDb.collection('users').doc(currentUser.uid).get();
+    const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Firestore timeout')), 3500));
+    const userDoc = await Promise.race([fetchDocPromise, timeoutPromise]);
+    if (userDoc && userDoc.exists) {
       const data = userDoc.data();
       const remoteBm = data.bookmarks;
       const remoteCards = data.bookmarkCards;
@@ -6418,16 +6424,6 @@ async function renderBookmarksPage() {
                 </div>
               </div>
             </div>
-            <div class="bm-hero-right">
-              <div class="bm-hero-actions-row">
-                <button type="button" class="btn btn-danger btn-sm font-weight-bold" onclick="openCreateCardModal()" style="border-radius: 8px;">
-                  <i class="fas fa-folder-plus me-1"></i> Створити картку
-                </button>
-                <button type="button" class="btn btn-primary btn-sm font-weight-bold" onclick="openAddBookmarkModal()" style="border-radius: 8px;">
-                  <i class="fas fa-plus me-1"></i> Додати сайт
-                </button>
-              </div>
-            </div>
           </div>
 
           <!-- Зворотна сторона: Корисні поради та підказки (без великого заголовка для максимальної компактності) -->
@@ -6450,12 +6446,24 @@ async function renderBookmarksPage() {
                 <div class="bm-tip-icon text-danger"><i class="fas fa-heart"></i></div>
                 <div class="bm-tip-content">
                   <div class="bm-tip-title">Швидке додавання з каталогу «ТОП ЗАКЛАДКИ»</div>
-                  <div class="bm-tip-desc">Розгорніть опис будь-якого сайту на будь-якій сторінці каталогу та натисніть на значок <strong>❤️</strong> ліворуч — сайт миттєво збережеться у ваші картки без необхідності копіювати посилання!</div>
+                  <div class="bm-tip-desc">Розгорніть опис будь-якого сайту на будь-якій сторінці каталогу та натисніть на значок <strong>❤️</strong> ліворуч - сайт миттєво збережеться у ваші картки без необхідності копіювати посилання!</div>
                 </div>
               </div>
             </div>
           </div>
 
+        </div>
+      </div>
+
+      <!-- Шапочка перед першою карткою з кнопками створення папки та додавання сайту -->
+      <div class="bm-cards-cap" id="bmCardsCap">
+        <div class="bm-cards-cap-actions">
+          <button type="button" class="btn btn-danger btn-sm font-weight-bold bm-cap-btn bm-cap-btn-card" onclick="openCreateCardModal()" title="Створити нову тематичну папку / картку">
+            <i class="fas fa-folder-plus me-1"></i> Створити папку
+          </button>
+          <button type="button" class="btn btn-primary btn-sm font-weight-bold bm-cap-btn bm-cap-btn-add" onclick="openAddBookmarkModal()" title="Додати новий сайт у закладки">
+            <i class="fas fa-plus me-1"></i> Додати сайт
+          </button>
         </div>
       </div>
 

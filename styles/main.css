@@ -1020,7 +1020,18 @@ footer.footer .btn-primary:active {
   max-height: 100% !important;
 }
 
-/* Контейнер для нижнього блоку мультиплекс-реклами на всіх сторінках */
+/* Контейнер для нижнього блоку мультиплекс-реклами на всіх сторінках (окрім Головної та «❤️ Закладки») */
+body.page-bookmarks .bottom-multiplex-container,
+body.page-bookmarks .ad-wrapper-bottom,
+body.page-bookmarks #bookmarksPageApp ~ .bottom-multiplex-container,
+.bottom-multiplex-container:empty {
+  display: none !important;
+  height: 0 !important;
+  max-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
 .bottom-multiplex-container {
   margin-top: 0 !important;
   margin-bottom: 0 !important;
@@ -7511,6 +7522,83 @@ body.dark-mode .desc-heart-add-btn.in-bookmarks {
   color: #f43f5e !important;
 }
 
+/* Шапочка з кнопками дій перед першою карткою (ширина за шириною картки) */
+.bm-cards-cap {
+  background: var(--card-bg, #ffffff);
+  border: 1px solid var(--border-color, #cbd5e1);
+  border-radius: 12px;
+  padding: 10px 14px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  width: 100%;
+  max-width: calc((100% - 32px) / 3); /* На ПК точно відповідає ширині одного стовпчика/картки у 3-колонковій сітці */
+  box-sizing: border-box;
+}
+body.dark-mode .bm-cards-cap {
+  background: #1e293b;
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+}
+.bm-cards-cap-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  width: 100%;
+}
+.bm-cap-btn {
+  border-radius: 8px;
+  padding: 6px 14px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.15s ease;
+  cursor: pointer;
+  flex: 1 1 auto;
+}
+.bm-cap-btn:hover {
+  transform: translateY(-1px);
+}
+@media (max-width: 1024px) and (min-width: 700px) {
+  .bm-cards-cap {
+    max-width: calc((100% - 16px) / 2); /* Для 2 стовпчиків */
+  }
+}
+@media (max-width: 768px) {
+  .bm-hero-flip-container {
+    margin-bottom: 12px;
+  }
+}
+@media (max-width: 699.98px) {
+  .bm-cards-cap {
+    max-width: 100%; /* На смартфонах/планшетах у 1 стовпчик ширина як у картки на весь контейнер */
+  }
+}
+@media (max-width: 576px) {
+  .bm-cards-cap {
+    padding: 8px 10px;
+    margin-bottom: 12px;
+    border-radius: 10px;
+  }
+  .bm-cards-cap-actions {
+    width: 100%;
+    display: flex;
+    gap: 8px;
+  }
+  .bm-cap-btn {
+    flex: 1 1 0;
+    justify-content: center;
+    padding: 7px 8px;
+    font-size: 0.82rem;
+  }
+}
+
 /* ==========================================================================
    3 СТОВПЧИКА ТА КАРТКИ КОРИСТУВАЧА В «❤️ ЗАКЛАДКАХ»
    ========================================================================== */
@@ -7519,7 +7607,7 @@ body.dark-mode .desc-heart-add-btn.in-bookmarks {
   grid-template-columns: repeat(3, 1fr);
   gap: 16px;
   align-items: start;
-  margin-top: 14px;
+  margin-top: 0;
   margin-bottom: 30px;
 }
 .bm-column {
