@@ -1060,9 +1060,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // 5. Динамічне додавання рекламних блоків по боках з різним розташуванням для головної та інших сторінок
   // Визначаємо, чи є поточна сторінка головною (index.html, корінь "/" або пустий шлях)
-  const isHomepage = window.location.pathname.endsWith('/') || 
-                     window.location.pathname.endsWith('/index.html') || 
-                     !window.location.pathname.includes('.html');
+  const isHomepage = (window.location.pathname.endsWith('/') || 
+                      window.location.pathname.endsWith('/index.html') || 
+                      !window.location.pathname.includes('.html')) &&
+                      !window.location.pathname.includes('bookmarks');
 
   const screenWidth = window.innerWidth;
   let totalAdCount = 0;
@@ -1255,7 +1256,9 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // === 2. НИЖНІЙ МУЛЬТИПЛЕКС ПЕРЕД ФУТЕРОМ (На всіх сторінках, окрім Головної та «❤️ Закладки», і тільки для ПК екранів >= 1250px) ===
-  const isBookmarksPage = window.location.pathname.includes('bookmarks.html');
+  const isBookmarksPage = window.location.pathname.includes('bookmarks') || 
+                          !!document.getElementById('bookmarksPageApp') ||
+                          document.body.classList.contains('page-bookmarks');
   if (!isHomepage && !isBookmarksPage && screenWidth >= 1250) {
     const footer = document.querySelector('footer.footer');
     if (footer) {
@@ -1271,6 +1274,11 @@ document.addEventListener("DOMContentLoaded", () => {
       totalAdCount += 1; // 1 блок нижнього мультиплексу
       observeAdStatus(multiplexContainer);
     }
+  }
+
+  // На головній сторінці та в розділі «сердечко» примусово видаляємо будь-які нижні горизонтальні блоки
+  if (isHomepage || isBookmarksPage) {
+    document.querySelectorAll('.bottom-multiplex-container, .ad-wrapper-bottom').forEach(el => el.remove());
   }
 
   // === 3. ВПРОВАДЖЕННЯ МОБІЛЬНИХ IN-FEED РЕКЛАМНИХ БЛОКІВ МІЖ КАРТКАМИ (Тільки для мобільних екранів < 1250px) ===
@@ -5008,10 +5016,8 @@ function openUserCabinetModal(tab) {
 
   if (tab) {
     currentCabinetTab = tab;
-  } else if (isAdminUser()) {
-    currentCabinetTab = 'admin';
   } else {
-    currentCabinetTab = 'orders';
+    currentCabinetTab = 'dashboard';
   }
 
   renderUserCabinetContent();
@@ -5036,67 +5042,27 @@ function renderUserCabinetContent() {
   const body = document.getElementById('cabinetBody');
   if (!body) return;
 
-  if (!currentUser) {
-    // Екран для гостя (вхід через Google)
-    body.innerHTML = `
-      <div class="cabinet-welcome-box">
-        <div class="cabinet-welcome-icon"><i class="fas fa-shield-alt"></i></div>
-        <h4 class="cabinet-welcome-title">Особистий кабінет ТОП ЗАКЛАДКИ</h4>
-        <p class="cabinet-welcome-desc">
-          Увійдіть через акаунт Google, щоб отримати доступ до персональної історії замовлень, управління рекламою та хмарних закладок:
-        </p>
-
-        <!-- Кнопка входу Google та примітка вгорі -->
-        <div class="cabinet-top-auth-wrap">
-          <button type="button" class="google-auth-btn" id="btnCabinetGoogleLogin">
-            <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
-            Увійти через Google
-          </button>
-          <div class="cabinet-privacy-note text-muted">
-            <em>🔒 Вхід захищено сервісом Google Identity. Ми отримуємо лише публічне ім'я, аватарку та email.</em>
-          </div>
-        </div>
-
-        <div class="cabinet-features-grid mt-4">
-          <div class="cabinet-feature-item">
-            <div class="cabinet-feature-icon"><i class="fas fa-bullhorn"></i></div>
-            <div class="cabinet-feature-title">Мої замовлення реклами</div>
-            <p class="cabinet-feature-desc">Контролюйте статус розміщення сайту, терміни, реквізити та подовжуйте в 1 клік.</p>
-          </div>
-          <div class="cabinet-feature-item">
-            <div class="cabinet-feature-icon"><i class="fas fa-star"></i></div>
-            <div class="cabinet-feature-title">Хмарні закладки</div>
-            <p class="cabinet-feature-desc">Зберігайте персональні сайти з синхронізацією між смартфоном і комп'ютером.</p>
-          </div>
-          <div class="cabinet-feature-item">
-            <div class="cabinet-feature-icon"><i class="fab fa-google"></i></div>
-            <div class="cabinet-feature-title">Вхід в один клік</div>
-            <p class="cabinet-feature-desc">Миттєва та безпечна авторизація через захищений сервіс Google без створення паролів.</p>
-          </div>
-        </div>
-      </div>
-    `;
-    const btn = document.getElementById('btnCabinetGoogleLogin');
-    if (btn) btn.onclick = loginWithGoogle;
-    return;
-  }
-
-  // Екран для авторизованого користувача
   const isAdmin = isAdminUser();
-  const avatarSrc = currentUser.photoURL || 'https://www.gravatar.com/avatar/?d=mp';
+  const avatarSrc = currentUser ? (currentUser.photoURL || 'https://www.gravatar.com/avatar/?d=mp') : '';
 
-  // Перелік розділів кабінету
+  // Перелік розділів кабінету: Дашборд завжди перший та активний за замовчуванням
   const cabinetTabsList = [
-    ...(isAdmin ? [{
-      id: 'admin',
-      name: 'Всі замовлення (Адмін)',
-      icon: '<i class="fas fa-crown text-warning"></i>',
-      desc: 'Панель модерації та управління замовленнями'
-    }] : []),
+    {
+      id: 'dashboard',
+      name: 'Дашборд',
+      icon: '<i class="fas fa-tachometer-alt text-primary"></i>',
+      desc: 'Загальний огляд, бали, статистика та швидкі дії'
+    },
+    {
+      id: 'hints',
+      name: 'Підказки',
+      icon: '<i class="fas fa-lightbulb text-warning"></i>',
+      desc: 'Корисні поради, сортування та інструкції щодо закладок'
+    },
     {
       id: 'orders',
       name: 'Мої замовлення реклами',
-      icon: '<i class="fas fa-bullhorn text-primary"></i>',
+      icon: '<i class="fas fa-bullhorn text-success"></i>',
       desc: 'Контроль статусів, терміни розміщення та управління'
     },
     {
@@ -5104,7 +5070,13 @@ function renderUserCabinetContent() {
       name: 'Мої закладки',
       icon: '<i class="fas fa-star text-warning"></i>',
       desc: 'Хмарні персональні сайти та швидкі посилання'
-    }
+    },
+    ...(isAdmin ? [{
+      id: 'admin',
+      name: 'Всі замовлення (Адмін)',
+      icon: '<i class="fas fa-crown text-warning"></i>',
+      desc: 'Панель модерації та управління замовленнями'
+    }] : [])
   ];
 
   const currentTabObj = cabinetTabsList.find(t => t.id === currentCabinetTab) || cabinetTabsList[0];
@@ -5113,23 +5085,52 @@ function renderUserCabinetContent() {
     <!-- Профіль користувача вгорі -->
     <div class="cabinet-user-bar">
       <div class="cabinet-user-info">
-        <img src="${avatarSrc}" class="cabinet-avatar-lg" alt="Аватарка" referrerpolicy="no-referrer">
-        <div class="cabinet-user-names">
-          <div class="cabinet-user-name">${escapeHtml(currentUser.displayName || 'Користувач')}</div>
-          <div class="cabinet-user-badges">
-            <span class="cabinet-role-badge ${isAdmin ? 'cabinet-role-admin' : 'cabinet-role-user'}">
-              ${isAdmin ? '<i class="fas fa-crown"></i> Адміністратор' : '<i class="fas fa-user"></i> Клієнт'}
-            </span>
+        ${currentUser ? `
+          <img src="${avatarSrc}" class="cabinet-avatar-lg" alt="Аватарка" referrerpolicy="no-referrer">
+          <div class="cabinet-user-names">
+            <div class="cabinet-user-name-row">
+              <span class="cabinet-user-name">${escapeHtml(currentUser.displayName || 'Користувач')}</span>
+              <button type="button" class="cabinet-logout-compact-btn" id="btnCabinetLogout" title="Вийти з акаунта Google">
+                <i class="fas fa-sign-out-alt me-1"></i> Вийти
+              </button>
+            </div>
+            <div class="cabinet-user-badges">
+              <span class="cabinet-role-badge ${isAdmin ? 'cabinet-role-admin' : 'cabinet-role-user'}">
+                ${isAdmin ? '<i class="fas fa-crown"></i> Адміністратор' : '<i class="fas fa-user-check"></i> Клієнт'}
+              </span>
+              <span class="cabinet-points-badge" title="Бали активності (система нарахування незабаром)">
+                <i class="fas fa-coins text-warning"></i> 0 балів
+              </span>
+            </div>
+            <div class="cabinet-user-email">${escapeHtml(currentUser.email || '')}</div>
           </div>
-          <div class="cabinet-user-email">${escapeHtml(currentUser.email || '')}</div>
-        </div>
+        ` : `
+          <div class="cabinet-avatar-lg cabinet-avatar-guest"><i class="fas fa-user-circle"></i></div>
+          <div class="cabinet-user-names">
+            <div class="cabinet-user-name">Гість</div>
+            <div class="cabinet-user-badges">
+              <span class="cabinet-role-badge cabinet-role-user">
+                <i class="fas fa-user-clock"></i> Локальний профіль
+              </span>
+              <span class="cabinet-points-badge" title="Бали активності">
+                <i class="fas fa-coins text-warning"></i> 0 балів
+              </span>
+            </div>
+            <div class="cabinet-user-email">Увійдіть через Google для збереження даних у хмарі</div>
+          </div>
+        `}
       </div>
-      <button type="button" class="btn btn-outline-danger btn-sm" id="btnCabinetLogout">
-        <i class="fas fa-sign-out-alt me-1"></i> Вийти
-      </button>
+      <div>
+        ${currentUser ? '' : `
+          <button type="button" class="btn btn-primary btn-sm font-weight-bold" id="btnCabinetTopLogin">
+            <svg width="15" height="15" viewBox="0 0 48 48" class="me-1 align-middle" style="display:inline-block;"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+            Увійти
+          </button>
+        `}
+      </div>
     </div>
 
-    <!-- Нова організація меню кабінету: кнопка вибору перед назвою обраного розділу -->
+    <!-- Організація меню кабінету: кнопка вибору перед назвою обраного розділу -->
     <div class="cabinet-section-selector-bar">
       <div class="cabinet-menu-trigger-wrap">
         <button type="button" class="cabinet-menu-picker-btn" id="btnCabinetMenuPicker" aria-haspopup="true" aria-expanded="false" title="Натисніть, щоб обрати розділ меню">
@@ -5170,7 +5171,11 @@ function renderUserCabinetContent() {
   `;
 
   // Обробники кнопок та меню
-  document.getElementById('btnCabinetLogout').onclick = logoutUser;
+  const logoutBtn = document.getElementById('btnCabinetLogout');
+  if (logoutBtn) logoutBtn.onclick = logoutUser;
+
+  const loginTopBtn = document.getElementById('btnCabinetTopLogin');
+  if (loginTopBtn) loginTopBtn.onclick = loginWithGoogle;
 
   const pickerBtn = body.querySelector('#btnCabinetMenuPicker');
   const dropdown = body.querySelector('#cabinetMenuDropdown');
@@ -5215,7 +5220,11 @@ function renderUserCabinetContent() {
   }, 10);
 
   // Завантаження вмісту обраної вкладки
-  if (currentCabinetTab === 'admin' && isAdmin) {
+  if (currentCabinetTab === 'dashboard') {
+    renderDashboardTab();
+  } else if (currentCabinetTab === 'hints') {
+    renderHintsTab();
+  } else if (currentCabinetTab === 'admin' && isAdmin) {
     renderAdminOrdersTab();
   } else if (currentCabinetTab === 'bookmarks') {
     renderUserBookmarksTab();
@@ -5224,10 +5233,254 @@ function renderUserCabinetContent() {
   }
 }
 
+// 0. Вкладка: Дашборд
+function renderDashboardTab() {
+  const container = document.getElementById('cabinetTabContent');
+  if (!container) return;
+
+  const cardsCount = (userBookmarkCards && userBookmarkCards.length) ? userBookmarkCards.length : 1;
+  const bookmarksCount = (userBookmarksList && userBookmarksList.length) ? userBookmarksList.length : 0;
+  const userGreetingName = currentUser ? (currentUser.displayName || currentUser.email.split('@')[0]) : 'Шановний Гість';
+
+  container.innerHTML = `
+    <div class="cabinet-dashboard-wrap">
+      <!-- Привітний банер дашборду -->
+      <div class="cabinet-dash-banner">
+        <div class="cabinet-dash-banner-content">
+          <div class="cabinet-dash-banner-badge"><i class="fas fa-sparkles text-warning me-1"></i> Персональний Дашборд</div>
+          <h4 class="cabinet-dash-banner-title">Вітаємо, ${escapeHtml(userGreetingName)}!</h4>
+          <p class="cabinet-dash-banner-desc">
+            Тут зібрано вашу ключову статистику, баланс балів, швидкі дії та новини сервісу «ТОП ЗАКЛАДКИ».
+          </p>
+        </div>
+      </div>
+
+      <!-- Сітка карток показників (Метрики) -->
+      <div class="cabinet-dash-metrics-grid">
+        <div class="cabinet-dash-metric-card metric-points">
+          <div class="dash-metric-icon"><i class="fas fa-coins"></i></div>
+          <div class="dash-metric-data">
+            <div class="dash-metric-value">0 <span class="dash-metric-unit">балів</span></div>
+            <div class="dash-metric-label">Бали активності</div>
+            <div class="dash-metric-hint text-warning"><i class="fas fa-clock me-1"></i>Система нарахування незабаром</div>
+          </div>
+        </div>
+
+        <div class="cabinet-dash-metric-card metric-folders">
+          <div class="dash-metric-icon"><i class="fas fa-folder-open"></i></div>
+          <div class="dash-metric-data">
+            <div class="dash-metric-value">${cardsCount}</div>
+            <div class="dash-metric-label">Тематичні папки</div>
+            <div class="dash-metric-hint text-muted">Створено в закладках</div>
+          </div>
+        </div>
+
+        <div class="cabinet-dash-metric-card metric-bookmarks">
+          <div class="dash-metric-icon"><i class="fas fa-bookmark"></i></div>
+          <div class="dash-metric-data">
+            <div class="dash-metric-value">${bookmarksCount}</div>
+            <div class="dash-metric-label">Збережені сайти</div>
+            <div class="dash-metric-hint text-muted">Швидкі посилання</div>
+          </div>
+        </div>
+
+        <div class="cabinet-dash-metric-card metric-cloud">
+          <div class="dash-metric-icon"><i class="${currentUser ? 'fas fa-shield-alt text-success' : 'fas fa-cloud-upload-alt text-muted'}"></i></div>
+          <div class="dash-metric-data">
+            <div class="dash-metric-value ${currentUser ? 'text-success' : 'text-secondary'}">${currentUser ? 'Активна' : 'Локально'}</div>
+            <div class="dash-metric-label">Хмарна синхронізація</div>
+            <div class="dash-metric-hint text-muted">${currentUser ? escapeHtml(currentUser.email) : 'Увійдіть для синхронізації'}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Швидкі дії -->
+      <div class="cabinet-dash-section">
+        <div class="cabinet-dash-section-title"><i class="fas fa-bolt text-warning me-1"></i> Швидкі дії</div>
+        <div class="cabinet-dash-actions-grid">
+          <a href="./bookmarks.html" class="cabinet-dash-action-btn action-bookmarks" onclick="closeUserCabinetModal()">
+            <div class="action-btn-icon"><i class="fas fa-heart"></i></div>
+            <div class="action-btn-text">
+              <span class="action-btn-title">Мої Закладки</span>
+              <span class="action-btn-sub">Перейти до персональних карток</span>
+            </div>
+          </a>
+
+          <button type="button" class="cabinet-dash-action-btn action-add" id="btnDashAddSite">
+            <div class="action-btn-icon"><i class="fas fa-plus"></i></div>
+            <div class="action-btn-text">
+              <span class="action-btn-title">Додати сайт</span>
+              <span class="action-btn-sub">Зберегти нове посилання</span>
+            </div>
+          </button>
+
+          <button type="button" class="cabinet-dash-action-btn action-hints" id="btnDashOpenHints">
+            <div class="action-btn-icon"><i class="fas fa-lightbulb"></i></div>
+            <div class="action-btn-text">
+              <span class="action-btn-title">Підказки</span>
+              <span class="action-btn-sub">Сортування та корисні поради</span>
+            </div>
+          </button>
+
+          <button type="button" class="cabinet-dash-action-btn action-ad" id="btnDashOrderAd">
+            <div class="action-btn-icon"><i class="fas fa-bullhorn"></i></div>
+            <div class="action-btn-text">
+              <span class="action-btn-title">Замовити рекламу</span>
+              <span class="action-btn-sub">Розмістити свій сайт у каталозі</span>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <!-- Блок про систему балів та розвиток -->
+      <div class="cabinet-dash-info-card">
+        <div class="dash-info-icon"><i class="fas fa-gift text-warning"></i></div>
+        <div class="dash-info-content">
+          <h6 class="dash-info-title">Система винагород та накопичення балів</h6>
+          <p class="dash-info-desc">
+            Ми поступово наповнюємо та розвиваємо Особистий кабінет! Незабаром тут з'явиться можливість накопичувати бали за активне користування каталогом, додавання корисних сервісів та участь у спільноті.
+          </p>
+        </div>
+      </div>
+    </div>
+  `;
+
+  const addSiteBtn = container.querySelector('#btnDashAddSite');
+  if (addSiteBtn) {
+    addSiteBtn.onclick = () => {
+      closeUserCabinetModal();
+      openAddBookmarkModal();
+    };
+  }
+
+  const hintsBtn = container.querySelector('#btnDashOpenHints');
+  if (hintsBtn) {
+    hintsBtn.onclick = () => {
+      currentCabinetTab = 'hints';
+      renderUserCabinetContent();
+    };
+  }
+
+  const adBtn = container.querySelector('#btnDashOrderAd');
+  if (adBtn) {
+    adBtn.onclick = () => {
+      closeUserCabinetModal();
+      openAdOrderModal();
+    };
+  }
+}
+
+// 0.1 Вкладка: Підказки (ті дві підказки, що були на оборотній стороні шапочки, та інструкції)
+function renderHintsTab() {
+  const container = document.getElementById('cabinetTabContent');
+  if (!container) return;
+
+  container.innerHTML = `
+    <div class="cabinet-hints-wrap">
+      <div class="cabinet-hints-header mb-3">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+          <div>
+            <h5 class="font-weight-bold mb-1"><i class="fas fa-lightbulb text-warning me-2"></i>Корисні підказки та інструкції</h5>
+            <p class="text-muted small mb-0">Дізнайтеся, як максимально зручно користуватися персональними закладками та каталогом.</p>
+          </div>
+          <button type="button" class="btn btn-outline-secondary btn-sm" id="btnHintsBackDash">
+            <i class="fas fa-tachometer-alt me-1"></i> На Дашборд
+          </button>
+        </div>
+      </div>
+
+      <div class="cabinet-tips-list">
+        <!-- Підказка 1 -->
+        <div class="cabinet-tip-card">
+          <div class="cabinet-tip-badge tip-badge-blue">
+            <i class="fas fa-arrows-alt"></i>
+          </div>
+          <div class="cabinet-tip-body">
+            <div class="cabinet-tip-title">Сортування та зміна порядку карток</div>
+            <p class="cabinet-tip-desc">
+              Ви можете легко змінювати розташування карток перетягуванням. Затисніть значок <strong><i class="fas fa-arrows-alt text-primary"></i></strong> ліворуч у шапці будь-якої картки та перетягніть її на бажане місце (працює мишкою на комп'ютері або дотиком на смартфоні). Новий порядок карток зберігається автоматично!
+            </p>
+          </div>
+        </div>
+
+        <!-- Підказка 2 -->
+        <div class="cabinet-tip-card">
+          <div class="cabinet-tip-badge tip-badge-red">
+            <i class="fas fa-heart"></i>
+          </div>
+          <div class="cabinet-tip-body">
+            <div class="cabinet-tip-title">Швидке додавання з каталогу «ТОП ЗАКЛАДКИ»</div>
+            <p class="cabinet-tip-desc">
+              Розгорніть опис будь-якого сайту на будь-якій сторінці нашого каталогу та натисніть на значок <strong>❤️</strong> ліворуч - обраний сайт миттєво збережеться у ваші закладки без необхідності копіювати посилання чи вводити назву вручну!
+            </p>
+          </div>
+        </div>
+
+        <!-- Підказка 3 -->
+        <div class="cabinet-tip-card">
+          <div class="cabinet-tip-badge tip-badge-green">
+            <i class="fas fa-cloud-upload-alt"></i>
+          </div>
+          <div class="cabinet-tip-body">
+            <div class="cabinet-tip-title">Хмарна синхронізація на всіх пристроях</div>
+            <p class="cabinet-tip-desc">
+              Увійдіть через акаунт Google в 1 клік — ваші створені тематичні папки та всі збережені закладки будуть надійно збережені у хмарі та доступні на комп'ютері, смартфоні й планшеті одночасно.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="cabinet-hints-footer mt-4 pt-3 border-top d-flex align-items-center justify-content-between flex-wrap gap-2">
+        <a href="./bookmarks.html" class="btn btn-danger font-weight-bold" onclick="closeUserCabinetModal()">
+          <i class="fas fa-heart me-1"></i> Відкрити «❤️ Закладки»
+        </a>
+        <button type="button" class="btn btn-outline-primary" id="btnHintsAddSite">
+          <i class="fas fa-plus me-1"></i> Додати новий сайт
+        </button>
+      </div>
+    </div>
+  `;
+
+  const backDashBtn = container.querySelector('#btnHintsBackDash');
+  if (backDashBtn) {
+    backDashBtn.onclick = () => {
+      currentCabinetTab = 'dashboard';
+      renderUserCabinetContent();
+    };
+  }
+
+  const addSiteBtn = container.querySelector('#btnHintsAddSite');
+  if (addSiteBtn) {
+    addSiteBtn.onclick = () => {
+      closeUserCabinetModal();
+      openAddBookmarkModal();
+    };
+  }
+}
+
 // 1. Вкладка: Мої замовлення
 async function renderUserOrdersTab() {
   const container = document.getElementById('cabinetTabContent');
-  if (!container || !currentUser) return;
+  if (!container) return;
+
+  if (!currentUser) {
+    container.innerHTML = `
+      <div class="cabinet-guest-auth-prompt text-center py-4">
+        <div class="mb-3 text-primary" style="font-size: 2.4rem;"><i class="fas fa-bullhorn"></i></div>
+        <h5 class="font-weight-bold mb-2">Історія замовлень реклами</h5>
+        <p class="text-muted small mb-3" style="max-width: 440px; margin: 0 auto; line-height: 1.45;">
+          Увійдіть через акаунт Google, щоб переглядати ваші замовлення, узгоджені локації, терміни розміщення та статуси:
+        </p>
+        <button type="button" class="google-auth-btn" id="btnTabOrdersLogin">
+          <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+          Увійти через Google
+        </button>
+      </div>
+    `;
+    const btn = container.querySelector('#btnTabOrdersLogin');
+    if (btn) btn.onclick = loginWithGoogle;
+    return;
+  }
 
   if (!firebaseDb) {
     container.innerHTML = `<div class="alert alert-warning">База даних завантажується...</div>`;
@@ -6189,6 +6442,103 @@ function promptDeleteCard(cardName) {
   });
 }
 
+// Керування виїзними діями рядка закладок (стрілочка вліво розгортає кнопки дій)
+function toggleBookmarkRowActions(event, toggleBtn) {
+  if (event) {
+    event.preventDefault();
+    event.stopPropagation();
+  }
+  const wrap = toggleBtn ? toggleBtn.closest('.bm-row-actions-wrap') : null;
+  if (!wrap) return;
+
+  const isOpen = wrap.classList.contains('is-open');
+
+  // Закриваємо всі інші відкриті шторки дій для охайного інтерфейсу
+  document.querySelectorAll('.bm-row-actions-wrap.is-open').forEach(el => {
+    if (el !== wrap) {
+      el.classList.remove('is-open');
+      const btn = el.querySelector('.bm-row-actions-toggle');
+      if (btn) {
+        btn.setAttribute('title', 'Дії з ресурсом');
+        btn.setAttribute('aria-expanded', 'false');
+      }
+    }
+  });
+
+  if (isOpen) {
+    wrap.classList.remove('is-open');
+    toggleBtn.setAttribute('title', 'Дії з ресурсом');
+    toggleBtn.setAttribute('aria-expanded', 'false');
+  } else {
+    wrap.classList.add('is-open');
+    toggleBtn.setAttribute('title', 'Приховати дії');
+    toggleBtn.setAttribute('aria-expanded', 'true');
+  }
+}
+window.toggleBookmarkRowActions = toggleBookmarkRowActions;
+
+// Керування виїзними діями шапки картки (стрілочка вліво розгортає кнопки дій шапки)
+function toggleCardHeaderActions(event, toggleBtn) {
+  if (event) {
+    event.preventDefault();
+    event.stopPropagation();
+  }
+  const wrap = toggleBtn ? toggleBtn.closest('.bm-card-header-actions-wrap') : null;
+  if (!wrap) return;
+
+  const isOpen = wrap.classList.contains('is-open');
+
+  // Закриваємо всі інші відкриті шторки дій шапок карток
+  document.querySelectorAll('.bm-card-header-actions-wrap.is-open').forEach(el => {
+    if (el !== wrap) {
+      el.classList.remove('is-open');
+      const btn = el.querySelector('.bm-card-actions-toggle');
+      if (btn) {
+        btn.setAttribute('title', 'Дії з карткою');
+        btn.setAttribute('aria-expanded', 'false');
+      }
+    }
+  });
+
+  if (isOpen) {
+    wrap.classList.remove('is-open');
+    toggleBtn.setAttribute('title', 'Дії з карткою');
+    toggleBtn.setAttribute('aria-expanded', 'false');
+  } else {
+    wrap.classList.add('is-open');
+    toggleBtn.setAttribute('title', 'Приховати дії');
+    toggleBtn.setAttribute('aria-expanded', 'true');
+  }
+}
+window.toggleCardHeaderActions = toggleCardHeaderActions;
+
+// Глобальний слухач для закриття висунутих кнопок при кліку поза рядком або шапкою
+if (!window._bmActionsOutsideListener) {
+  window._bmActionsOutsideListener = true;
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.bm-row-actions-wrap')) {
+      document.querySelectorAll('.bm-row-actions-wrap.is-open').forEach(el => {
+        el.classList.remove('is-open');
+        const btn = el.querySelector('.bm-row-actions-toggle');
+        if (btn) {
+          btn.setAttribute('title', 'Дії з ресурсом');
+          btn.setAttribute('aria-expanded', 'false');
+        }
+      });
+    }
+    if (!e.target.closest('.bm-card-header-actions-wrap')) {
+      document.querySelectorAll('.bm-card-header-actions-wrap.is-open').forEach(el => {
+        el.classList.remove('is-open');
+        const btn = el.querySelector('.bm-card-actions-toggle');
+        if (btn) {
+          btn.setAttribute('title', 'Дії з карткою');
+          btn.setAttribute('aria-expanded', 'false');
+        }
+      });
+    }
+  });
+}
+
 function promptMoveBookmark(bookmarkIndex) {
   const bm = userBookmarksList[bookmarkIndex];
   if (!bm) return;
@@ -6198,9 +6548,9 @@ function promptMoveBookmark(bookmarkIndex) {
   `).join('');
 
   showCustomModal({
-    title: '📁 Перемістити закладку в іншу картку',
+    title: '📁 Перемістити в іншу папку/картку',
     bodyHtml: `
-      <p class="small mb-2">Перемістити сайт <strong>${escapeHtml(bm.name)}</strong> в іншу картку:</p>
+      <p class="small mb-2">Перемістити сайт <strong>${escapeHtml(bm.name)}</strong> в іншу папку/картку:</p>
       <select id="moveTargetCardSelect" class="form-control">
         ${optionsHtml}
       </select>
@@ -6343,12 +6693,17 @@ async function renderBookmarksPage() {
                 <a href="${escapeHtml(bm.url)}" target="_blank" rel="noopener noreferrer" class="bm-item-link" title="${escapeHtml(bm.name)}">
                   ${escapeHtml(bm.name)}
                 </a>
-                <div class="bm-item-actions">
-                  <button type="button" class="bm-icon-btn" onclick="promptMoveBookmark(${bm.origIdx})" title="Перемістити в іншу картку">
-                    <i class="fas fa-folder-open"></i>
-                  </button>
-                  <button type="button" class="bm-icon-btn btn-del" onclick="deleteUserBookmarkFromPage(${bm.origIdx})" title="Видалити закладку">
-                    <i class="far fa-trash-alt"></i>
+                <div class="bm-row-actions-wrap">
+                  <div class="bm-row-actions-slider">
+                    <button type="button" class="bm-icon-btn" onclick="promptMoveBookmark(${bm.origIdx})" title="Перемістити в іншу папку/картку">
+                      <i class="fas fa-folder-open"></i>
+                    </button>
+                    <button type="button" class="bm-icon-btn btn-del" onclick="deleteUserBookmarkFromPage(${bm.origIdx})" title="Видалити сайт/ресурс">
+                      <i class="far fa-trash-alt"></i>
+                    </button>
+                  </div>
+                  <button type="button" class="bm-row-actions-toggle" onclick="toggleBookmarkRowActions(event, this)" title="Дії з ресурсом" aria-label="Відкрити дії">
+                    <i class="fas fa-chevron-left"></i>
                   </button>
                 </div>
               </li>
@@ -6362,29 +6717,34 @@ async function renderBookmarksPage() {
             <div class="group-title">
               <div class="d-flex align-items-center flex-grow-1" style="min-width: 0;">
                 <span class="bm-card-drag-handle" title="Затисніть і перетягніть для сортування карток">
-                  <i class="fas fa-grip-vertical"></i>
+                  <i class="fas fa-arrows-alt"></i>
                 </span>
                 <span class="bm-card-header-title text-truncate" title="${escapeHtml(card.name)}">
                   <i class="fas fa-folder text-warning bm-folder-icon"></i> ${escapeHtml(card.name)}
                 </span>
               </div>
-              <div class="bm-card-header-actions">
-                ${isDefault ? `
-                <button type="button" class="bm-head-btn bm-head-btn-create-card text-warning" onclick="openCreateCardModal()" title="Створити нову картку">
-                  <i class="fas fa-folder-plus"></i>
+              <div class="bm-card-header-actions-wrap">
+                <div class="bm-card-header-actions-slider">
+                  ${isDefault ? `
+                  <button type="button" class="bm-head-btn bm-head-btn-create-card text-warning" onclick="openCreateCardModal()" title="Створити нову папку/картку">
+                    <i class="fas fa-folder-plus"></i>
+                  </button>
+                  ` : ''}
+                  <button type="button" class="bm-head-btn" onclick="openAddBookmarkModal('${escapeHtml(card.name)}')" title="Додати сайт у цю картку">
+                    <i class="fas fa-plus"></i>
+                  </button>
+                  ${!isDefault ? `
+                  <button type="button" class="bm-head-btn" onclick="promptRenameCard('${escapeHtml(card.name)}')" title="Перейменувати картку">
+                    <i class="fas fa-pen"></i>
+                  </button>
+                  <button type="button" class="bm-head-btn btn-del" onclick="promptDeleteCard('${escapeHtml(card.name)}')" title="Видалити картку">
+                    <i class="far fa-trash-alt"></i>
+                  </button>
+                  ` : ''}
+                </div>
+                <button type="button" class="bm-card-actions-toggle" onclick="toggleCardHeaderActions(event, this)" title="Дії з карткою" aria-label="Відкрити дії з карткою">
+                  <i class="fas fa-chevron-left"></i>
                 </button>
-                ` : ''}
-                <button type="button" class="bm-head-btn" onclick="openAddBookmarkModal('${escapeHtml(card.name)}')" title="Додати сайт у цю картку">
-                  <i class="fas fa-plus"></i>
-                </button>
-                ${!isDefault ? `
-                <button type="button" class="bm-head-btn" onclick="promptRenameCard('${escapeHtml(card.name)}')" title="Перейменувати картку">
-                  <i class="fas fa-pen"></i>
-                </button>
-                <button type="button" class="bm-head-btn btn-del" onclick="promptDeleteCard('${escapeHtml(card.name)}')" title="Видалити картку">
-                  <i class="far fa-trash-alt"></i>
-                </button>
-                ` : ''}
               </div>
             </div>
             <ul class="bm-card-list">
@@ -6395,81 +6755,47 @@ async function renderBookmarksPage() {
       }).join('');
     };
 
+    let avatarHtml = '';
+    if (currentUser && currentUser.photoURL) {
+      avatarHtml = `<img src="${currentUser.photoURL}" class="bm-user-strip-avatar" alt="Avatar" referrerpolicy="no-referrer">`;
+    } else if (currentUser) {
+      avatarHtml = `<div class="bm-user-strip-avatar bm-user-strip-placeholder"><i class="fas fa-user-check text-success"></i></div>`;
+    } else {
+      avatarHtml = `<div class="bm-user-strip-avatar bm-user-strip-guest"><i class="fas fa-user-circle"></i></div>`;
+    }
+
     pageContainer.innerHTML = `
-      <!-- 3D Flip Панель користувача та підказок -->
-      <div class="bm-hero-flip-container" id="bmHeroFlipContainer">
-        <div class="bm-hero-flip-inner">
-          
-          <!-- Лицьова сторона: Картка статусу користувача -->
-          <div class="bm-hero-flip-front bm-hero-card">
-            <!-- Вертикальна кнопка на лівому краю для перевертання до підказок -->
-            <button type="button" class="bm-hero-edge-flip-btn" onclick="toggleHeroFlip(true)" title="Перевернути панель та відкрити корисні підказки" aria-label="Підказки">
-              <i class="fas fa-sync-alt bm-edge-sync-icon"></i>
-              <span class="bm-edge-btn-text">Підказки</span>
-            </button>
-
-            <div class="bm-hero-left">
-              <div class="bm-hero-user">
-                <img src="${avatarUrl}" class="bm-hero-avatar" alt="Avatar" referrerpolicy="no-referrer">
-                <div class="bm-hero-info">
-                  <div class="bm-hero-name-row">
-                    <h4>${escapeHtml(userName)}</h4>
-                    <button type="button" class="btn btn-outline-secondary btn-sm bm-hero-cabinet-btn" onclick="openUserCabinetModal()" title="Відкрити особистий кабінет">
-                      <i class="far fa-user-circle me-1"></i> Мій Кабінет
-                    </button>
-                  </div>
-                  <div class="bm-hero-sub">
-                    <i class="fas fa-shield-alt text-success me-1"></i> Хмарна синхронізація активна • <strong>${escapeHtml(currentUser.email)}</strong>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Зворотна сторона: Корисні поради та підказки (без великого заголовка для максимальної компактності) -->
-          <div class="bm-hero-flip-back bm-hero-card">
-            <!-- Вертикальна кнопка на лівому краю для повернення назад -->
-            <button type="button" class="bm-hero-edge-flip-btn bm-hero-edge-return-btn" onclick="toggleHeroFlip(false)" title="Повернутися назад до панелі користувача" aria-label="Назад">
-              <i class="fas fa-sync-alt bm-edge-sync-icon"></i>
-              <span class="bm-edge-btn-text">Назад</span>
-            </button>
-
-            <div class="bm-tips-grid">
-              <div class="bm-tip-card">
-                <div class="bm-tip-icon text-primary"><i class="fas fa-arrows-alt"></i></div>
-                <div class="bm-tip-content">
-                  <div class="bm-tip-title">Сортування та зміна порядку карток</div>
-                  <div class="bm-tip-desc">Ви можете змінювати розташування карток перетягуванням. Затисніть значок <strong><i class="fas fa-grip-vertical"></i></strong> ліворуч у шапці будь-якої картки та перетягніть її на бажане місце (працює мишкою або пальцем на смартфоні). Новий порядок зберігається автоматично!</div>
-                </div>
-              </div>
-              <div class="bm-tip-card">
-                <div class="bm-tip-icon text-danger"><i class="fas fa-heart"></i></div>
-                <div class="bm-tip-content">
-                  <div class="bm-tip-title">Швидке додавання з каталогу «ТОП ЗАКЛАДКИ»</div>
-                  <div class="bm-tip-desc">Розгорніть опис будь-якого сайту на будь-якій сторінці каталогу та натисніть на значок <strong>❤️</strong> ліворуч - сайт миттєво збережеться у ваші картки без необхідності копіювати посилання!</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-        </div>
-      </div>
-
-      <!-- Шапочка перед першою карткою з кнопками створення папки та додавання сайту -->
-      <div class="bm-cards-cap" id="bmCardsCap">
-        <div class="bm-cards-cap-actions">
-          <button type="button" class="btn btn-danger btn-sm font-weight-bold bm-cap-btn bm-cap-btn-card" onclick="openCreateCardModal()" title="Створити нову тематичну папку / картку">
-            <i class="fas fa-folder-plus me-1"></i> Створити папку
-          </button>
-          <button type="button" class="btn btn-primary btn-sm font-weight-bold bm-cap-btn bm-cap-btn-add" onclick="openAddBookmarkModal()" title="Додати новий сайт у закладки">
-            <i class="fas fa-plus me-1"></i> Додати сайт
-          </button>
-        </div>
-      </div>
-
       <!-- 3 Стовпчика карток (автоматичний розподіл) -->
       <div class="bm-3columns-grid">
-        <div class="bm-column" id="bmCol0">${renderColumnHtml(colCards[0])}</div>
+        <div class="bm-column" id="bmCol0">
+          <!-- Єдина об'єднана верхня панель: користувач, бали та кнопки швидких дій -->
+          <div class="bm-top-panel" id="bmTopPanel">
+            <div class="bm-top-user-row" onclick="openUserCabinetModal('dashboard')" title="Відкрити Особистий кабінет (Дашборд)">
+              <div class="bm-user-strip-left">
+                ${avatarHtml}
+                <span class="bm-user-strip-name">${escapeHtml(userName)}</span>
+                <span class="bm-user-points-badge" title="Бали активності (система нарахування незабаром)">
+                  <i class="fas fa-coins text-warning"></i> <span>0 балів</span>
+                </span>
+              </div>
+            </div>
+            <div class="bm-top-divider"></div>
+            <div class="bm-top-actions-row">
+              <div class="bm-cards-cap-actions">
+                <button type="button" class="btn btn-danger btn-sm font-weight-bold bm-cap-btn bm-cap-btn-card" onclick="openCreateCardModal()" title="Створити нову тематичну папку / картку">
+                  <i class="fas fa-folder-plus me-1"></i> Створити папку
+                </button>
+                <button type="button" class="btn btn-primary btn-sm font-weight-bold bm-cap-btn bm-cap-btn-add" onclick="openAddBookmarkModal()" title="Додати новий сайт у закладки">
+                  <i class="fas fa-plus me-1"></i> Додати сайт
+                </button>
+              </div>
+              <button type="button" class="bm-cap-hints-btn" onclick="openUserCabinetModal('hints')" title="Корисні підказки (відкрити в Особистому кабінеті)" aria-label="Підказки">
+                <i class="fas fa-question"></i>
+              </button>
+            </div>
+          </div>
+          ${renderColumnHtml(colCards[0])}
+        </div>
         <div class="bm-column" id="bmCol1">${renderColumnHtml(colCards[1])}</div>
         <div class="bm-column" id="bmCol2">${renderColumnHtml(colCards[2])}</div>
       </div>
@@ -6502,13 +6828,34 @@ async function initBookmarksSortable() {
       group: 'bm-user-cards-group',
       animation: 250,
       handle: '.bm-card-drag-handle',
+      draggable: '.bm-user-card',
+      filter: '.bm-user-strip, .bm-cards-cap',
       fallbackOnBody: true,
       swapThreshold: 0.65,
       ghostClass: 'bm-card-sortable-ghost',
       chosenClass: 'bm-card-sortable-chosen',
       dragClass: 'bm-card-sortable-drag',
+      onMove: function (evt) {
+        if (evt.related && (evt.related.classList.contains('bm-cards-cap') || evt.related.classList.contains('bm-user-strip'))) {
+          return false; // Не дозволяємо перетягувати картки вище за рядок користувача та шапку кнопок у першій колонці
+        }
+        return true;
+      },
       onEnd: async function () {
-        const col0Cards = Array.from(document.getElementById('bmCol0')?.querySelectorAll('.bm-user-card') || []).map(c => c.getAttribute('data-card-name')).filter(Boolean);
+        // Завжди переконуємося, що bmUserStrip та bmCardsCap залишаються першими двома елементами у bmCol0
+        const col0 = document.getElementById('bmCol0');
+        const userStrip = document.getElementById('bmUserStrip');
+        const cap = document.getElementById('bmCardsCap');
+        if (col0) {
+          if (userStrip && col0.firstElementChild !== userStrip) {
+            col0.insertBefore(userStrip, col0.firstElementChild);
+          }
+          if (cap && userStrip && userStrip.nextElementSibling !== cap) {
+            userStrip.after(cap);
+          }
+        }
+
+        const col0Cards = Array.from(col0?.querySelectorAll('.bm-user-card') || []).map(c => c.getAttribute('data-card-name')).filter(Boolean);
         const col1Cards = Array.from(document.getElementById('bmCol1')?.querySelectorAll('.bm-user-card') || []).map(c => c.getAttribute('data-card-name')).filter(Boolean);
         const col2Cards = Array.from(document.getElementById('bmCol2')?.querySelectorAll('.bm-user-card') || []).map(c => c.getAttribute('data-card-name')).filter(Boolean);
 
@@ -6534,22 +6881,12 @@ async function initBookmarksSortable() {
   });
 }
 
-// 3D Flip перевертання верхньої панелі статусу та підказок
-function toggleHeroFlip(showBack) {
-  const container = document.getElementById('bmHeroFlipContainer');
-  if (!container) return;
-  if (typeof showBack === 'boolean') {
-    if (showBack) {
-      container.classList.add('is-flipped');
-    } else {
-      container.classList.remove('is-flipped');
-    }
-  } else {
-    container.classList.toggle('is-flipped');
-  }
-}
+// Заглушки для сумісності з попередніми викликами
+function toggleHeroFlip() {}
 window.toggleHeroFlip = toggleHeroFlip;
 window.toggleBookmarksTipsAccordion = toggleHeroFlip;
+function toggleHeroPanelCollapse() {}
+window.toggleHeroPanelCollapse = toggleHeroPanelCollapse;
 
 // 3. Вкладка: 👑 Панель Адміністратора (для weber515sis@gmail.com)
 async function renderAdminOrdersTab() {
