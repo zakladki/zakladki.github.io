@@ -5393,12 +5393,12 @@ function renderHintsTab() {
         <!-- Підказка 1 -->
         <div class="cabinet-tip-card">
           <div class="cabinet-tip-badge tip-badge-blue">
-            <i class="fas fa-arrows-alt"></i>
+            <svg width="10" height="15" viewBox="0 0 10 15" fill="currentColor" style="display:inline-block; vertical-align:middle;"><circle cx="2.5" cy="2.5" r="1.6"/><circle cx="7.5" cy="2.5" r="1.6"/><circle cx="2.5" cy="7.5" r="1.6"/><circle cx="7.5" cy="7.5" r="1.6"/><circle cx="2.5" cy="12.5" r="1.6"/><circle cx="7.5" cy="12.5" r="1.6"/></svg>
           </div>
           <div class="cabinet-tip-body">
             <div class="cabinet-tip-title">Сортування та зміна порядку карток</div>
             <p class="cabinet-tip-desc">
-              Ви можете легко змінювати розташування карток перетягуванням. Затисніть значок <strong><i class="fas fa-arrows-alt text-primary"></i></strong> ліворуч у шапці будь-якої картки та перетягніть її на бажане місце (працює мишкою на комп'ютері або дотиком на смартфоні). Новий порядок карток зберігається автоматично!
+              Ви можете легко змінювати розташування карток перетягуванням. Затисніть квадратний значок із точками <strong><span class="d-inline-flex align-items-center justify-content-center px-1 rounded bg-secondary text-white" style="width:20px;height:20px;vertical-align:middle;"><svg width="8" height="12" viewBox="0 0 10 15" fill="currentColor"><circle cx="2.5" cy="2.5" r="1.6"/><circle cx="7.5" cy="2.5" r="1.6"/><circle cx="2.5" cy="7.5" r="1.6"/><circle cx="7.5" cy="7.5" r="1.6"/><circle cx="2.5" cy="12.5" r="1.6"/><circle cx="7.5" cy="12.5" r="1.6"/></svg></span></strong> ліворуч у шапці будь-якої картки та перетягніть її на бажане місце (працює мишкою на комп'ютері або дотиком на смартфоні). Новий порядок карток зберігається автоматично!
             </p>
           </div>
         </div>
@@ -6091,14 +6091,10 @@ function openAddBookmarkModal(defaultCard = '') {
             <input type="url" id="bmModalUrlInput" class="form-control form-control-sm" placeholder="https://...">
           </div>
           <div class="mb-2">
-            <label class="small font-weight-bold mb-1">Оберіть картку:</label>
+            <label class="small font-weight-bold mb-1">Оберіть папку/картку:</label>
             <select id="bmModalCardSelect" class="form-control form-control-sm">
               ${optionsHtml}
             </select>
-          </div>
-          <div class="mb-1">
-            <label class="small font-weight-bold mb-1">Короткий опис (необов'язково):</label>
-            <textarea id="bmModalDescInput" class="form-control form-control-sm" rows="2" placeholder="Опис сайту..."></textarea>
           </div>
         </div>
       </div>
@@ -6141,14 +6137,10 @@ function openAddBookmarkModal(defaultCard = '') {
           </div>
 
           <div class="mb-2">
-            <label class="small font-weight-bold mb-1">Оберіть картку:</label>
+            <label class="small font-weight-bold mb-1">Оберіть папку/картку:</label>
             <select id="bmCatalogCardSelect" class="form-control form-control-sm">
               ${optionsHtml}
             </select>
-          </div>
-          <div class="mb-1">
-            <label class="small font-weight-bold mb-1">Короткий опис (необов'язково):</label>
-            <textarea id="bmCatalogDescInput" class="form-control form-control-sm" rows="2" placeholder="Опис сайту..."></textarea>
           </div>
         </div>
       </div>
@@ -6171,7 +6163,6 @@ function openAddBookmarkModal(defaultCard = '') {
   const nameInput = document.getElementById('bmModalNameInput');
   const urlInput = document.getElementById('bmModalUrlInput');
   const cardSelectManual = document.getElementById('bmModalCardSelect');
-  const descInput = document.getElementById('bmModalDescInput');
 
   const searchInput = document.getElementById('bmCatalogSearchInput');
   const dropdown = document.getElementById('bmCatalogDropdownResults');
@@ -6180,7 +6171,6 @@ function openAddBookmarkModal(defaultCard = '') {
   const selName = document.getElementById('bmCatalogSelName');
   const selUrl = document.getElementById('bmCatalogSelUrl');
   const cardSelectCatalog = document.getElementById('bmCatalogCardSelect');
-  const descCatalogInput = document.getElementById('bmCatalogDescInput');
   const resetChoiceBtn = document.getElementById('bmCatalogResetChoiceBtn');
 
   // Синхронізація вибору картки між обома формами
@@ -6278,11 +6268,10 @@ function openAddBookmarkModal(defaultCard = '') {
             if (selFavicon) selFavicon.src = faviconUrl;
             if (selName) selName.textContent = item.name;
             if (selUrl) selUrl.textContent = item.url;
-            if (descCatalogInput) descCatalogInput.value = item.desc || '';
             if (selectedWrap) selectedWrap.style.display = 'block';
             dropdown.style.display = 'none';
             searchInput.value = item.name;
-            showQuickToast(`Підставлено «${item.name}»! Оберіть картку та натисніть «Зберегти закладку»`, 'info');
+            showQuickToast(`Підставлено «${item.name}»! Оберіть папку/картку та натисніть «Зберегти закладку»`, 'info');
           }
         };
       });
@@ -6307,7 +6296,6 @@ function openAddBookmarkModal(defaultCard = '') {
         searchInput.value = '';
         searchInput.focus();
       }
-      if (descCatalogInput) descCatalogInput.value = '';
     };
   }
 
@@ -6331,7 +6319,7 @@ function openAddBookmarkModal(defaultCard = '') {
       name = nameInput ? nameInput.value.trim() : '';
       url = urlInput ? urlInput.value.trim() : '';
       card = cardSelectManual ? cardSelectManual.value : targetCard;
-      desc = descInput ? descInput.value.trim() : '';
+      desc = '';
 
       if (!name || !url) {
         alert('Будь ласка, введіть назву та адресу (URL) сайту.');
@@ -6351,7 +6339,7 @@ function openAddBookmarkModal(defaultCard = '') {
       name = selectedCatalogItem.name;
       url = selectedCatalogItem.url;
       card = cardSelectCatalog ? cardSelectCatalog.value : targetCard;
-      desc = descCatalogInput ? descCatalogInput.value.trim() : (selectedCatalogItem.desc || '');
+      desc = selectedCatalogItem.desc || '';
     }
 
     userBookmarksList.push({
@@ -6539,6 +6527,64 @@ if (!window._bmActionsOutsideListener) {
   });
 }
 
+function promptEditBookmark(bookmarkIndex) {
+  const bm = userBookmarksList[bookmarkIndex];
+  if (!bm) return;
+
+  showCustomModal({
+    title: '✏️ Редагувати сайт',
+    bodyHtml: `
+      <div class="mb-3">
+        <label for="editBmName" class="small font-weight-bold mb-1">Назва сайту:</label>
+        <input type="text" id="editBmName" class="form-control" value="${escapeHtml(bm.name || '')}" placeholder="Наприклад: Google">
+      </div>
+      <div class="mb-2">
+        <label for="editBmUrl" class="small font-weight-bold mb-1">Адреса сайту (URL):</label>
+        <input type="url" id="editBmUrl" class="form-control" value="${escapeHtml(bm.url || '')}" placeholder="https://example.com">
+      </div>
+    `,
+    footerHtml: `
+      <button type="button" class="btn btn-secondary btn-sm" onclick="closeCustomModal()">Скасувати</button>
+      <button type="button" class="btn btn-primary btn-sm font-weight-bold" id="confirmEditBmBtn">Зберегти</button>
+    `
+  });
+
+  const confirmBtn = document.getElementById('confirmEditBmBtn');
+  if (confirmBtn) {
+    confirmBtn.onclick = async () => {
+      const nameInput = document.getElementById('editBmName');
+      const urlInput = document.getElementById('editBmUrl');
+      if (!nameInput || !urlInput) return;
+      const newName = nameInput.value.trim();
+      let newUrl = urlInput.value.trim();
+      if (!newName) {
+        showQuickToast('Введіть назву сайту', 'warning');
+        nameInput.focus();
+        return;
+      }
+      if (!newUrl) {
+        showQuickToast('Введіть адресу сайту (URL)', 'warning');
+        urlInput.focus();
+        return;
+      }
+      if (!/^https?:\/\//i.test(newUrl)) {
+        newUrl = 'https://' + newUrl;
+      }
+      bm.name = newName;
+      bm.url = newUrl;
+      const rawIcon = getFaviconForUrl(newUrl);
+      bm.icon = cleanFaviconDataUri(rawIcon);
+
+      await saveUserBookmarksData();
+      closeCustomModal();
+      renderBookmarksPage();
+      syncAllCatalogHeartButtons();
+      showQuickToast(`Сайт «${escapeHtml(newName)}» оновлено!`, 'success');
+    };
+  }
+}
+window.promptEditBookmark = promptEditBookmark;
+
 function promptMoveBookmark(bookmarkIndex) {
   const bm = userBookmarksList[bookmarkIndex];
   if (!bm) return;
@@ -6661,10 +6707,10 @@ async function renderBookmarksPage() {
       cardsMap[cName].push({ ...bm, origIdx });
     });
 
-    // Розподіляємо картки автоматично у 3 стовпчики
-    const colCards = [[], [], []];
+    // Розподіляємо картки автоматично у 4 стовпчики (як на всьому сайті)
+    const colCards = [[], [], [], []];
     userBookmarkCards.forEach((cName, idx) => {
-      colCards[idx % 3].push({
+      colCards[idx % 4].push({
         name: cName,
         items: cardsMap[cName] || []
       });
@@ -6695,6 +6741,9 @@ async function renderBookmarksPage() {
                 </a>
                 <div class="bm-row-actions-wrap">
                   <div class="bm-row-actions-slider">
+                    <button type="button" class="bm-icon-btn btn-edit" onclick="promptEditBookmark(${bm.origIdx})" title="Редагувати сайт (назву та адресу)">
+                      <i class="fas fa-pen"></i>
+                    </button>
                     <button type="button" class="bm-icon-btn" onclick="promptMoveBookmark(${bm.origIdx})" title="Перемістити в іншу папку/картку">
                       <i class="fas fa-folder-open"></i>
                     </button>
@@ -6717,7 +6766,14 @@ async function renderBookmarksPage() {
             <div class="group-title">
               <div class="d-flex align-items-center flex-grow-1" style="min-width: 0;">
                 <span class="bm-card-drag-handle" title="Затисніть і перетягніть для сортування карток">
-                  <i class="fas fa-arrows-alt"></i>
+                  <svg class="bm-drag-dots-svg" width="10" height="15" viewBox="0 0 10 15" fill="currentColor">
+                    <circle cx="2.5" cy="2.5" r="1.6"/>
+                    <circle cx="7.5" cy="2.5" r="1.6"/>
+                    <circle cx="2.5" cy="7.5" r="1.6"/>
+                    <circle cx="7.5" cy="7.5" r="1.6"/>
+                    <circle cx="2.5" cy="12.5" r="1.6"/>
+                    <circle cx="7.5" cy="12.5" r="1.6"/>
+                  </svg>
                 </span>
                 <span class="bm-card-header-title text-truncate" title="${escapeHtml(card.name)}">
                   <i class="fas fa-folder text-warning bm-folder-icon"></i> ${escapeHtml(card.name)}
@@ -6765,8 +6821,8 @@ async function renderBookmarksPage() {
     }
 
     pageContainer.innerHTML = `
-      <!-- 3 Стовпчика карток (автоматичний розподіл) -->
-      <div class="bm-3columns-grid">
+      <!-- 4 Стовпчика карток (автоматичний розподіл як у каталозі сайту) -->
+      <div class="bm-3columns-grid bm-4columns-grid">
         <div class="bm-column" id="bmCol0">
           <!-- Єдина об'єднана верхня панель: користувач, бали та кнопки швидких дій -->
           <div class="bm-top-panel" id="bmTopPanel">
@@ -6798,6 +6854,7 @@ async function renderBookmarksPage() {
         </div>
         <div class="bm-column" id="bmCol1">${renderColumnHtml(colCards[1])}</div>
         <div class="bm-column" id="bmCol2">${renderColumnHtml(colCards[2])}</div>
+        <div class="bm-column" id="bmCol3">${renderColumnHtml(colCards[3])}</div>
       </div>
     `;
 
@@ -6815,7 +6872,7 @@ async function initBookmarksSortable() {
   await ensureSortableLoaded();
   if (!window.Sortable) return;
 
-  const colIds = ['bmCol0', 'bmCol1', 'bmCol2'];
+  const colIds = ['bmCol0', 'bmCol1', 'bmCol2', 'bmCol3'];
   colIds.forEach(colId => {
     const el = document.getElementById(colId);
     if (!el) return;
@@ -6829,42 +6886,38 @@ async function initBookmarksSortable() {
       animation: 250,
       handle: '.bm-card-drag-handle',
       draggable: '.bm-user-card',
-      filter: '.bm-user-strip, .bm-cards-cap',
+      filter: '.bm-top-panel, .bm-user-strip, .bm-cards-cap',
       fallbackOnBody: true,
       swapThreshold: 0.65,
       ghostClass: 'bm-card-sortable-ghost',
       chosenClass: 'bm-card-sortable-chosen',
       dragClass: 'bm-card-sortable-drag',
       onMove: function (evt) {
-        if (evt.related && (evt.related.classList.contains('bm-cards-cap') || evt.related.classList.contains('bm-user-strip'))) {
-          return false; // Не дозволяємо перетягувати картки вище за рядок користувача та шапку кнопок у першій колонці
+        if (evt.related && (evt.related.classList.contains('bm-top-panel') || evt.related.classList.contains('bm-cards-cap') || evt.related.classList.contains('bm-user-strip'))) {
+          return false; // Не дозволяємо перетягувати картки вище за єдину верхню панель у першій колонці
         }
         return true;
       },
       onEnd: async function () {
-        // Завжди переконуємося, що bmUserStrip та bmCardsCap залишаються першими двома елементами у bmCol0
+        // Завжди переконуємося, що bmTopPanel залишається першим елементом у bmCol0
         const col0 = document.getElementById('bmCol0');
-        const userStrip = document.getElementById('bmUserStrip');
-        const cap = document.getElementById('bmCardsCap');
-        if (col0) {
-          if (userStrip && col0.firstElementChild !== userStrip) {
-            col0.insertBefore(userStrip, col0.firstElementChild);
-          }
-          if (cap && userStrip && userStrip.nextElementSibling !== cap) {
-            userStrip.after(cap);
-          }
+        const topPanel = document.getElementById('bmTopPanel');
+        if (col0 && topPanel && col0.firstElementChild !== topPanel) {
+          col0.insertBefore(topPanel, col0.firstElementChild);
         }
 
         const col0Cards = Array.from(col0?.querySelectorAll('.bm-user-card') || []).map(c => c.getAttribute('data-card-name')).filter(Boolean);
         const col1Cards = Array.from(document.getElementById('bmCol1')?.querySelectorAll('.bm-user-card') || []).map(c => c.getAttribute('data-card-name')).filter(Boolean);
         const col2Cards = Array.from(document.getElementById('bmCol2')?.querySelectorAll('.bm-user-card') || []).map(c => c.getAttribute('data-card-name')).filter(Boolean);
+        const col3Cards = Array.from(document.getElementById('bmCol3')?.querySelectorAll('.bm-user-card') || []).map(c => c.getAttribute('data-card-name')).filter(Boolean);
 
         const newOrder = [];
-        const maxLen = Math.max(col0Cards.length, col1Cards.length, col2Cards.length);
+        const maxLen = Math.max(col0Cards.length, col1Cards.length, col2Cards.length, col3Cards.length);
         for (let r = 0; r < maxLen; r++) {
           if (col0Cards[r] && !newOrder.includes(col0Cards[r])) newOrder.push(col0Cards[r]);
           if (col1Cards[r] && !newOrder.includes(col1Cards[r])) newOrder.push(col1Cards[r]);
           if (col2Cards[r] && !newOrder.includes(col2Cards[r])) newOrder.push(col2Cards[r]);
+          if (col3Cards[r] && !newOrder.includes(col3Cards[r])) newOrder.push(col3Cards[r]);
         }
         userBookmarkCards.forEach(c => {
           if (!newOrder.includes(c)) newOrder.push(c);

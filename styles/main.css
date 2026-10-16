@@ -7737,42 +7737,50 @@ body.dark-mode .bm-cap-hints-btn:hover {
 }
 
 /* ==========================================================================
-   3 СТОВПЧИКА ТА КАРТКИ КОРИСТУВАЧА В «❤️ ЗАКЛАДКАХ»
+   4 СТОВПЧИКА ТА КАРТКИ КОРИСТУВАЧА В «❤️ ЗАКЛАДКАХ»
    ========================================================================== */
 #bookmarksPageApp {
   padding-top: 0 !important;
+  max-width: 1240px;
 }
-.bm-3columns-grid {
+.bm-3columns-grid,
+.bm-4columns-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
   align-items: start;
-  margin-top: 10px !important;
+  margin-top: 8px !important;
   margin-bottom: 30px;
 }
 .bm-column {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 10px;
   min-width: 0;
   min-height: 80px;
 }
-@media (max-width: 1024px) and (min-width: 700px) {
-  .bm-3columns-grid {
-    grid-template-columns: repeat(2, 1fr);
-    margin-top: 10px !important;
-  }
-  .bm-3columns-grid .bm-column:nth-child(3) {
-    grid-column: span 2;
+@media (max-width: 1199.98px) and (min-width: 900px) {
+  .bm-3columns-grid,
+  .bm-4columns-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-top: 8px !important;
   }
 }
-@media (max-width: 699.98px) {
-  .bm-3columns-grid {
-    grid-template-columns: 1fr;
-    margin-top: 10px !important;
+@media (max-width: 899.98px) and (min-width: 600px) {
+  .bm-3columns-grid,
+  .bm-4columns-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-top: 8px !important;
   }
-  .bm-3columns-grid .bm-column:nth-child(3) {
-    grid-column: auto;
+}
+@media (max-width: 599.98px) {
+  .bm-3columns-grid,
+  .bm-4columns-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    margin-top: 8px !important;
   }
 }
 
@@ -7844,30 +7852,35 @@ body.dark-mode .bm-user-card .group-title {
   cursor: grab;
   color: #e2e8f0;
   background: rgba(255, 255, 255, 0.12);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  padding: 3px 6px;
-  margin-right: 9px;
-  border-radius: 5px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  width: 25px;
+  height: 25px;
+  padding: 0;
+  margin-right: 8px;
+  border-radius: 4px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.8rem;
-  line-height: 1;
   transition: all 0.18s ease;
   user-select: none;
   -webkit-user-select: none;
   touch-action: none;
   flex-shrink: 0;
 }
+.bm-card-drag-handle .bm-drag-dots-svg {
+  width: 10px;
+  height: 15px;
+  display: block;
+}
 .bm-card-drag-handle i {
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   line-height: 1;
   display: block;
 }
 .bm-card-drag-handle:hover {
   color: #ffffff;
   background: rgba(255, 255, 255, 0.25);
-  border-color: rgba(255, 255, 255, 0.4);
+  border-color: rgba(255, 255, 255, 0.45);
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
 }
 .bm-card-drag-handle:active {
@@ -7994,7 +8007,7 @@ body.dark-mode .bm-user-card .group-title {
 .bm-card-list {
   list-style: none;
   margin: 0;
-  padding: 6px 8px 10px;
+  padding: 6px 6px 10px;
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -8004,7 +8017,7 @@ body.dark-mode .bm-user-card .group-title {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 6px 8px;
+  padding: 6px 6px;
   border-radius: 6px;
   transition: background-color 0.15s ease;
   position: relative;
@@ -8056,6 +8069,7 @@ body.dark-mode .bm-item-link:hover {
   display: inline-flex;
   align-items: center;
   margin-left: auto;
+  margin-right: 0;
   flex-shrink: 0;
   z-index: 3;
 }
@@ -8076,7 +8090,7 @@ body.dark-mode .bm-item-link:hover {
 }
 
 .bm-row-actions-wrap.is-open .bm-row-actions-slider {
-  max-width: 65px;
+  max-width: 100px;
   opacity: 1;
   transform: translateX(0);
   pointer-events: auto;
