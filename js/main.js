@@ -2553,7 +2553,7 @@ const AD_CONFIG = {
         nativeTicker: "GRAM",
         nativeName: "GRAM",
         binanceSymbol: "TONUSDT",
-        address: "UQBv5ZgXlNl6eyCGs4q-COY9ya_RTdOdeAmpm2j3oLEaG3cq", 
+        address: "UQA7QDMjQyIsuyIKUMtk9Ua8uZh4TkeR_evvnbMu8KFh43hy", 
         hasUsdt: true 
       },
       { 
@@ -2562,7 +2562,7 @@ const AD_CONFIG = {
         nativeTicker: "NEAR",
         nativeName: "NEAR Protocol",
         binanceSymbol: "NEARUSDT",
-        address: "weber515sis.near", 
+        address: "topdonat.near", 
         hasUsdt: true 
       },
       { id: "btc", name: "BTC (Bitcoin)", nativeTicker: "BTC", nativeName: "Bitcoin", binanceSymbol: "BTCUSDT", address: "bc1q2pxyrsx7z3d7dc83k880mujmlpqykg7hmsrkqa", hasUsdt: false },
@@ -4698,14 +4698,16 @@ let adminSearchQuery = '';
 let adminStatusFilter = 'all';
 
 // Глобальні змінні персональних закладок
-const DEFAULT_CARD_NAME = '📌 Основні закладки 📌';
+const DEFAULT_CARD_NAME = 'Основні закладки';
 let userBookmarksList = [];
 let userBookmarkCards = [DEFAULT_CARD_NAME];
+let userBookmarkColumns = [[DEFAULT_CARD_NAME], [], [], []];
 
 // Попереднє миттєве завантаження закладок із локального сховища (до старту Firebase)
 try {
   const initBm = localStorage.getItem('topz_bm_all_saved');
   const initCards = localStorage.getItem('topz_bm_cards_all');
+  const initCols = localStorage.getItem('topz_bm_columns_v4');
   if (initBm) {
     const parsedBm = JSON.parse(initBm);
     if (Array.isArray(parsedBm)) userBookmarksList = parsedBm;
@@ -4714,7 +4716,15 @@ try {
     const parsedCards = JSON.parse(initCards);
     if (Array.isArray(parsedCards) && parsedCards.length > 0) userBookmarkCards = parsedCards;
   }
-  // Нормалізуємо назву системної картки до актуальної '📌 Основні закладки 📌'
+  if (initCols) {
+    try {
+      const parsedCols = JSON.parse(initCols);
+      if (Array.isArray(parsedCols) && parsedCols.length === 4) {
+        userBookmarkColumns = parsedCols;
+      }
+    } catch (e) {}
+  }
+  // Нормалізуємо назву системної картки до актуальної 'Основні закладки'
   userBookmarkCards = userBookmarkCards.map(c => (c && (c.includes('Основні закладки') || c.toLowerCase().includes('основні закладки'))) ? DEFAULT_CARD_NAME : c);
   if (!userBookmarkCards.includes(DEFAULT_CARD_NAME)) {
     userBookmarkCards.unshift(DEFAULT_CARD_NAME);
@@ -5784,8 +5794,88 @@ function isDefaultCard(cardName) {
 
 const getBookmarksStorageKey = (uid) => uid ? `topz_bm_user_${uid}` : 'topz_bm_user_guest';
 const getCardsStorageKey = (uid) => uid ? `topz_bm_cards_${uid}` : 'topz_bm_cards_guest';
+const getColumnsStorageKey = (uid) => uid ? `topz_bm_columns_${uid}` : 'topz_bm_columns_guest';
 const GENERAL_BM_KEY = 'topz_bm_all_saved';
 const GENERAL_CARDS_KEY = 'topz_bm_cards_all';
+const GENERAL_COLS_KEY = 'topz_bm_columns_v4';
+
+function syncColumnsWithCards() {
+  if (!userBookmarkColumns || !Array.isArray(userBookmarkColumns) || userBookmarkColumns.length !== 4) {
+    userBookmarkColumns = [[], [], [], []];
+  }
+  // Ensure default card is in userBookmarkCards
+  if (!userBookmarkCards || userBookmarkCards.length === 0 || !userBookmarkCards.some(isDefaultCard)) {
+    userBookmarkCards = [DEFAULT_CARD_NAME, ...(userBookmarkCards || []).filter(c => !isDefaultCard(c))];
+  } else {
+    userBookmarkCards = userBookmarkCards.map(c => isDefaultCard(c) ? DEFAULT_CARD_NAME : c);
+  }
+
+  // Normalize card names in columns
+  userBookmarkColumns = userBookmarkColumns.map(col => 
+    (col || []).map(c => isDefaultCard(c) ? DEFAULT_CARD_NAME : c)
+  );
+
+  // If columns are completely empty, distribute existing userBookmarkCards evenly across 4 columns
+  const totalInCols = userBookmarkColumns[0].length + userBookmarkColumns[1].length + userBookmarkColumns[2].length + userBookmarkColumns[3].length;
+  if (totalInCols === 0 && userBookmarkCards.length > 0) {
+    userBookmarkCards.forEach((cName, idx) => {
+      userBookmarkColumns[idx % 4].push(cName);
+    });
+  }
+
+  // Ensure DEFAULT_CARD_NAME is in col 0 (and only in col 0, at position 0)
+  for (let i = 0; i < 4; i++) {
+    userBookmarkColumns[i] = userBookmarkColumns[i].filter(c => !isDefaultCard(c));
+  }
+  userBookmarkColumns[0].unshift(DEFAULT_CARD_NAME);
+
+  // Remove duplicate cards across columns if any
+  const seenCards = new Set();
+  for (let i = 0; i < 4; i++) {
+    userBookmarkColumns[i] = userBookmarkColumns[i].filter(c => {
+      if (seenCards.has(c)) return false;
+      seenCards.add(c);
+      return true;
+    });
+  }
+
+  // Clean up any cards in columns that are no longer in userBookmarkCards
+  const validCardsSet = new Set(userBookmarkCards);
+  for (let i = 0; i < 4; i++) {
+    userBookmarkColumns[i] = userBookmarkColumns[i].filter(c => validCardsSet.has(c));
+  }
+
+  // If any cards in userBookmarkCards are not yet assigned to any column, place them in the column with least cards
+  const assignedSet = new Set([
+    ...userBookmarkColumns[0],
+    ...userBookmarkColumns[1],
+    ...userBookmarkColumns[2],
+    ...userBookmarkColumns[3]
+  ]);
+
+  userBookmarkCards.forEach(cName => {
+    if (!assignedSet.has(cName)) {
+      let minCol = 0;
+      let minLen = userBookmarkColumns[0].length;
+      for (let i = 1; i < 4; i++) {
+        if (userBookmarkColumns[i].length < minLen) {
+          minLen = userBookmarkColumns[i].length;
+          minCol = i;
+        }
+      }
+      userBookmarkColumns[minCol].push(cName);
+      assignedSet.add(cName);
+    }
+  });
+
+  // Keep userBookmarkCards in sync with userBookmarkColumns
+  userBookmarkCards = [
+    ...userBookmarkColumns[0],
+    ...userBookmarkColumns[1],
+    ...userBookmarkColumns[2],
+    ...userBookmarkColumns[3]
+  ];
+}
 
 async function loadUserBookmarksData() {
   const uid = currentUser ? currentUser.uid : null;
@@ -5794,8 +5884,10 @@ async function loadUserBookmarksData() {
   try {
     let cachedBm = localStorage.getItem(getBookmarksStorageKey(uid));
     let cachedCards = localStorage.getItem(getCardsStorageKey(uid));
+    let cachedCols = localStorage.getItem(getColumnsStorageKey(uid));
     if (!cachedBm) cachedBm = localStorage.getItem(GENERAL_BM_KEY);
     if (!cachedCards) cachedCards = localStorage.getItem(GENERAL_CARDS_KEY);
+    if (!cachedCols) cachedCols = localStorage.getItem(GENERAL_COLS_KEY);
 
     if (cachedBm) {
       const parsed = JSON.parse(cachedBm);
@@ -5809,16 +5901,18 @@ async function loadUserBookmarksData() {
         userBookmarkCards = parsedCards;
       }
     }
+    if (cachedCols) {
+      const parsedCols = JSON.parse(cachedCols);
+      if (Array.isArray(parsedCols) && parsedCols.length === 4) {
+        userBookmarkColumns = parsedCols;
+      }
+    }
   } catch (e) {
     console.warn("Помилка зчитування з localStorage:", e);
   }
 
-  // Переконуємось, що системна картка «📌 Основні закладки 📌» завжди присутня першою та актуалізована
-  if (!userBookmarkCards || userBookmarkCards.length === 0 || !userBookmarkCards.some(isDefaultCard)) {
-    userBookmarkCards = [DEFAULT_CARD_NAME, ...(userBookmarkCards || []).filter(c => !isDefaultCard(c))];
-  } else {
-    userBookmarkCards = userBookmarkCards.map(c => isDefaultCard(c) ? DEFAULT_CARD_NAME : c);
-  }
+  syncColumnsWithCards();
+
   userBookmarksList.forEach(bm => {
     if (!bm.card || isDefaultCard(bm.card)) {
       bm.card = DEFAULT_CARD_NAME;
@@ -5835,6 +5929,7 @@ async function loadUserBookmarksData() {
       const data = userDoc.data();
       const remoteBm = data.bookmarks;
       const remoteCards = data.bookmarkCards;
+      const remoteCols = data.bookmarkColumns;
 
       if (Array.isArray(remoteBm) && remoteBm.length > 0) {
         if (userBookmarksList.length === 0 || remoteBm.length >= userBookmarksList.length) {
@@ -5848,23 +5943,26 @@ async function loadUserBookmarksData() {
         await saveUserBookmarksData();
       }
 
+      if (Array.isArray(remoteCols) && remoteCols.length === 4) {
+        userBookmarkColumns = remoteCols;
+      }
       if (Array.isArray(remoteCards) && remoteCards.length > 0) {
         userBookmarkCards = remoteCards;
       }
-      if (!userBookmarkCards.some(isDefaultCard)) {
-        userBookmarkCards.unshift(DEFAULT_CARD_NAME);
-      } else {
-        userBookmarkCards = userBookmarkCards.map(c => isDefaultCard(c) ? DEFAULT_CARD_NAME : c);
-      }
+
+      syncColumnsWithCards();
 
       // Оновлюємо локальний кеш
       try {
         const bmJson = JSON.stringify(userBookmarksList);
         const cardsJson = JSON.stringify(userBookmarkCards);
+        const colsJson = JSON.stringify(userBookmarkColumns);
         localStorage.setItem(getBookmarksStorageKey(currentUser.uid), bmJson);
         localStorage.setItem(getCardsStorageKey(currentUser.uid), cardsJson);
+        localStorage.setItem(getColumnsStorageKey(currentUser.uid), colsJson);
         localStorage.setItem(GENERAL_BM_KEY, bmJson);
         localStorage.setItem(GENERAL_CARDS_KEY, cardsJson);
+        localStorage.setItem(GENERAL_COLS_KEY, colsJson);
       } catch (e) {}
     } else if (userBookmarksList.length > 0) {
       await saveUserBookmarksData();
@@ -5877,12 +5975,8 @@ async function loadUserBookmarksData() {
 async function saveUserBookmarksData() {
   const uid = currentUser ? currentUser.uid : null;
 
-  // Переконуємося, що системна картка «📌 Основні закладки 📌» завжди є
-  if (!userBookmarkCards || userBookmarkCards.length === 0 || !userBookmarkCards.some(isDefaultCard)) {
-    userBookmarkCards = [DEFAULT_CARD_NAME, ...(userBookmarkCards || []).filter(c => !isDefaultCard(c))];
-  } else {
-    userBookmarkCards = userBookmarkCards.map(c => isDefaultCard(c) ? DEFAULT_CARD_NAME : c);
-  }
+  syncColumnsWithCards();
+
   userBookmarksList.forEach(bm => {
     if (!bm.card || isDefaultCard(bm.card)) {
       bm.card = DEFAULT_CARD_NAME;
@@ -5893,10 +5987,13 @@ async function saveUserBookmarksData() {
   try {
     const bmJson = JSON.stringify(userBookmarksList);
     const cardsJson = JSON.stringify(userBookmarkCards);
+    const colsJson = JSON.stringify(userBookmarkColumns);
     localStorage.setItem(getBookmarksStorageKey(uid), bmJson);
     localStorage.setItem(getCardsStorageKey(uid), cardsJson);
+    localStorage.setItem(getColumnsStorageKey(uid), colsJson);
     localStorage.setItem(GENERAL_BM_KEY, bmJson);
     localStorage.setItem(GENERAL_CARDS_KEY, cardsJson);
+    localStorage.setItem(GENERAL_COLS_KEY, colsJson);
   } catch (e) {
     console.warn("Помилка запису у localStorage:", e);
   }
@@ -5907,10 +6004,11 @@ async function saveUserBookmarksData() {
     await firebaseDb.collection('users').doc(currentUser.uid).set({
       bookmarks: userBookmarksList,
       bookmarkCards: userBookmarkCards,
+      bookmarkColumns: userBookmarkColumns,
       updatedAt: new Date().toISOString()
     }, { merge: true });
   } catch (e) {
-    console.warn("Помилка збереження у Firebase (дані в безпеці у localStorage):", e);
+    console.warn("Firestore save warning (дані збережено локально):", e);
   }
 }
 
@@ -6050,7 +6148,34 @@ function openCreateCardModal() {
       alert('Картка з такою назвою вже існує.');
       return;
     }
-    userBookmarkCards.push(val);
+
+    syncColumnsWithCards();
+
+    // Визначаємо куди додати нову картку:
+    // На мобільному (< 600px): додаємо завжди вкінець (в останню колонку)
+    // На ПК (>= 600px): у колонку з найменшою кількістю карток (якщо скрізь порівну - у першу колонку 0)
+    const isMobile = window.innerWidth < 600;
+    if (isMobile) {
+      userBookmarkColumns[3].push(val);
+    } else {
+      let minColIdx = 0;
+      let minCount = userBookmarkColumns[0].length;
+      for (let i = 1; i < 4; i++) {
+        if (userBookmarkColumns[i].length < minCount) {
+          minCount = userBookmarkColumns[i].length;
+          minColIdx = i;
+        }
+      }
+      userBookmarkColumns[minColIdx].push(val);
+    }
+
+    userBookmarkCards = [
+      ...userBookmarkColumns[0],
+      ...userBookmarkColumns[1],
+      ...userBookmarkColumns[2],
+      ...userBookmarkColumns[3]
+    ];
+
     await saveUserBookmarksData();
     closeCustomModal();
     renderBookmarksPage();
@@ -6396,6 +6521,14 @@ function promptRenameCard(oldName) {
     if (idx !== -1) {
       userBookmarkCards[idx] = newName;
     }
+    for (let i = 0; i < 4; i++) {
+      if (Array.isArray(userBookmarkColumns[i])) {
+        const cIdx = userBookmarkColumns[i].indexOf(oldName);
+        if (cIdx !== -1) {
+          userBookmarkColumns[i][cIdx] = newName;
+        }
+      }
+    }
     userBookmarksList.forEach(bm => {
       if (bm.card === oldName) {
         bm.card = newName;
@@ -6419,10 +6552,16 @@ function promptDeleteCard(cardName) {
     return;
   }
   userBookmarkCards = userBookmarkCards.filter(c => c !== cardName);
+  for (let i = 0; i < 4; i++) {
+    if (Array.isArray(userBookmarkColumns[i])) {
+      userBookmarkColumns[i] = userBookmarkColumns[i].filter(c => c !== cardName);
+    }
+  }
   userBookmarksList = userBookmarksList.filter(bm => (bm.card || userBookmarkCards[0]) !== cardName);
   if (userBookmarkCards.length === 0) {
     userBookmarkCards = [DEFAULT_CARD_NAME];
   }
+  syncColumnsWithCards();
   saveUserBookmarksData().then(() => {
     renderBookmarksPage();
     syncAllCatalogHeartButtons();
@@ -6707,14 +6846,15 @@ async function renderBookmarksPage() {
       cardsMap[cName].push({ ...bm, origIdx });
     });
 
-    // Розподіляємо картки автоматично у 4 стовпчики (як на всьому сайті)
-    const colCards = [[], [], [], []];
-    userBookmarkCards.forEach((cName, idx) => {
-      colCards[idx % 4].push({
-        name: cName,
-        items: cardsMap[cName] || []
-      });
-    });
+    syncColumnsWithCards();
+
+    // Картки беруться безпосередньо з userBookmarkColumns — порядок і положення карток у стовпчиках залишаються стабільними
+    const colCards = [
+      (userBookmarkColumns[0] || []).map(cName => ({ name: cName, items: cardsMap[cName] || [] })),
+      (userBookmarkColumns[1] || []).map(cName => ({ name: cName, items: cardsMap[cName] || [] })),
+      (userBookmarkColumns[2] || []).map(cName => ({ name: cName, items: cardsMap[cName] || [] })),
+      (userBookmarkColumns[3] || []).map(cName => ({ name: cName, items: cardsMap[cName] || [] }))
+    ];
 
     const renderColumnHtml = (cards) => {
       if (!cards || cards.length === 0) return '';
@@ -6723,9 +6863,10 @@ async function renderBookmarksPage() {
         if (card.items.length === 0) {
           itemsHtml = `
             <li class="bm-empty-card-item">
-              <div class="text-center py-3 text-muted small">
-                <div class="mb-1" style="font-size: 1.3rem;">📂</div>
-                Картка порожня.<br>Додайте сайти значком <strong>+</strong> у шапці картки або сердечком <strong>❤️</strong> в описах каталогу.
+              <div class="bm-empty-card-box">
+                <div class="bm-empty-card-title">Папка/Картка порожня</div>
+                <div class="bm-empty-card-icon">📂</div>
+                <p class="bm-empty-card-desc">Додайте сайти значком <strong>+</strong> у шапці картки або сердечком <strong>❤️</strong> в описах каталогу.</p>
               </div>
             </li>
           `;
@@ -6741,11 +6882,11 @@ async function renderBookmarksPage() {
                 </a>
                 <div class="bm-row-actions-wrap">
                   <div class="bm-row-actions-slider">
-                    <button type="button" class="bm-icon-btn btn-edit" onclick="promptEditBookmark(${bm.origIdx})" title="Редагувати сайт (назву та адресу)">
-                      <i class="fas fa-pen"></i>
-                    </button>
                     <button type="button" class="bm-icon-btn" onclick="promptMoveBookmark(${bm.origIdx})" title="Перемістити в іншу папку/картку">
                       <i class="fas fa-folder-open"></i>
+                    </button>
+                    <button type="button" class="bm-icon-btn btn-edit" onclick="promptEditBookmark(${bm.origIdx})" title="Редагувати сайт (назву та адресу)">
+                      <i class="fas fa-pen"></i>
                     </button>
                     <button type="button" class="bm-icon-btn btn-del" onclick="deleteUserBookmarkFromPage(${bm.origIdx})" title="Видалити сайт/ресурс">
                       <i class="far fa-trash-alt"></i>
@@ -6775,8 +6916,8 @@ async function renderBookmarksPage() {
                     <circle cx="7.5" cy="12.5" r="1.6"/>
                   </svg>
                 </span>
-                <span class="bm-card-header-title text-truncate" title="${escapeHtml(card.name)}">
-                  <i class="fas fa-folder text-warning bm-folder-icon"></i> ${escapeHtml(card.name)}
+                <span class="bm-card-header-title text-truncate" title="${escapeHtml(isDefault ? 'Основні закладки' : card.name)}">
+                  ${isDefault ? '<span class="bm-pin-icon" style="font-size: 0.95rem; margin-right: 4px; display: inline-block; vertical-align: middle;">📌</span>' : '<i class="fas fa-folder text-warning bm-folder-icon"></i>'} ${escapeHtml(isDefault ? 'Основні закладки' : card.name)}
                 </span>
               </div>
               <div class="bm-card-header-actions-wrap">
@@ -6911,24 +7052,15 @@ async function initBookmarksSortable() {
         const col2Cards = Array.from(document.getElementById('bmCol2')?.querySelectorAll('.bm-user-card') || []).map(c => c.getAttribute('data-card-name')).filter(Boolean);
         const col3Cards = Array.from(document.getElementById('bmCol3')?.querySelectorAll('.bm-user-card') || []).map(c => c.getAttribute('data-card-name')).filter(Boolean);
 
-        const newOrder = [];
-        const maxLen = Math.max(col0Cards.length, col1Cards.length, col2Cards.length, col3Cards.length);
-        for (let r = 0; r < maxLen; r++) {
-          if (col0Cards[r] && !newOrder.includes(col0Cards[r])) newOrder.push(col0Cards[r]);
-          if (col1Cards[r] && !newOrder.includes(col1Cards[r])) newOrder.push(col1Cards[r]);
-          if (col2Cards[r] && !newOrder.includes(col2Cards[r])) newOrder.push(col2Cards[r]);
-          if (col3Cards[r] && !newOrder.includes(col3Cards[r])) newOrder.push(col3Cards[r]);
-        }
-        userBookmarkCards.forEach(c => {
-          if (!newOrder.includes(c)) newOrder.push(c);
-        });
-
-        const isDifferent = newOrder.length === userBookmarkCards.length && newOrder.some((c, i) => c !== userBookmarkCards[i]);
-        if (isDifferent) {
-          userBookmarkCards = newOrder;
-          await saveUserBookmarksData();
-          showQuickToast('Порядок карток оновлено та збережено!', 'success');
-        }
+        userBookmarkColumns = [col0Cards, col1Cards, col2Cards, col3Cards];
+        userBookmarkCards = [
+          ...col0Cards,
+          ...col1Cards,
+          ...col2Cards,
+          ...col3Cards
+        ];
+        await saveUserBookmarksData();
+        showQuickToast('Порядок карток оновлено та збережено!', 'success');
       }
     });
   });

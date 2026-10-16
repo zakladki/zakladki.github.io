@@ -7625,11 +7625,11 @@ body.dark-mode .bm-top-divider {
 }
 
 .bm-top-actions-row {
-  padding: 6px 8px;
+  padding: 5px 8px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
+  gap: 6px;
 }
 
 /* Кнопки дій у панелі */
@@ -7641,14 +7641,16 @@ body.dark-mode .bm-top-divider {
   min-width: 0;
 }
 .bm-cap-btn {
-  border-radius: 6px;
-  padding: 5px 8px;
-  font-size: 0.8rem;
+  border-radius: 5px;
+  padding: 3px 6px;
+  font-size: 0.77rem;
   font-weight: 700;
+  height: 26px;
+  line-height: 1;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 5px;
+  gap: 4px;
   white-space: nowrap;
   transition: all 0.15s ease;
   cursor: pointer;
@@ -7683,8 +7685,9 @@ body.dark-mode .bm-top-divider {
   box-shadow: 0 2px 6px rgba(59, 130, 246, 0.35);
 }
 .bm-cap-hints-btn {
-  width: 25px;
-  height: 25px;
+  width: 24px;
+  height: 24px;
+  margin-left: 8px;
   border-radius: 50%;
   border: 1px solid rgba(59, 130, 246, 0.35);
   background: rgba(59, 130, 246, 0.1);
@@ -7693,7 +7696,7 @@ body.dark-mode .bm-top-divider {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   font-weight: 800;
   padding: 0;
   line-height: 1;
@@ -7741,6 +7744,7 @@ body.dark-mode .bm-cap-hints-btn:hover {
    ========================================================================== */
 #bookmarksPageApp {
   padding-top: 0 !important;
+  padding-bottom: 0 !important;
   max-width: 1240px;
 }
 .bm-3columns-grid,
@@ -7750,7 +7754,7 @@ body.dark-mode .bm-cap-hints-btn:hover {
   gap: 10px;
   align-items: start;
   margin-top: 8px !important;
-  margin-bottom: 30px;
+  margin-bottom: 8px !important;
 }
 .bm-column {
   display: flex;
@@ -7813,11 +7817,11 @@ body.dark-mode .bm-user-card:hover {
 .bm-user-card .group-title {
   background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
   color: #ffffff;
-  padding: 8px 12px;
+  padding: 6px 10px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
+  gap: 6px;
   border-radius: 9px 9px 0 0;
 }
 body.dark-mode .bm-user-card .group-title {
@@ -8007,18 +8011,54 @@ body.dark-mode .bm-user-card .group-title {
 .bm-card-list {
   list-style: none;
   margin: 0;
-  padding: 6px 6px 10px;
+  padding: 2px 4px 4px;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
   flex-grow: 1;
+}
+
+/* Компактний вигляд порожньої картки без надлишкових проміжків */
+.bm-empty-card-item {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.bm-empty-card-box {
+  text-align: center;
+  padding: 3px 6px 8px;
+  color: var(--text-muted, #64748b);
+}
+.bm-empty-card-title {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-main, #334155);
+  margin-bottom: 2px;
+  line-height: 1.2;
+}
+body.dark-mode .bm-empty-card-title {
+  color: #cbd5e1;
+}
+.bm-empty-card-icon {
+  font-size: 1.15rem;
+  line-height: 1;
+  margin-bottom: 3px;
+}
+.bm-empty-card-desc {
+  font-size: 0.72rem;
+  line-height: 1.25;
+  color: var(--text-muted, #94a3b8);
+  margin: 0;
+}
+body.dark-mode .bm-empty-card-desc {
+  color: #94a3b8;
 }
 .bm-link-row {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 6px 6px;
-  border-radius: 6px;
+  gap: 7px;
+  padding: 4px 6px;
+  border-radius: 5px;
   transition: background-color 0.15s ease;
   position: relative;
 }
