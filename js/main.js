@@ -5047,13 +5047,36 @@ function closeUserCabinetModal() {
   }
 }
 
+let userProfileSettings = {
+  phone: '',
+  telegram: '',
+  displayName: '',
+  customNotes: ''
+};
+
+function loadCachedUserProfile() {
+  if (!currentUser) return;
+  try {
+    const raw = localStorage.getItem('user_profile_' + currentUser.uid);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (parsed && typeof parsed === 'object') {
+        userProfileSettings = { ...userProfileSettings, ...parsed };
+      }
+    }
+  } catch (e) {}
+}
+
 // Рендеринг вмісту кабінету
 function renderUserCabinetContent() {
   const body = document.getElementById('cabinetBody');
   if (!body) return;
 
+  loadCachedUserProfile();
+
   const isAdmin = isAdminUser();
   const avatarSrc = currentUser ? (currentUser.photoURL || 'https://www.gravatar.com/avatar/?d=mp') : '';
+  const userDisplayName = (userProfileSettings && userProfileSettings.displayName) || (currentUser && currentUser.displayName) || 'Користувач';
 
   // Перелік розділів кабінету: Дашборд завжди перший та активний за замовчуванням
   const cabinetTabsList = [
@@ -5068,6 +5091,12 @@ function renderUserCabinetContent() {
       name: 'Підказки',
       icon: '<i class="fas fa-lightbulb text-warning"></i>',
       desc: 'Корисні поради, сортування та інструкції щодо закладок'
+    },
+    {
+      id: 'settings',
+      name: 'Налаштування',
+      icon: '<i class="fas fa-cog text-secondary"></i>',
+      desc: 'Персональні дані, контакти та налаштування акаунта'
     },
     {
       id: 'orders',
@@ -5099,7 +5128,7 @@ function renderUserCabinetContent() {
           <img src="${avatarSrc}" class="cabinet-avatar-lg" alt="Аватарка" referrerpolicy="no-referrer">
           <div class="cabinet-user-names">
             <div class="cabinet-user-name-row">
-              <span class="cabinet-user-name">${escapeHtml(currentUser.displayName || 'Користувач')}</span>
+              <span class="cabinet-user-name">${escapeHtml(userDisplayName)}</span>
               <button type="button" class="cabinet-logout-compact-btn" id="btnCabinetLogout" title="Вийти з акаунта Google">
                 <i class="fas fa-sign-out-alt me-1"></i> Вийти
               </button>
@@ -5234,6 +5263,8 @@ function renderUserCabinetContent() {
     renderDashboardTab();
   } else if (currentCabinetTab === 'hints') {
     renderHintsTab();
+  } else if (currentCabinetTab === 'settings') {
+    renderSettingsTab();
   } else if (currentCabinetTab === 'admin' && isAdmin) {
     renderAdminOrdersTab();
   } else if (currentCabinetTab === 'bookmarks') {
@@ -5250,21 +5281,9 @@ function renderDashboardTab() {
 
   const cardsCount = (userBookmarkCards && userBookmarkCards.length) ? userBookmarkCards.length : 1;
   const bookmarksCount = (userBookmarksList && userBookmarksList.length) ? userBookmarksList.length : 0;
-  const userGreetingName = currentUser ? (currentUser.displayName || currentUser.email.split('@')[0]) : 'Шановний Гість';
 
   container.innerHTML = `
     <div class="cabinet-dashboard-wrap">
-      <!-- Привітний банер дашборду -->
-      <div class="cabinet-dash-banner">
-        <div class="cabinet-dash-banner-content">
-          <div class="cabinet-dash-banner-badge"><i class="fas fa-sparkles text-warning me-1"></i> Персональний Дашборд</div>
-          <h4 class="cabinet-dash-banner-title">Вітаємо, ${escapeHtml(userGreetingName)}!</h4>
-          <p class="cabinet-dash-banner-desc">
-            Тут зібрано вашу ключову статистику, баланс балів, швидкі дії та новини сервісу «ТОП ЗАКЛАДКИ».
-          </p>
-        </div>
-      </div>
-
       <!-- Сітка карток показників (Метрики) -->
       <div class="cabinet-dash-metrics-grid">
         <div class="cabinet-dash-metric-card metric-points">
@@ -5324,6 +5343,14 @@ function renderDashboardTab() {
             </div>
           </button>
 
+          <button type="button" class="cabinet-dash-action-btn action-settings" id="btnDashOpenSettings">
+            <div class="action-btn-icon" style="background: rgba(100, 116, 139, 0.12); color: #475569;"><i class="fas fa-cog"></i></div>
+            <div class="action-btn-text">
+              <span class="action-btn-title">Налаштування</span>
+              <span class="action-btn-sub">Контакти, Telegram та дані</span>
+            </div>
+          </button>
+
           <button type="button" class="cabinet-dash-action-btn action-hints" id="btnDashOpenHints">
             <div class="action-btn-icon"><i class="fas fa-lightbulb"></i></div>
             <div class="action-btn-text">
@@ -5363,6 +5390,14 @@ function renderDashboardTab() {
     };
   }
 
+  const settingsBtn = container.querySelector('#btnDashOpenSettings');
+  if (settingsBtn) {
+    settingsBtn.onclick = () => {
+      currentCabinetTab = 'settings';
+      renderUserCabinetContent();
+    };
+  }
+
   const hintsBtn = container.querySelector('#btnDashOpenHints');
   if (hintsBtn) {
     hintsBtn.onclick = () => {
@@ -5376,6 +5411,207 @@ function renderDashboardTab() {
     adBtn.onclick = () => {
       closeUserCabinetModal();
       openAdOrderModal();
+    };
+  }
+}
+
+// 0.2 Вкладка: Налаштування профілю користувача
+function renderSettingsTab() {
+  const container = document.getElementById('cabinetTabContent');
+  if (!container) return;
+
+  if (!currentUser) {
+    container.innerHTML = `
+      <div class="cabinet-settings-wrap">
+        <div class="cabinet-settings-card text-center py-4">
+          <div class="cabinet-settings-icon mx-auto mb-3" style="width: 48px; height: 48px; font-size: 1.4rem;">
+            <i class="fas fa-user-lock"></i>
+          </div>
+          <h5 class="cabinet-settings-title mb-2">Налаштування профілю</h5>
+          <p class="cabinet-settings-desc mb-3" style="font-size: 0.85rem; max-width: 440px; margin: 0 auto;">
+            Увійдіть через акаунт Google, щоб персоналізувати свій профіль, зберігати контактні дані та синхронізувати налаштування в хмарі.
+          </p>
+          <button type="button" class="google-auth-btn mx-auto" id="btnSettingsLogin">
+            <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+            Увійти через Google
+          </button>
+        </div>
+      </div>
+    `;
+    const loginBtn = container.querySelector('#btnSettingsLogin');
+    if (loginBtn) loginBtn.onclick = loginWithGoogle;
+    return;
+  }
+
+  loadCachedUserProfile();
+
+  const currentDisplayName = userProfileSettings.displayName || currentUser.displayName || '';
+  const currentPhone = userProfileSettings.phone || '';
+  const currentTg = userProfileSettings.telegram || '';
+  const currentNotes = userProfileSettings.customNotes || '';
+
+  container.innerHTML = `
+    <div class="cabinet-settings-wrap">
+      <!-- Блок 1: Системні дані облікового запису -->
+      <div class="cabinet-settings-card">
+        <div class="cabinet-settings-header">
+          <div class="cabinet-settings-icon"><i class="fas fa-shield-alt"></i></div>
+          <div>
+            <h6 class="cabinet-settings-title">Обліковий запис та безпека</h6>
+            <p class="cabinet-settings-desc">Унікальний ID користувача в базі Firebase та статус авторизації</p>
+          </div>
+        </div>
+
+        <div class="cabinet-setting-field">
+          <div class="cabinet-setting-label">
+            <span>ID облікового запису (Firebase UID)</span>
+            <button type="button" class="cabinet-copy-id-btn" id="btnCopyFirebaseUid" title="Скопіювати унікальний ID">
+              <i class="far fa-copy me-1"></i> Скопіювати ID
+            </button>
+          </div>
+          <input type="text" class="cabinet-setting-input" value="${escapeHtml(currentUser.uid)}" readonly id="settingFirebaseUid" style="font-family: monospace; font-size: 0.82rem; letter-spacing: 0.02em;">
+          <div class="cabinet-setting-hint">Ваш персональний цифровий ідентифікатор у хмарній базі Firestore.</div>
+        </div>
+
+        <div class="cabinet-setting-field mb-0">
+          <div class="cabinet-setting-label">
+            <span>Електронна пошта (Google Email)</span>
+            <span class="badge badge-success px-2 py-1" style="font-size: 0.7rem;"><i class="fas fa-check-circle me-1"></i>Підтверджено</span>
+          </div>
+          <input type="email" class="cabinet-setting-input" value="${escapeHtml(currentUser.email || '')}" readonly>
+          <div class="cabinet-setting-hint">Прив'язана адреса вашого профілю Google.</div>
+        </div>
+      </div>
+
+      <!-- Блок 2: Персональні та контактні дані -->
+      <div class="cabinet-settings-card">
+        <div class="cabinet-settings-header">
+          <div class="cabinet-settings-icon"><i class="fas fa-user-edit"></i></div>
+          <div>
+            <h6 class="cabinet-settings-title">Персональні та контактні дані</h6>
+            <p class="cabinet-settings-desc">Використовуються для швидкого заповнення замовлень реклами та зворотного зв'язку</p>
+          </div>
+        </div>
+
+        <div class="cabinet-setting-field">
+          <label class="cabinet-setting-label" for="settingInputDisplayName">
+            <span>Ім'я / Псевдонім:</span>
+          </label>
+          <input type="text" class="cabinet-setting-input" id="settingInputDisplayName" value="${escapeHtml(currentDisplayName)}" placeholder="Наприклад: Олександр">
+          <div class="cabinet-setting-hint">Відображається у шапці сайту та привітаннях.</div>
+        </div>
+
+        <div class="cabinet-setting-field">
+          <label class="cabinet-setting-label" for="settingInputPhone">
+            <span>Номер мобільного телефону:</span>
+          </label>
+          <input type="tel" class="cabinet-setting-input" id="settingInputPhone" value="${escapeHtml(currentPhone)}" placeholder="+380 (XX) XXX-XX-XX">
+          <div class="cabinet-setting-hint">Для оперативного зв'язку, підтвердження замовлень та сервісних питань.</div>
+        </div>
+
+        <div class="cabinet-setting-field">
+          <label class="cabinet-setting-label" for="settingInputTelegram">
+            <span>Нікнейм або посилання у Telegram:</span>
+          </label>
+          <input type="text" class="cabinet-setting-input" id="settingInputTelegram" value="${escapeHtml(currentTg)}" placeholder="@username або https://t.me/username">
+          <div class="cabinet-setting-hint">Для швидкого зв'язку в месенджері.</div>
+        </div>
+
+        <div class="cabinet-setting-field mb-0">
+          <label class="cabinet-setting-label" for="settingInputNotes">
+            <span>Додаткова інформація / Побажання:</span>
+          </label>
+          <textarea class="cabinet-setting-input" id="settingInputNotes" rows="2" placeholder="Будь-які примітки чи побажання щодо сервісу...">${escapeHtml(currentNotes)}</textarea>
+          <div class="cabinet-setting-hint">Ваші персональні нотатки (зберігаються разом із профілем).</div>
+        </div>
+      </div>
+
+      <!-- Нижня панель збереження -->
+      <div class="cabinet-settings-save-bar">
+        <button type="button" class="cabinet-settings-save-btn" id="btnSaveUserSettings">
+          <i class="fas fa-check-circle"></i> Зберегти внесені налаштування
+        </button>
+        <div class="cabinet-settings-save-note">
+          <i class="fas fa-shield-alt me-1"></i> Збереження виконується одним пакетом (1 операція запису) для ощадливого використання бази даних.
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Копіювання UID
+  const copyBtn = container.querySelector('#btnCopyFirebaseUid');
+  if (copyBtn) {
+    copyBtn.onclick = () => {
+      const uidVal = currentUser.uid;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(uidVal).then(() => {
+          showQuickToast('ID облікового запису скопійовано!', 'success');
+        }).catch(() => {
+          fallbackCopyText(uidVal);
+        });
+      } else {
+        fallbackCopyText(uidVal);
+      }
+    };
+  }
+
+  function fallbackCopyText(text) {
+    const input = document.createElement('input');
+    input.value = text;
+    document.body.appendChild(input);
+    input.select();
+    try {
+      document.execCommand('copy');
+      showQuickToast('ID облікового запису скопійовано!', 'success');
+    } catch (e) {
+      showQuickToast('Не вдалося скопіювати ID', 'warning');
+    }
+    document.body.removeChild(input);
+  }
+
+  // Обробник збереження налаштувань
+  const saveBtn = container.querySelector('#btnSaveUserSettings');
+  if (saveBtn) {
+    saveBtn.onclick = async () => {
+      if (!checkAndIncrementDailyActionLimit()) return;
+
+      const nameVal = (container.querySelector('#settingInputDisplayName')?.value || '').trim();
+      const phoneVal = (container.querySelector('#settingInputPhone')?.value || '').trim();
+      const tgVal = (container.querySelector('#settingInputTelegram')?.value || '').trim();
+      const notesVal = (container.querySelector('#settingInputNotes')?.value || '').trim();
+
+      saveBtn.disabled = true;
+      saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Збереження...';
+
+      userProfileSettings = {
+        displayName: nameVal,
+        phone: phoneVal,
+        telegram: tgVal,
+        customNotes: notesVal,
+        updatedAt: new Date().toISOString()
+      };
+
+      try {
+        localStorage.setItem('user_profile_' + currentUser.uid, JSON.stringify(userProfileSettings));
+      } catch (e) {}
+
+      try {
+        await ensureFirebaseLoaded();
+        if (firebaseDb && currentUser) {
+          await firebaseDb.collection('users').doc(currentUser.uid).set({
+            profile: userProfileSettings,
+            displayName: nameVal || currentUser.displayName || '',
+            updatedAt: new Date().toISOString()
+          }, { merge: true });
+        }
+        showQuickToast('Налаштування успішно збережено!', 'success');
+        renderUserCabinetContent();
+      } catch (err) {
+        console.warn('Помилка збереження налаштувань:', err);
+        showQuickToast('Збережено локально. Помилка синхронізації з хмарою.', 'warning');
+        saveBtn.disabled = false;
+        saveBtn.innerHTML = '<i class="fas fa-check-circle"></i> Зберегти внесені налаштування';
+      }
     };
   }
 }
@@ -5437,16 +5673,6 @@ function renderHintsTab() {
               Увійдіть через акаунт Google в 1 клік — ваші створені тематичні папки та всі збережені закладки будуть надійно збережені у хмарі та доступні на комп'ютері, смартфоні й планшеті одночасно.
             </p>
           </div>
-        </div>
-      </div>
-
-      <div class="cabinet-hints-footer mt-4 pt-3 border-top d-flex align-items-center justify-content-between flex-wrap gap-2">
-        <a href="./bookmarks.html" class="btn btn-danger font-weight-bold" onclick="closeUserCabinetModal()">
-          <i class="fas fa-heart me-1"></i> Відкрити «❤️ Закладки»
-        </a>
-        <button type="button" class="btn btn-outline-primary" id="btnHintsAddSite">
-          <i class="fas fa-plus me-1"></i> Додати новий сайт
-        </button>
       </div>
     </div>
   `;
@@ -5456,14 +5682,6 @@ function renderHintsTab() {
     backDashBtn.onclick = () => {
       currentCabinetTab = 'dashboard';
       renderUserCabinetContent();
-    };
-  }
-
-  const addSiteBtn = container.querySelector('#btnHintsAddSite');
-  if (addSiteBtn) {
-    addSiteBtn.onclick = () => {
-      closeUserCabinetModal();
-      openAddBookmarkModal();
     };
   }
 }
@@ -5763,19 +5981,19 @@ function showCustomModal({ title, bodyHtml, footerHtml }) {
   if (!modalWrap) {
     modalWrap = document.createElement('div');
     modalWrap.id = 'universalActionModal';
-    modalWrap.style.cssText = 'position: fixed; inset: 0; z-index: 10050; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.65); padding: 16px; backdrop-filter: blur(2px);';
+    modalWrap.style.cssText = 'position: fixed; inset: 0; z-index: 10050; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.65); padding: 8px; backdrop-filter: blur(2px); box-sizing: border-box; overflow: hidden;';
     document.body.appendChild(modalWrap);
   }
   modalWrap.innerHTML = `
-    <div style="background: var(--card-bg, #ffffff); color: var(--text-main, #0f172a); border: 1px solid var(--border-color, #cbd5e1); border-radius: 14px; width: 100%; max-width: 440px; box-shadow: 0 15px 35px rgba(0,0,0,0.3); overflow: hidden; animation: fadeIn 0.2s ease;">
-      <div style="padding: 12px 18px; border-bottom: 1px solid var(--border-color, #e2e8f0); display: flex; align-items: center; justify-content: space-between; background: linear-gradient(135deg, #1e293b, #334155); color: #fff;">
+    <div style="background: var(--card-bg, #ffffff); color: var(--text-main, #0f172a); border: 1px solid var(--border-color, #cbd5e1); border-radius: 12px; width: 100%; max-width: 440px; max-height: calc(100vh - 16px); max-height: calc(100dvh - 16px); display: flex; flex-direction: column; box-shadow: 0 15px 35px rgba(0,0,0,0.3); overflow: hidden; animation: fadeIn 0.2s ease; box-sizing: border-box;">
+      <div style="padding: 10px 14px; border-bottom: 1px solid var(--border-color, #e2e8f0); display: flex; align-items: center; justify-content: space-between; background: linear-gradient(135deg, #1e293b, #334155); color: #fff; flex-shrink: 0;">
         <h6 style="margin: 0; font-weight: 700; font-size: 0.95rem; color: #fff;">${title}</h6>
-        <button type="button" style="background: transparent; border: none; color: #fff; font-size: 1.3rem; cursor: pointer; padding: 0; line-height: 1;" onclick="closeCustomModal()">&times;</button>
+        <button type="button" style="background: transparent; border: none; color: #fff; font-size: 1.35rem; cursor: pointer; padding: 0 4px; line-height: 1;" onclick="closeCustomModal()">&times;</button>
       </div>
-      <div style="padding: 16px 18px;">
+      <div style="padding: 12px 14px; overflow-y: auto; -webkit-overflow-scrolling: touch; flex: 1 1 auto; min-height: 0;">
         ${bodyHtml}
       </div>
-      ${footerHtml ? `<div style="padding: 10px 18px; border-top: 1px solid var(--border-color, #e2e8f0); display: flex; justify-content: flex-end; gap: 8px; background: rgba(0,0,0,0.02);">${footerHtml}</div>` : ''}
+      ${footerHtml ? `<div style="padding: 8px 14px; border-top: 1px solid var(--border-color, #e2e8f0); display: flex; justify-content: flex-end; gap: 8px; background: rgba(0,0,0,0.02); flex-shrink: 0;">${footerHtml}</div>` : ''}
     </div>
   `;
   modalWrap.style.display = 'flex';
@@ -5980,6 +6198,12 @@ async function loadUserBookmarksData() {
       }
       if (Array.isArray(remoteCards) && remoteCards.length > 0) {
         userBookmarkCards = remoteCards;
+      }
+      if (data.profile && typeof data.profile === 'object') {
+        userProfileSettings = { ...userProfileSettings, ...data.profile };
+        try {
+          localStorage.setItem('user_profile_' + currentUser.uid, JSON.stringify(userProfileSettings));
+        } catch (e) {}
       }
 
       syncColumnsWithCards();
@@ -6916,8 +7140,9 @@ async function renderBookmarksPage() {
     if (loadingEl) loadingEl.style.display = 'none';
     pageContainer.style.display = 'block';
 
+    loadCachedUserProfile();
     const avatarUrl = currentUser.photoURL || 'https://www.gravatar.com/avatar/?d=mp';
-    const userName = currentUser.displayName || currentUser.email || 'Користувач';
+    const userName = (userProfileSettings && userProfileSettings.displayName) || currentUser.displayName || currentUser.email || 'Користувач';
 
     if (!userBookmarkCards || userBookmarkCards.length === 0) {
       userBookmarkCards = [DEFAULT_CARD_NAME];
@@ -7081,10 +7306,10 @@ async function renderBookmarksPage() {
             <div class="bm-top-actions-row">
               <div class="bm-cards-cap-actions">
                 <button type="button" class="btn btn-danger btn-sm font-weight-bold bm-cap-btn bm-cap-btn-card" onclick="openCreateCardModal()" title="Створити нову тематичну папку / картку">
-                  <i class="fas fa-folder-plus me-1"></i> Створити папку
+                  Створити папку
                 </button>
                 <button type="button" class="btn btn-primary btn-sm font-weight-bold bm-cap-btn bm-cap-btn-add" onclick="openAddBookmarkModal()" title="Додати новий сайт у закладки">
-                  <i class="fas fa-plus me-1"></i> Додати сайт
+                  Додати сайт
                 </button>
               </div>
               <button type="button" class="bm-cap-hints-btn" onclick="openUserCabinetModal('hints')" title="Корисні підказки (відкрити в Особистому кабінеті)" aria-label="Підказки">
