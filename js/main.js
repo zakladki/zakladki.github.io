@@ -5799,6 +5799,38 @@ const GENERAL_BM_KEY = 'topz_bm_all_saved';
 const GENERAL_CARDS_KEY = 'topz_bm_cards_all';
 const GENERAL_COLS_KEY = 'topz_bm_columns_v4';
 
+// Ліміти тарифного плану Spark та захист від спаму
+const MAX_USER_CARDS = 12;        // Максимум 12 папок/карток на акаунт
+const MAX_USER_BOOKMARKS = 120;   // Максимум 120 збережених сайтів на акаунт
+const DAILY_ACTION_LIMIT = 100;   // Максимум 100 операцій запису на добу на акаунт
+
+function checkAndIncrementDailyActionLimit() {
+  const uid = currentUser ? currentUser.uid : 'guest';
+  const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+  const key = `topz_daily_actions_${uid}`;
+  let data = { date: today, count: 0 };
+  try {
+    const raw = localStorage.getItem(key);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (parsed.date === today && typeof parsed.count === 'number') {
+        data = parsed;
+      }
+    }
+  } catch (e) {}
+
+  if (data.count >= DAILY_ACTION_LIMIT) {
+    alert(`Ви досягли денного ліміту операцій (${DAILY_ACTION_LIMIT} дій на добу).\n\nЦе обмеження створено для захисту сервера від навантаження. Відпочиньте до завтра!`);
+    return false;
+  }
+
+  data.count += 1;
+  try {
+    localStorage.setItem(key, JSON.stringify(data));
+  } catch (e) {}
+  return true;
+}
+
 function syncColumnsWithCards() {
   if (!userBookmarkColumns || !Array.isArray(userBookmarkColumns) || userBookmarkColumns.length !== 4) {
     userBookmarkColumns = [[], [], [], []];
@@ -5972,7 +6004,42 @@ async function loadUserBookmarksData() {
   }
 }
 
-async function saveUserBookmarksData() {
+let cloudSyncTimeout = null;
+
+async function pushBookmarksToFirestore() {
+  if (!currentUser || !firebaseDb) return;
+  try {
+    await firebaseDb.collection('users').doc(currentUser.uid).set({
+      bookmarks: userBookmarksList,
+      bookmarkCards: userBookmarkCards,
+      bookmarkColumns: userBookmarkColumns,
+      updatedAt: new Date().toISOString()
+    }, { merge: true });
+  } catch (e) {
+    console.warn("Firestore save warning (дані збережено локально):", e);
+  }
+}
+
+// Слухачі для гарантованого збереження відкладених змін при закритті вкладки або переході з неї
+if (typeof window !== 'undefined' && !window._bmCloudSyncAttached) {
+  window._bmCloudSyncAttached = true;
+  window.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden' && cloudSyncTimeout) {
+      clearTimeout(cloudSyncTimeout);
+      cloudSyncTimeout = null;
+      pushBookmarksToFirestore();
+    }
+  });
+  window.addEventListener('beforeunload', () => {
+    if (cloudSyncTimeout) {
+      clearTimeout(cloudSyncTimeout);
+      cloudSyncTimeout = null;
+      pushBookmarksToFirestore();
+    }
+  });
+}
+
+async function saveUserBookmarksData(options = {}) {
   const uid = currentUser ? currentUser.uid : null;
 
   syncColumnsWithCards();
@@ -5983,7 +6050,7 @@ async function saveUserBookmarksData() {
     }
   });
 
-  // 1. ЗАВЖДИ миттєво зберігаємо у localStorage
+  // 1. ЗАВЖДИ миттєво зберігаємо у localStorage (0 мс, гарантія відсутності втрат)
   try {
     const bmJson = JSON.stringify(userBookmarksList);
     const cardsJson = JSON.stringify(userBookmarkCards);
@@ -5998,17 +6065,24 @@ async function saveUserBookmarksData() {
     console.warn("Помилка запису у localStorage:", e);
   }
 
-  // 2. Паралельно синхронізуємо у Cloud Firestore
+  // 2. Хмарна синхронізація у Cloud Firestore
   if (!currentUser || !firebaseDb) return;
-  try {
-    await firebaseDb.collection('users').doc(currentUser.uid).set({
-      bookmarks: userBookmarksList,
-      bookmarkCards: userBookmarkCards,
-      bookmarkColumns: userBookmarkColumns,
-      updatedAt: new Date().toISOString()
-    }, { merge: true });
-  } catch (e) {
-    console.warn("Firestore save warning (дані збережено локально):", e);
+
+  if (options && options.debounceCloud) {
+    // Відкладаємо запис у базу: доки користувач активно перетягує картки/сайти,
+    // нові запити у Firestore не йдуть. Запис відбудеться 1 раз через вказаний час після останньої дії.
+    if (cloudSyncTimeout) clearTimeout(cloudSyncTimeout);
+    cloudSyncTimeout = setTimeout(async () => {
+      cloudSyncTimeout = null;
+      await pushBookmarksToFirestore();
+    }, options.debounceMs || 8000);
+  } else {
+    // Миттєвий запис для точкових дій (створення, додавання, видалення)
+    if (cloudSyncTimeout) {
+      clearTimeout(cloudSyncTimeout);
+      cloudSyncTimeout = null;
+    }
+    await pushBookmarksToFirestore();
   }
 }
 
@@ -6053,12 +6127,18 @@ async function handleQuickBookmarkClick(link, description, heartBtn) {
     const bm = userBookmarksList[existingIdx];
     const card = bm.card || userBookmarkCards[0] || DEFAULT_CARD_NAME;
     if (confirm(`Сайт «${bm.name}» уже є у ваших закладках (Картка: «${card}»).\n\nВидалити його з «❤️ Закладок»?`)) {
+      if (!checkAndIncrementDailyActionLimit()) return;
       userBookmarksList.splice(existingIdx, 1);
       await saveUserBookmarksData();
       syncAllCatalogHeartButtons();
       showQuickToast(`«${bm.name}» видалено з «❤️ Закладок»`, 'info');
     }
   } else {
+    if (userBookmarksList.length >= MAX_USER_BOOKMARKS) {
+      alert(`Ви досягли ліміту: максимум ${MAX_USER_BOOKMARKS} збережених сайтів на акаунт.`);
+      return;
+    }
+    if (!checkAndIncrementDailyActionLimit()) return;
     if (!userBookmarkCards || userBookmarkCards.length <= 1) {
       const targetCard = (userBookmarkCards && userBookmarkCards[0]) || DEFAULT_CARD_NAME;
       userBookmarksList.push({
@@ -6107,6 +6187,11 @@ function openChooseCardForBookmarkModal(linkName, cleanUrl, description) {
   });
 
   document.getElementById('confirmQuickAddCardBtn').onclick = async () => {
+    if (userBookmarksList.length >= MAX_USER_BOOKMARKS) {
+      alert(`Ви досягли ліміту: максимум ${MAX_USER_BOOKMARKS} збережених сайтів на акаунт.`);
+      return;
+    }
+    if (!checkAndIncrementDailyActionLimit()) return;
     const sel = document.getElementById('quickCardChoiceSelect');
     const card = sel ? sel.value : userBookmarkCards[0];
     userBookmarksList.push({
@@ -6144,10 +6229,15 @@ function openCreateCardModal() {
       alert('Будь ласка, введіть назву картки.');
       return;
     }
+    if (userBookmarkCards.length >= MAX_USER_CARDS) {
+      alert(`Ви досягли ліміту: максимум ${MAX_USER_CARDS} папок/карток на акаунт.`);
+      return;
+    }
     if (userBookmarkCards.includes(val)) {
       alert('Картка з такою назвою вже існує.');
       return;
     }
+    if (!checkAndIncrementDailyActionLimit()) return;
 
     syncColumnsWithCards();
 
@@ -6426,6 +6516,12 @@ function openAddBookmarkModal(defaultCard = '') {
 
   // Обробка збереження закладки
   document.getElementById('confirmAddBmBtn').onclick = async () => {
+    if (userBookmarksList.length >= MAX_USER_BOOKMARKS) {
+      alert(`Ви досягли ліміту: максимум ${MAX_USER_BOOKMARKS} збережених сайтів на акаунт.`);
+      return;
+    }
+    if (!checkAndIncrementDailyActionLimit()) return;
+
     // Якщо жодна пропозиція не розгорнута
     if (!activeMode) {
       showQuickToast('Оберіть спосіб: «Додати сайт власноруч» або «Обрати з каталогу сайту»', 'warning');
@@ -6517,6 +6613,7 @@ function promptRenameCard(oldName) {
       alert('Картка з такою назвою вже існує.');
       return;
     }
+    if (!checkAndIncrementDailyActionLimit()) return;
     const idx = userBookmarkCards.indexOf(oldName);
     if (idx !== -1) {
       userBookmarkCards[idx] = newName;
@@ -6551,6 +6648,7 @@ function promptDeleteCard(cardName) {
   if (!confirm(`Ви дійсно бажаєте видалити картку «${cardName}» та всі її збережені сайти (${cardItemsCount})?`)) {
     return;
   }
+  if (!checkAndIncrementDailyActionLimit()) return;
   userBookmarkCards = userBookmarkCards.filter(c => c !== cardName);
   for (let i = 0; i < 4; i++) {
     if (Array.isArray(userBookmarkColumns[i])) {
@@ -6709,6 +6807,7 @@ function promptEditBookmark(bookmarkIndex) {
       if (!/^https?:\/\//i.test(newUrl)) {
         newUrl = 'https://' + newUrl;
       }
+      if (!checkAndIncrementDailyActionLimit()) return;
       bm.name = newName;
       bm.url = newUrl;
       const rawIcon = getFaviconForUrl(newUrl);
@@ -6747,6 +6846,7 @@ function promptMoveBookmark(bookmarkIndex) {
   });
 
   document.getElementById('confirmMoveBmBtn').onclick = async () => {
+    if (!checkAndIncrementDailyActionLimit()) return;
     const sel = document.getElementById('moveTargetCardSelect');
     if (!sel) return;
     const newCard = sel.value;
@@ -6762,6 +6862,7 @@ async function deleteUserBookmarkFromPage(bookmarkIndex) {
   const bm = userBookmarksList[bookmarkIndex];
   const name = bm ? bm.name : 'цей сайт';
   if (!confirm(`Видалити «${name}» із ваших закладок?`)) return;
+  if (!checkAndIncrementDailyActionLimit()) return;
   userBookmarksList.splice(bookmarkIndex, 1);
   await saveUserBookmarksData();
   renderBookmarksPage();
@@ -7059,7 +7160,8 @@ async function initBookmarksSortable() {
           ...col2Cards,
           ...col3Cards
         ];
-        await saveUserBookmarksData();
+        if (!checkAndIncrementDailyActionLimit()) return;
+        await saveUserBookmarksData({ debounceCloud: true, debounceMs: 8000 });
         showQuickToast('Порядок карток оновлено та збережено!', 'success');
       }
     });
