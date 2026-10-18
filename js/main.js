@@ -1255,11 +1255,11 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // === 2. НИЖНІЙ МУЛЬТИПЛЕКС ПЕРЕД ФУТЕРОМ (На всіх сторінках, окрім Головної та «❤️ Закладки», і тільки для ПК екранів >= 1250px) ===
+  // === 2. НИЖНІЙ МУЛЬТИПЛЕКС ПЕРЕД ФУТЕРОМ (На всіх сторінках, окрім Головної та «❤️ Закладки», і тільки для ПК екранів >= 1280px) ===
   const isBookmarksPage = window.location.pathname.includes('bookmarks') || 
                           !!document.getElementById('bookmarksPageApp') ||
                           document.body.classList.contains('page-bookmarks');
-  if (!isHomepage && !isBookmarksPage && screenWidth >= 1250) {
+  if (!isHomepage && !isBookmarksPage && screenWidth >= 1280) {
     const footer = document.querySelector('footer.footer');
     if (footer) {
       const multiplexContainer = document.createElement('div');
@@ -1281,8 +1281,8 @@ document.addEventListener("DOMContentLoaded", () => {
     document.querySelectorAll('.bottom-multiplex-container, .ad-wrapper-bottom').forEach(el => el.remove());
   }
 
-  // === 3. ВПРОВАДЖЕННЯ МОБІЛЬНИХ IN-FEED РЕКЛАМНИХ БЛОКІВ МІЖ КАРТКАМИ (Тільки для мобільних екранів < 1250px) ===
-  if (screenWidth < 1250) {
+  // === 3. ВПРОВАДЖЕННЯ МОБІЛЬНИХ IN-FEED РЕКЛАМНИХ БЛОКІВ МІЖ КАРТКАМИ (Тільки для мобільних екранів < 1280px) ===
+  if (screenWidth < 1280) {
     const groups = document.querySelectorAll('.group');
     const totalGroups = groups.length;
 
@@ -5161,7 +5161,7 @@ function renderUserCabinetContent() {
       </div>
       <div>
         ${currentUser ? '' : `
-          <button type="button" class="btn btn-primary btn-sm font-weight-bold" id="btnCabinetTopLogin">
+          <button type="button" class="btn btn-primary btn-sm font-weight-bold cabinet-login-btn-pulse" id="btnCabinetTopLogin">
             <svg width="15" height="15" viewBox="0 0 48 48" class="me-1 align-middle" style="display:inline-block;"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
             Увійти
           </button>
@@ -5325,7 +5325,7 @@ function renderDashboardTab() {
 
       <!-- Швидкі дії -->
       <div class="cabinet-dash-section">
-        <div class="cabinet-dash-section-title"><i class="fas fa-bolt text-warning me-1"></i> Швидкі дії</div>
+        <div class="cabinet-dash-section-title"><i class="fas fa-bolt text-warning"></i> <span>Швидкі дії</span></div>
         <div class="cabinet-dash-actions-grid">
           <a href="./bookmarks.html" class="cabinet-dash-action-btn action-bookmarks" onclick="closeUserCabinetModal()">
             <div class="action-btn-icon"><i class="fas fa-heart"></i></div>
@@ -5894,40 +5894,143 @@ async function deleteUserBookmark(index) {
   }
 }
 
-// Синхронізація вкладки «❤️ Закладки» у навігаційній панелі
+// Синхронізація вкладки «❤️ Закладки» у навігаційній панелі (відображається завжди)
 function syncBookmarksNav() {
   const navLists = document.querySelectorAll('.navbar-nav');
   navLists.forEach(navList => {
     let item = navList.querySelector('#navItemBookmarks');
     const isBookmarksPage = window.location.pathname.includes('bookmarks.html');
 
-    if (currentUser || isBookmarksPage) {
-      if (!item) {
-        item = document.createElement('li');
-        item.id = 'navItemBookmarks';
-        item.className = 'nav-item nav-item-bookmarks';
-        item.innerHTML = `
-          <a class="nav-link nav-link-bookmarks ${isBookmarksPage ? 'active' : ''}" href="./bookmarks.html" title="Мої персональні закладки" aria-label="Мої персональні закладки">
-            <span class="nav-heart-icon">❤️</span>
-          </a>
-        `;
-        navList.appendChild(item);
-      } else {
-        const link = item.querySelector('a');
-        if (link) {
-          link.innerHTML = `<span class="nav-heart-icon">❤️</span>`;
-          link.title = 'Мої персональні закладки';
-          link.setAttribute('aria-label', 'Мої персональні закладки');
-          if (isBookmarksPage) link.classList.add('active');
-          else link.classList.remove('active');
+    if (!item) {
+      item = document.createElement('li');
+      item.id = 'navItemBookmarks';
+      item.className = 'nav-item nav-item-bookmarks';
+      item.innerHTML = `
+        <a class="nav-link nav-link-bookmarks ${isBookmarksPage ? 'active' : ''}" href="./bookmarks.html" title="Мої персональні закладки" aria-label="Мої персональні закладки">
+          <span class="nav-heart-icon">❤️</span>
+        </a>
+      `;
+      navList.appendChild(item);
+    }
+
+    const link = item.querySelector('a');
+    if (link) {
+      link.innerHTML = `<span class="nav-heart-icon">❤️</span>`;
+      link.title = currentUser ? 'Мої персональні закладки' : 'Мої персональні закладки (натисніть для входу)';
+      link.setAttribute('aria-label', 'Мої персональні закладки');
+      if (isBookmarksPage) link.classList.add('active');
+      else link.classList.remove('active');
+
+      link.onclick = (e) => {
+        if (!currentUser) {
+          e.preventDefault();
+          openGuestBookmarksInfoModal();
         }
-      }
-    } else {
-      if (item && !isBookmarksPage) {
-        item.remove();
-      }
+      };
     }
   });
+}
+
+// Дружнє інформаційне вікно для неавторизованого користувача при спробі відкрити «❤️ Закладки»
+function openGuestBookmarksInfoModal() {
+  let modal = document.getElementById('guestBookmarksInfoModal');
+  if (modal) modal.remove();
+
+  modal = document.createElement('div');
+  modal.id = 'guestBookmarksInfoModal';
+  modal.className = 'guest-bm-modal-backdrop';
+  modal.innerHTML = `
+    <div class="guest-bm-modal-card" role="dialog" aria-modal="true" aria-labelledby="guestBmModalTitle">
+      <div class="guest-bm-modal-header">
+        <h3 class="guest-bm-modal-title" id="guestBmModalTitle">
+          <span class="nav-heart-icon">❤️</span>
+          <span>Розділ «Мої Закладки»</span>
+        </h3>
+        <button type="button" class="guest-bm-modal-close" id="btnCloseGuestBmModal" aria-label="Закрити">&times;</button>
+      </div>
+
+      <div class="guest-bm-modal-body">
+        <div class="guest-bm-promo-banner">
+          <p class="guest-bm-promo-desc">
+            Створюйте власний затишний простір, впорядковуйте корисні ресурси та майте швидкий доступ до улюблених сайтів з будь-якого пристрою!
+          </p>
+          <button type="button" class="btn btn-primary cabinet-login-btn-pulse guest-bm-login-action-btn" id="btnGuestBmModalLogin">
+            <svg width="18" height="18" viewBox="0 0 48 48" class="align-middle" style="display:inline-block;"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+            Увійти через Google в 1 клік
+          </button>
+        </div>
+
+        <div>
+          <div class="guest-bm-features-header">
+            <i class="fas fa-sparkles text-warning"></i>
+            <span>Що це дасть користувачеві (переваги та функції):</span>
+          </div>
+          <div class="guest-bm-features-list">
+            <div class="guest-bm-feature-item">
+              <span class="guest-bm-feature-icon">📂</span>
+              <div class="guest-bm-feature-text">
+                <strong>Тематичні папки</strong> - створення власних карток під роботу, новини, покупки чи хобі.
+              </div>
+            </div>
+            <div class="guest-bm-feature-item">
+              <span class="guest-bm-feature-icon">⭐</span>
+              <div class="guest-bm-feature-text">
+                <strong>Збереження сайтів в 1 клік</strong> - додавайте улюблені ресурси з нашого каталогу або власні зовнішні посилання.
+              </div>
+            </div>
+            <div class="guest-bm-feature-item">
+              <span class="guest-bm-feature-icon">☁️</span>
+              <div class="guest-bm-feature-text">
+                <strong>Хмарна синхронізація</strong> - персональні закладки автоматично доступні на всіх ваших пристроях: комп'ютері, телефоні чи планшеті.
+              </div>
+            </div>
+            <div class="guest-bm-feature-item">
+              <span class="guest-bm-feature-icon">🔄</span>
+              <div class="guest-bm-feature-text">
+                <strong>Зручне впорядкування</strong> - перетягування карток, налаштування порядку та зручний робочий простір під рукою.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="guest-bm-modal-footer">
+        <a href="./bookmarks.html" class="btn btn-outline-secondary btn-sm" id="btnGuestPreviewBookmarks" style="border-radius: 8px;">
+          <i class="fas fa-eye me-1"></i> Ознайомитися з розділом
+        </a>
+        <button type="button" class="btn btn-secondary btn-sm" id="btnDismissGuestBmModal" style="border-radius: 8px;">
+          Закрити
+        </button>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+
+  const closeModal = () => {
+    if (modal && modal.parentNode) modal.parentNode.removeChild(modal);
+  };
+
+  const closeBtn = modal.querySelector('#btnCloseGuestBmModal');
+  if (closeBtn) closeBtn.onclick = closeModal;
+
+  const dismissBtn = modal.querySelector('#btnDismissGuestBmModal');
+  if (dismissBtn) dismissBtn.onclick = closeModal;
+
+  modal.onclick = (e) => {
+    if (e.target === modal) closeModal();
+  };
+
+  const loginBtn = modal.querySelector('#btnGuestBmModalLogin');
+  if (loginBtn) {
+    loginBtn.onclick = async () => {
+      closeModal();
+      await loginWithGoogle();
+      if (currentUser) {
+        window.location.href = './bookmarks.html';
+      }
+    };
+  }
 }
 
 // ==========================================================================
@@ -5981,27 +6084,35 @@ function showCustomModal({ title, bodyHtml, footerHtml }) {
   if (!modalWrap) {
     modalWrap = document.createElement('div');
     modalWrap.id = 'universalActionModal';
-    modalWrap.style.cssText = 'position: fixed; inset: 0; z-index: 10050; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.65); padding: 8px; backdrop-filter: blur(2px); box-sizing: border-box; overflow: hidden;';
+    modalWrap.className = 'universal-modal-backdrop';
     document.body.appendChild(modalWrap);
+
+    modalWrap.addEventListener('click', (e) => {
+      if (e.target === modalWrap) closeCustomModal();
+    });
   }
   modalWrap.innerHTML = `
-    <div style="background: var(--card-bg, #ffffff); color: var(--text-main, #0f172a); border: 1px solid var(--border-color, #cbd5e1); border-radius: 12px; width: 100%; max-width: 440px; max-height: calc(100vh - 16px); max-height: calc(100dvh - 16px); display: flex; flex-direction: column; box-shadow: 0 15px 35px rgba(0,0,0,0.3); overflow: hidden; animation: fadeIn 0.2s ease; box-sizing: border-box;">
-      <div style="padding: 10px 14px; border-bottom: 1px solid var(--border-color, #e2e8f0); display: flex; align-items: center; justify-content: space-between; background: linear-gradient(135deg, #1e293b, #334155); color: #fff; flex-shrink: 0;">
+    <div class="universal-modal-card" role="dialog" aria-modal="true">
+      <div class="universal-modal-header">
         <h6 style="margin: 0; font-weight: 700; font-size: 0.95rem; color: #fff;">${title}</h6>
         <button type="button" style="background: transparent; border: none; color: #fff; font-size: 1.35rem; cursor: pointer; padding: 0 4px; line-height: 1;" onclick="closeCustomModal()">&times;</button>
       </div>
-      <div style="padding: 12px 14px; overflow-y: auto; -webkit-overflow-scrolling: touch; flex: 1 1 auto; min-height: 0;">
+      <div class="universal-modal-body">
         ${bodyHtml}
       </div>
-      ${footerHtml ? `<div style="padding: 8px 14px; border-top: 1px solid var(--border-color, #e2e8f0); display: flex; justify-content: flex-end; gap: 8px; background: rgba(0,0,0,0.02); flex-shrink: 0;">${footerHtml}</div>` : ''}
+      ${footerHtml ? `<div class="universal-modal-footer">${footerHtml}</div>` : ''}
     </div>
   `;
   modalWrap.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
 }
 
 function closeCustomModal() {
   const modalWrap = document.getElementById('universalActionModal');
   if (modalWrap) modalWrap.style.display = 'none';
+  if (!document.querySelector('.cl-modal-backdrop.show') && !document.getElementById('userCabinetModal')) {
+    document.body.style.overflow = '';
+  }
 }
 
 function isDefaultCard(cardName) {
@@ -6117,6 +6228,20 @@ function syncColumnsWithCards() {
       assignedSet.add(cName);
     }
   });
+
+  // Автоматичне вирівнювання: якщо проміжні колонки 1 чи 2 порожні, а в наступних колонках є картки
+  // (наприклад, через попередній запис в останню колонку на мобільних пристроях),
+  // послідовно зсуваємо картки у порожні попередні колонки, щоб уникнути штучних розривів на смартфонах:
+  for (let c = 1; c < 3; c++) {
+    if (userBookmarkColumns[c].length === 0) {
+      for (let nextCol = c + 1; nextCol < 4; nextCol++) {
+        if (userBookmarkColumns[nextCol].length > 0) {
+          userBookmarkColumns[c].push(userBookmarkColumns[nextCol].shift());
+          break;
+        }
+      }
+    }
+  }
 
   // Keep userBookmarkCards in sync with userBookmarkColumns
   userBookmarkCards = [
@@ -6466,22 +6591,21 @@ function openCreateCardModal() {
     syncColumnsWithCards();
 
     // Визначаємо куди додати нову картку:
-    // На мобільному (< 600px): додаємо завжди вкінець (в останню колонку)
-    // На ПК (>= 600px): у колонку з найменшою кількістю карток (якщо скрізь порівну - у першу колонку 0)
-    const isMobile = window.innerWidth < 600;
-    if (isMobile) {
-      userBookmarkColumns[3].push(val);
-    } else {
-      let minColIdx = 0;
-      let minCount = userBookmarkColumns[0].length;
-      for (let i = 1; i < 4; i++) {
-        if (userBookmarkColumns[i].length < minCount) {
-          minCount = userBookmarkColumns[i].length;
-          minColIdx = i;
-        }
+    // Додаємо рівномірно у колонку з найменшою кількістю карток.
+    // Оскільки в колонці 0 вже є системна картка "Основні закладки", пріоритет віддається колонкам 1, 2, 3,
+    // завдяки чому нові картки розміщуються послідовно без порожніх проміжків як на ПК, так і на мобільних пристроях:
+    let minColIdx = 1;
+    let minCount = userBookmarkColumns[1].length;
+    for (let i = 2; i < 4; i++) {
+      if (userBookmarkColumns[i].length < minCount) {
+        minCount = userBookmarkColumns[i].length;
+        minColIdx = i;
       }
-      userBookmarkColumns[minColIdx].push(val);
     }
+    if (userBookmarkColumns[0].length < minCount) {
+      minColIdx = 0;
+    }
+    userBookmarkColumns[minColIdx].push(val);
 
     userBookmarkCards = [
       ...userBookmarkColumns[0],
@@ -7109,10 +7233,43 @@ async function renderBookmarksPage() {
         <p class="bm-guest-desc">
           Створюйте власні тематичні картки, зберігайте улюблені сайти з усього каталогу в 1 клік та керуйте персональними посиланнями з хмарною синхронізацією на всіх пристроях.
         </p>
-        <button type="button" class="bm-guest-btn" id="btnBookmarksPageLogin">
+        <button type="button" class="bm-guest-btn cabinet-login-btn-pulse" id="btnBookmarksPageLogin" style="margin-bottom: 24px;">
           <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
           Увійти через Google в 1 клік
         </button>
+
+        <div style="max-width: 480px; margin: 0 auto; text-align: left;">
+          <div class="guest-bm-features-header" style="justify-content: center; margin-bottom: 10px;">
+            <i class="fas fa-sparkles text-warning"></i>
+            <span>Ключові можливості та переваги авторизації:</span>
+          </div>
+          <div class="guest-bm-features-list">
+            <div class="guest-bm-feature-item">
+              <span class="guest-bm-feature-icon">📂</span>
+              <div class="guest-bm-feature-text">
+                <strong>Тематичні картки</strong> - створення власних папок під роботу, новини, покупки чи хобі.
+              </div>
+            </div>
+            <div class="guest-bm-feature-item">
+              <span class="guest-bm-feature-icon">⭐</span>
+              <div class="guest-bm-feature-text">
+                <strong>Збереження сайтів в 1 клік</strong> - додавайте улюблені ресурси з нашого каталогу або власні зовнішні посилання.
+              </div>
+            </div>
+            <div class="guest-bm-feature-item">
+              <span class="guest-bm-feature-icon">☁️</span>
+              <div class="guest-bm-feature-text">
+                <strong>Хмарна синхронізація</strong> - персональні закладки автоматично доступні на всіх ваших пристроях.
+              </div>
+            </div>
+            <div class="guest-bm-feature-item">
+              <span class="guest-bm-feature-icon">🔄</span>
+              <div class="guest-bm-feature-text">
+                <strong>Зручне впорядкування</strong> - перетягування карток та гнучке сортування посилань.
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     `;
     const loginBtn = document.getElementById('btnBookmarksPageLogin');
@@ -7319,9 +7476,9 @@ async function renderBookmarksPage() {
           </div>
           ${renderColumnHtml(colCards[0])}
         </div>
-        <div class="bm-column" id="bmCol1">${renderColumnHtml(colCards[1])}</div>
-        <div class="bm-column" id="bmCol2">${renderColumnHtml(colCards[2])}</div>
-        <div class="bm-column" id="bmCol3">${renderColumnHtml(colCards[3])}</div>
+        <div class="bm-column ${(colCards[1] || []).length === 0 ? 'bm-col-empty' : ''}" id="bmCol1">${renderColumnHtml(colCards[1])}</div>
+        <div class="bm-column ${(colCards[2] || []).length === 0 ? 'bm-col-empty' : ''}" id="bmCol2">${renderColumnHtml(colCards[2])}</div>
+        <div class="bm-column ${(colCards[3] || []).length === 0 ? 'bm-col-empty' : ''}" id="bmCol3">${renderColumnHtml(colCards[3])}</div>
       </div>
     `;
 

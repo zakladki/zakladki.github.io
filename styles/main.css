@@ -73,8 +73,8 @@ body {
   break-inside: auto !important;
 }
 
-/* Tablet screen columns (768px - 1249.98px): 2 balanced independent columns */
-@media (min-width: 768px) and (max-width: 1249.98px) {
+/* Tablet screen columns (768px - 1279.98px): 2 balanced independent columns */
+@media (min-width: 768px) and (max-width: 1279.98px) {
   .row.animated.fadeIn {
     display: flex !important;
     flex-direction: row !important;
@@ -102,8 +102,8 @@ body {
   }
 }
 
-/* Large screen columns (>= 1250px): 4 fixed independent columns for all pages */
-@media (min-width: 1250px) {
+/* Large screen columns (>= 1280px): 4 fixed independent columns for all pages */
+@media (min-width: 1280px) {
   .tab-content.container {
     max-width: 1160px;
   }
@@ -134,7 +134,7 @@ body {
 }
 
 /* Header spacing and fully vertical menu styling for desktop */
-@media (min-width: 1250px) {
+@media (min-width: 1280px) {
   .main {
     padding-top: 41px !important;
   }
@@ -811,8 +811,8 @@ footer.footer .btn-primary:active {
 /* ==========================================================================
    7. MOBILE AND RESPONSIVE OVERRIDES
    ========================================================================== */
-@media (max-width: 1249.98px) {
-  /* 0. Перевизначення поведінки розгортання Bootstrap для екранів < 1250px */
+@media (max-width: 1279.98px) {
+  /* 0. Перевизначення поведінки розгортання Bootstrap для екранів < 1280px */
   .navbar-expand-md .navbar-toggler {
     display: block !important;
   }
@@ -1080,8 +1080,8 @@ body.page-bookmarks #bookmarksPageApp ~ .bottom-multiplex-container,
   overflow: hidden;
 }
 
-/* На мобільних екранах та планшетах (< 1250px) нижній мультиплекс повністю приховується */
-@media (max-width: 1249.98px) {
+/* На мобільних екранах та планшетах (< 1280px) нижній мультиплекс повністю приховується */
+@media (max-width: 1279.98px) {
   .bottom-multiplex-container {
     display: none !important;
     height: 0 !important;
@@ -1197,7 +1197,7 @@ body.page-bookmarks #bookmarksPageApp ~ .bottom-multiplex-container,
   overflow: hidden !important;
 }
 
-@media (min-width: 1250px) {
+@media (min-width: 1280px) {
   .infeed-ad-mobile-container {
     display: none !important;
     height: 0 !important;
@@ -1207,7 +1207,7 @@ body.page-bookmarks #bookmarksPageApp ~ .bottom-multiplex-container,
   }
 }
 
-@media (max-width: 1249.98px) {
+@media (max-width: 1279.98px) {
   /* За замовчуванням робимо контейнер майже невидимим і без відступів, щоб не створювати порожніх дірок під час завантаження */
   .infeed-ad-mobile-container {
     display: block !important;
@@ -1898,13 +1898,7 @@ body.dark-mode .status-dot.dot-gold {
   }
 }
 
-@media (max-width: 576px) {
-  .cl-modal-backdrop {
-    padding: 10px 10px env(safe-area-inset-bottom, 10px) 10px;
-  }
-}
-
-/* Модальне вікно для перегляду CHANGELOG.md */
+/* Модальне вікно для перегляду CHANGELOG.md та загальних діалогів */
 .cl-modal-backdrop {
   position: fixed;
   inset: 0;
@@ -1914,7 +1908,6 @@ body.dark-mode .status-dot.dot-gold {
   bottom: 0;
   width: 100%;
   height: 100%;
-  height: 100dvh;
   background-color: rgba(0, 0, 0, 0.65);
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
@@ -2014,6 +2007,9 @@ body.dark-mode .cl-modal-title {
 .cl-modal-body {
   padding: 20px;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+  overscroll-behavior: contain;
   font-size: 0.98rem;
   line-height: 1.6;
   flex: 1 1 auto;
@@ -2149,33 +2145,46 @@ body.dark-mode .cl-modal-body .cl-calendar-prefix {
 
 @media (max-width: 576px) {
   .cl-modal-backdrop {
-    padding: 8px;
-    padding-top: max(8px, env(safe-area-inset-top));
-    padding-right: max(8px, env(safe-area-inset-right));
-    padding-bottom: max(10px, env(safe-area-inset-bottom, 10px));
-    padding-left: max(8px, env(safe-area-inset-left));
+    padding: 6px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-start !important;
+    align-items: center !important;
+    overflow: hidden !important;
   }
   .cl-modal {
-    min-height: 0;
-    max-height: calc(100vh - 16px);
-    max-height: calc(100dvh - 16px);
-    max-height: calc(100dvh - (max(8px, env(safe-area-inset-top)) + max(10px, env(safe-area-inset-bottom, 10px))));
-    height: auto;
-    border-radius: 10px;
+    min-height: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: 100% !important;
+    max-height: 100% !important;
+    border-radius: 10px !important;
+    margin: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+    transform: none !important;
   }
   .cl-modal-header {
-    padding: 8px 12px;
+    padding: 8px 12px !important;
+    flex-shrink: 0 !important;
   }
   .cl-modal-body {
-    padding: 8px 10px;
-    font-size: 0.88rem;
+    padding: 8px 10px !important;
+    font-size: 0.88rem !important;
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-y !important;
+    overscroll-behavior: contain !important;
   }
   .cl-modal-body ul,
   .cl-modal-body .cl-changelog-list {
-    padding-left: 0;
+    padding-left: 0 !important;
   }
   .cl-modal-body li {
-    padding-left: 9px;
+    padding-left: 9px !important;
   }
 }
 /* Модальне вікно для умовних позначок */
@@ -3353,7 +3362,7 @@ body.dark-mode .maintenance-progress-bar {
   100% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
 }
 
-@media (min-width: 1250px) {
+@media (min-width: 1280px) {
   .notice-bell-btn {
     position: absolute !important;
     left: 48px !important;
@@ -3368,7 +3377,7 @@ body.dark-mode .maintenance-progress-bar {
   }
 }
 
-@media (max-width: 1249.98px) {
+@media (max-width: 1279.98px) {
   .notice-bell-btn {
     position: absolute !important;
     top: 50% !important;
@@ -3408,12 +3417,17 @@ body.dark-mode .maintenance-progress-bar {
 
 @media (max-width: 576px) {
   .announcements-modal {
-    min-height: 0;
-    max-height: calc(100vh - 16px) !important;
-    max-height: calc(100dvh - 16px) !important;
-    max-height: calc(100dvh - (max(8px, env(safe-area-inset-top)) + max(10px, env(safe-area-inset-bottom, 10px)))) !important;
-    height: auto;
-    border-radius: 10px;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: 100% !important;
+    max-height: 100% !important;
+    min-height: 0 !important;
+    border-radius: 10px !important;
+    margin: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+    transform: none !important;
   }
   .announcements-modal-header {
     padding: 8px 10px !important;
@@ -5558,18 +5572,33 @@ body.dark-mode .ad-terms-link {
 
 @media (max-width: 576px) {
   .ad-order-modal {
-    max-height: 92vh;
-    max-height: 92dvh;
-    border-radius: 12px;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: 100% !important;
+    max-height: 100% !important;
+    min-height: 0 !important;
+    border-radius: 10px !important;
+    margin: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+    transform: none !important;
   }
   .ad-order-modal .ad-modal-header {
-    padding: 10px 46px 10px 12px;
+    padding: 10px 46px 10px 12px !important;
+    flex-shrink: 0 !important;
   }
   .ad-order-modal .cl-modal-title {
     font-size: 1rem;
   }
   .ad-modal-body {
     padding: 8px 8px 12px 8px;
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-y !important;
+    overscroll-behavior: contain !important;
   }
   .ad-sticky-close-wrapper {
     top: 0;
@@ -5806,12 +5835,12 @@ body.dark-mode .ad-terms-link {
   transition: all 0.2s ease;
   overflow: hidden !important;
 }
-@media (min-width: 1250px) {
+@media (min-width: 1280px) {
   .user-auth-btn {
     right: 12px !important;
   }
 }
-@media (max-width: 1249.98px) {
+@media (max-width: 1279.98px) {
   .user-auth-btn {
     right: 56px !important;
   }
@@ -5819,6 +5848,20 @@ body.dark-mode .ad-terms-link {
 .user-auth-btn:hover {
   background: rgba(255, 255, 255, 0.28) !important;
   transform: translateY(-50%) scale(1.05) !important;
+}
+.user-auth-btn:not(.logged-in) {
+  border-color: rgba(96, 165, 250, 0.7) !important;
+  animation: navUserGuestPulse 2.8s infinite ease-in-out;
+}
+@keyframes navUserGuestPulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.6), 0 0 6px rgba(37, 99, 235, 0.4);
+    border-color: rgba(96, 165, 250, 0.6);
+  }
+  50% {
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0), 0 0 12px rgba(96, 165, 250, 0.85);
+    border-color: rgba(147, 197, 253, 0.95);
+  }
 }
 .user-auth-btn.logged-in {
   padding: 0 !important;
@@ -5894,35 +5937,31 @@ body.dark-mode .user-cabinet-modal {
     bottom: 0;
     width: 100%;
     height: 100%;
-    height: 100dvh;
     padding: 6px;
-    padding-top: max(6px, env(safe-area-inset-top));
-    padding-right: max(6px, env(safe-area-inset-right));
-    padding-bottom: max(6px, env(safe-area-inset-bottom));
-    padding-left: max(6px, env(safe-area-inset-left));
     box-sizing: border-box;
     display: flex;
+    flex-direction: column;
+    justify-content: flex-start !important;
     align-items: center;
-    justify-content: center;
     overflow: hidden;
   }
   .user-cabinet-modal {
-    width: 100%;
-    max-width: 100%;
-    max-height: calc(100vh - 12px) !important;
-    max-height: calc(100dvh - 12px) !important;
-    height: 94vh !important;
-    height: 94dvh !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: 100% !important;
+    max-height: 100% !important;
     min-height: 0 !important;
     border-radius: 10px;
-    margin: 0 auto;
+    margin: 0 !important;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    transform: none !important;
   }
   .cabinet-header {
     padding: 6px 10px;
+    flex-shrink: 0 !important;
   }
   .cabinet-header-title {
     font-size: 0.95rem;
@@ -5935,8 +5974,9 @@ body.dark-mode .user-cabinet-modal {
     padding: 6px 8px 14px 8px;
     flex: 1 1 auto;
     min-height: 0;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-y !important;
     overscroll-behavior: contain;
   }
   .cabinet-user-bar {
@@ -6012,6 +6052,93 @@ body.dark-mode .user-cabinet-modal {
   }
   .cabinet-feature-item {
     padding: 8px 10px;
+  }
+}
+
+/* Універсальне модальне вікно дій (створення папки, додавання сайту тощо) */
+.universal-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 10050;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.65);
+  padding: 8px;
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  box-sizing: border-box;
+  overflow: hidden;
+}
+.universal-modal-card {
+  background: var(--card-bg, #ffffff);
+  color: var(--text-main, #0f172a);
+  border: 1px solid var(--border-color, #cbd5e1);
+  border-radius: 12px;
+  width: 100%;
+  max-width: 440px;
+  max-height: calc(100vh - 24px);
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  animation: fadeIn 0.2s ease;
+  box-sizing: border-box;
+}
+.universal-modal-header {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border-color, #e2e8f0);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(135deg, #1e293b, #334155);
+  color: #fff;
+  flex-shrink: 0;
+}
+.universal-modal-body {
+  padding: 12px 14px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+  overscroll-behavior: contain;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+.universal-modal-footer {
+  padding: 8px 14px;
+  border-top: 1px solid var(--border-color, #e2e8f0);
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  background: rgba(0, 0, 0, 0.02);
+  flex-shrink: 0;
+}
+@media (max-width: 576px) {
+  .universal-modal-backdrop {
+    padding: 6px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-start !important;
+    align-items: center !important;
+  }
+  .universal-modal-card {
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+    border-radius: 10px !important;
+    margin: 0 !important;
+  }
+  .universal-modal-header {
+    padding: 8px 12px !important;
+  }
+  .universal-modal-body {
+    padding: 10px 12px !important;
   }
 }
 
@@ -7054,7 +7181,7 @@ body.dark-mode .ad-order-claim-box.success {
   30% { transform: scale(1); }
   45% { transform: scale(1.18); }
 }
-@media (min-width: 1250px) {
+@media (min-width: 1280px) {
   nav.navbar .nav-link-bookmarks.active {
     background-color: rgba(225, 29, 72, 0.28) !important;
     border-bottom: 3px solid #e11d48 !important;
@@ -7066,7 +7193,7 @@ body.dark-mode .ad-order-claim-box.success {
     border-bottom: 3px solid rgba(225, 29, 72, 0.5) !important;
   }
 }
-@media (max-width: 1249.98px) {
+@media (max-width: 1279.98px) {
   .nav-link-bookmarks {
     padding: 7px 6px !important;
   }
@@ -7810,6 +7937,17 @@ body.dark-mode .bm-cap-hints-btn:hover {
     grid-template-columns: 1fr;
     gap: 10px;
     margin-top: 8px !important;
+    padding: 0 !important;
+  }
+  .bm-column {
+    min-height: 0 !important;
+  }
+  .bm-column.bm-col-empty,
+  .bm-column:empty {
+    display: none !important;
+    min-height: 0 !important;
+    height: 0 !important;
+    margin: 0 !important;
     padding: 0 !important;
   }
 }
@@ -8617,6 +8755,11 @@ body.dark-mode .dash-metric-label {
   color: var(--text-main, #0f172a);
   display: flex;
   align-items: center;
+  gap: 5px;
+}
+.cabinet-dash-section-title i {
+  display: inline-block;
+  margin-right: 0;
 }
 body.dark-mode .cabinet-dash-section-title {
   color: #f8fafc;
@@ -9228,12 +9371,17 @@ body.dark-mode .about-site-actions-bar {
 
 @media (max-width: 576px) {
   .about-site-modal {
-    min-height: 0;
-    max-height: calc(100vh - 16px) !important;
-    max-height: calc(100dvh - 16px) !important;
-    max-height: calc(100dvh - (max(8px, env(safe-area-inset-top)) + max(10px, env(safe-area-inset-bottom, 10px)))) !important;
-    height: auto;
-    border-radius: 10px;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: 100% !important;
+    max-height: 100% !important;
+    min-height: 0 !important;
+    border-radius: 10px !important;
+    margin: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+    transform: none !important;
   }
   .about-site-modal-body {
     padding: 6px 6px 10px !important;
@@ -9477,6 +9625,236 @@ body.dark-mode .cabinet-copy-id-btn:hover {
 body.dark-mode .cabinet-settings-save-note {
   color: #34d399;
 }
+
+/* ==========================================================================
+   ПУЛЬСУЮЧЕ СЯЙВО ДЛЯ КНОПОК «УВІЙТИ» ТА МОДАЛЬНЕ ВІКНО «МОЇ ЗАКЛАДКИ» ДЛЯ ГОСТЯ
+   ========================================================================== */
+.cabinet-login-btn-pulse {
+  position: relative !important;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
+  border: 1.5px solid #60a5fa !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.7), 0 2px 10px rgba(37, 99, 235, 0.4) !important;
+  animation: loginGlowPulse 2.4s infinite ease-in-out !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.01em;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  z-index: 1;
+}
+
+.cabinet-login-btn-pulse:hover {
+  transform: translateY(-1px) scale(1.02);
+  box-shadow: 0 0 16px rgba(59, 130, 246, 0.8), 0 4px 14px rgba(37, 99, 235, 0.5) !important;
+  border-color: #93c5fd !important;
+  color: #ffffff !important;
+}
+
+@keyframes loginGlowPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7), 0 0 8px rgba(37, 99, 235, 0.5);
+    border-color: #60a5fa;
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(59, 130, 246, 0), 0 0 18px rgba(96, 165, 250, 0.85);
+    border-color: #93c5fd;
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0), 0 0 8px rgba(37, 99, 235, 0.5);
+    border-color: #60a5fa;
+  }
+}
+
+/* Модальне вікно для гостя при натисканні на ❤️ Закладки */
+.guest-bm-modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(15, 23, 42, 0.7);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10600;
+  padding: 16px;
+  animation: guestFadeIn 0.2s ease-out;
+}
+
+@keyframes guestFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.guest-bm-modal-card {
+  background: var(--card-bg, #ffffff);
+  color: var(--text-main, #0f172a);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 16px;
+  max-width: 520px;
+  width: 100%;
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  animation: guestModalSlideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+body.dark-mode .guest-bm-modal-card {
+  background: #1e293b;
+  border-color: #334155;
+  color: #f8fafc;
+}
+
+@keyframes guestModalSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.guest-bm-modal-header {
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border-color, #e2e8f0);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(225, 29, 72, 0.05);
+}
+body.dark-mode .guest-bm-modal-header {
+  border-color: #334155;
+  background: rgba(225, 29, 72, 0.1);
+}
+
+.guest-bm-modal-title {
+  font-size: 1.08rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  color: #e11d48;
+}
+
+.guest-bm-modal-close {
+  background: transparent;
+  border: none;
+  font-size: 1.4rem;
+  line-height: 1;
+  color: var(--text-muted, #64748b);
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 8px;
+  transition: all 0.15s ease;
+}
+.guest-bm-modal-close:hover {
+  color: #e11d48;
+  background: rgba(225, 29, 72, 0.12);
+}
+
+.guest-bm-modal-body {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-height: 75vh;
+  overflow-y: auto;
+}
+
+.guest-bm-promo-banner {
+  text-align: center;
+  padding: 14px;
+  background: linear-gradient(135deg, rgba(225, 29, 72, 0.06), rgba(37, 99, 235, 0.08));
+  border-radius: 12px;
+  border: 1px dashed rgba(225, 29, 72, 0.3);
+}
+
+.guest-bm-promo-desc {
+  font-size: 0.92rem;
+  line-height: 1.5;
+  margin-bottom: 14px;
+  color: var(--text-main, #1e293b);
+}
+body.dark-mode .guest-bm-promo-desc {
+  color: #e2e8f0;
+}
+
+.guest-bm-login-action-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  padding: 10px 20px !important;
+  font-size: 0.95rem !important;
+  border-radius: 10px !important;
+  width: 100%;
+  text-decoration: none !important;
+  cursor: pointer;
+}
+
+.guest-bm-features-header {
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: var(--text-main, #0f172a);
+  margin-bottom: 2px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+body.dark-mode .guest-bm-features-header {
+  color: #f1f5f9;
+}
+
+.guest-bm-features-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: rgba(0, 0, 0, 0.02);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 12px;
+  padding: 12px 14px;
+}
+body.dark-mode .guest-bm-features-list {
+  background: rgba(255, 255, 255, 0.02);
+  border-color: #334155;
+}
+
+.guest-bm-feature-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 0.86rem;
+  line-height: 1.45;
+}
+.guest-bm-feature-icon {
+  font-size: 1.05rem;
+  line-height: 1.2;
+  flex-shrink: 0;
+}
+.guest-bm-feature-text strong {
+  color: var(--text-main, #0f172a);
+}
+body.dark-mode .guest-bm-feature-text strong {
+  color: #f1f5f9;
+}
+
+.guest-bm-modal-footer {
+  padding: 12px 18px 14px;
+  border-top: 1px solid var(--border-color, #e2e8f0);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+body.dark-mode .guest-bm-modal-footer {
+  border-color: #334155;
+}
+
 
 
 
