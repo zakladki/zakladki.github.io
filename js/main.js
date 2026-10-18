@@ -1504,8 +1504,9 @@ function updateNoticeBellState() {
   if (!bellBtn) return;
   const dot = bellBtn.querySelector(".notice-bell-badge-dot");
   const unread = hasUnreadNotices();
+  const bellBadgeEnabled = (userProfileSettings && userProfileSettings.noticeBellBadge !== false);
 
-  if (unread) {
+  if (unread && bellBadgeEnabled) {
     bellBtn.classList.add("has-unread");
     if (dot) dot.style.display = "block";
   } else {
@@ -4699,6 +4700,8 @@ let adminStatusFilter = 'all';
 
 // Глобальні змінні персональних закладок
 const DEFAULT_CARD_NAME = 'Основні закладки';
+const MAX_USER_CARDS = 12;        // Максимум 12 папок/карток на акаунт
+const MAX_USER_BOOKMARKS = 120;   // Максимум 120 збережених сайтів на акаунт
 let userBookmarksList = [];
 let userBookmarkCards = [DEFAULT_CARD_NAME];
 let userBookmarkColumns = [[DEFAULT_CARD_NAME], [], [], []];
@@ -5051,7 +5054,11 @@ let userProfileSettings = {
   phone: '',
   telegram: '',
   displayName: '',
-  customNotes: ''
+  customNotes: '',
+  isPhonePublic: false,
+  isTelegramPublic: false,
+  notifyUpdates: false,
+  showInLeaderboard: false
 };
 
 function loadCachedUserProfile() {
@@ -5298,18 +5305,18 @@ function renderDashboardTab() {
         <div class="cabinet-dash-metric-card metric-folders">
           <div class="dash-metric-icon"><i class="fas fa-folder-open"></i></div>
           <div class="dash-metric-data">
-            <div class="dash-metric-value">${cardsCount}</div>
+            <div class="dash-metric-value">${cardsCount} <span class="dash-metric-unit" style="font-size: 0.8rem; font-weight: normal; color: var(--text-muted, #64748b);">/ ${MAX_USER_CARDS}</span></div>
             <div class="dash-metric-label">Тематичні папки</div>
-            <div class="dash-metric-hint text-muted">Створено в закладках</div>
+            <div class="dash-metric-hint text-muted">Ліміт: до ${MAX_USER_CARDS} карток</div>
           </div>
         </div>
 
         <div class="cabinet-dash-metric-card metric-bookmarks">
-          <div class="dash-metric-icon"><i class="fas fa-bookmark"></i></div>
+          <div class="dash-metric-icon"><i class="fas fa-globe"></i></div>
           <div class="dash-metric-data">
-            <div class="dash-metric-value">${bookmarksCount}</div>
+            <div class="dash-metric-value">${bookmarksCount} <span class="dash-metric-unit" style="font-size: 0.8rem; font-weight: normal; color: var(--text-muted, #64748b);">/ ${MAX_USER_BOOKMARKS}</span></div>
             <div class="dash-metric-label">Збережені сайти</div>
-            <div class="dash-metric-hint text-muted">Швидкі посилання</div>
+            <div class="dash-metric-hint text-muted">Ліміт: до ${MAX_USER_BOOKMARKS} сайтів</div>
           </div>
         </div>
 
@@ -5449,6 +5456,11 @@ function renderSettingsTab() {
   const currentPhone = userProfileSettings.phone || '';
   const currentTg = userProfileSettings.telegram || '';
   const currentNotes = userProfileSettings.customNotes || '';
+  let phonePublicState = Boolean(userProfileSettings.isPhonePublic);
+  let tgPublicState = Boolean(userProfileSettings.isTelegramPublic);
+  const notifyUpdatesState = Boolean(userProfileSettings.notifyUpdates);
+  const showLeaderboardState = Boolean(userProfileSettings.showInLeaderboard);
+  const anonCode = (currentUser.uid || 'USER').slice(0, 5).toUpperCase();
 
   container.innerHTML = `
     <div class="cabinet-settings-wrap">
@@ -5494,35 +5506,75 @@ function renderSettingsTab() {
         </div>
 
         <div class="cabinet-setting-field">
-          <label class="cabinet-setting-label" for="settingInputDisplayName">
-            <span>Ім'я / Псевдонім:</span>
-          </label>
+          <div class="cabinet-setting-label">
+            <label for="settingInputDisplayName" class="m-0">Публічне ім'я / Псевдонім:</label>
+            <div class="cabinet-privacy-badge is-locked" title="Зафіксовано системою: публічне ім'я завжди відкрите для ідентифікації вашого профілю">
+              <i class="fas fa-lock"></i> <span>Завжди публічно</span>
+            </div>
+          </div>
           <input type="text" class="cabinet-setting-input" id="settingInputDisplayName" value="${escapeHtml(currentDisplayName)}" placeholder="Наприклад: Олександр">
-          <div class="cabinet-setting-hint">Відображається у шапці сайту та привітаннях.</div>
+          <div class="cabinet-setting-hint">Відображається у шапці сайту, привітаннях та ваших персональних діях.</div>
         </div>
 
         <div class="cabinet-setting-field">
-          <label class="cabinet-setting-label" for="settingInputPhone">
-            <span>Номер мобільного телефону:</span>
-          </label>
+          <div class="cabinet-setting-label">
+            <label for="settingInputPhone" class="m-0">Номер мобільного телефону:</label>
+            <button type="button" class="cabinet-privacy-toggle ${phonePublicState ? 'is-public' : 'is-private'}" id="togglePrivacyPhone" title="Натисніть, щоб змінити статус: Публічно чи Непублічно">
+              <i class="${phonePublicState ? 'fas fa-eye' : 'fas fa-eye-slash'}"></i> <span class="privacy-status-text">${phonePublicState ? 'Публічно' : 'Непублічно'}</span>
+            </button>
+          </div>
           <input type="tel" class="cabinet-setting-input" id="settingInputPhone" value="${escapeHtml(currentPhone)}" placeholder="+380 (XX) XXX-XX-XX">
           <div class="cabinet-setting-hint">Для оперативного зв'язку, підтвердження замовлень та сервісних питань.</div>
         </div>
 
         <div class="cabinet-setting-field">
-          <label class="cabinet-setting-label" for="settingInputTelegram">
-            <span>Нікнейм або посилання у Telegram:</span>
-          </label>
+          <div class="cabinet-setting-label">
+            <label for="settingInputTelegram" class="m-0">Нікнейм або посилання у Telegram:</label>
+            <button type="button" class="cabinet-privacy-toggle ${tgPublicState ? 'is-public' : 'is-private'}" id="togglePrivacyTelegram" title="Натисніть, щоб змінити статус: Публічно чи Непублічно">
+              <i class="${tgPublicState ? 'fas fa-eye' : 'fas fa-eye-slash'}"></i> <span class="privacy-status-text">${tgPublicState ? 'Публічно' : 'Непублічно'}</span>
+            </button>
+          </div>
           <input type="text" class="cabinet-setting-input" id="settingInputTelegram" value="${escapeHtml(currentTg)}" placeholder="@username або https://t.me/username">
           <div class="cabinet-setting-hint">Для швидкого зв'язку в месенджері.</div>
         </div>
 
         <div class="cabinet-setting-field mb-0">
-          <label class="cabinet-setting-label" for="settingInputNotes">
-            <span>Додаткова інформація / Побажання:</span>
-          </label>
+          <div class="cabinet-setting-label">
+            <label for="settingInputNotes" class="m-0">Додаткова інформація / Побажання:</label>
+          </div>
           <textarea class="cabinet-setting-input" id="settingInputNotes" rows="2" placeholder="Будь-які примітки чи побажання щодо сервісу...">${escapeHtml(currentNotes)}</textarea>
           <div class="cabinet-setting-hint">Ваші персональні нотатки (зберігаються разом із профілем).</div>
+        </div>
+      </div>
+
+      <!-- Блок 3: Конфіденційність та сповіщення -->
+      <div class="cabinet-settings-card">
+        <div class="cabinet-settings-header">
+          <div class="cabinet-settings-icon" style="background: rgba(139, 92, 246, 0.12); color: #8b5cf6;"><i class="fas fa-sliders-h"></i></div>
+          <div>
+            <h6 class="cabinet-settings-title">Конфіденційність та сповіщення</h6>
+            <p class="cabinet-settings-desc">Керування публічністю в рейтингах та інформаційними каналами</p>
+          </div>
+        </div>
+
+        <div class="cabinet-setting-checkbox-row">
+          <label class="cabinet-checkbox-label" for="settingNotifyUpdates">
+            <input type="checkbox" class="cabinet-setting-checkbox" id="settingNotifyUpdates" ${notifyUpdatesState ? 'checked' : ''}>
+            <div class="cabinet-checkbox-body">
+              <span class="cabinet-checkbox-title">Отримувати сповіщення про нові корисні сайти, бонуси та оновлення</span>
+              <span class="cabinet-checkbox-desc">Сервісні повідомлення та корисні підбірки на пошту або в Telegram (за замовчуванням вимкнено).</span>
+            </div>
+          </label>
+        </div>
+
+        <div class="cabinet-setting-checkbox-row mb-0">
+          <label class="cabinet-checkbox-label" for="settingShowLeaderboard">
+            <input type="checkbox" class="cabinet-setting-checkbox" id="settingShowLeaderboard" ${showLeaderboardState ? 'checked' : ''}>
+            <div class="cabinet-checkbox-body">
+              <span class="cabinet-checkbox-title">Відображати моє публічне ім'я в загальному рейтингу активності та статистиці</span>
+              <span class="cabinet-checkbox-desc">Якщо вимкнено - у публічних списках лідерів ви відображатиметеся приватно як «Анонім #${anonCode}».</span>
+            </div>
+          </label>
         </div>
       </div>
 
@@ -5569,6 +5621,31 @@ function renderSettingsTab() {
     document.body.removeChild(input);
   }
 
+  // Інтерактивні перемикачі публічності
+  const phoneToggleBtn = container.querySelector('#togglePrivacyPhone');
+  if (phoneToggleBtn) {
+    phoneToggleBtn.onclick = (e) => {
+      e.preventDefault();
+      phonePublicState = !phonePublicState;
+      phoneToggleBtn.className = `cabinet-privacy-toggle ${phonePublicState ? 'is-public' : 'is-private'}`;
+      phoneToggleBtn.innerHTML = `
+        <i class="${phonePublicState ? 'fas fa-eye' : 'fas fa-eye-slash'}"></i> <span class="privacy-status-text">${phonePublicState ? 'Публічно' : 'Непублічно'}</span>
+      `;
+    };
+  }
+
+  const tgToggleBtn = container.querySelector('#togglePrivacyTelegram');
+  if (tgToggleBtn) {
+    tgToggleBtn.onclick = (e) => {
+      e.preventDefault();
+      tgPublicState = !tgPublicState;
+      tgToggleBtn.className = `cabinet-privacy-toggle ${tgPublicState ? 'is-public' : 'is-private'}`;
+      tgToggleBtn.innerHTML = `
+        <i class="${tgPublicState ? 'fas fa-eye' : 'fas fa-eye-slash'}"></i> <span class="privacy-status-text">${tgPublicState ? 'Публічно' : 'Непублічно'}</span>
+      `;
+    };
+  }
+
   // Обробник збереження налаштувань
   const saveBtn = container.querySelector('#btnSaveUserSettings');
   if (saveBtn) {
@@ -5579,6 +5656,8 @@ function renderSettingsTab() {
       const phoneVal = (container.querySelector('#settingInputPhone')?.value || '').trim();
       const tgVal = (container.querySelector('#settingInputTelegram')?.value || '').trim();
       const notesVal = (container.querySelector('#settingInputNotes')?.value || '').trim();
+      const notifyUpdatesVal = Boolean(container.querySelector('#settingNotifyUpdates')?.checked);
+      const showLeaderboardVal = Boolean(container.querySelector('#settingShowLeaderboard')?.checked);
 
       saveBtn.disabled = true;
       saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Збереження...';
@@ -5588,6 +5667,10 @@ function renderSettingsTab() {
         phone: phoneVal,
         telegram: tgVal,
         customNotes: notesVal,
+        isPhonePublic: phonePublicState,
+        isTelegramPublic: tgPublicState,
+        notifyUpdates: notifyUpdatesVal,
+        showInLeaderboard: showLeaderboardVal,
         updatedAt: new Date().toISOString()
       };
 
@@ -5834,8 +5917,17 @@ async function renderUserBookmarksTab() {
           </div>
           <div class="cabinet-bm-stat-divider"></div>
           <div class="cabinet-bm-stat-col">
-            <i class="fas fa-bookmark"></i>
-            <span>Закладок: <strong>${bookmarksCount}</strong></span>
+            <i class="fas fa-globe"></i>
+            <span>Сайтів: <strong>${bookmarksCount}</strong></span>
+          </div>
+        </div>
+        <div class="cabinet-bm-unified-limits">
+          <div class="cabinet-bm-limit-col">
+            <i class="fas fa-info-circle"></i> <span>Ліміт: до <strong>${MAX_USER_CARDS}</strong> карток</span>
+          </div>
+          <div class="cabinet-bm-limit-divider"></div>
+          <div class="cabinet-bm-limit-col">
+            <i class="fas fa-info-circle"></i> <span>Ліміт: до <strong>${MAX_USER_BOOKMARKS}</strong> сайтів</span>
           </div>
         </div>
       </div>
@@ -6128,9 +6220,7 @@ const GENERAL_BM_KEY = 'topz_bm_all_saved';
 const GENERAL_CARDS_KEY = 'topz_bm_cards_all';
 const GENERAL_COLS_KEY = 'topz_bm_columns_v4';
 
-// Ліміти тарифного плану Spark та захист від спаму
-const MAX_USER_CARDS = 12;        // Максимум 12 папок/карток на акаунт
-const MAX_USER_BOOKMARKS = 120;   // Максимум 120 збережених сайтів на акаунт
+// Ліміти тарифного плану Spark та захист від спаму (MAX_USER_CARDS і MAX_USER_BOOKMARKS оголошено вище)
 const DAILY_ACTION_LIMIT = 100;   // Максимум 100 операцій запису на добу на акаунт
 
 function checkAndIncrementDailyActionLimit() {

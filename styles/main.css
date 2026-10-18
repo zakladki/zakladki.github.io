@@ -5850,17 +5850,19 @@ body.dark-mode .ad-terms-link {
   transform: translateY(-50%) scale(1.05) !important;
 }
 .user-auth-btn:not(.logged-in) {
-  border-color: rgba(96, 165, 250, 0.7) !important;
-  animation: navUserGuestPulse 2.8s infinite ease-in-out;
+  border-color: rgba(96, 165, 250, 0.8) !important;
+  animation: navUserGuestPulse 2.5s infinite ease-in-out;
 }
 @keyframes navUserGuestPulse {
   0%, 100% {
-    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.6), 0 0 6px rgba(37, 99, 235, 0.4);
-    border-color: rgba(96, 165, 250, 0.6);
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7), 0 0 6px rgba(37, 99, 235, 0.45);
+    border-color: rgba(96, 165, 250, 0.75);
+    transform: translateY(-50%) scale(1);
   }
   50% {
-    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0), 0 0 12px rgba(96, 165, 250, 0.85);
-    border-color: rgba(147, 197, 253, 0.95);
+    box-shadow: 0 0 0 4.5px rgba(59, 130, 246, 0), 0 0 16px rgba(96, 165, 250, 0.95);
+    border-color: rgba(186, 230, 253, 1);
+    transform: translateY(-50%) scale(1.06);
   }
 }
 .user-auth-btn.logged-in {
@@ -7323,11 +7325,13 @@ body.dark-mode .bm-stat-badge {
   border-color: rgba(225, 29, 72, 0.4);
 }
 
-/* Суцільний прямокутний бейджик статистики з симетричним розділенням по центру */
+/* Суцільний прямокутний бейджик статистики з симетричним розділенням по центру та лімітами */
 .cabinet-bm-unified-stats-wrap {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
+  gap: 6px;
 }
 .cabinet-bm-unified-badge {
   display: inline-flex;
@@ -7339,6 +7343,46 @@ body.dark-mode .bm-stat-badge {
   max-width: 100%;
   width: min(340px, 100%);
   box-shadow: 0 1px 3px rgba(225, 29, 72, 0.06);
+}
+.cabinet-bm-unified-limits {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: min(340px, 100%);
+  padding: 4px 8px;
+  background: rgba(225, 29, 72, 0.04);
+  border: 1px dashed rgba(225, 29, 72, 0.24);
+  border-radius: 6px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: #be123c;
+}
+body.dark-mode .cabinet-bm-unified-limits {
+  background: rgba(225, 29, 72, 0.1);
+  border-color: rgba(225, 29, 72, 0.32);
+  color: #fda4af;
+}
+.cabinet-bm-limit-col {
+  flex: 1 1 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  white-space: nowrap;
+}
+.cabinet-bm-limit-col i {
+  font-size: 0.72rem;
+  opacity: 0.85;
+}
+.cabinet-bm-limit-divider {
+  width: 1px;
+  height: 12px;
+  background: rgba(225, 29, 72, 0.25);
+  margin: 0 4px;
+  flex-shrink: 0;
+}
+body.dark-mode .cabinet-bm-limit-divider {
+  background: rgba(225, 29, 72, 0.35);
 }
 body.dark-mode .cabinet-bm-unified-badge {
   background: rgba(225, 29, 72, 0.16);
@@ -9587,6 +9631,162 @@ body.dark-mode .cabinet-copy-id-btn:hover {
   border-color: #3b82f6;
   color: #ffffff;
 }
+
+/* Бейджик статусу публічності та інтерактивний перемикач */
+.cabinet-privacy-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3.5px;
+  padding: 2.5px 8px;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  user-select: none;
+  white-space: nowrap;
+}
+.cabinet-privacy-badge i {
+  font-size: 0.72rem;
+  margin: 0;
+}
+.cabinet-privacy-badge.is-locked {
+  background: rgba(100, 116, 139, 0.12);
+  color: #475569;
+  border: 1px solid rgba(100, 116, 139, 0.28);
+  cursor: default;
+  opacity: 0.92;
+}
+body.dark-mode .cabinet-privacy-badge.is-locked {
+  background: rgba(148, 163, 184, 0.14);
+  color: #cbd5e1;
+  border-color: rgba(148, 163, 184, 0.32);
+}
+
+.cabinet-privacy-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 3.5px;
+  padding: 2.5px 8px;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  border: 1px solid transparent;
+  user-select: none;
+  white-space: nowrap;
+}
+.cabinet-privacy-toggle i {
+  font-size: 0.72rem;
+  margin: 0;
+}
+
+/* Бейджик підтвердження електронної пошти */
+.cabinet-email-verified-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3.5px;
+  padding: 2.5px 8px;
+  border-radius: 6px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  background: #16a34a;
+  color: #ffffff;
+  user-select: none;
+  white-space: nowrap;
+}
+.cabinet-email-verified-badge i {
+  font-size: 0.72rem;
+  margin: 0;
+}
+
+/* Стан: Публічно (зелений зі свіченням) */
+.cabinet-privacy-toggle.is-public {
+  background: rgba(16, 185, 129, 0.14);
+  color: #059669;
+  border-color: #10b981;
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.28);
+}
+body.dark-mode .cabinet-privacy-toggle.is-public {
+  background: rgba(16, 185, 129, 0.22);
+  color: #34d399;
+  border-color: #059669;
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.38);
+}
+.cabinet-privacy-toggle.is-public:hover {
+  background: rgba(16, 185, 129, 0.24);
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.45);
+  transform: translateY(-0.5px);
+}
+
+/* Стан: Непублічно (червоний/кораловий) */
+.cabinet-privacy-toggle.is-private {
+  background: rgba(239, 68, 68, 0.1);
+  color: #dc2626;
+  border-color: rgba(239, 68, 68, 0.38);
+}
+body.dark-mode .cabinet-privacy-toggle.is-private {
+  background: rgba(239, 68, 68, 0.18);
+  color: #f87171;
+  border-color: rgba(239, 68, 68, 0.48);
+}
+.cabinet-privacy-toggle.is-private:hover {
+  background: rgba(239, 68, 68, 0.18);
+  border-color: #ef4444;
+  transform: translateY(-0.5px);
+}
+
+/* Блок налаштувань сповіщень та чекбоксів */
+.cabinet-setting-checkbox-row {
+  margin-bottom: 12px;
+  padding: 8px 10px;
+  background: var(--body-bg, #f8fafc);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 8px;
+  transition: all 0.15s ease;
+}
+body.dark-mode .cabinet-setting-checkbox-row {
+  background: rgba(15, 23, 42, 0.5);
+  border-color: #334155;
+}
+.cabinet-checkbox-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  cursor: pointer;
+  margin: 0;
+  user-select: none;
+}
+.cabinet-setting-checkbox {
+  width: 17px;
+  height: 17px;
+  margin-top: 2px;
+  cursor: pointer;
+  accent-color: #2563eb;
+  flex-shrink: 0;
+}
+.cabinet-checkbox-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.cabinet-checkbox-title {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-main, #0f172a);
+  line-height: 1.35;
+}
+body.dark-mode .cabinet-checkbox-title {
+  color: #f1f5f9;
+}
+.cabinet-checkbox-desc {
+  font-size: 0.73rem;
+  color: var(--text-muted, #64748b);
+  line-height: 1.35;
+}
+body.dark-mode .cabinet-checkbox-desc {
+  color: #94a3b8;
+}
+
 .cabinet-settings-save-bar {
   margin-top: 6px;
   display: flex;
@@ -9631,36 +9831,89 @@ body.dark-mode .cabinet-settings-save-note {
    ========================================================================== */
 .cabinet-login-btn-pulse {
   position: relative !important;
-  background: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
+  background: linear-gradient(135deg, #1e40af 0%, #2563eb 55%, #3b82f6 100%) !important;
   border: 1.5px solid #60a5fa !important;
   color: #ffffff !important;
-  box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.7), 0 2px 10px rgba(37, 99, 235, 0.4) !important;
-  animation: loginGlowPulse 2.4s infinite ease-in-out !important;
+  box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.75), 0 2px 10px rgba(37, 99, 235, 0.4) !important;
+  animation: loginGlowPulse 2.5s infinite ease-in-out !important;
   font-weight: 700 !important;
-  letter-spacing: 0.01em;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  letter-spacing: 0.015em;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
   z-index: 1;
+  overflow: hidden !important;
+  cursor: pointer !important;
+}
+
+/* Біжучий світловий відблиск (Shimmer sweep), який постійно привертає увагу ще до наведення мишки */
+.cabinet-login-btn-pulse::after {
+  content: "";
+  position: absolute;
+  top: -60%;
+  left: -85%;
+  width: 55%;
+  height: 220%;
+  background: linear-gradient(
+    105deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.05) 20%,
+    rgba(255, 255, 255, 0.45) 50%,
+    rgba(255, 255, 255, 0.05) 80%,
+    transparent 100%
+  );
+  transform: rotate(22deg);
+  animation: loginBeamSweep 3s infinite cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+}
+
+@keyframes loginBeamSweep {
+  0%, 25% {
+    left: -85%;
+    opacity: 0;
+  }
+  35% {
+    opacity: 1;
+  }
+  65% {
+    left: 155%;
+    opacity: 0.9;
+  }
+  75%, 100% {
+    left: 155%;
+    opacity: 0;
+  }
+}
+
+.cabinet-login-btn-pulse svg {
+  background: #ffffff;
+  border-radius: 50%;
+  padding: 1.5px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+  vertical-align: middle;
+  flex-shrink: 0;
 }
 
 .cabinet-login-btn-pulse:hover {
-  transform: translateY(-1px) scale(1.02);
-  box-shadow: 0 0 16px rgba(59, 130, 246, 0.8), 0 4px 14px rgba(37, 99, 235, 0.5) !important;
-  border-color: #93c5fd !important;
+  transform: translateY(-1.5px) scale(1.04) !important;
+  box-shadow: 0 0 25px rgba(59, 130, 246, 0.95), 0 0 45px rgba(37, 99, 235, 0.6), 0 4px 14px rgba(15, 23, 42, 0.25) !important;
+  border-color: #bae6fd !important;
   color: #ffffff !important;
 }
 
 @keyframes loginGlowPulse {
   0% {
-    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7), 0 0 8px rgba(37, 99, 235, 0.5);
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.8), 0 0 10px rgba(59, 130, 246, 0.5), 0 2px 6px rgba(15, 23, 42, 0.15);
     border-color: #60a5fa;
+    transform: scale(1);
   }
   50% {
-    box-shadow: 0 0 0 6px rgba(59, 130, 246, 0), 0 0 18px rgba(96, 165, 250, 0.85);
-    border-color: #93c5fd;
+    box-shadow: 0 0 0 6px rgba(59, 130, 246, 0), 0 0 22px 4px rgba(96, 165, 250, 0.95), 0 0 35px 7px rgba(37, 99, 235, 0.5);
+    border-color: #bae6fd;
+    transform: scale(1.028);
   }
   100% {
-    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0), 0 0 8px rgba(37, 99, 235, 0.5);
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0), 0 0 10px rgba(59, 130, 246, 0.5), 0 2px 6px rgba(15, 23, 42, 0.15);
     border-color: #60a5fa;
+    transform: scale(1);
   }
 }
 
