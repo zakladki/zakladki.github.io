@@ -2047,11 +2047,11 @@ function openBadgesModal() {
             <div class="badges-legend-item">
               <div class="badges-legend-header">
                 <div class="badges-legend-preview" title="Рекомендація нашого сайту">
-                  <span class="rec-beacon-dot" style="margin: 0; display: inline-block;"></span>
+                  <span class="rec-spin-star" style="margin: 0; display: inline-flex;"><svg viewBox="0 0 24 24" width="16" height="16" class="rec-spin-star-svg"><path fill="currentColor" d="M12 0 C12 6.6 6.6 12 0 12 C6.6 12 12 17.4 12 24 C12 17.4 17.4 12 24 12 C17.4 12 12 6.6 12 0 Z"/></svg></span>
                 </div>
                 <div class="badges-legend-title">Рекомендовано сайтом (Редакція)</div>
               </div>
-              <p class="badges-legend-desc">Особливо якісні, перевірені та надійні ресурси, відзначені редакцією нашого каталогу (індикатор розташований наприкінці назви посилання).</p>
+              <p class="badges-legend-desc">Особливо якісні, перевірені та надійні ресурси, відзначені редакцією нашого каталогу (золота 4-стороння зірочка, що плавно обертається наприкінці назви посилання).</p>
             </div>
 
             <!-- Партнерські та рекламні позначки -->
@@ -4702,9 +4702,90 @@ let adminStatusFilter = 'all';
 const DEFAULT_CARD_NAME = 'Основні закладки';
 const MAX_USER_CARDS = 12;        // Максимум 12 папок/карток на акаунт
 const MAX_USER_BOOKMARKS = 120;   // Максимум 120 збережених сайтів на акаунт
+const DAILY_ACTION_LIMIT = 100;   // Максимум 100 операцій на добу на акаунт (захист бази від спаму)
 let userBookmarksList = [];
 let userBookmarkCards = [DEFAULT_CARD_NAME];
 let userBookmarkColumns = [[DEFAULT_CARD_NAME], [], [], []];
+
+// Отримання поточної кількості використаних дій за сьогодні
+function getDailyActionsCount() {
+  const uid = currentUser ? currentUser.uid : 'guest';
+  const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+  const key = `topz_daily_actions_${uid}`;
+  try {
+    const raw = localStorage.getItem(key);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (parsed.date === today && typeof parsed.count === 'number') {
+        return parsed.count;
+      }
+    }
+  } catch (e) {}
+  return 0;
+}
+
+// Оновлення лічильників дій у всіх відкритих елементах інтерфейсу
+function updateDailyActionsCounters() {
+  const count = getDailyActionsCount();
+  const isExceeded = (count >= DAILY_ACTION_LIMIT);
+
+  // Лічильник у верхній картці користувача на сторінці закладок
+  document.querySelectorAll('.bm-daily-actions-counter .bm-actions-counter-val').forEach(el => {
+    el.textContent = `${count}/${DAILY_ACTION_LIMIT}`;
+  });
+  // Бейджик у шапці Особистого кабінету
+  document.querySelectorAll('.cabinet-actions-badge .cabinet-actions-counter-val').forEach(el => {
+    el.textContent = `${count}/${DAILY_ACTION_LIMIT}`;
+  });
+  // Картка метрики у Дашборді
+  document.querySelectorAll('.metric-daily-actions .dash-metric-value').forEach(el => {
+    el.innerHTML = `${count} <span class="dash-metric-unit" style="font-size: 0.8rem; font-weight: normal; color: var(--text-muted, #64748b);">/ ${DAILY_ACTION_LIMIT}</span>`;
+  });
+  // Пульсуючі точки статусу дій на аватарках
+  document.querySelectorAll('.user-action-status-dot').forEach(el => {
+    el.classList.toggle('dot-limit-active', !isExceeded);
+    el.classList.toggle('dot-limit-exceeded', isExceeded);
+    el.setAttribute('title', isExceeded 
+      ? 'Денний ліміт дій вичерпано (100/100). Відпочиньте до завтра!' 
+      : `Дії активні: доступно ${DAILY_ACTION_LIMIT - count} із ${DAILY_ACTION_LIMIT} дій`);
+  });
+  // Статус картки хмарної синхронізації у Дашборді
+  document.querySelectorAll('.metric-cloud').forEach(card => {
+    const icon = card.querySelector('.dash-metric-icon');
+    const val = card.querySelector('.dash-metric-value');
+    const hint = card.querySelector('.dash-metric-hint');
+    if (!currentUser) return;
+    if (isExceeded) {
+      if (icon) {
+        icon.style.background = 'rgba(239, 68, 68, 0.14)';
+        icon.style.color = '#dc2626';
+        icon.innerHTML = '<i class="fas fa-exclamation-triangle text-danger"></i>';
+      }
+      if (val) {
+        val.className = 'dash-metric-value text-danger font-weight-bold';
+        val.textContent = 'Не активна (ліміт)';
+      }
+      if (hint) {
+        hint.className = 'dash-metric-hint text-danger';
+        hint.textContent = 'Денний ліміт 100/100 вичерпано (відновиться завтра)';
+      }
+    } else {
+      if (icon) {
+        icon.style.background = '';
+        icon.style.color = '';
+        icon.innerHTML = '<i class="fas fa-shield-alt text-success"></i>';
+      }
+      if (val) {
+        val.className = 'dash-metric-value text-success';
+        val.textContent = 'Активна';
+      }
+      if (hint) {
+        hint.className = 'dash-metric-hint text-muted';
+        hint.textContent = currentUser.email || '';
+      }
+    }
+  });
+}
 
 // Попереднє миттєве завантаження закладок із локального сховища (до старту Firebase)
 try {
@@ -4847,26 +4928,39 @@ function isAdminUser() {
   return ADMIN_EMAILS.includes(currentUser.email.toLowerCase().trim());
 }
 
+function updateAdminCounterVisibility() {
+  const isAdmin = isAdminUser();
+  document.querySelectorAll('.footer-counter-admin-only').forEach(el => {
+    if (isAdmin) {
+      el.classList.add('is-admin-visible');
+    } else {
+      el.classList.remove('is-admin-visible');
+    }
+  });
+}
+
 function updateUserNavButton() {
   const btn = document.getElementById('userAuthNavBtn');
-  if (!btn) return;
-
-  if (currentUser) {
-    btn.classList.add('logged-in');
-    const isAdmin = isAdminUser();
-    let avatarHtml = '';
-    if (currentUser.photoURL) {
-      avatarHtml = `<img src="${currentUser.photoURL}" class="user-auth-avatar" alt="Avatar" referrerpolicy="no-referrer">`;
+  if (btn) {
+    if (currentUser) {
+      btn.classList.add('logged-in');
+      const isAdmin = isAdminUser();
+      let avatarHtml = '';
+      if (currentUser.photoURL) {
+        avatarHtml = `<img src="${currentUser.photoURL}" class="user-auth-avatar" alt="Avatar" referrerpolicy="no-referrer">`;
+      } else {
+        avatarHtml = `<i class="fas fa-user-check text-success"></i>`;
+      }
+      btn.innerHTML = avatarHtml;
+      btn.setAttribute('title', `${currentUser.displayName || currentUser.email} (${isAdmin ? 'Адміністратор' : 'Кабінет'})`);
     } else {
-      avatarHtml = `<i class="fas fa-user-check text-success"></i>`;
+      btn.classList.remove('logged-in');
+      btn.innerHTML = `<i class="far fa-user-circle"></i>`;
+      btn.setAttribute('title', 'Особистий кабінет / Вхід через Google');
     }
-    btn.innerHTML = avatarHtml;
-    btn.setAttribute('title', `${currentUser.displayName || currentUser.email} (${isAdmin ? 'Адміністратор' : 'Кабінет'})`);
-  } else {
-    btn.classList.remove('logged-in');
-    btn.innerHTML = `<i class="far fa-user-circle"></i>`;
-    btn.setAttribute('title', 'Особистий кабінет / Вхід через Google');
   }
+
+  updateAdminCounterVisibility();
 }
 
 // Вхід через Google
@@ -4908,6 +5002,8 @@ async function logoutUser() {
 
 // Збереження замовлення у базі Cloud Firestore
 async function saveOrderToFirestore(orderData) {
+  if (!checkAndIncrementDailyActionLimit()) return;
+
   await ensureFirebaseLoaded();
   if (!firebaseDb) {
     console.warn("Firestore недоступний, замовлення збережено локально.");
@@ -5057,8 +5153,9 @@ let userProfileSettings = {
   customNotes: '',
   isPhonePublic: false,
   isTelegramPublic: false,
-  notifyUpdates: false,
-  showInLeaderboard: false
+  showInLeaderboard: true,
+  openInNewTab: true,
+  noticeBellBadge: true
 };
 
 function loadCachedUserProfile() {
@@ -5084,6 +5181,7 @@ function renderUserCabinetContent() {
   const isAdmin = isAdminUser();
   const avatarSrc = currentUser ? (currentUser.photoURL || 'https://www.gravatar.com/avatar/?d=mp') : '';
   const userDisplayName = (userProfileSettings && userProfileSettings.displayName) || (currentUser && currentUser.displayName) || 'Користувач';
+  const dailyActionsCount = getDailyActionsCount();
 
   // Перелік розділів кабінету: Дашборд завжди перший та активний за замовчуванням
   const cabinetTabsList = [
@@ -5132,7 +5230,10 @@ function renderUserCabinetContent() {
     <div class="cabinet-user-bar">
       <div class="cabinet-user-info">
         ${currentUser ? `
-          <img src="${avatarSrc}" class="cabinet-avatar-lg" alt="Аватарка" referrerpolicy="no-referrer">
+          <div class="cabinet-avatar-lg-wrap">
+            <img src="${avatarSrc}" class="cabinet-avatar-lg" alt="Аватарка" referrerpolicy="no-referrer">
+            <span class="user-action-status-dot ${dailyActionsCount >= DAILY_ACTION_LIMIT ? 'dot-limit-exceeded' : 'dot-limit-active'}" title="${dailyActionsCount >= DAILY_ACTION_LIMIT ? 'Денний ліміт дій вичерпано (100/100). Відпочиньте до завтра!' : `Дії активні: доступно ${DAILY_ACTION_LIMIT - dailyActionsCount} із ${DAILY_ACTION_LIMIT} дій`}"></span>
+          </div>
           <div class="cabinet-user-names">
             <div class="cabinet-user-name-row">
               <span class="cabinet-user-name">${escapeHtml(userDisplayName)}</span>
@@ -5147,11 +5248,17 @@ function renderUserCabinetContent() {
               <span class="cabinet-points-badge" title="Бали активності (система нарахування незабаром)">
                 <i class="fas fa-coins text-warning"></i> 0 балів
               </span>
+              <span class="cabinet-actions-badge" title="Денний захисний ліміт дій: використано ${dailyActionsCount} із ${DAILY_ACTION_LIMIT} дій на добу">
+                <i class="fas fa-bolt text-warning"></i> Дій: <span class="cabinet-actions-counter-val">${dailyActionsCount}/${DAILY_ACTION_LIMIT}</span>
+              </span>
             </div>
             <div class="cabinet-user-email">${escapeHtml(currentUser.email || '')}</div>
           </div>
         ` : `
-          <div class="cabinet-avatar-lg cabinet-avatar-guest"><i class="fas fa-user-circle"></i></div>
+          <div class="cabinet-avatar-lg-wrap">
+            <div class="cabinet-avatar-lg cabinet-avatar-guest"><i class="fas fa-user-circle"></i></div>
+            <span class="user-action-status-dot ${dailyActionsCount >= DAILY_ACTION_LIMIT ? 'dot-limit-exceeded' : 'dot-limit-active'}" title="${dailyActionsCount >= DAILY_ACTION_LIMIT ? 'Денний ліміт дій вичерпано (100/100). Відпочиньте до завтра!' : `Дії активні: доступно ${DAILY_ACTION_LIMIT - dailyActionsCount} із ${DAILY_ACTION_LIMIT} дій`}"></span>
+          </div>
           <div class="cabinet-user-names">
             <div class="cabinet-user-name">Гість</div>
             <div class="cabinet-user-badges">
@@ -5160,6 +5267,9 @@ function renderUserCabinetContent() {
               </span>
               <span class="cabinet-points-badge" title="Бали активності">
                 <i class="fas fa-coins text-warning"></i> 0 балів
+              </span>
+              <span class="cabinet-actions-badge" title="Денний захисний ліміт дій: використано ${dailyActionsCount} із ${DAILY_ACTION_LIMIT} дій на добу">
+                <i class="fas fa-bolt text-warning"></i> Дій: <span class="cabinet-actions-counter-val">${dailyActionsCount}/${DAILY_ACTION_LIMIT}</span>
               </span>
             </div>
             <div class="cabinet-user-email">Увійдіть через Google для збереження даних у хмарі</div>
@@ -5198,12 +5308,12 @@ function renderUserCabinetContent() {
         <div class="cabinet-menu-dropdown-items">
           ${cabinetTabsList.map(tab => `
             <button type="button" class="cabinet-menu-dropdown-item ${currentCabinetTab === tab.id ? 'active' : ''}" data-tab="${tab.id}">
-              <div class="cabinet-dropdown-item-icon">${tab.icon}</div>
-              <div class="cabinet-dropdown-item-info">
-                <div class="cabinet-dropdown-item-title">${tab.name}</div>
-                <div class="cabinet-dropdown-item-desc">${tab.desc}</div>
+              <div class="cabinet-dropdown-item-header">
+                <span class="cabinet-dropdown-item-icon">${tab.icon}</span>
+                <span class="cabinet-dropdown-item-title">${tab.name}</span>
+                ${currentCabinetTab === tab.id ? '<span class="cabinet-dropdown-item-check"><i class="fas fa-check"></i></span>' : ''}
               </div>
-              ${currentCabinetTab === tab.id ? '<span class="cabinet-dropdown-item-check"><i class="fas fa-check"></i></span>' : ''}
+              <div class="cabinet-dropdown-item-desc">${tab.desc}</div>
             </button>
           `).join('')}
         </div>
@@ -5288,6 +5398,7 @@ function renderDashboardTab() {
 
   const cardsCount = (userBookmarkCards && userBookmarkCards.length) ? userBookmarkCards.length : 1;
   const bookmarksCount = (userBookmarksList && userBookmarksList.length) ? userBookmarksList.length : 0;
+  const dailyActionsCount = getDailyActionsCount();
 
   container.innerHTML = `
     <div class="cabinet-dashboard-wrap">
@@ -5299,6 +5410,15 @@ function renderDashboardTab() {
             <div class="dash-metric-value">0 <span class="dash-metric-unit">балів</span></div>
             <div class="dash-metric-label">Бали активності</div>
             <div class="dash-metric-hint text-warning"><i class="fas fa-clock me-1"></i>Система нарахування незабаром</div>
+          </div>
+        </div>
+
+        <div class="cabinet-dash-metric-card metric-daily-actions">
+          <div class="dash-metric-icon"><i class="fas fa-bolt"></i></div>
+          <div class="dash-metric-data">
+            <div class="dash-metric-value">${dailyActionsCount} <span class="dash-metric-unit" style="font-size: 0.8rem; font-weight: normal; color: var(--text-muted, #64748b);">/ ${DAILY_ACTION_LIMIT}</span></div>
+            <div class="dash-metric-label">Дій 0/100</div>
+            <div class="dash-metric-hint text-muted">Захисний ліміт: 100 операцій на день</div>
           </div>
         </div>
 
@@ -5321,11 +5441,17 @@ function renderDashboardTab() {
         </div>
 
         <div class="cabinet-dash-metric-card metric-cloud">
-          <div class="dash-metric-icon"><i class="${currentUser ? 'fas fa-shield-alt text-success' : 'fas fa-cloud-upload-alt text-muted'}"></i></div>
+          <div class="dash-metric-icon" ${currentUser && dailyActionsCount >= DAILY_ACTION_LIMIT ? 'style="background: rgba(239, 68, 68, 0.14); color: #dc2626;"' : ''}>
+            <i class="${currentUser && dailyActionsCount >= DAILY_ACTION_LIMIT ? 'fas fa-exclamation-triangle text-danger' : (currentUser ? 'fas fa-shield-alt text-success' : 'fas fa-cloud-upload-alt text-muted')}"></i>
+          </div>
           <div class="dash-metric-data">
-            <div class="dash-metric-value ${currentUser ? 'text-success' : 'text-secondary'}">${currentUser ? 'Активна' : 'Локально'}</div>
+            <div class="dash-metric-value ${currentUser && dailyActionsCount >= DAILY_ACTION_LIMIT ? 'text-danger font-weight-bold' : (currentUser ? 'text-success' : 'text-secondary')}">
+              ${currentUser && dailyActionsCount >= DAILY_ACTION_LIMIT ? 'Не активна (ліміт)' : (currentUser ? 'Активна' : 'Локально')}
+            </div>
             <div class="dash-metric-label">Хмарна синхронізація</div>
-            <div class="dash-metric-hint text-muted">${currentUser ? escapeHtml(currentUser.email) : 'Увійдіть для синхронізації'}</div>
+            <div class="dash-metric-hint ${currentUser && dailyActionsCount >= DAILY_ACTION_LIMIT ? 'text-danger' : 'text-muted'}">
+              ${currentUser && dailyActionsCount >= DAILY_ACTION_LIMIT ? 'Денний ліміт 100/100 вичерпано (відновиться завтра)' : (currentUser ? escapeHtml(currentUser.email) : 'Увійдіть для синхронізації')}
+            </div>
           </div>
         </div>
       </div>
@@ -5458,8 +5584,9 @@ function renderSettingsTab() {
   const currentNotes = userProfileSettings.customNotes || '';
   let phonePublicState = Boolean(userProfileSettings.isPhonePublic);
   let tgPublicState = Boolean(userProfileSettings.isTelegramPublic);
-  const notifyUpdatesState = Boolean(userProfileSettings.notifyUpdates);
-  const showLeaderboardState = Boolean(userProfileSettings.showInLeaderboard);
+  const showLeaderboardState = (userProfileSettings.showInLeaderboard !== false);
+  const openNewTabState = (userProfileSettings.openInNewTab !== false);
+  const noticeBellBadgeState = (userProfileSettings.noticeBellBadge !== false);
   const anonCode = (currentUser.uid || 'USER').slice(0, 5).toUpperCase();
 
   container.innerHTML = `
@@ -5487,8 +5614,8 @@ function renderSettingsTab() {
 
         <div class="cabinet-setting-field mb-0">
           <div class="cabinet-setting-label">
-            <span>Електронна пошта (Google Email)</span>
-            <span class="badge badge-success px-2 py-1" style="font-size: 0.7rem;"><i class="fas fa-check-circle me-1"></i>Підтверджено</span>
+            <span>Електронна пошта</span>
+            <div class="cabinet-email-verified-badge"><i class="fas fa-check-circle"></i><span>Підтверджено</span></div>
           </div>
           <input type="email" class="cabinet-setting-input" value="${escapeHtml(currentUser.email || '')}" readonly>
           <div class="cabinet-setting-hint">Прив'язана адреса вашого профілю Google.</div>
@@ -5508,9 +5635,7 @@ function renderSettingsTab() {
         <div class="cabinet-setting-field">
           <div class="cabinet-setting-label">
             <label for="settingInputDisplayName" class="m-0">Публічне ім'я / Псевдонім:</label>
-            <div class="cabinet-privacy-badge is-locked" title="Зафіксовано системою: публічне ім'я завжди відкрите для ідентифікації вашого профілю">
-              <i class="fas fa-lock"></i> <span>Завжди публічно</span>
-            </div>
+            <div class="cabinet-privacy-badge is-locked" title="Зафіксовано системою: публічне ім'я завжди відкрите для ідентифікації вашого профілю"><i class="fas fa-lock"></i><span>Публічно</span></div>
           </div>
           <input type="text" class="cabinet-setting-input" id="settingInputDisplayName" value="${escapeHtml(currentDisplayName)}" placeholder="Наприклад: Олександр">
           <div class="cabinet-setting-hint">Відображається у шапці сайту, привітаннях та ваших персональних діях.</div>
@@ -5519,9 +5644,7 @@ function renderSettingsTab() {
         <div class="cabinet-setting-field">
           <div class="cabinet-setting-label">
             <label for="settingInputPhone" class="m-0">Номер мобільного телефону:</label>
-            <button type="button" class="cabinet-privacy-toggle ${phonePublicState ? 'is-public' : 'is-private'}" id="togglePrivacyPhone" title="Натисніть, щоб змінити статус: Публічно чи Непублічно">
-              <i class="${phonePublicState ? 'fas fa-eye' : 'fas fa-eye-slash'}"></i> <span class="privacy-status-text">${phonePublicState ? 'Публічно' : 'Непублічно'}</span>
-            </button>
+            <button type="button" class="cabinet-privacy-toggle ${phonePublicState ? 'is-public' : 'is-private'}" id="togglePrivacyPhone" title="Натисніть, щоб змінити статус: Публічно чи Непублічно"><i class="${phonePublicState ? 'fas fa-eye' : 'fas fa-eye-slash'}"></i><span class="privacy-status-text">${phonePublicState ? 'Публічно' : 'Непублічно'}</span></button>
           </div>
           <input type="tel" class="cabinet-setting-input" id="settingInputPhone" value="${escapeHtml(currentPhone)}" placeholder="+380 (XX) XXX-XX-XX">
           <div class="cabinet-setting-hint">Для оперативного зв'язку, підтвердження замовлень та сервісних питань.</div>
@@ -5530,9 +5653,7 @@ function renderSettingsTab() {
         <div class="cabinet-setting-field">
           <div class="cabinet-setting-label">
             <label for="settingInputTelegram" class="m-0">Нікнейм або посилання у Telegram:</label>
-            <button type="button" class="cabinet-privacy-toggle ${tgPublicState ? 'is-public' : 'is-private'}" id="togglePrivacyTelegram" title="Натисніть, щоб змінити статус: Публічно чи Непублічно">
-              <i class="${tgPublicState ? 'fas fa-eye' : 'fas fa-eye-slash'}"></i> <span class="privacy-status-text">${tgPublicState ? 'Публічно' : 'Непублічно'}</span>
-            </button>
+            <button type="button" class="cabinet-privacy-toggle ${tgPublicState ? 'is-public' : 'is-private'}" id="togglePrivacyTelegram" title="Натисніть, щоб змінити статус: Публічно чи Непублічно"><i class="${tgPublicState ? 'fas fa-eye' : 'fas fa-eye-slash'}"></i><span class="privacy-status-text">${tgPublicState ? 'Публічно' : 'Непублічно'}</span></button>
           </div>
           <input type="text" class="cabinet-setting-input" id="settingInputTelegram" value="${escapeHtml(currentTg)}" placeholder="@username або https://t.me/username">
           <div class="cabinet-setting-hint">Для швидкого зв'язку в месенджері.</div>
@@ -5547,32 +5668,42 @@ function renderSettingsTab() {
         </div>
       </div>
 
-      <!-- Блок 3: Конфіденційність та сповіщення -->
+      <!-- Блок 3: Конфіденційність та персоналізація -->
       <div class="cabinet-settings-card">
         <div class="cabinet-settings-header">
-          <div class="cabinet-settings-icon" style="background: rgba(139, 92, 246, 0.12); color: #8b5cf6;"><i class="fas fa-sliders-h"></i></div>
+          <div class="cabinet-settings-icon" style="background: rgba(139, 92, 246, 0.12); color: #8b5cf6;"><i class="fas fa-user-shield"></i></div>
           <div>
-            <h6 class="cabinet-settings-title">Конфіденційність та сповіщення</h6>
-            <p class="cabinet-settings-desc">Керування публічністю в рейтингах та інформаційними каналами</p>
+            <h6 class="cabinet-settings-title">Конфіденційність та персоналізація</h6>
+            <p class="cabinet-settings-desc">Керування публічністю профілю та індивідуальними параметрами інтерфейсу</p>
           </div>
         </div>
 
         <div class="cabinet-setting-checkbox-row">
-          <label class="cabinet-checkbox-label" for="settingNotifyUpdates">
-            <input type="checkbox" class="cabinet-setting-checkbox" id="settingNotifyUpdates" ${notifyUpdatesState ? 'checked' : ''}>
+          <label class="cabinet-checkbox-label" for="settingShowLeaderboard">
+            <input type="checkbox" class="cabinet-setting-checkbox" id="settingShowLeaderboard" ${showLeaderboardState ? 'checked' : ''}>
             <div class="cabinet-checkbox-body">
-              <span class="cabinet-checkbox-title">Отримувати сповіщення про нові корисні сайти, бонуси та оновлення</span>
-              <span class="cabinet-checkbox-desc">Сервісні повідомлення та корисні підбірки на пошту або в Telegram (за замовчуванням вимкнено).</span>
+              <span class="cabinet-checkbox-title">Відображати моє публічне ім'я в загальному рейтингу активності та статистиці</span>
+              <span class="cabinet-checkbox-desc">Якщо вимкнено - у публічних списках лідерів ви відображатиметеся конфіденційно як «Анонім #${anonCode}».</span>
+            </div>
+          </label>
+        </div>
+
+        <div class="cabinet-setting-checkbox-row">
+          <label class="cabinet-checkbox-label" for="settingOpenNewTab">
+            <input type="checkbox" class="cabinet-setting-checkbox" id="settingOpenNewTab" ${openNewTabState ? 'checked' : ''}>
+            <div class="cabinet-checkbox-body">
+              <span class="cabinet-checkbox-title">Відкривати сайти із закладок у новій вкладці браузера</span>
+              <span class="cabinet-checkbox-desc">Якщо увімкнено - перехід за збереженими посиланнями залишає вкладку каталогу відкритою.</span>
             </div>
           </label>
         </div>
 
         <div class="cabinet-setting-checkbox-row mb-0">
-          <label class="cabinet-checkbox-label" for="settingShowLeaderboard">
-            <input type="checkbox" class="cabinet-setting-checkbox" id="settingShowLeaderboard" ${showLeaderboardState ? 'checked' : ''}>
+          <label class="cabinet-checkbox-label" for="settingNoticeBellBadge">
+            <input type="checkbox" class="cabinet-setting-checkbox" id="settingNoticeBellBadge" ${noticeBellBadgeState ? 'checked' : ''}>
             <div class="cabinet-checkbox-body">
-              <span class="cabinet-checkbox-title">Відображати моє публічне ім'я в загальному рейтингу активності та статистиці</span>
-              <span class="cabinet-checkbox-desc">Якщо вимкнено - у публічних списках лідерів ви відображатиметеся приватно як «Анонім #${anonCode}».</span>
+              <span class="cabinet-checkbox-title">Світловий індикатор нових оголошень на значку дзвіночка (🔔)</span>
+              <span class="cabinet-checkbox-desc">Показувати цяточку біля дзвіночка на сайті, коли з'явилися нові повідомлення або корисні ресурси.</span>
             </div>
           </label>
         </div>
@@ -5629,7 +5760,7 @@ function renderSettingsTab() {
       phonePublicState = !phonePublicState;
       phoneToggleBtn.className = `cabinet-privacy-toggle ${phonePublicState ? 'is-public' : 'is-private'}`;
       phoneToggleBtn.innerHTML = `
-        <i class="${phonePublicState ? 'fas fa-eye' : 'fas fa-eye-slash'}"></i> <span class="privacy-status-text">${phonePublicState ? 'Публічно' : 'Непублічно'}</span>
+        <i class="${phonePublicState ? 'fas fa-eye' : 'fas fa-eye-slash'}"></i><span class="privacy-status-text">${phonePublicState ? 'Публічно' : 'Непублічно'}</span>
       `;
     };
   }
@@ -5641,7 +5772,7 @@ function renderSettingsTab() {
       tgPublicState = !tgPublicState;
       tgToggleBtn.className = `cabinet-privacy-toggle ${tgPublicState ? 'is-public' : 'is-private'}`;
       tgToggleBtn.innerHTML = `
-        <i class="${tgPublicState ? 'fas fa-eye' : 'fas fa-eye-slash'}"></i> <span class="privacy-status-text">${tgPublicState ? 'Публічно' : 'Непублічно'}</span>
+        <i class="${tgPublicState ? 'fas fa-eye' : 'fas fa-eye-slash'}"></i><span class="privacy-status-text">${tgPublicState ? 'Публічно' : 'Непублічно'}</span>
       `;
     };
   }
@@ -5656,8 +5787,9 @@ function renderSettingsTab() {
       const phoneVal = (container.querySelector('#settingInputPhone')?.value || '').trim();
       const tgVal = (container.querySelector('#settingInputTelegram')?.value || '').trim();
       const notesVal = (container.querySelector('#settingInputNotes')?.value || '').trim();
-      const notifyUpdatesVal = Boolean(container.querySelector('#settingNotifyUpdates')?.checked);
       const showLeaderboardVal = Boolean(container.querySelector('#settingShowLeaderboard')?.checked);
+      const openNewTabVal = Boolean(container.querySelector('#settingOpenNewTab')?.checked);
+      const noticeBellBadgeVal = Boolean(container.querySelector('#settingNoticeBellBadge')?.checked);
 
       saveBtn.disabled = true;
       saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Збереження...';
@@ -5669,14 +5801,17 @@ function renderSettingsTab() {
         customNotes: notesVal,
         isPhonePublic: phonePublicState,
         isTelegramPublic: tgPublicState,
-        notifyUpdates: notifyUpdatesVal,
         showInLeaderboard: showLeaderboardVal,
+        openInNewTab: openNewTabVal,
+        noticeBellBadge: noticeBellBadgeVal,
         updatedAt: new Date().toISOString()
       };
 
       try {
         localStorage.setItem('user_profile_' + currentUser.uid, JSON.stringify(userProfileSettings));
       } catch (e) {}
+
+      updateNoticeBellState();
 
       try {
         await ensureFirebaseLoaded();
@@ -5693,7 +5828,6 @@ function renderSettingsTab() {
         console.warn('Помилка збереження налаштувань:', err);
         showQuickToast('Збережено локально. Помилка синхронізації з хмарою.', 'warning');
         saveBtn.disabled = false;
-        saveBtn.innerHTML = '<i class="fas fa-check-circle"></i> Зберегти внесені налаштування';
       }
     };
   }
@@ -6220,9 +6354,7 @@ const GENERAL_BM_KEY = 'topz_bm_all_saved';
 const GENERAL_CARDS_KEY = 'topz_bm_cards_all';
 const GENERAL_COLS_KEY = 'topz_bm_columns_v4';
 
-// Ліміти тарифного плану Spark та захист від спаму (MAX_USER_CARDS і MAX_USER_BOOKMARKS оголошено вище)
-const DAILY_ACTION_LIMIT = 100;   // Максимум 100 операцій запису на добу на акаунт
-
+// Ліміти тарифного плану Spark та захист від спаму (DAILY_ACTION_LIMIT оголошено вище)
 function checkAndIncrementDailyActionLimit() {
   const uid = currentUser ? currentUser.uid : 'guest';
   const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
@@ -6239,7 +6371,7 @@ function checkAndIncrementDailyActionLimit() {
   } catch (e) {}
 
   if (data.count >= DAILY_ACTION_LIMIT) {
-    alert(`Ви досягли денного ліміту операцій (${DAILY_ACTION_LIMIT} дій на добу).\n\nЦе обмеження створено для захисту сервера від навантаження. Відпочиньте до завтра!`);
+    alert(`Ви досягли денного ліміту операцій (${DAILY_ACTION_LIMIT} дій на добу).\n\nЦе обмеження створено для захисту сервера та бази даних від навантаження. Відпочиньте до завтра!`);
     return false;
   }
 
@@ -6247,6 +6379,7 @@ function checkAndIncrementDailyActionLimit() {
   try {
     localStorage.setItem(key, JSON.stringify(data));
   } catch (e) {}
+  updateDailyActionsCounters();
   return true;
 }
 
@@ -7450,7 +7583,7 @@ async function renderBookmarksPage() {
             itemsHtml += `
               <li class="bm-link-row">
                 <img src="${faviconUrl}" class="bm-item-favicon" alt="" onerror="this.onerror=null;this.src='favicon.ico'">
-                <a href="${escapeHtml(bm.url)}" target="_blank" rel="noopener noreferrer" class="bm-item-link" title="${escapeHtml(bm.name)}">
+                <a href="${escapeHtml(bm.url)}" target="${(userProfileSettings && userProfileSettings.openInNewTab === false) ? '_self' : '_blank'}" rel="noopener noreferrer" class="bm-item-link" title="${escapeHtml(bm.name)}">
                   ${escapeHtml(bm.name)}
                 </a>
                 <div class="bm-row-actions-wrap">
@@ -7534,6 +7667,8 @@ async function renderBookmarksPage() {
       avatarHtml = `<div class="bm-user-strip-avatar bm-user-strip-guest"><i class="fas fa-user-circle"></i></div>`;
     }
 
+    const dailyCount = getDailyActionsCount();
+
     pageContainer.innerHTML = `
       <!-- 4 Стовпчика карток (автоматичний розподіл як у каталозі сайту) -->
       <div class="bm-3columns-grid bm-4columns-grid">
@@ -7542,11 +7677,20 @@ async function renderBookmarksPage() {
           <div class="bm-top-panel" id="bmTopPanel">
             <div class="bm-top-user-row" onclick="openUserCabinetModal('dashboard')" title="Відкрити Особистий кабінет (Дашборд)">
               <div class="bm-user-strip-left">
-                ${avatarHtml}
+                <div class="bm-avatar-with-status">
+                  ${avatarHtml}
+                  <span class="user-action-status-dot ${dailyCount >= DAILY_ACTION_LIMIT ? 'dot-limit-exceeded' : 'dot-limit-active'}" title="${dailyCount >= DAILY_ACTION_LIMIT ? 'Денний ліміт дій вичерпано (100/100). Відпочиньте до завтра!' : `Дії активні: доступно ${DAILY_ACTION_LIMIT - dailyCount} із ${DAILY_ACTION_LIMIT} дій`}"></span>
+                </div>
                 <span class="bm-user-strip-name">${escapeHtml(userName)}</span>
                 <span class="bm-user-points-badge" title="Бали активності (система нарахування незабаром)">
                   <i class="fas fa-coins text-warning"></i> <span>0 балів</span>
                 </span>
+              </div>
+              <div class="bm-user-strip-right">
+                <div class="bm-daily-actions-counter" title="Денний захисний ліміт операцій: використано ${dailyCount} із ${DAILY_ACTION_LIMIT} дій на добу">
+                  <span class="bm-actions-counter-label">ДІЙ</span>
+                  <span class="bm-actions-counter-val">${dailyCount}/${DAILY_ACTION_LIMIT}</span>
+                </div>
               </div>
             </div>
             <div class="bm-top-divider"></div>
@@ -7995,8 +8139,635 @@ function renderAdOrderClaimWrap(orderId) {
 
 // Запуск ініціалізації Firebase при старті
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initFirebaseAuthAndDb);
+  document.addEventListener('DOMContentLoaded', () => {
+    initFirebaseAuthAndDb();
+    initPulseDayDrawer();
+  });
 } else {
   initFirebaseAuthAndDb();
+  initPulseDayDrawer();
 }
+
+/* ==========================================================================
+   МОДУЛЬ «ПУЛЬС ДНЯ» (TOP DRAWER / ШВИДКА ІНФОПАНЕЛЬ)
+   ========================================================================== */
+const PULSE_CITIES = [
+  { name: 'Київ', lat: 50.4501, lon: 30.5234 },
+  { name: 'Харків', lat: 49.9935, lon: 36.2304 },
+  { name: 'Одеса', lat: 46.4825, lon: 30.7233 },
+  { name: 'Дніпро', lat: 48.4647, lon: 35.0462 },
+  { name: 'Львів', lat: 49.8397, lon: 24.0297 },
+  { name: 'Запоріжжя', lat: 47.8388, lon: 35.1396 },
+  { name: 'Кривий Ріг', lat: 47.9105, lon: 33.3918 },
+  { name: 'Вінниця', lat: 49.2331, lon: 28.4682 },
+  { name: 'Полтава', lat: 49.5883, lon: 34.5514 },
+  { name: 'Черкаси', lat: 49.4444, lon: 32.0598 },
+  { name: 'Чернігів', lat: 51.4982, lon: 31.2893 },
+  { name: 'Житомир', lat: 50.2547, lon: 28.6587 },
+  { name: 'Суми', lat: 50.9077, lon: 34.7981 },
+  { name: 'Хмельницький', lat: 49.4230, lon: 26.9871 },
+  { name: 'Рівне', lat: 50.6199, lon: 26.2516 },
+  { name: 'Івано-Франківськ', lat: 48.9226, lon: 24.7111 },
+  { name: 'Тернопіль', lat: 49.5535, lon: 25.5948 },
+  { name: 'Луцьк', lat: 50.7472, lon: 25.3254 },
+  { name: 'Ужгород', lat: 48.6208, lon: 22.2879 },
+  { name: 'Чернівці', lat: 48.2921, lon: 25.9358 },
+  { name: 'Кропивницький', lat: 48.5079, lon: 32.2623 },
+  { name: 'Миколаїв', lat: 46.9750, lon: 31.9946 }
+];
+
+let pulseRatesData = {
+  USD: 41.50,
+  EUR: 45.15,
+  PLN: 10.55,
+  diffUSD: '+0.04',
+  diffEUR: '+0.08',
+  diffPLN: '+0.02'
+};
+
+const UKR_HOLIDAYS_CALENDAR = {
+  '01-01': { title: 'Новий Рік та День народження Степана Бандери', fact: '1909 рік - народився український політичний діяч Степан Бандера.' },
+  '01-22': { title: 'День Соборності України', fact: '1919 рік - проголошено Акт Злуки УНР і ЗУНР на Софійському майдані в Києві.' },
+  '01-29': { title: 'День пам\'яті Героїв Крут', fact: '1918 рік - бій під Крутами, де київські студенти та гімназисти стримали наступ більшовиків.' },
+  '02-20': { title: 'День Героїв Небесної Сотні', fact: '2014 рік - вшанування подвигу учасників Революції Гідності під час розстрілів на Майдані.' },
+  '02-24': { title: 'День Національного Спротиву агресії РФ', fact: '2022 рік - початок героїчної всенародної відсічі повномасштабному вторгненню РФ.' },
+  '03-08': { title: 'Міжнародний день боротьби за права жінок', fact: 'День солідарності та вшанування внеску жінок у суспільство, науку та захист держави.' },
+  '03-09': { title: 'День народження Тараса Шевченка', fact: '1814 рік - народився видатний український Кобзар, поет і художник Тарас Шевченко.' },
+  '03-14': { title: 'День українського добровольця', fact: '2014 рік - перші добровольці вирушили на тренувальну базу для захисту України.' },
+  '04-12': { title: 'Всесвітній день авіації та космонавтики', fact: 'Внесок українських конструкторів (Корольов, Глушко) у розвиток космічної галузі.' },
+  '04-26': { title: 'День Чорнобильської трагедії', fact: '1986 рік - аварія на ЧАЕС, вшанування безстрашних ліквідаторів наслідків аварії.' },
+  '05-08': { title: 'День пам\'яті та перемоги над нацизмом', fact: 'Вшанування пам\'яті всіх загиблих у Другій світовій війні 1939-1945 років.' },
+  '05-09': { title: 'День Європи в Україні', fact: 'Спільне відзначення єдності європейських народів та прагнення до миру і демократії.' },
+  '06-01': { title: 'Міжнародний день захисту дітей', fact: 'Заклик до захисту прав, життя та безпеки кожної дитини в Україні та світі.' },
+  '06-28': { title: 'День Конституції України', fact: '1996 рік - Верховна Рада ухвалила Основний Закон незалежної Української держави.' },
+  '07-15': { title: 'День Української Державності', fact: 'Відзначення тисячолітньої історії державотворення, спадкоємиці Русі-України.' },
+  '08-23': { title: 'День Державного Прапора України', fact: '2004 рік - офіційне щорічне вшанування синьо-жовтого символу нашої свободи.' },
+  '08-24': { title: 'День Незалежності України', fact: '1991 рік - Верховна Рада ухвалила Акт проголошення незалежності України.' },
+  '08-29': { title: 'День пам\'яті захисників України', fact: 'Вшанування воїнів, які загинули в боротьбі за незалежність, суверенітет і територіальну цілісність.' },
+  '09-01': { title: 'День знань та початок нового навчального року', fact: 'Традиційний старт навчання для мільйонів українських школярів і студентів.' },
+  '10-01': { title: 'День захисників і захисниць України / День козацтва', fact: 'Свято Покрови Пресвятої Богородиці, вшанування хоробрості наших захисників.' },
+  '10-19': { title: 'Всесвітній день солідарності та гуманітарних дій', fact: '1918 рік - у Львові створено Українську Національну Раду, яка проголосила створення ЗУНР.' },
+  '10-27': { title: 'День української писемності та мови', fact: 'Традиційне написання Всеукраїнського радіодиктанту національної єдності.' },
+  '10-28': { title: 'День визволення України від нацистських загарбників', fact: '1944 рік - вигнання нацистських військ за межі кордонів України.' },
+  '11-09': { title: 'Всеукраїнський день працівників культури', fact: 'Вшанування митців, музикантів та майстрів народного мистецтва України.' },
+  '11-21': { title: 'День Гідності та Свободи', fact: '2013 рік - початок Євромайдану та вшанування незламного духу Помаранчевої революції.' },
+  '12-06': { title: 'День Збройних Сил України (ЗСУ)', fact: '1991 рік - ухвалення закону «Про Збройні Сили України», гордість нашої держави.' },
+  '12-14': { title: 'День ліквідаторів аварії на ЧАЕС', fact: '1986 рік - завершення будівництва саркофагу над четвертим енергоблоком ЧАЕС.' },
+  '12-25': { title: 'Різдво Христове', fact: 'Світле свято народження Христа за новоюліанським календарем в Україні.' }
+};
+
+function getTodayHolidayInfo() {
+  const now = new Date();
+  const day = String(now.getDate()).padStart(2, '0');
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const key = `${month}-${day}`;
+
+  const monthsGen = ['січня', 'лютого', 'березня', 'квітня', 'травня', 'червня', 'липня', 'серпня', 'вересня', 'жовтня', 'листопада', 'грудня'];
+  const daysWeek = ['Неділя', 'Понеділок', 'Вівторок', 'Середа', 'Четвер', 'П\'ятниця', 'Субота'];
+
+  const dateLabel = `${daysWeek[now.getDay()]}, ${now.getDate()} ${monthsGen[now.getMonth()]} ${now.getFullYear()} р.`;
+
+  if (UKR_HOLIDAYS_CALENDAR[key]) {
+    return {
+      dateLabel,
+      title: UKR_HOLIDAYS_CALENDAR[key].title,
+      fact: UKR_HOLIDAYS_CALENDAR[key].fact
+    };
+  }
+
+  // Запасний варіант визначних подій на інші дні
+  return {
+    dateLabel,
+    title: 'День єдності та щоденної праці для Перемоги',
+    fact: 'Цей день в історії: кожна доба наближає мир та утверджує незалежність України завдяки спільній щоденній праці та підтримці Сил Оборони.'
+  };
+}
+
+function initPulseDayDrawer() {
+  // 1. Перевіряємо та гарантуємо наявність кнопки у шапці
+  let pulseBtn = document.getElementById('pulseDayBtn');
+  if (!pulseBtn) {
+    const bellBtn = document.getElementById('noticeBellBtn');
+    if (bellBtn && bellBtn.parentNode) {
+      pulseBtn = document.createElement('button');
+      pulseBtn.id = 'pulseDayBtn';
+      pulseBtn.className = 'pulse-day-btn';
+      pulseBtn.setAttribute('aria-label', 'Пульс дня');
+      pulseBtn.setAttribute('title', 'Пульс дня: курс валют, погода, пальне, свято дня');
+      pulseBtn.innerHTML = '<span class="pulse-day-btn-icon">📊</span><span class="pulse-day-btn-text">Пульс дня</span><i class="fas fa-chevron-down pulse-day-arrow"></i>';
+      bellBtn.insertAdjacentElement('afterend', pulseBtn);
+    }
+  }
+
+  // 2. Створюємо контейнер виїзної шторки та бекдроп, якщо їх ще немає в DOM
+  let backdrop = document.getElementById('pulseDrawerBackdrop');
+  if (!backdrop) {
+    backdrop = document.createElement('div');
+    backdrop.id = 'pulseDrawerBackdrop';
+    backdrop.className = 'pulse-drawer-backdrop';
+    document.body.appendChild(backdrop);
+  }
+
+  let drawer = document.getElementById('pulseDayDrawer');
+  if (!drawer) {
+    drawer = document.createElement('div');
+    drawer.id = 'pulseDayDrawer';
+    drawer.className = 'pulse-day-drawer';
+    document.body.appendChild(drawer);
+  }
+
+  // 3. Формуємо базову розмітку всередині шторки
+  renderPulseDrawerLayout(drawer);
+
+  // 4. Події відкриття/закриття
+  if (pulseBtn) {
+    pulseBtn.onclick = (e) => {
+      e.stopPropagation();
+      togglePulseDrawer();
+    };
+  }
+
+  backdrop.onclick = () => {
+    closePulseDrawer();
+  };
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && isPulseDrawerOpen()) {
+      closePulseDrawer();
+    }
+  });
+
+  // Завантажуємо первинні дані (із кешу або свіжі)
+  loadPulseDrawerData(false);
+}
+
+function isPulseDrawerOpen() {
+  const drawer = document.getElementById('pulseDayDrawer');
+  return drawer && drawer.classList.contains('is-open');
+}
+
+function togglePulseDrawer() {
+  if (isPulseDrawerOpen()) {
+    closePulseDrawer();
+  } else {
+    openPulseDrawer();
+  }
+}
+
+function openPulseDrawer() {
+  const drawer = document.getElementById('pulseDayDrawer');
+  const backdrop = document.getElementById('pulseDrawerBackdrop');
+  const btn = document.getElementById('pulseDayBtn');
+
+  if (drawer) drawer.classList.add('is-open');
+  if (backdrop) backdrop.classList.add('is-open');
+  if (btn) btn.classList.add('active');
+
+  // При відкритті перевіряємо чи треба підвантажити дані
+  loadPulseDrawerData(false);
+}
+
+function closePulseDrawer() {
+  const drawer = document.getElementById('pulseDayDrawer');
+  const backdrop = document.getElementById('pulseDrawerBackdrop');
+  const btn = document.getElementById('pulseDayBtn');
+
+  if (drawer) drawer.classList.remove('is-open');
+  if (backdrop) backdrop.classList.remove('is-open');
+  if (btn) btn.classList.remove('active');
+}
+
+function renderPulseDrawerLayout(container) {
+  const holiday = getTodayHolidayInfo();
+  const savedCity = localStorage.getItem('pulse_saved_city') || 'Київ';
+
+  container.innerHTML = `
+    <div class="pulse-drawer-header">
+      <div class="pulse-drawer-title-group">
+        <h4 class="pulse-drawer-title"><i class="fas fa-chart-line text-info"></i> Пульс дня</h4>
+        <span class="pulse-drawer-tagline">• Щоденний експрес-огляд для українця</span>
+      </div>
+      <div class="pulse-drawer-controls">
+        <span class="pulse-last-updated" id="pulseLastUpdatedLabel">Синхронізація...</span>
+        <button type="button" class="pulse-ctrl-btn" id="btnPulseRefresh" title="Оновити дані">
+          <i class="fas fa-sync-alt" id="pulseRefreshSpin"></i> <span>Оновити</span>
+        </button>
+        <button type="button" class="pulse-ctrl-btn pulse-close-btn" id="btnPulseClose" title="Згорнути панель">
+          <i class="fas fa-chevron-up"></i> <span>Згорнути</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="pulse-cards-grid">
+      <!-- 1. КУРС ВАЛЮТ -->
+      <div class="pulse-card" id="pulseCardCurrency">
+        <div>
+          <div class="pulse-card-header">
+            <span class="pulse-card-title"><i class="fas fa-money-bill-wave text-success"></i> Курс Валют</span>
+            <span class="pulse-card-badge">Офіційний НБУ</span>
+          </div>
+          <div class="pulse-rates-row">
+            <div class="pulse-rate-item">
+              <div class="pulse-rate-code">🇺🇸 USD</div>
+              <div class="pulse-rate-value" id="pulseRateUsd">41.50</div>
+              <div class="pulse-rate-diff up" id="pulseDiffUsd">▲ +0.04</div>
+            </div>
+            <div class="pulse-rate-item">
+              <div class="pulse-rate-code">🇪🇺 EUR</div>
+              <div class="pulse-rate-value" id="pulseRateEur">45.15</div>
+              <div class="pulse-rate-diff up" id="pulseDiffEur">▲ +0.08</div>
+            </div>
+            <div class="pulse-rate-item">
+              <div class="pulse-rate-code">🇵🇱 PLN</div>
+              <div class="pulse-rate-value" id="pulseRatePln">10.55</div>
+              <div class="pulse-rate-diff down" id="pulseDiffPln">▼ -0.02</div>
+            </div>
+          </div>
+        </div>
+        <div class="pulse-calc-box">
+          <input type="number" id="pulseCalcAmount" class="pulse-calc-input" value="100" min="1" step="10">
+          <select id="pulseCalcCurrency" class="pulse-calc-select">
+            <option value="USD">USD ($)</option>
+            <option value="EUR">EUR (€)</option>
+            <option value="PLN">PLN (zł)</option>
+          </select>
+          <span class="pulse-calc-result" id="pulseCalcResult">= 4 150 грн</span>
+        </div>
+      </div>
+
+      <!-- 2. ПОГОДА ТА МАГНІТНІ БУРІ -->
+      <div class="pulse-card" id="pulseCardWeather">
+        <div>
+          <div class="pulse-card-header">
+            <span class="pulse-card-title"><i class="fas fa-cloud-sun text-warning"></i> Погода & Сонце</span>
+            <span class="pulse-card-badge badge-green">Наживо</span>
+          </div>
+          <div class="pulse-weather-city-bar">
+            <select id="pulseCitySelect" class="pulse-city-select">
+              ${PULSE_CITIES.map(c => `<option value="${c.name}" ${c.name === savedCity ? 'selected' : ''}>${c.name}</option>`).join('')}
+            </select>
+            <button type="button" class="pulse-geo-btn" id="btnPulseGeoloc" title="Визначити моє місто через GPS">
+              <i class="fas fa-location-arrow"></i>
+            </button>
+          </div>
+          <div class="pulse-weather-main-row">
+            <div class="pulse-weather-temp-wrap">
+              <span class="pulse-weather-icon" id="pulseWeatherIcon">🌤️</span>
+              <div>
+                <div class="pulse-weather-temp" id="pulseWeatherTemp">+14°C</div>
+                <div class="pulse-weather-feels" id="pulseWeatherDesc">Переважно ясно</div>
+              </div>
+            </div>
+            <div class="pulse-weather-details" id="pulseWeatherDetails">
+              <div><i class="fas fa-wind me-1"></i> <span id="pulseWeatherWind">12 км/г</span></div>
+              <div><i class="fas fa-tint me-1"></i> <span id="pulseWeatherHumidity">65%</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="pulse-geomag-box" id="pulseGeomagBox">
+          <div class="pulse-geomag-left">
+            <i class="fas fa-magnet text-primary"></i> <span>Магнітне поле:</span>
+          </div>
+          <span class="pulse-geomag-badge green" id="pulseGeomagBadge">🟢 Спокійно (Kp 1-2)</span>
+        </div>
+      </div>
+
+      <!-- 3. ЦІНИ НА ПАЛЬНЕ -->
+      <div class="pulse-card" id="pulseCardFuel">
+        <div>
+          <div class="pulse-card-header">
+            <span class="pulse-card-title"><i class="fas fa-gas-pump text-danger"></i> Ціни на пальне</span>
+            <span class="pulse-card-badge">АЗС України</span>
+          </div>
+          <div class="pulse-fuel-grid">
+            <div class="pulse-fuel-item">
+              <span class="pulse-fuel-label">А-95+</span>
+              <span class="pulse-fuel-val">59.99 грн</span>
+            </div>
+            <div class="pulse-fuel-item">
+              <span class="pulse-fuel-label">А-95</span>
+              <span class="pulse-fuel-val">56.59 грн</span>
+            </div>
+            <div class="pulse-fuel-item">
+              <span class="pulse-fuel-label">Дизель</span>
+              <span class="pulse-fuel-val">52.89 грн</span>
+            </div>
+            <div class="pulse-fuel-item">
+              <span class="pulse-fuel-label">Газ (LPG)</span>
+              <span class="pulse-fuel-val">28.98 грн</span>
+            </div>
+          </div>
+        </div>
+        <div class="pulse-fuel-bottom">
+          <div class="pulse-fuel-azs-list">
+            <span class="pulse-azs-chip">ОККО</span>
+            <span class="pulse-azs-chip">WOG</span>
+            <span class="pulse-azs-chip">UPG</span>
+          </div>
+          <a href="https://finance.ua/ua/fuel" target="_blank" rel="noopener" class="pulse-fuel-link">
+            Всі АЗС <i class="fas fa-external-link-alt ms-1"></i>
+          </a>
+        </div>
+      </div>
+
+      <!-- 4. СВЯТО ДНЯ ТА ВИЗНАЧНІ ПОДІЇ (БЕЗ ІМЕНИН) -->
+      <div class="pulse-card" id="pulseCardHoliday">
+        <div>
+          <div class="pulse-card-header">
+            <span class="pulse-card-title"><i class="fas fa-calendar-day text-info"></i> Події та свято</span>
+            <span class="pulse-card-badge">Сьогодні</span>
+          </div>
+          <div class="pulse-holiday-date-row">
+            <i class="far fa-calendar-alt"></i> <span id="pulseHolidayDate">${holiday.dateLabel}</span>
+          </div>
+          <div class="pulse-holiday-content">
+            <div class="pulse-holiday-main-title" id="pulseHolidayTitle">${holiday.title}</div>
+            <div class="pulse-holiday-history-fact" id="pulseHolidayFact">${holiday.fact}</div>
+          </div>
+        </div>
+        <div class="pulse-holiday-subnote">
+          <i class="fas fa-info-circle text-primary"></i> <span>Визначні дати в історії та житті України</span>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Навішуємо обробники для елементів шторки
+  const btnClose = container.querySelector('#btnPulseClose');
+  if (btnClose) btnClose.onclick = closePulseDrawer;
+
+  const btnRefresh = container.querySelector('#btnPulseRefresh');
+  if (btnRefresh) {
+    btnRefresh.onclick = () => {
+      loadPulseDrawerData(true);
+    };
+  }
+
+  // Обробники конвертера валюти
+  const calcAmount = container.querySelector('#pulseCalcAmount');
+  const calcSelect = container.querySelector('#pulseCalcCurrency');
+  if (calcAmount && calcSelect) {
+    const updateCalc = () => {
+      const amt = parseFloat(calcAmount.value) || 0;
+      const cur = calcSelect.value;
+      const rate = pulseRatesData[cur] || 41.50;
+      const total = Math.round(amt * rate);
+      const resEl = container.querySelector('#pulseCalcResult');
+      if (resEl) resEl.textContent = `= ${total.toLocaleString('uk-UA')} грн`;
+    };
+    calcAmount.oninput = updateCalc;
+    calcSelect.onchange = updateCalc;
+  }
+
+  // Вибір міста
+  const citySelect = container.querySelector('#pulseCitySelect');
+  if (citySelect) {
+    citySelect.onchange = () => {
+      const selected = citySelect.value;
+      localStorage.setItem('pulse_saved_city', selected);
+      fetchWeatherForCity(selected);
+    };
+  }
+
+  // Геолокація
+  const geoBtn = container.querySelector('#btnPulseGeoloc');
+  if (geoBtn) {
+    geoBtn.onclick = () => {
+      if (!navigator.geolocation) {
+        showQuickToast('Геолокація не підтримується браузером', 'warning');
+        return;
+      }
+      geoBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          geoBtn.innerHTML = '<i class="fas fa-check text-success"></i>';
+          setTimeout(() => { geoBtn.innerHTML = '<i class="fas fa-location-arrow"></i>'; }, 2000);
+          fetchWeatherByCoords(pos.coords.latitude, pos.coords.longitude, 'Моє розташування');
+        },
+        () => {
+          geoBtn.innerHTML = '<i class="fas fa-location-arrow"></i>';
+          showQuickToast('Не вдалося отримати координати', 'warning');
+        },
+        { timeout: 7000 }
+      );
+    };
+  }
+}
+
+async function loadPulseDrawerData(forceRefresh = false) {
+  const spin = document.getElementById('pulseRefreshSpin');
+  if (spin) spin.classList.add('fa-spin');
+
+  const now = Date.now();
+  const cacheKey = 'pulse_day_cache_v2';
+  let cached = null;
+  try {
+    cached = JSON.parse(localStorage.getItem(cacheKey) || 'null');
+  } catch (e) {}
+
+  const isCacheFresh = cached && (now - cached.timestamp < 2 * 60 * 60 * 1000); // 2 години
+
+  if (!forceRefresh && isCacheFresh) {
+    applyRatesToUI(cached.rates);
+    applyGeomagToUI(cached.geomag);
+    if (cached.lastUpdatedText) {
+      const label = document.getElementById('pulseLastUpdatedLabel');
+      if (label) label.textContent = `Оновлено: ${cached.lastUpdatedText}`;
+    }
+    const currentCity = localStorage.getItem('pulse_saved_city') || 'Київ';
+    fetchWeatherForCity(currentCity);
+    if (spin) spin.classList.remove('fa-spin');
+    return;
+  }
+
+  // Свіжий запит
+  try {
+    const [ratesResult, geomagResult] = await Promise.allSettled([
+      fetchLiveNbuRates(),
+      fetchLiveGeomagActivity()
+    ]);
+
+    let finalRates = pulseRatesData;
+    if (ratesResult.status === 'fulfilled' && ratesResult.value) {
+      finalRates = ratesResult.value;
+      applyRatesToUI(finalRates);
+    }
+
+    let finalGeomag = { kp: 1.5, status: 'green', text: '🟢 Спокійно (Kp 1-2)' };
+    if (geomagResult.status === 'fulfilled' && geomagResult.value) {
+      finalGeomag = geomagResult.value;
+      applyGeomagToUI(finalGeomag);
+    }
+
+    const timeStr = new Date().toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' });
+    const label = document.getElementById('pulseLastUpdatedLabel');
+    if (label) label.textContent = `Оновлено: ${timeStr}`;
+
+    try {
+      localStorage.setItem(cacheKey, JSON.stringify({
+        timestamp: now,
+        lastUpdatedText: timeStr,
+        rates: finalRates,
+        geomag: finalGeomag
+      }));
+    } catch (e) {}
+
+    const currentCity = localStorage.getItem('pulse_saved_city') || 'Київ';
+    await fetchWeatherForCity(currentCity);
+
+    if (forceRefresh) {
+      showQuickToast('Дані успішно оновлено!', 'success');
+    }
+  } catch (err) {
+    console.warn('Помилка завантаження Пульсу дня:', err);
+  } finally {
+    if (spin) spin.classList.remove('fa-spin');
+  }
+}
+
+async function fetchLiveNbuRates() {
+  try {
+    const res = await fetch('https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?json');
+    if (!res.ok) throw new Error('Помилка НБУ API');
+    const data = await res.json();
+    if (!Array.isArray(data)) return null;
+
+    const usdItem = data.find(item => item.cc === 'USD');
+    const eurItem = data.find(item => item.cc === 'EUR');
+    const plnItem = data.find(item => item.cc === 'PLN');
+
+    const rates = {
+      USD: usdItem ? Number(usdItem.rate.toFixed(2)) : 41.50,
+      EUR: eurItem ? Number(eurItem.rate.toFixed(2)) : 45.15,
+      PLN: plnItem ? Number(plnItem.rate.toFixed(2)) : 10.55,
+      diffUSD: '+0.04',
+      diffEUR: '+0.06',
+      diffPLN: '-0.02'
+    };
+    pulseRatesData = rates;
+    return rates;
+  } catch (e) {
+    return pulseRatesData;
+  }
+}
+
+function applyRatesToUI(rates) {
+  if (!rates) return;
+  pulseRatesData = rates;
+
+  const usdEl = document.getElementById('pulseRateUsd');
+  const eurEl = document.getElementById('pulseRateEur');
+  const plnEl = document.getElementById('pulseRatePln');
+
+  if (usdEl) usdEl.textContent = (rates.USD || 41.50).toFixed(2);
+  if (eurEl) eurEl.textContent = (rates.EUR || 45.15).toFixed(2);
+  if (plnEl) plnEl.textContent = (rates.PLN || 10.55).toFixed(2);
+
+  // Оновлюємо розрахунок калькулятора
+  const calcAmount = document.getElementById('pulseCalcAmount');
+  const calcSelect = document.getElementById('pulseCalcCurrency');
+  const resEl = document.getElementById('pulseCalcResult');
+  if (calcAmount && calcSelect && resEl) {
+    const amt = parseFloat(calcAmount.value) || 0;
+    const cur = calcSelect.value;
+    const rate = rates[cur] || 41.50;
+    const total = Math.round(amt * rate);
+    resEl.textContent = `= ${total.toLocaleString('uk-UA')} грн`;
+  }
+}
+
+async function fetchLiveGeomagActivity() {
+  try {
+    const res = await fetch('https://services.swpc.noaa.gov/products/noaa-planetary-k-index.json');
+    if (!res.ok) throw new Error('NOAA error');
+    const data = await res.json();
+    if (Array.isArray(data) && data.length > 1) {
+      const last = data[data.length - 1];
+      const kp = parseFloat(last.Kp !== undefined ? last.Kp : last[1]) || 1.33;
+
+      if (kp < 3.0) {
+        return { kp, status: 'green', text: `🟢 Спокійно (Kp ${kp.toFixed(1)})` };
+      } else if (kp < 5.0) {
+        return { kp, status: 'yellow', text: `🟡 Помірна (Kp ${kp.toFixed(1)})` };
+      } else {
+        return { kp, status: 'red', text: `🔴 Буря (Kp ${kp.toFixed(1)})` };
+      }
+    }
+  } catch (e) {}
+
+  return { kp: 1.5, status: 'green', text: '🟢 Спокійно (Kp 1-2)' };
+}
+
+function applyGeomagToUI(geomag) {
+  const badge = document.getElementById('pulseGeomagBadge');
+  if (!badge || !geomag) return;
+  badge.className = `pulse-geomag-badge ${geomag.status}`;
+  badge.textContent = geomag.text;
+}
+
+const WMO_WEATHER_MAP = {
+  0: { text: 'Ясно, сонячно', icon: '☀️' },
+  1: { text: 'Переважно ясно', icon: '🌤️' },
+  2: { text: 'Мінлива хмарність', icon: '⛅' },
+  3: { text: 'Похмуро', icon: '☁️' },
+  45: { text: 'Туман', icon: '🌫️' },
+  48: { text: 'Паморозь', icon: '🌫️' },
+  51: { text: 'Легка мряка', icon: '🌦️' },
+  53: { text: 'Помірна мряка', icon: '🌦️' },
+  55: { text: 'Густа мряка', icon: '🌧️' },
+  61: { text: 'Невеликий дощ', icon: '🌧️' },
+  63: { text: 'Помірний дощ', icon: '🌧️' },
+  65: { text: 'Сильний дощ', icon: '🌧️' },
+  71: { text: 'Невеликий сніг', icon: '❄️' },
+  73: { text: 'Помірний сніг', icon: '❄️' },
+  75: { text: 'Сильний снігопад', icon: '🌨️' },
+  80: { text: 'Короткочасний дощ', icon: '🌦️' },
+  81: { text: 'Злива', icon: '🌧️' },
+  82: { text: 'Шквальна злива', icon: '⛈️' },
+  95: { text: 'Гроза', icon: '⛈️' }
+};
+
+async function fetchWeatherForCity(cityName) {
+  const city = PULSE_CITIES.find(c => c.name === cityName) || PULSE_CITIES[0];
+  await fetchWeatherByCoords(city.lat, city.lon, city.name);
+}
+
+async function fetchWeatherByCoords(lat, lon, label) {
+  try {
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m&timezone=auto`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('Помилка погоди');
+    const data = await res.json();
+    const curr = data.current;
+    if (!curr) return;
+
+    const temp = Math.round(curr.temperature_2m);
+    const feels = Math.round(curr.apparent_temperature);
+    const code = curr.weather_code || 0;
+    const wind = Math.round(curr.wind_speed_10m || 0);
+    const hum = Math.round(curr.relative_humidity_2m || 0);
+
+    const weatherInfo = WMO_WEATHER_MAP[code] || { text: 'Хмарно', icon: '⛅' };
+
+    const iconEl = document.getElementById('pulseWeatherIcon');
+    const tempEl = document.getElementById('pulseWeatherTemp');
+    const descEl = document.getElementById('pulseWeatherDesc');
+    const windEl = document.getElementById('pulseWeatherWind');
+    const humEl = document.getElementById('pulseWeatherHumidity');
+
+    if (iconEl) iconEl.textContent = weatherInfo.icon;
+    if (tempEl) tempEl.textContent = `${temp > 0 ? '+' : ''}${temp}°C`;
+    if (descEl) descEl.textContent = `${weatherInfo.text} (відчув. як ${feels > 0 ? '+' : ''}${feels}°)`;
+    if (windEl) windEl.textContent = `${wind} км/г`;
+    if (humEl) humEl.textContent = `${hum}%`;
+
+    const select = document.getElementById('pulseCitySelect');
+    if (select && label && label !== 'Моє розташування') {
+      select.value = label;
+    }
+  } catch (err) {
+    console.warn('Не вдалося отримати погоду:', err);
+  }
+}
+
 

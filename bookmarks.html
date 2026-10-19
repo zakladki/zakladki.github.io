@@ -145,6 +145,7 @@
         <button id="userAuthNavBtn" class="user-auth-btn" aria-label="Особистий кабінет" title="Особистий кабінет / Вхід"><i class="far fa-user-circle"></i></button>
         <button id="themeToggle" class="theme-toggle-btn" aria-label="Переключити тему" title="Переключити тему (світла/темна)"><i class="fas fa-moon"></i></button>
         <button id="noticeBellBtn" class="notice-bell-btn" aria-label="Оголошення" title="Оголошення"><i class="fas fa-bell"></i><span class="notice-bell-badge-dot"></span></button>
+        <button id="pulseDayBtn" class="pulse-day-btn" aria-label="Пульс дня" title="Пульс дня: курс валют, погода, пальне, свято дня"><span class="pulse-day-btn-icon">📊</span><span class="pulse-day-btn-text">Пульс дня</span><i class="fas fa-chevron-down pulse-day-arrow"></i></button>
       </nav>
     </div>
 
@@ -178,21 +179,23 @@
           <div class="col-sm footer-col d-flex justify-content-center">
             <div class="kolobok d-flex align-items-center gap-3">
               <a class="btn btn-primary btn-sm" href="https://docs.google.com/document/d/15VLtvFvXNxhkXU_ZH74387e289Rx6If2Zmrp4m8KFAc" title="Фінансова допомога на розвиток та підтримку проекту" role="button" target="_blank">ПІДТРИМАТИ САЙТ</a>
-              <!-- MyCounter v.2.0 -->
-              <script type="text/javascript"><!--
-              my_id = 168151;
-              my_width = 88;
-              my_height = 31;
-              my_alt = "MyCounter - счётчик и статистика";
-              //--></script>
-              <script type="text/javascript"
-                src="https://get.mycounter.ua/counter2.0.js">
-              </script><noscript>
-              <a target="_blank" href="https://mycounter.ua/"><img
-              src="https://get.mycounter.ua/counter.php?id=168151"
-              title="MyCounter - счётчик и статистика"
-              alt="MyCounter - счётчик и статистика"
-              width="88" height="31" border="0" /></a></noscript>
+              <!-- MyCounter v.2.0 (видимий лише адміністратору) -->
+              <span class="footer-counter-admin-only" title="Статистика сайту MyCounter (видимо лише адміністратору)">
+                <script type="text/javascript"><!--
+                my_id = 168151;
+                my_width = 88;
+                my_height = 31;
+                my_alt = "MyCounter - счётчик и статистика";
+                //--></script>
+                <script type="text/javascript"
+                  src="https://get.mycounter.ua/counter2.0.js">
+                </script><noscript>
+                <a target="_blank" href="https://mycounter.ua/"><img
+                src="https://get.mycounter.ua/counter.php?id=168151"
+                title="MyCounter - счётчик и статистика"
+                alt="MyCounter - счётчик и статистика"
+                width="88" height="31" border="0" /></a></noscript>
+              </span>
               <!--/ MyCounter -->
             </div>
           </div>

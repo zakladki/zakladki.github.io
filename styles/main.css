@@ -2715,7 +2715,52 @@ body.dark-mode .group li .like-badge:hover::after, body.dark-mode .like-badge:ho
   }
 }
 
-/* Позначка «Рекомендовано» у кінці назви посилання (золотистий маячок) */
+/* Позначка «Рекомендовано сайтом (Редакція)»: 4-стороння золотиста зірочка, що обертається */
+.rec-spin-star {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 5px;
+  margin-right: 2px;
+  vertical-align: middle;
+  color: #f59e0b;
+  cursor: help;
+  line-height: 1;
+  flex-shrink: 0;
+  transition: transform 0.2s ease, filter 0.2s ease;
+}
+.rec-spin-star-svg {
+  display: block;
+  animation: recStarRotate 4.5s linear infinite;
+  filter: drop-shadow(0 0 2px rgba(245, 158, 11, 0.5));
+}
+body.dark-mode .rec-spin-star {
+  color: #fbbf24;
+}
+body.dark-mode .rec-spin-star-svg {
+  filter: drop-shadow(0 0 3px rgba(251, 191, 36, 0.7));
+}
+.rec-spin-star:hover .rec-spin-star-svg,
+a:hover .rec-spin-star .rec-spin-star-svg {
+  animation-duration: 2s;
+  color: #d97706;
+  filter: drop-shadow(0 0 4px rgba(217, 119, 6, 0.8));
+}
+body.dark-mode a:hover .rec-spin-star .rec-spin-star-svg {
+  color: #fcd34d;
+  filter: drop-shadow(0 0 5px rgba(252, 211, 77, 0.9));
+}
+
+@keyframes recStarRotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Стара сумісна позначка (якщо десь залишилася) */
 .rec-beacon-dot {
   display: inline-block;
   width: 7px;
@@ -6633,10 +6678,11 @@ body.dark-mode .cabinet-menu-dropdown-header {
 .cabinet-menu-dropdown-item {
   width: 100%;
   display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 7px 9px;
-  border-radius: 8px;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 2px;
+  padding: 5px 8px;
+  border-radius: 6px;
   border: 1px solid transparent;
   background: transparent;
   cursor: pointer;
@@ -6658,42 +6704,47 @@ body.dark-mode .cabinet-menu-dropdown-item.active {
   background: rgba(59, 130, 246, 0.22);
   border-color: rgba(96, 165, 250, 0.35);
 }
-.cabinet-dropdown-item-icon {
-  font-size: 1.15rem;
-  width: 24px;
+.cabinet-dropdown-item-header {
   display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+}
+.cabinet-dropdown-item-icon {
+  font-size: 0.95rem;
+  width: 18px;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
 }
-.cabinet-dropdown-item-info {
-  flex-grow: 1;
-  min-width: 0;
-}
 .cabinet-dropdown-item-title {
-  font-size: 0.88rem;
+  font-size: 0.82rem;
   font-weight: 700;
   color: var(--text-main, #0f172a);
+  line-height: 1.2;
 }
 body.dark-mode .cabinet-dropdown-item-title {
   color: #f1f5f9;
 }
-.cabinet-dropdown-item-desc {
-  font-size: 0.72rem;
-  color: var(--text-muted, #64748b);
-  margin-top: 1px;
-}
-body.dark-mode .cabinet-dropdown-item-desc {
-  color: #94a3b8;
-}
 .cabinet-dropdown-item-check {
-  font-size: 0.85rem;
+  font-size: 0.78rem;
   color: #2563eb;
   margin-left: auto;
   flex-shrink: 0;
 }
 body.dark-mode .cabinet-dropdown-item-check {
   color: #60a5fa;
+}
+.cabinet-dropdown-item-desc {
+  font-size: 0.69rem;
+  color: var(--text-muted, #64748b);
+  line-height: 1.22;
+  margin: 0;
+  padding-left: 24px;
+}
+body.dark-mode .cabinet-dropdown-item-desc {
+  color: #94a3b8;
 }
 
 /* Старі вкладки кабінету (fallback) */
@@ -7796,7 +7847,8 @@ body.dark-mode .bm-top-panel:hover {
   padding: 6px 10px;
   display: flex;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: space-between;
+  gap: 8px;
   cursor: pointer;
   transition: background 0.15s ease;
 }
@@ -7805,6 +7857,58 @@ body.dark-mode .bm-top-panel:hover {
 }
 body.dark-mode .bm-top-user-row:hover {
   background: rgba(255, 255, 255, 0.04);
+}
+
+/* Інформер-лічильник денних дій у правому верхньому кутку картки користувача */
+.bm-user-strip-right {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+.bm-daily-actions-counter {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  line-height: 1.05;
+  padding: 2.5px 6.5px;
+  border-radius: 6px;
+  background: rgba(100, 116, 139, 0.08);
+  border: 1px solid rgba(100, 116, 139, 0.2);
+  user-select: none;
+  transition: all 0.15s ease;
+}
+.bm-top-user-row:hover .bm-daily-actions-counter {
+  border-color: rgba(59, 130, 246, 0.4);
+  background: rgba(59, 130, 246, 0.08);
+}
+body.dark-mode .bm-daily-actions-counter {
+  background: rgba(148, 163, 184, 0.1);
+  border-color: rgba(148, 163, 184, 0.25);
+}
+body.dark-mode .bm-top-user-row:hover .bm-daily-actions-counter {
+  background: rgba(59, 130, 246, 0.16);
+  border-color: rgba(96, 165, 250, 0.4);
+}
+.bm-actions-counter-label {
+  font-size: 0.56rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: var(--text-muted, #64748b);
+  margin-bottom: 1.5px;
+}
+body.dark-mode .bm-actions-counter-label {
+  color: #94a3b8;
+}
+.bm-actions-counter-val {
+  font-size: 0.73rem;
+  font-weight: 700;
+  font-family: monospace, system-ui, sans-serif;
+  color: var(--text-main, #0f172a);
+}
+body.dark-mode .bm-actions-counter-val {
+  color: #f1f5f9;
 }
 
 .bm-top-divider {
@@ -8643,6 +8747,24 @@ body.dark-mode .cabinet-points-badge {
   border-color: rgba(245, 158, 11, 0.35);
 }
 
+.cabinet-actions-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  background: rgba(147, 51, 234, 0.1);
+  color: #9333ea;
+  border: 1px solid rgba(147, 51, 234, 0.25);
+  border-radius: 9999px;
+  padding: 1px 7px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+body.dark-mode .cabinet-actions-badge {
+  background: rgba(168, 85, 247, 0.16);
+  color: #c084fc;
+  border-color: rgba(192, 132, 252, 0.35);
+}
+
 .cabinet-avatar-guest {
   background: rgba(100, 116, 139, 0.15);
   display: flex;
@@ -8650,6 +8772,74 @@ body.dark-mode .cabinet-points-badge {
   justify-content: center;
   font-size: 1.8rem;
   color: #64748b;
+}
+
+/* Обгортки аватарок з індикатором статусу дій (вгорі ліворуч) */
+.cabinet-avatar-lg-wrap,
+.bm-avatar-with-status {
+  position: relative;
+  display: inline-flex;
+  flex-shrink: 0;
+}
+
+.user-action-status-dot {
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  border: 1.5px solid #ffffff;
+  z-index: 4;
+  cursor: help;
+  pointer-events: auto;
+}
+body.dark-mode .user-action-status-dot {
+  border-color: #0f172a;
+}
+
+/* Зелена пульсуюча точка (дії є в наявності) */
+.user-action-status-dot.dot-limit-active {
+  background-color: #10b981;
+  box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+  animation: userDotPulseGreen 2s infinite cubic-bezier(0.4, 0, 0.6, 1);
+}
+
+@keyframes userDotPulseGreen {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.75);
+  }
+  70% {
+    transform: scale(1.1);
+    box-shadow: 0 0 0 5px rgba(16, 185, 129, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+  }
+}
+
+/* Червона пульсуюча точка (денний ліміт дій вичерпано) */
+.user-action-status-dot.dot-limit-exceeded {
+  background-color: #ef4444;
+  box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.75);
+  animation: userDotPulseRed 1.6s infinite cubic-bezier(0.4, 0, 0.6, 1);
+}
+
+@keyframes userDotPulseRed {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.85);
+  }
+  70% {
+    transform: scale(1.15);
+    box-shadow: 0 0 0 6px rgba(239, 68, 68, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+  }
 }
 
 .cabinet-dashboard-wrap {
@@ -8753,6 +8943,14 @@ body.dark-mode .cabinet-dash-metric-card {
 .metric-cloud .dash-metric-icon {
   background: rgba(16, 185, 129, 0.14);
   color: #059669;
+}
+.metric-daily-actions .dash-metric-icon {
+  background: rgba(147, 51, 234, 0.14);
+  color: #9333ea;
+}
+body.dark-mode .metric-daily-actions .dash-metric-icon {
+  background: rgba(168, 85, 247, 0.2);
+  color: #c084fc;
 }
 
 .dash-metric-data {
@@ -10107,6 +10305,719 @@ body.dark-mode .guest-bm-feature-text strong {
 body.dark-mode .guest-bm-modal-footer {
   border-color: #334155;
 }
+
+/* Лічильник MyCounter у футері: прихований для звичайних користувачів, видимий для адміністратора */
+.footer-counter-admin-only {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  position: absolute;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+.footer-counter-admin-only.is-admin-visible {
+  opacity: 1;
+  width: auto;
+  height: auto;
+  position: static;
+  overflow: visible;
+  pointer-events: auto;
+  display: inline-flex;
+  align-items: center;
+}
+
+/* ==========================================================================
+   КНОПКА «ПУЛЬС ДНЯ» У ШАПЦІ ТА ВИЇЗНА ШТОРКА (TOP DRAWER)
+   ========================================================================== */
+.pulse-day-btn {
+  background: rgba(255, 255, 255, 0.16) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  color: #ffffff !important;
+  height: 30px;
+  border-radius: 7px;
+  cursor: pointer;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px;
+  padding: 0 10px !important;
+  font-size: 0.82rem;
+  font-weight: 600;
+  line-height: 1;
+  outline: none;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  z-index: 1050;
+}
+.pulse-day-btn:hover {
+  background: rgba(255, 255, 255, 0.28) !important;
+  border-color: rgba(56, 189, 248, 0.7) !important;
+  color: #38bdf8 !important;
+}
+.pulse-day-btn.active {
+  background: rgba(56, 189, 248, 0.25) !important;
+  border-color: #38bdf8 !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
+}
+.pulse-day-btn-icon {
+  font-size: 0.95rem;
+  line-height: 1;
+}
+.pulse-day-arrow {
+  font-size: 0.68rem;
+  transition: transform 0.25s ease;
+  opacity: 0.85;
+}
+.pulse-day-btn.active .pulse-day-arrow {
+  transform: rotate(180deg);
+}
+
+@media (min-width: 1280px) {
+  .pulse-day-btn {
+    position: absolute !important;
+    left: 84px !important;
+    right: auto !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+  }
+}
+@media (max-width: 1279.98px) {
+  .pulse-day-btn {
+    position: absolute !important;
+    left: 84px !important;
+    right: auto !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    width: 30px !important;
+    min-width: 30px !important;
+    max-width: 30px !important;
+    padding: 0 !important;
+  }
+  .pulse-day-btn .pulse-day-btn-text,
+  .pulse-day-btn .pulse-day-arrow {
+    display: none !important;
+  }
+}
+
+/* Затемнення позаду шторки */
+.pulse-drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  top: 42px;
+  background: rgba(0, 0, 0, 0.52);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  z-index: 997;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.pulse-drawer-backdrop.is-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Головний контейнер шторки «Пульс дня» */
+.pulse-day-drawer {
+  position: fixed;
+  top: 42px;
+  left: 0;
+  right: 0;
+  width: 100%;
+  max-height: calc(100vh - 54px);
+  max-height: calc(100dvh - 54px);
+  overflow-y: auto;
+  z-index: 998;
+  transform: translateY(-115%);
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.4);
+  border-bottom: 2px solid #0284c7;
+}
+.pulse-day-drawer.is-open {
+  transform: translateY(0);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+body:not(.dark-mode) .pulse-day-drawer {
+  background: rgba(255, 255, 255, 0.98);
+  color: #0f172a;
+  border-bottom-color: #0284c7;
+}
+body.dark-mode .pulse-day-drawer {
+  background: rgba(15, 23, 42, 0.97);
+  color: #f8fafc;
+  border-bottom-color: #38bdf8;
+}
+
+/* Шапка всередині виїзної шторки */
+.pulse-drawer-header {
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 10px 18px 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+}
+body.dark-mode .pulse-drawer-header {
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+
+.pulse-drawer-title-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.pulse-drawer-title {
+  margin: 0;
+  font-size: 0.96rem;
+  font-weight: 700;
+  color: #0284c7;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+body.dark-mode .pulse-drawer-title {
+  color: #38bdf8;
+}
+.pulse-drawer-tagline {
+  font-size: 0.75rem;
+  color: #64748b;
+  display: inline-block;
+}
+body.dark-mode .pulse-drawer-tagline {
+  color: #94a3b8;
+}
+
+.pulse-drawer-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.pulse-last-updated {
+  font-size: 0.72rem;
+  color: #64748b;
+  margin-right: 4px;
+}
+body.dark-mode .pulse-last-updated {
+  color: #94a3b8;
+}
+.pulse-ctrl-btn {
+  height: 28px;
+  padding: 0 10px;
+  border-radius: 6px;
+  font-size: 0.76rem;
+  font-weight: 600;
+  border: 1px solid #cbd5e1;
+  background: #f1f5f9;
+  color: #334155;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.15s ease;
+}
+.pulse-ctrl-btn:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+  border-color: #94a3b8;
+}
+body.dark-mode .pulse-ctrl-btn {
+  background: #1e293b;
+  border-color: #334155;
+  color: #cbd5e1;
+}
+body.dark-mode .pulse-ctrl-btn:hover {
+  background: #334155;
+  color: #ffffff;
+  border-color: #64748b;
+}
+.pulse-close-btn {
+  background: rgba(239, 68, 68, 0.1) !important;
+  border-color: rgba(239, 68, 68, 0.3) !important;
+  color: #dc2626 !important;
+}
+.pulse-close-btn:hover {
+  background: #dc2626 !important;
+  color: #ffffff !important;
+}
+body.dark-mode .pulse-close-btn {
+  color: #f87171 !important;
+  background: rgba(239, 68, 68, 0.18) !important;
+}
+
+/* Сітка 4 карток */
+.pulse-cards-grid {
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 12px 18px 14px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+@media (max-width: 1199.98px) {
+  .pulse-cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (max-width: 640px) {
+  .pulse-cards-grid {
+    grid-template-columns: 1fr;
+    padding: 10px 12px 14px;
+    gap: 10px;
+  }
+  .pulse-drawer-tagline {
+    display: none;
+  }
+}
+
+/* Стиль кожної окремої картки */
+.pulse-card {
+  border-radius: 9px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+body.dark-mode .pulse-card {
+  background: rgba(30, 41, 59, 0.7);
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+.pulse-card:hover {
+  border-color: rgba(56, 189, 248, 0.4);
+}
+
+.pulse-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #e2e8f0;
+}
+body.dark-mode .pulse-card-header {
+  border-bottom-color: rgba(255, 255, 255, 0.07);
+}
+.pulse-card-title {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.pulse-card-badge {
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: #e2e8f0;
+  color: #475569;
+  letter-spacing: 0.02em;
+}
+body.dark-mode .pulse-card-badge {
+  background: rgba(255, 255, 255, 0.1);
+  color: #94a3b8;
+}
+.pulse-card-badge.badge-green {
+  background: rgba(16, 185, 129, 0.14);
+  color: #059669;
+}
+body.dark-mode .pulse-card-badge.badge-green {
+  background: rgba(16, 185, 129, 0.2);
+  color: #34d399;
+}
+
+/* Вміст Картки 1: Валюта */
+.pulse-rates-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.pulse-rate-item {
+  padding: 6px 4px;
+  border-radius: 6px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  text-align: center;
+}
+body.dark-mode .pulse-rate-item {
+  background: #1e293b;
+  border-color: #334155;
+}
+.pulse-rate-code {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+}
+body.dark-mode .pulse-rate-code {
+  color: #94a3b8;
+}
+.pulse-rate-value {
+  font-size: 0.94rem;
+  font-weight: 800;
+  color: #0f172a;
+  line-height: 1.15;
+  margin: 2px 0 1px;
+}
+body.dark-mode .pulse-rate-value {
+  color: #38bdf8;
+}
+.pulse-rate-diff {
+  font-size: 0.65rem;
+  font-weight: 600;
+}
+.pulse-rate-diff.up { color: #16a34a; }
+.pulse-rate-diff.down { color: #dc2626; }
+
+/* Калькулятор валюти */
+.pulse-calc-box {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 6px 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+body.dark-mode .pulse-calc-box {
+  background: #1e293b;
+  border-color: #334155;
+}
+.pulse-calc-input {
+  width: 62px;
+  height: 26px;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  background: transparent;
+  color: inherit;
+  outline: none;
+}
+body.dark-mode .pulse-calc-input {
+  border-color: #475569;
+}
+.pulse-calc-select {
+  height: 26px;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  background: transparent;
+  color: inherit;
+  outline: none;
+  cursor: pointer;
+  padding: 0 4px;
+}
+body.dark-mode .pulse-calc-select {
+  border-color: #475569;
+  background: #1e293b;
+}
+.pulse-calc-result {
+  margin-left: auto;
+  font-size: 0.84rem;
+  font-weight: 800;
+  color: #0284c7;
+  white-space: nowrap;
+}
+body.dark-mode .pulse-calc-result {
+  color: #38bdf8;
+}
+
+/* Вміст Картки 2: Погода та Магнітні бурі */
+.pulse-weather-city-bar {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-bottom: 8px;
+}
+.pulse-city-select {
+  flex: 1;
+  height: 26px;
+  border: 1px solid #cbd5e1;
+  border-radius: 5px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  background: #ffffff;
+  color: inherit;
+  outline: none;
+  cursor: pointer;
+  padding: 0 6px;
+}
+body.dark-mode .pulse-city-select {
+  background: #1e293b;
+  border-color: #475569;
+}
+.pulse-geo-btn {
+  height: 26px;
+  width: 26px;
+  border-radius: 5px;
+  border: 1px solid #cbd5e1;
+  background: #f1f5f9;
+  color: #0284c7;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 0.76rem;
+}
+body.dark-mode .pulse-geo-btn {
+  background: #1e293b;
+  border-color: #475569;
+  color: #38bdf8;
+}
+.pulse-geo-btn:hover {
+  background: #0284c7;
+  color: #ffffff;
+}
+body.dark-mode .pulse-geo-btn:hover {
+  background: #38bdf8;
+  color: #0f172a;
+}
+
+.pulse-weather-main-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.pulse-weather-temp-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.pulse-weather-icon {
+  font-size: 1.8rem;
+  line-height: 1;
+}
+.pulse-weather-temp {
+  font-size: 1.35rem;
+  font-weight: 800;
+  line-height: 1;
+}
+.pulse-weather-feels {
+  font-size: 0.70rem;
+  color: #64748b;
+  margin-top: 2px;
+}
+body.dark-mode .pulse-weather-feels {
+  color: #94a3b8;
+}
+.pulse-weather-details {
+  text-align: right;
+  font-size: 0.72rem;
+  color: #475569;
+}
+body.dark-mode .pulse-weather-details {
+  color: #94a3b8;
+}
+
+/* Секція Сонячної активності / Магнітних бур */
+.pulse-geomag-box {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 5px 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+body.dark-mode .pulse-geomag-box {
+  background: #1e293b;
+  border-color: #334155;
+}
+.pulse-geomag-left {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+.pulse-geomag-badge {
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+.pulse-geomag-badge.green {
+  background: rgba(16, 185, 129, 0.15);
+  color: #059669;
+}
+body.dark-mode .pulse-geomag-badge.green {
+  background: rgba(16, 185, 129, 0.22);
+  color: #34d399;
+}
+.pulse-geomag-badge.yellow {
+  background: rgba(245, 158, 11, 0.18);
+  color: #d97706;
+}
+body.dark-mode .pulse-geomag-badge.yellow {
+  background: rgba(245, 158, 11, 0.25);
+  color: #fbbf24;
+}
+.pulse-geomag-badge.red {
+  background: rgba(239, 68, 68, 0.18);
+  color: #dc2626;
+  animation: pulse-red-bell 2s infinite;
+}
+body.dark-mode .pulse-geomag-badge.red {
+  background: rgba(239, 68, 68, 0.25);
+  color: #f87171;
+}
+
+/* Вміст Картки 3: Ціни на пальне */
+.pulse-fuel-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.pulse-fuel-item {
+  padding: 5px 7px;
+  border-radius: 6px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+body.dark-mode .pulse-fuel-item {
+  background: #1e293b;
+  border-color: #334155;
+}
+.pulse-fuel-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #475569;
+}
+body.dark-mode .pulse-fuel-label {
+  color: #94a3b8;
+}
+.pulse-fuel-val {
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+body.dark-mode .pulse-fuel-val {
+  color: #38bdf8;
+}
+
+.pulse-fuel-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+}
+.pulse-fuel-azs-list {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.68rem;
+  color: #64748b;
+  flex-wrap: wrap;
+}
+body.dark-mode .pulse-fuel-azs-list {
+  color: #94a3b8;
+}
+.pulse-azs-chip {
+  padding: 1px 5px;
+  border-radius: 3px;
+  background: #e2e8f0;
+  font-weight: 600;
+}
+body.dark-mode .pulse-azs-chip {
+  background: #334155;
+  color: #e2e8f0;
+}
+.pulse-fuel-link {
+  font-size: 0.70rem;
+  font-weight: 600;
+  color: #0284c7;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.pulse-fuel-link:hover {
+  text-decoration: underline;
+}
+body.dark-mode .pulse-fuel-link {
+  color: #38bdf8;
+}
+
+/* Вміст Картки 4: Свято та Події Дня */
+.pulse-holiday-date-row {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #0284c7;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+body.dark-mode .pulse-holiday-date-row {
+  color: #38bdf8;
+}
+.pulse-holiday-content {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 7px 9px;
+  margin-bottom: 6px;
+}
+body.dark-mode .pulse-holiday-content {
+  background: #1e293b;
+  border-color: #334155;
+}
+.pulse-holiday-main-title {
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: #0f172a;
+  line-height: 1.25;
+  margin-bottom: 3px;
+}
+body.dark-mode .pulse-holiday-main-title {
+  color: #f8fafc;
+}
+.pulse-holiday-history-fact {
+  font-size: 0.71rem;
+  color: #475569;
+  line-height: 1.35;
+  margin-top: 3px;
+}
+body.dark-mode .pulse-holiday-history-fact {
+  color: #94a3b8;
+}
+.pulse-holiday-subnote {
+  font-size: 0.68rem;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+body.dark-mode .pulse-holiday-subnote {
+  color: #94a3b8;
+}
+
+
 
 
 
