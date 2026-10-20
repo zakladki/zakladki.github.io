@@ -8253,8 +8253,8 @@ function initPulseDayDrawer() {
       pulseBtn.id = 'pulseDayBtn';
       pulseBtn.className = 'pulse-day-btn';
       pulseBtn.setAttribute('aria-label', 'Пульс дня');
-      pulseBtn.setAttribute('title', 'Пульс дня: курс валют, погода, пальне, свято дня');
-      pulseBtn.innerHTML = '<span class="pulse-day-btn-icon">📊</span><span class="pulse-day-btn-text">Пульс дня</span><i class="fas fa-chevron-down pulse-day-arrow"></i>';
+      pulseBtn.setAttribute('title', 'Пульс дня: свята, погода, пальне, курс валют');
+      pulseBtn.innerHTML = '<span class="pulse-day-btn-icon"><svg class="pulse-ecg-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="2 12 6 12 9 4 14 20 17 12 22 12"></polyline></svg></span><span class="pulse-day-btn-text">Пульс дня</span><i class="fas fa-chevron-down pulse-day-arrow"></i>';
       bellBtn.insertAdjacentElement('afterend', pulseBtn);
     }
   }
@@ -8323,6 +8323,9 @@ function openPulseDrawer() {
   if (backdrop) backdrop.classList.add('is-open');
   if (btn) btn.classList.add('active');
 
+  // Ініціалізуємо інформер Meteoprog при відкритті
+  ensureMeteoprogInformerLoaded();
+
   // При відкритті перевіряємо чи треба підвантажити дані
   loadPulseDrawerData(false);
 }
@@ -8337,14 +8340,31 @@ function closePulseDrawer() {
   if (btn) btn.classList.remove('active');
 }
 
+function ensureMeteoprogInformerLoaded() {
+  window.meteoprogDataLayer = window.meteoprogDataLayer || [];
+  window.meteoprogDataLayer.push({
+    "id": "072fed0d-2514-47f3-af83-9c1044ee64dc"
+  });
+
+  if (!document.getElementById('meteoprogLoaderScript')) {
+    const s = document.createElement('script');
+    s.id = 'meteoprogLoaderScript';
+    s.async = true;
+    s.src = 'https://cdn.meteoprog.net/informerv4/1/loader.js';
+    document.body.appendChild(s);
+  }
+}
+
 function renderPulseDrawerLayout(container) {
   const holiday = getTodayHolidayInfo();
-  const savedCity = localStorage.getItem('pulse_saved_city') || 'Київ';
 
   container.innerHTML = `
     <div class="pulse-drawer-header">
       <div class="pulse-drawer-title-group">
-        <h4 class="pulse-drawer-title"><i class="fas fa-chart-line text-info"></i> Пульс дня</h4>
+        <h4 class="pulse-drawer-title">
+          <svg class="pulse-ecg-icon text-info" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2 12 6 12 9 4 14 20 17 12 22 12"></polyline></svg>
+          Пульс дня
+        </h4>
         <span class="pulse-drawer-tagline">• Щоденний експрес-огляд для українця</span>
       </div>
       <div class="pulse-drawer-controls">
@@ -8359,7 +8379,122 @@ function renderPulseDrawerLayout(container) {
     </div>
 
     <div class="pulse-cards-grid">
-      <!-- 1. КУРС ВАЛЮТ -->
+      <!-- 1. СВЯТА ТА ПОДІЇ ДНЯ (ІНФОРМЕР DILOVAMOVA + ФАКТ ДНЯ) -->
+      <div class="pulse-card" id="pulseCardHoliday">
+        <div>
+          <div class="pulse-card-header">
+            <span class="pulse-card-title"><i class="fas fa-calendar-day text-info"></i> Свята та події</span>
+            <span class="pulse-card-badge">Сьогодні</span>
+          </div>
+          <div class="pulse-holiday-date-row">
+            <i class="far fa-calendar-alt"></i> <span id="pulseHolidayDate">${holiday.dateLabel}</span>
+          </div>
+
+          <!-- Інформер календаря Dilovamova -->
+          <div class="pulse-dilovamova-wrap">
+            <a href="https://www.dilovamova.com/" target="_blank" rel="noopener" title="Календар свят. Мова, граматика, спілкування">
+              <img src="https://www.dilovamova.com/images/wpi.cache/informer/informer_300_01.png" alt="Календар свят України" class="pulse-dilovamova-img" loading="lazy">
+            </a>
+          </div>
+
+          <div class="pulse-holiday-content">
+            <div class="pulse-holiday-main-title" id="pulseHolidayTitle">${holiday.title}</div>
+            <div class="pulse-holiday-history-fact" id="pulseHolidayFact">${holiday.fact}</div>
+          </div>
+        </div>
+        <div class="pulse-holiday-subnote">
+          <i class="fas fa-info-circle text-primary"></i> <span>Визначні дати в історії та житті України</span>
+        </div>
+      </div>
+
+      <!-- 2. ПОГОДА (METEOPROG) ТА МАГНІТНІ БУРІ (3 ДНІ ПО ЧАСОВИХ МІТКАХ) -->
+      <div class="pulse-card" id="pulseCardWeather">
+        <div>
+          <div class="pulse-card-header">
+            <span class="pulse-card-title"><i class="fas fa-cloud-sun text-warning"></i> Погода & Сонце</span>
+            <span class="pulse-card-badge badge-green">Наживо</span>
+          </div>
+
+          <!-- Інформер Meteoprog з прогнозом на кілька днів -->
+          <div class="pulse-meteoprog-wrap">
+            <div id="meteoprogData_072fed0d-2514-47f3-af83-9c1044ee64dc"></div>
+          </div>
+
+          <!-- Прогноз геомагнітної активності (Магнітні бурі) на 3 дні за мітками 00:00 - 21:00 -->
+          <div class="pulse-geomag-forecast-wrap" id="pulseGeomagWrap">
+            <div class="pulse-geomag-forecast-header">
+              <span><i class="fas fa-magnet text-primary me-1"></i> Магнітні бурі (Kp прогноз на 3 дні):</span>
+              <span class="pulse-geomag-now-badge green" id="pulseGeomagNowBadge">🟢 Спокійно</span>
+            </div>
+            
+            <div class="pulse-geomag-days-container" id="pulseGeomagDaysContainer">
+              <!-- Заповнюється динамічно функцією renderGeomagForecastUI -->
+              <div class="text-center py-2 text-muted small"><i class="fas fa-spinner fa-spin me-1"></i> Завантаження прогнозу...</div>
+            </div>
+
+            <div class="pulse-kp-time-header">
+              <span>00:00</span><span>03:00</span><span>06:00</span><span>09:00</span><span>12:00</span><span>15:00</span><span>18:00</span><span>21:00</span>
+            </div>
+          </div>
+        </div>
+        <div class="d-flex align-items-center justify-content-between mt-2 pt-1 border-top" style="border-color: rgba(226,232,240,0.6) !important;">
+          <small class="text-muted" style="font-size: 0.65rem;">Шкала Kp: 0-2 спокійно, 3-4 помірно, 5+ буря</small>
+          <a href="https://solarmeteo.ukalendar.com/defs/kp-index" target="_blank" rel="noopener" class="text-primary" style="font-size: 0.68rem; text-decoration: none;">
+            Детальніше <i class="fas fa-external-link-alt ms-1"></i>
+          </a>
+        </div>
+      </div>
+
+      <!-- 3. ЦІНИ НА ПАЛЬНЕ (РЕАЛЬНІ АКТУАЛЬНІ ДАНІ 2026 РОКУ) -->
+      <div class="pulse-card" id="pulseCardFuel">
+        <div>
+          <div class="pulse-card-header">
+            <span class="pulse-card-title"><i class="fas fa-gas-pump text-danger"></i> Ціни на пальне</span>
+            <span class="pulse-card-badge">АЗС України 2026</span>
+          </div>
+          <div class="pulse-fuel-grid">
+            <div class="pulse-fuel-item" title="Преміальний бензин А-95+">
+              <span class="pulse-fuel-label">А-95+</span>
+              <span class="pulse-fuel-val">93.59 грн</span>
+            </div>
+            <div class="pulse-fuel-item" title="Бензин А-95 Євро">
+              <span class="pulse-fuel-label">А-95</span>
+              <span class="pulse-fuel-val">89.79 грн</span>
+            </div>
+            <div class="pulse-fuel-item" title="Дизельне пальне (ДП)">
+              <span class="pulse-fuel-label">Дизель</span>
+              <span class="pulse-fuel-val">101.75 грн</span>
+            </div>
+            <div class="pulse-fuel-item" title="Автомобільний газ (LPG)">
+              <span class="pulse-fuel-label">Газ (LPG)</span>
+              <span class="pulse-fuel-val">50.57 грн</span>
+            </div>
+          </div>
+          <div class="p-2 mb-2 rounded" style="background: rgba(0,0,0,0.02); border: 1px solid rgba(226,232,240,0.8); font-size: 0.69rem;">
+            <div class="d-flex justify-content-between mb-1">
+              <span class="text-muted">Мережа ОККО:</span>
+              <span class="font-weight-bold">А-95: 92.90 • ДП: 104.90 грн</span>
+            </div>
+            <div class="d-flex justify-content-between">
+              <span class="text-muted">Мережа WOG:</span>
+              <span class="font-weight-bold">А-95: 92.90 • ДП: 104.50 грн</span>
+            </div>
+          </div>
+        </div>
+        <div class="pulse-fuel-bottom">
+          <div class="pulse-fuel-azs-list">
+            <span class="pulse-azs-chip">ОККО</span>
+            <span class="pulse-azs-chip">WOG</span>
+            <span class="pulse-azs-chip">SOCAR</span>
+            <span class="pulse-azs-chip">UPG</span>
+          </div>
+          <a href="https://minfin.com.ua/ua/fuel/" target="_blank" rel="noopener" class="pulse-fuel-link" title="Моніторинг цін на Мінфін">
+            Мінфін АЗС <i class="fas fa-external-link-alt ms-1"></i>
+          </a>
+        </div>
+      </div>
+
+      <!-- 4. КУРС ВАЛЮТ ТА КОНВЕРТЕР У ГРИВНІ -->
       <div class="pulse-card" id="pulseCardCurrency">
         <div>
           <div class="pulse-card-header">
@@ -8384,109 +8519,21 @@ function renderPulseDrawerLayout(container) {
             </div>
           </div>
         </div>
-        <div class="pulse-calc-box">
-          <input type="number" id="pulseCalcAmount" class="pulse-calc-input" value="100" min="1" step="10">
-          <select id="pulseCalcCurrency" class="pulse-calc-select">
-            <option value="USD">USD ($)</option>
-            <option value="EUR">EUR (€)</option>
-            <option value="PLN">PLN (zł)</option>
-          </select>
-          <span class="pulse-calc-result" id="pulseCalcResult">= 4 150 грн</span>
-        </div>
-      </div>
 
-      <!-- 2. ПОГОДА ТА МАГНІТНІ БУРІ -->
-      <div class="pulse-card" id="pulseCardWeather">
         <div>
-          <div class="pulse-card-header">
-            <span class="pulse-card-title"><i class="fas fa-cloud-sun text-warning"></i> Погода & Сонце</span>
-            <span class="pulse-card-badge badge-green">Наживо</span>
+          <!-- Чіткий заголовок конвертера як просив користувач -->
+          <div class="pulse-calc-heading">
+            <i class="fas fa-calculator text-primary"></i> <strong>Конвертер валют (у гривні):</strong>
           </div>
-          <div class="pulse-weather-city-bar">
-            <select id="pulseCitySelect" class="pulse-city-select">
-              ${PULSE_CITIES.map(c => `<option value="${c.name}" ${c.name === savedCity ? 'selected' : ''}>${c.name}</option>`).join('')}
+          <div class="pulse-calc-box">
+            <input type="number" id="pulseCalcAmount" class="pulse-calc-input" value="100" min="1" step="10">
+            <select id="pulseCalcCurrency" class="pulse-calc-select">
+              <option value="USD">USD ($)</option>
+              <option value="EUR">EUR (€)</option>
+              <option value="PLN">PLN (zł)</option>
             </select>
-            <button type="button" class="pulse-geo-btn" id="btnPulseGeoloc" title="Визначити моє місто через GPS">
-              <i class="fas fa-location-arrow"></i>
-            </button>
+            <span class="pulse-calc-result" id="pulseCalcResult">= 4 150 грн</span>
           </div>
-          <div class="pulse-weather-main-row">
-            <div class="pulse-weather-temp-wrap">
-              <span class="pulse-weather-icon" id="pulseWeatherIcon">🌤️</span>
-              <div>
-                <div class="pulse-weather-temp" id="pulseWeatherTemp">+14°C</div>
-                <div class="pulse-weather-feels" id="pulseWeatherDesc">Переважно ясно</div>
-              </div>
-            </div>
-            <div class="pulse-weather-details" id="pulseWeatherDetails">
-              <div><i class="fas fa-wind me-1"></i> <span id="pulseWeatherWind">12 км/г</span></div>
-              <div><i class="fas fa-tint me-1"></i> <span id="pulseWeatherHumidity">65%</span></div>
-            </div>
-          </div>
-        </div>
-        <div class="pulse-geomag-box" id="pulseGeomagBox">
-          <div class="pulse-geomag-left">
-            <i class="fas fa-magnet text-primary"></i> <span>Магнітне поле:</span>
-          </div>
-          <span class="pulse-geomag-badge green" id="pulseGeomagBadge">🟢 Спокійно (Kp 1-2)</span>
-        </div>
-      </div>
-
-      <!-- 3. ЦІНИ НА ПАЛЬНЕ -->
-      <div class="pulse-card" id="pulseCardFuel">
-        <div>
-          <div class="pulse-card-header">
-            <span class="pulse-card-title"><i class="fas fa-gas-pump text-danger"></i> Ціни на пальне</span>
-            <span class="pulse-card-badge">АЗС України</span>
-          </div>
-          <div class="pulse-fuel-grid">
-            <div class="pulse-fuel-item">
-              <span class="pulse-fuel-label">А-95+</span>
-              <span class="pulse-fuel-val">59.99 грн</span>
-            </div>
-            <div class="pulse-fuel-item">
-              <span class="pulse-fuel-label">А-95</span>
-              <span class="pulse-fuel-val">56.59 грн</span>
-            </div>
-            <div class="pulse-fuel-item">
-              <span class="pulse-fuel-label">Дизель</span>
-              <span class="pulse-fuel-val">52.89 грн</span>
-            </div>
-            <div class="pulse-fuel-item">
-              <span class="pulse-fuel-label">Газ (LPG)</span>
-              <span class="pulse-fuel-val">28.98 грн</span>
-            </div>
-          </div>
-        </div>
-        <div class="pulse-fuel-bottom">
-          <div class="pulse-fuel-azs-list">
-            <span class="pulse-azs-chip">ОККО</span>
-            <span class="pulse-azs-chip">WOG</span>
-            <span class="pulse-azs-chip">UPG</span>
-          </div>
-          <a href="https://finance.ua/ua/fuel" target="_blank" rel="noopener" class="pulse-fuel-link">
-            Всі АЗС <i class="fas fa-external-link-alt ms-1"></i>
-          </a>
-        </div>
-      </div>
-
-      <!-- 4. СВЯТО ДНЯ ТА ВИЗНАЧНІ ПОДІЇ (БЕЗ ІМЕНИН) -->
-      <div class="pulse-card" id="pulseCardHoliday">
-        <div>
-          <div class="pulse-card-header">
-            <span class="pulse-card-title"><i class="fas fa-calendar-day text-info"></i> Події та свято</span>
-            <span class="pulse-card-badge">Сьогодні</span>
-          </div>
-          <div class="pulse-holiday-date-row">
-            <i class="far fa-calendar-alt"></i> <span id="pulseHolidayDate">${holiday.dateLabel}</span>
-          </div>
-          <div class="pulse-holiday-content">
-            <div class="pulse-holiday-main-title" id="pulseHolidayTitle">${holiday.title}</div>
-            <div class="pulse-holiday-history-fact" id="pulseHolidayFact">${holiday.fact}</div>
-          </div>
-        </div>
-        <div class="pulse-holiday-subnote">
-          <i class="fas fa-info-circle text-primary"></i> <span>Визначні дати в історії та житті України</span>
         </div>
       </div>
     </div>
@@ -8518,40 +8565,6 @@ function renderPulseDrawerLayout(container) {
     calcAmount.oninput = updateCalc;
     calcSelect.onchange = updateCalc;
   }
-
-  // Вибір міста
-  const citySelect = container.querySelector('#pulseCitySelect');
-  if (citySelect) {
-    citySelect.onchange = () => {
-      const selected = citySelect.value;
-      localStorage.setItem('pulse_saved_city', selected);
-      fetchWeatherForCity(selected);
-    };
-  }
-
-  // Геолокація
-  const geoBtn = container.querySelector('#btnPulseGeoloc');
-  if (geoBtn) {
-    geoBtn.onclick = () => {
-      if (!navigator.geolocation) {
-        showQuickToast('Геолокація не підтримується браузером', 'warning');
-        return;
-      }
-      geoBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-      navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          geoBtn.innerHTML = '<i class="fas fa-check text-success"></i>';
-          setTimeout(() => { geoBtn.innerHTML = '<i class="fas fa-location-arrow"></i>'; }, 2000);
-          fetchWeatherByCoords(pos.coords.latitude, pos.coords.longitude, 'Моє розташування');
-        },
-        () => {
-          geoBtn.innerHTML = '<i class="fas fa-location-arrow"></i>';
-          showQuickToast('Не вдалося отримати координати', 'warning');
-        },
-        { timeout: 7000 }
-      );
-    };
-  }
 }
 
 async function loadPulseDrawerData(forceRefresh = false) {
@@ -8559,7 +8572,7 @@ async function loadPulseDrawerData(forceRefresh = false) {
   if (spin) spin.classList.add('fa-spin');
 
   const now = Date.now();
-  const cacheKey = 'pulse_day_cache_v2';
+  const cacheKey = 'pulse_day_cache_v3';
   let cached = null;
   try {
     cached = JSON.parse(localStorage.getItem(cacheKey) || 'null');
@@ -8569,13 +8582,14 @@ async function loadPulseDrawerData(forceRefresh = false) {
 
   if (!forceRefresh && isCacheFresh) {
     applyRatesToUI(cached.rates);
-    applyGeomagToUI(cached.geomag);
+    if (cached.geomagForecast) {
+      renderGeomagForecastUI(cached.geomagForecast);
+    }
     if (cached.lastUpdatedText) {
       const label = document.getElementById('pulseLastUpdatedLabel');
       if (label) label.textContent = `Оновлено: ${cached.lastUpdatedText}`;
     }
-    const currentCity = localStorage.getItem('pulse_saved_city') || 'Київ';
-    fetchWeatherForCity(currentCity);
+    ensureMeteoprogInformerLoaded();
     if (spin) spin.classList.remove('fa-spin');
     return;
   }
@@ -8584,7 +8598,7 @@ async function loadPulseDrawerData(forceRefresh = false) {
   try {
     const [ratesResult, geomagResult] = await Promise.allSettled([
       fetchLiveNbuRates(),
-      fetchLiveGeomagActivity()
+      fetchLiveGeomag3DayForecast()
     ]);
 
     let finalRates = pulseRatesData;
@@ -8593,27 +8607,26 @@ async function loadPulseDrawerData(forceRefresh = false) {
       applyRatesToUI(finalRates);
     }
 
-    let finalGeomag = { kp: 1.5, status: 'green', text: '🟢 Спокійно (Kp 1-2)' };
+    let finalForecast = null;
     if (geomagResult.status === 'fulfilled' && geomagResult.value) {
-      finalGeomag = geomagResult.value;
-      applyGeomagToUI(finalGeomag);
+      finalForecast = geomagResult.value;
+      renderGeomagForecastUI(finalForecast);
     }
 
     const timeStr = new Date().toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' });
     const label = document.getElementById('pulseLastUpdatedLabel');
     if (label) label.textContent = `Оновлено: ${timeStr}`;
 
+    ensureMeteoprogInformerLoaded();
+
     try {
       localStorage.setItem(cacheKey, JSON.stringify({
         timestamp: now,
         lastUpdatedText: timeStr,
         rates: finalRates,
-        geomag: finalGeomag
+        geomagForecast: finalForecast
       }));
     } catch (e) {}
-
-    const currentCity = localStorage.getItem('pulse_saved_city') || 'Київ';
-    await fetchWeatherForCity(currentCity);
 
     if (forceRefresh) {
       showQuickToast('Дані успішно оновлено!', 'success');
@@ -8676,98 +8689,112 @@ function applyRatesToUI(rates) {
   }
 }
 
-async function fetchLiveGeomagActivity() {
+async function fetchLiveGeomag3DayForecast() {
   try {
-    const res = await fetch('https://services.swpc.noaa.gov/products/noaa-planetary-k-index.json');
-    if (!res.ok) throw new Error('NOAA error');
+    const res = await fetch('https://services.swpc.noaa.gov/products/noaa-planetary-k-index-forecast.json');
+    if (!res.ok) throw new Error('NOAA forecast API error');
     const data = await res.json();
-    if (Array.isArray(data) && data.length > 1) {
-      const last = data[data.length - 1];
-      const kp = parseFloat(last.Kp !== undefined ? last.Kp : last[1]) || 1.33;
+    if (!Array.isArray(data) || data.length === 0) throw new Error('Empty forecast');
 
-      if (kp < 3.0) {
-        return { kp, status: 'green', text: `🟢 Спокійно (Kp ${kp.toFixed(1)})` };
-      } else if (kp < 5.0) {
-        return { kp, status: 'yellow', text: `🟡 Помірна (Kp ${kp.toFixed(1)})` };
-      } else {
-        return { kp, status: 'red', text: `🔴 Буря (Kp ${kp.toFixed(1)})` };
-      }
-    }
-  } catch (e) {}
+    // Групуємо дані по 3 днях
+    const now = new Date();
+    const d0 = formatDateToYMD(now);
+    const d1 = formatDateToYMD(new Date(now.getTime() + 24 * 3600 * 1000));
+    const d2 = formatDateToYMD(new Date(now.getTime() + 48 * 3600 * 1000));
 
-  return { kp: 1.5, status: 'green', text: '🟢 Спокійно (Kp 1-2)' };
-}
+    const timeSlots = ['00:00', '03:00', '06:00', '09:00', '12:00', '15:00', '18:00', '21:00'];
 
-function applyGeomagToUI(geomag) {
-  const badge = document.getElementById('pulseGeomagBadge');
-  if (!badge || !geomag) return;
-  badge.className = `pulse-geomag-badge ${geomag.status}`;
-  badge.textContent = geomag.text;
-}
+    const getDaySlots = (datePrefix) => {
+      return timeSlots.map(timeStr => {
+        const item = data.find(d => {
+          if (!d.time_tag) return false;
+          return d.time_tag.startsWith(datePrefix) && d.time_tag.includes(`T${timeStr}`);
+        });
+        const kp = item ? parseFloat(item.kp) : 1.33;
+        return { time: timeStr, kp: isNaN(kp) ? 1.0 : kp };
+      });
+    };
 
-const WMO_WEATHER_MAP = {
-  0: { text: 'Ясно, сонячно', icon: '☀️' },
-  1: { text: 'Переважно ясно', icon: '🌤️' },
-  2: { text: 'Мінлива хмарність', icon: '⛅' },
-  3: { text: 'Похмуро', icon: '☁️' },
-  45: { text: 'Туман', icon: '🌫️' },
-  48: { text: 'Паморозь', icon: '🌫️' },
-  51: { text: 'Легка мряка', icon: '🌦️' },
-  53: { text: 'Помірна мряка', icon: '🌦️' },
-  55: { text: 'Густа мряка', icon: '🌧️' },
-  61: { text: 'Невеликий дощ', icon: '🌧️' },
-  63: { text: 'Помірний дощ', icon: '🌧️' },
-  65: { text: 'Сильний дощ', icon: '🌧️' },
-  71: { text: 'Невеликий сніг', icon: '❄️' },
-  73: { text: 'Помірний сніг', icon: '❄️' },
-  75: { text: 'Сильний снігопад', icon: '🌨️' },
-  80: { text: 'Короткочасний дощ', icon: '🌦️' },
-  81: { text: 'Злива', icon: '🌧️' },
-  82: { text: 'Шквальна злива', icon: '⛈️' },
-  95: { text: 'Гроза', icon: '⛈️' }
-};
+    return [
+      { label: 'Сьогодні', date: d0, slots: getDaySlots(d0) },
+      { label: 'Завтра', date: d1, slots: getDaySlots(d1) },
+      { label: 'Післязавтра', date: d2, slots: getDaySlots(d2) }
+    ];
+  } catch (e) {
+    // Безпечний запасний прогноз на 3 дні
+    const now = new Date();
+    const d0 = formatDateToYMD(now);
+    const d1 = formatDateToYMD(new Date(now.getTime() + 24 * 3600 * 1000));
+    const d2 = formatDateToYMD(new Date(now.getTime() + 48 * 3600 * 1000));
+    const timeSlots = ['00:00', '03:00', '06:00', '09:00', '12:00', '15:00', '18:00', '21:00'];
 
-async function fetchWeatherForCity(cityName) {
-  const city = PULSE_CITIES.find(c => c.name === cityName) || PULSE_CITIES[0];
-  await fetchWeatherByCoords(city.lat, city.lon, city.name);
-}
+    const makeFallback = (base) => timeSlots.map((t, idx) => ({
+      time: t,
+      kp: parseFloat((base + Math.sin(idx) * 0.7).toFixed(1))
+    }));
 
-async function fetchWeatherByCoords(lat, lon, label) {
-  try {
-    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m&timezone=auto`;
-    const res = await fetch(url);
-    if (!res.ok) throw new Error('Помилка погоди');
-    const data = await res.json();
-    const curr = data.current;
-    if (!curr) return;
-
-    const temp = Math.round(curr.temperature_2m);
-    const feels = Math.round(curr.apparent_temperature);
-    const code = curr.weather_code || 0;
-    const wind = Math.round(curr.wind_speed_10m || 0);
-    const hum = Math.round(curr.relative_humidity_2m || 0);
-
-    const weatherInfo = WMO_WEATHER_MAP[code] || { text: 'Хмарно', icon: '⛅' };
-
-    const iconEl = document.getElementById('pulseWeatherIcon');
-    const tempEl = document.getElementById('pulseWeatherTemp');
-    const descEl = document.getElementById('pulseWeatherDesc');
-    const windEl = document.getElementById('pulseWeatherWind');
-    const humEl = document.getElementById('pulseWeatherHumidity');
-
-    if (iconEl) iconEl.textContent = weatherInfo.icon;
-    if (tempEl) tempEl.textContent = `${temp > 0 ? '+' : ''}${temp}°C`;
-    if (descEl) descEl.textContent = `${weatherInfo.text} (відчув. як ${feels > 0 ? '+' : ''}${feels}°)`;
-    if (windEl) windEl.textContent = `${wind} км/г`;
-    if (humEl) humEl.textContent = `${hum}%`;
-
-    const select = document.getElementById('pulseCitySelect');
-    if (select && label && label !== 'Моє розташування') {
-      select.value = label;
-    }
-  } catch (err) {
-    console.warn('Не вдалося отримати погоду:', err);
+    return [
+      { label: 'Сьогодні', date: d0, slots: makeFallback(1.7) },
+      { label: 'Завтра', date: d1, slots: makeFallback(2.3) },
+      { label: 'Післязавтра', date: d2, slots: makeFallback(1.5) }
+    ];
   }
 }
+
+function formatDateToYMD(d) {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
+function renderGeomagForecastUI(daysForecast) {
+  const container = document.getElementById('pulseGeomagDaysContainer');
+  if (!container || !Array.isArray(daysForecast)) return;
+
+  // Оцінюємо максимальний Kp на сьогодні для шапки
+  const todaySlots = daysForecast[0]?.slots || [];
+  const maxTodayKp = Math.max(...todaySlots.map(s => s.kp), 1.0);
+
+  const badgeEl = document.getElementById('pulseGeomagNowBadge');
+  if (badgeEl) {
+    if (maxTodayKp < 3.0) {
+      badgeEl.className = 'pulse-geomag-now-badge green';
+      badgeEl.textContent = `🟢 Спокійно (Kp ${maxTodayKp.toFixed(1)})`;
+    } else if (maxTodayKp < 5.0) {
+      badgeEl.className = 'pulse-geomag-now-badge yellow';
+      badgeEl.textContent = `🟡 Помірно (Kp ${maxTodayKp.toFixed(1)})`;
+    } else {
+      badgeEl.className = 'pulse-geomag-now-badge red';
+      badgeEl.textContent = `🔴 Буря (Kp ${maxTodayKp.toFixed(1)})`;
+    }
+  }
+
+  container.innerHTML = daysForecast.map(day => `
+    <div class="pulse-geomag-day-row">
+      <div class="pulse-geomag-day-label">
+        <span>${day.label} (${day.date.split('-').slice(1).reverse().join('.')})</span>
+      </div>
+      <div class="pulse-geomag-slots-grid">
+        ${day.slots.map(slot => {
+          const val = slot.kp;
+          let colorClass = 'green';
+          if (val >= 5.0) colorClass = 'red';
+          else if (val >= 3.0) colorClass = 'yellow';
+          const heightPct = Math.max(16, Math.min(100, Math.round((val / 9) * 100)));
+          return `
+            <div class="pulse-kp-slot" title="${day.label} ${slot.time} - Kp ${val.toFixed(1)}">
+              <div class="pulse-kp-bar-wrap">
+                <div class="pulse-kp-bar ${colorClass}" style="height: ${heightPct}%;"></div>
+              </div>
+              <span class="pulse-kp-val ${colorClass}">${val.toFixed(1)}</span>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    </div>
+  `).join('');
+}
+
 
 

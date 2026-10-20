@@ -10362,8 +10362,26 @@ body.dark-mode .guest-bm-modal-footer {
   box-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
 }
 .pulse-day-btn-icon {
-  font-size: 0.95rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   line-height: 1;
+}
+.pulse-ecg-icon {
+  width: 17px;
+  height: 17px;
+  stroke: currentColor;
+  stroke-width: 2.3;
+  fill: none;
+  vertical-align: middle;
+  transition: transform 0.25s ease, stroke 0.25s ease;
+}
+.pulse-day-btn:hover .pulse-ecg-icon {
+  transform: scale(1.1);
+  stroke: #38bdf8;
+}
+.pulse-day-btn.active .pulse-ecg-icon {
+  stroke: #ffffff;
 }
 .pulse-day-arrow {
   font-size: 0.68rem;
@@ -10639,7 +10657,307 @@ body.dark-mode .pulse-card-badge.badge-green {
   color: #34d399;
 }
 
-/* Вміст Картки 1: Валюта */
+/* ==========================================================================
+   КАРТКА 1: СВЯТА ТА ПОДІЇ ДНЯ (ІНФОРМЕР DILOVAMOVA + ФАКТ ДНЯ)
+   ========================================================================== */
+.pulse-holiday-date-row {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #0284c7;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+body.dark-mode .pulse-holiday-date-row {
+  color: #38bdf8;
+}
+.pulse-dilovamova-wrap {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 6px;
+  text-align: center;
+  margin-bottom: 8px;
+}
+body.dark-mode .pulse-dilovamova-wrap {
+  background: #1e293b;
+  border-color: #334155;
+}
+.pulse-dilovamova-img {
+  max-width: 100%;
+  width: 220px;
+  height: auto;
+  border-radius: 6px;
+  display: block;
+  margin: 0 auto;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+.pulse-holiday-content {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 7px 9px;
+  margin-bottom: 6px;
+}
+body.dark-mode .pulse-holiday-content {
+  background: #1e293b;
+  border-color: #334155;
+}
+.pulse-holiday-main-title {
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: #0f172a;
+  line-height: 1.25;
+  margin-bottom: 3px;
+}
+body.dark-mode .pulse-holiday-main-title {
+  color: #f8fafc;
+}
+.pulse-holiday-history-fact {
+  font-size: 0.71rem;
+  color: #475569;
+  line-height: 1.35;
+  margin-top: 3px;
+}
+body.dark-mode .pulse-holiday-history-fact {
+  color: #94a3b8;
+}
+.pulse-holiday-subnote {
+  font-size: 0.68rem;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+body.dark-mode .pulse-holiday-subnote {
+  color: #94a3b8;
+}
+
+/* ==========================================================================
+   КАРТКА 2: ПОГОДА (METEOPROG) ТА МАГНІТНІ БУРІ (3 ДНІ ПО ЧАСОВИХ МІТКАХ)
+   ========================================================================== */
+.pulse-meteoprog-wrap {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 7px;
+  padding: 4px;
+  margin-bottom: 8px;
+  min-height: 80px;
+  overflow: hidden;
+}
+body.dark-mode .pulse-meteoprog-wrap {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+/* Блок прогнозу геомагнітного поля на 3 дні */
+.pulse-geomag-forecast-wrap {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 7px;
+  padding: 6px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+body.dark-mode .pulse-geomag-forecast-wrap {
+  background: #1e293b;
+  border-color: #334155;
+}
+.pulse-geomag-forecast-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.71rem;
+  font-weight: 700;
+  color: #334155;
+  padding-bottom: 4px;
+  border-bottom: 1px solid #f1f5f9;
+}
+body.dark-mode .pulse-geomag-forecast-header {
+  color: #cbd5e1;
+  border-bottom-color: rgba(255, 255, 255, 0.06);
+}
+.pulse-geomag-now-badge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+.pulse-geomag-now-badge.green { background: rgba(16, 185, 129, 0.15); color: #059669; }
+body.dark-mode .pulse-geomag-now-badge.green { background: rgba(16, 185, 129, 0.25); color: #34d399; }
+.pulse-geomag-now-badge.yellow { background: rgba(245, 158, 11, 0.18); color: #d97706; }
+body.dark-mode .pulse-geomag-now-badge.yellow { background: rgba(245, 158, 11, 0.28); color: #fbbf24; }
+.pulse-geomag-now-badge.red { background: rgba(239, 68, 68, 0.2); color: #dc2626; }
+body.dark-mode .pulse-geomag-now-badge.red { background: rgba(239, 68, 68, 0.3); color: #f87171; }
+
+.pulse-geomag-days-container {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.pulse-geomag-day-row {
+  display: flex;
+  flex-direction: column;
+}
+.pulse-geomag-day-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #0284c7;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2px;
+}
+body.dark-mode .pulse-geomag-day-label {
+  color: #38bdf8;
+}
+.pulse-geomag-slots-grid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 2px;
+  align-items: end;
+  height: 28px;
+}
+.pulse-kp-slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  height: 100%;
+}
+.pulse-kp-bar-wrap {
+  width: 100%;
+  height: 18px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.04);
+  border-radius: 2px;
+  overflow: hidden;
+}
+body.dark-mode .pulse-kp-bar-wrap {
+  background: rgba(255, 255, 255, 0.06);
+}
+.pulse-kp-bar {
+  width: 100%;
+  border-radius: 2px 2px 0 0;
+  min-height: 3px;
+  transition: height 0.25s ease;
+}
+.pulse-kp-bar.green { background: #10b981; }
+.pulse-kp-bar.yellow { background: #f59e0b; }
+.pulse-kp-bar.red { background: #ef4444; }
+.pulse-kp-val {
+  font-size: 0.58rem;
+  font-weight: 700;
+  line-height: 1;
+  margin-top: 1px;
+}
+.pulse-kp-val.green { color: #059669; }
+body.dark-mode .pulse-kp-val.green { color: #34d399; }
+.pulse-kp-val.yellow { color: #d97706; }
+body.dark-mode .pulse-kp-val.yellow { color: #fbbf24; }
+.pulse-kp-val.red { color: #dc2626; }
+body.dark-mode .pulse-kp-val.red { color: #f87171; }
+
+.pulse-kp-time-header {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 2px;
+  text-align: center;
+  font-size: 0.55rem;
+  color: #64748b;
+  margin-top: 1px;
+}
+body.dark-mode .pulse-kp-time-header {
+  color: #94a3b8;
+}
+
+/* ==========================================================================
+   КАРТКА 3: ЦІНИ НА ПАЛЬНЕ (АКТУАЛЬНІ ДАНІ 2026 РОКУ)
+   ========================================================================== */
+.pulse-fuel-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.pulse-fuel-item {
+  padding: 6px 7px;
+  border-radius: 6px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+body.dark-mode .pulse-fuel-item {
+  background: #1e293b;
+  border-color: #334155;
+}
+.pulse-fuel-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #475569;
+}
+body.dark-mode .pulse-fuel-label {
+  color: #94a3b8;
+}
+.pulse-fuel-val {
+  font-size: 0.84rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+body.dark-mode .pulse-fuel-val {
+  color: #38bdf8;
+}
+
+.pulse-fuel-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+}
+.pulse-fuel-azs-list {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.68rem;
+  color: #64748b;
+  flex-wrap: wrap;
+}
+body.dark-mode .pulse-fuel-azs-list {
+  color: #94a3b8;
+}
+.pulse-azs-chip {
+  padding: 1px 5px;
+  border-radius: 3px;
+  background: #e2e8f0;
+  font-weight: 600;
+}
+body.dark-mode .pulse-azs-chip {
+  background: #334155;
+  color: #e2e8f0;
+}
+.pulse-fuel-link {
+  font-size: 0.70rem;
+  font-weight: 600;
+  color: #0284c7;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.pulse-fuel-link:hover {
+  text-decoration: underline;
+}
+body.dark-mode .pulse-fuel-link {
+  color: #38bdf8;
+}
+
+/* ==========================================================================
+   КАРТКА 4: КУРС ВАЛЮТ ТА КОНВЕРТЕР У ГРИВНІ
+   ========================================================================== */
 .pulse-rates-row {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -10686,7 +11004,19 @@ body.dark-mode .pulse-rate-value {
 .pulse-rate-diff.up { color: #16a34a; }
 .pulse-rate-diff.down { color: #dc2626; }
 
-/* Калькулятор валюти */
+/* Калькулятор валюти з чітким заголовком */
+.pulse-calc-heading {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #475569;
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+body.dark-mode .pulse-calc-heading {
+  color: #94a3b8;
+}
 .pulse-calc-box {
   background: #ffffff;
   border: 1px solid #e2e8f0;
@@ -10742,280 +11072,6 @@ body.dark-mode .pulse-calc-result {
   color: #38bdf8;
 }
 
-/* Вміст Картки 2: Погода та Магнітні бурі */
-.pulse-weather-city-bar {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  margin-bottom: 8px;
-}
-.pulse-city-select {
-  flex: 1;
-  height: 26px;
-  border: 1px solid #cbd5e1;
-  border-radius: 5px;
-  font-size: 0.74rem;
-  font-weight: 600;
-  background: #ffffff;
-  color: inherit;
-  outline: none;
-  cursor: pointer;
-  padding: 0 6px;
-}
-body.dark-mode .pulse-city-select {
-  background: #1e293b;
-  border-color: #475569;
-}
-.pulse-geo-btn {
-  height: 26px;
-  width: 26px;
-  border-radius: 5px;
-  border: 1px solid #cbd5e1;
-  background: #f1f5f9;
-  color: #0284c7;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  font-size: 0.76rem;
-}
-body.dark-mode .pulse-geo-btn {
-  background: #1e293b;
-  border-color: #475569;
-  color: #38bdf8;
-}
-.pulse-geo-btn:hover {
-  background: #0284c7;
-  color: #ffffff;
-}
-body.dark-mode .pulse-geo-btn:hover {
-  background: #38bdf8;
-  color: #0f172a;
-}
-
-.pulse-weather-main-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 8px;
-}
-.pulse-weather-temp-wrap {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.pulse-weather-icon {
-  font-size: 1.8rem;
-  line-height: 1;
-}
-.pulse-weather-temp {
-  font-size: 1.35rem;
-  font-weight: 800;
-  line-height: 1;
-}
-.pulse-weather-feels {
-  font-size: 0.70rem;
-  color: #64748b;
-  margin-top: 2px;
-}
-body.dark-mode .pulse-weather-feels {
-  color: #94a3b8;
-}
-.pulse-weather-details {
-  text-align: right;
-  font-size: 0.72rem;
-  color: #475569;
-}
-body.dark-mode .pulse-weather-details {
-  color: #94a3b8;
-}
-
-/* Секція Сонячної активності / Магнітних бур */
-.pulse-geomag-box {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 6px;
-  padding: 5px 8px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 6px;
-}
-body.dark-mode .pulse-geomag-box {
-  background: #1e293b;
-  border-color: #334155;
-}
-.pulse-geomag-left {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  font-size: 0.72rem;
-  font-weight: 600;
-}
-.pulse-geomag-badge {
-  font-size: 0.68rem;
-  font-weight: 700;
-  padding: 2px 6px;
-  border-radius: 4px;
-  white-space: nowrap;
-}
-.pulse-geomag-badge.green {
-  background: rgba(16, 185, 129, 0.15);
-  color: #059669;
-}
-body.dark-mode .pulse-geomag-badge.green {
-  background: rgba(16, 185, 129, 0.22);
-  color: #34d399;
-}
-.pulse-geomag-badge.yellow {
-  background: rgba(245, 158, 11, 0.18);
-  color: #d97706;
-}
-body.dark-mode .pulse-geomag-badge.yellow {
-  background: rgba(245, 158, 11, 0.25);
-  color: #fbbf24;
-}
-.pulse-geomag-badge.red {
-  background: rgba(239, 68, 68, 0.18);
-  color: #dc2626;
-  animation: pulse-red-bell 2s infinite;
-}
-body.dark-mode .pulse-geomag-badge.red {
-  background: rgba(239, 68, 68, 0.25);
-  color: #f87171;
-}
-
-/* Вміст Картки 3: Ціни на пальне */
-.pulse-fuel-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 6px;
-  margin-bottom: 8px;
-}
-.pulse-fuel-item {
-  padding: 5px 7px;
-  border-radius: 6px;
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-body.dark-mode .pulse-fuel-item {
-  background: #1e293b;
-  border-color: #334155;
-}
-.pulse-fuel-label {
-  font-size: 0.72rem;
-  font-weight: 700;
-  color: #475569;
-}
-body.dark-mode .pulse-fuel-label {
-  color: #94a3b8;
-}
-.pulse-fuel-val {
-  font-size: 0.82rem;
-  font-weight: 800;
-  color: #0f172a;
-}
-body.dark-mode .pulse-fuel-val {
-  color: #38bdf8;
-}
-
-.pulse-fuel-bottom {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 4px;
-}
-.pulse-fuel-azs-list {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 0.68rem;
-  color: #64748b;
-  flex-wrap: wrap;
-}
-body.dark-mode .pulse-fuel-azs-list {
-  color: #94a3b8;
-}
-.pulse-azs-chip {
-  padding: 1px 5px;
-  border-radius: 3px;
-  background: #e2e8f0;
-  font-weight: 600;
-}
-body.dark-mode .pulse-azs-chip {
-  background: #334155;
-  color: #e2e8f0;
-}
-.pulse-fuel-link {
-  font-size: 0.70rem;
-  font-weight: 600;
-  color: #0284c7;
-  text-decoration: none;
-  white-space: nowrap;
-}
-.pulse-fuel-link:hover {
-  text-decoration: underline;
-}
-body.dark-mode .pulse-fuel-link {
-  color: #38bdf8;
-}
-
-/* Вміст Картки 4: Свято та Події Дня */
-.pulse-holiday-date-row {
-  font-size: 0.78rem;
-  font-weight: 700;
-  color: #0284c7;
-  margin-bottom: 6px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-body.dark-mode .pulse-holiday-date-row {
-  color: #38bdf8;
-}
-.pulse-holiday-content {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 6px;
-  padding: 7px 9px;
-  margin-bottom: 6px;
-}
-body.dark-mode .pulse-holiday-content {
-  background: #1e293b;
-  border-color: #334155;
-}
-.pulse-holiday-main-title {
-  font-size: 0.82rem;
-  font-weight: 800;
-  color: #0f172a;
-  line-height: 1.25;
-  margin-bottom: 3px;
-}
-body.dark-mode .pulse-holiday-main-title {
-  color: #f8fafc;
-}
-.pulse-holiday-history-fact {
-  font-size: 0.71rem;
-  color: #475569;
-  line-height: 1.35;
-  margin-top: 3px;
-}
-body.dark-mode .pulse-holiday-history-fact {
-  color: #94a3b8;
-}
-.pulse-holiday-subnote {
-  font-size: 0.68rem;
-  color: #64748b;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-body.dark-mode .pulse-holiday-subnote {
-  color: #94a3b8;
-}
 
 
 
