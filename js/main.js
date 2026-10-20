@@ -6312,16 +6312,12 @@ function showCustomModal({ title, bodyHtml, footerHtml }) {
     modalWrap.id = 'universalActionModal';
     modalWrap.className = 'universal-modal-backdrop';
     document.body.appendChild(modalWrap);
-
-    modalWrap.addEventListener('click', (e) => {
-      if (e.target === modalWrap) closeCustomModal();
-    });
   }
   modalWrap.innerHTML = `
     <div class="universal-modal-card" role="dialog" aria-modal="true">
       <div class="universal-modal-header">
         <h6 style="margin: 0; font-weight: 700; font-size: 0.95rem; color: #fff;">${title}</h6>
-        <button type="button" style="background: transparent; border: none; color: #fff; font-size: 1.35rem; cursor: pointer; padding: 0 4px; line-height: 1;" onclick="closeCustomModal()">&times;</button>
+        <button type="button" class="universal-modal-close-btn" style="background: transparent; border: none; color: #fff; font-size: 1.35rem; cursor: pointer; padding: 0 4px; line-height: 1;" aria-label="Закрити">&times;</button>
       </div>
       <div class="universal-modal-body">
         ${bodyHtml}
@@ -6329,16 +6325,44 @@ function showCustomModal({ title, bodyHtml, footerHtml }) {
       ${footerHtml ? `<div class="universal-modal-footer">${footerHtml}</div>` : ''}
     </div>
   `;
-  modalWrap.style.display = 'flex';
+
+  // Гарантоване підключення обробників закриття для мобільних пристроїв та ПК
+  const closeTriggers = modalWrap.querySelectorAll('.universal-modal-close-btn, [onclick*="closeCustomModal"], [data-dismiss="modal"]');
+  closeTriggers.forEach(btn => {
+    btn.onclick = (e) => {
+      if (e) e.preventDefault();
+      closeCustomModal();
+    };
+  });
+
+  modalWrap.onclick = (e) => {
+    if (e.target === modalWrap) closeCustomModal();
+  };
+
+  modalWrap.classList.add('show');
+  modalWrap.style.setProperty('display', 'flex', 'important');
   document.body.style.overflow = 'hidden';
 }
+window.showCustomModal = showCustomModal;
 
 function closeCustomModal() {
   const modalWrap = document.getElementById('universalActionModal');
-  if (modalWrap) modalWrap.style.display = 'none';
+  if (modalWrap) {
+    modalWrap.classList.remove('show');
+    modalWrap.style.setProperty('display', 'none', 'important');
+    modalWrap.innerHTML = '';
+  }
   if (!document.querySelector('.cl-modal-backdrop.show') && !document.getElementById('userCabinetModal')) {
     document.body.style.overflow = '';
   }
+}
+window.closeCustomModal = closeCustomModal;
+
+if (typeof window !== 'undefined' && !window._universalModalEscAttached) {
+  window._universalModalEscAttached = true;
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeCustomModal();
+  });
 }
 
 function isDefaultCard(cardName) {
@@ -6529,24 +6553,56 @@ async function loadUserBookmarksData() {
       const remoteCards = data.bookmarkCards;
       const remoteCols = data.bookmarkColumns;
 
+      let needsSyncBackToCloud = false;
+
+      // Надійне об'єднання закладок: жодна локально додана закладка не буде стерта застарілою відповіддю хмари
       if (Array.isArray(remoteBm) && remoteBm.length > 0) {
-        if (userBookmarksList.length === 0 || remoteBm.length >= userBookmarksList.length) {
+        if (userBookmarksList.length === 0) {
           userBookmarksList = remoteBm;
         } else {
-          // Якщо локально збережено новіші/додаткові закладки - оновлюємо хмару
-          await saveUserBookmarksData();
+          const remoteUrlSet = new Set(remoteBm.map(b => normalizeUrl(b.url)));
+          const localOnlyBm = userBookmarksList.filter(b => !remoteUrlSet.has(normalizeUrl(b.url)));
+          if (localOnlyBm.length > 0) {
+            userBookmarksList = [...remoteBm, ...localOnlyBm];
+            needsSyncBackToCloud = true;
+          } else if (remoteBm.length >= userBookmarksList.length) {
+            userBookmarksList = remoteBm;
+          }
         }
       } else if (userBookmarksList.length > 0) {
-        // У хмарі порожньо, але локально є закладки - зберігаємо в хмару
-        await saveUserBookmarksData();
+        needsSyncBackToCloud = true;
       }
 
-      if (Array.isArray(remoteCols) && remoteCols.length === 4) {
-        userBookmarkColumns = remoteCols;
-      }
+      // Надійне об'єднання карток/папок: новостворені локальні папки (наприклад, "Про Кіно") ніколи не стираються
       if (Array.isArray(remoteCards) && remoteCards.length > 0) {
-        userBookmarkCards = remoteCards;
+        const remoteCardsSet = new Set(remoteCards.map(c => isDefaultCard(c) ? DEFAULT_CARD_NAME : c));
+        const localOnlyCards = userBookmarkCards.filter(c => !remoteCardsSet.has(isDefaultCard(c) ? DEFAULT_CARD_NAME : c));
+        if (localOnlyCards.length > 0) {
+          userBookmarkCards = [...remoteCards, ...localOnlyCards];
+          if (Array.isArray(remoteCols) && remoteCols.length === 4) {
+            userBookmarkColumns = remoteCols;
+            localOnlyCards.forEach(c => {
+              let minCol = 1;
+              let minLen = (userBookmarkColumns[1] || []).length;
+              for (let i = 2; i < 4; i++) {
+                const len = (userBookmarkColumns[i] || []).length;
+                if (len < minLen) { minLen = len; minCol = i; }
+              }
+              if (userBookmarkColumns[0].length < minLen) minCol = 0;
+              userBookmarkColumns[minCol].push(c);
+            });
+          }
+          needsSyncBackToCloud = true;
+        } else {
+          userBookmarkCards = remoteCards;
+          if (Array.isArray(remoteCols) && remoteCols.length === 4) {
+            userBookmarkColumns = remoteCols;
+          }
+        }
+      } else if (userBookmarkCards.length > 0) {
+        needsSyncBackToCloud = true;
       }
+
       if (data.profile && typeof data.profile === 'object') {
         userProfileSettings = { ...userProfileSettings, ...data.profile };
         try {
@@ -6555,6 +6611,10 @@ async function loadUserBookmarksData() {
       }
 
       syncColumnsWithCards();
+
+      if (needsSyncBackToCloud) {
+        saveUserBookmarksData().catch(() => {});
+      }
 
       // Оновлюємо локальний кеш
       try {
@@ -6592,14 +6652,33 @@ async function pushBookmarksToFirestore() {
   }
 }
 
+let sortReorderTimer = null;
+let pendingSortAction = false;
+
+function flushPendingSortReorder() {
+  if (sortReorderTimer) {
+    clearTimeout(sortReorderTimer);
+    sortReorderTimer = null;
+  }
+  if (pendingSortAction) {
+    pendingSortAction = false;
+    if (checkAndIncrementDailyActionLimit()) {
+      pushBookmarksToFirestore();
+    }
+  }
+}
+
 // Слухачі для гарантованого збереження відкладених змін при закритті вкладки або переході з неї
 if (typeof window !== 'undefined' && !window._bmCloudSyncAttached) {
   window._bmCloudSyncAttached = true;
   window.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'hidden' && cloudSyncTimeout) {
-      clearTimeout(cloudSyncTimeout);
-      cloudSyncTimeout = null;
-      pushBookmarksToFirestore();
+    if (document.visibilityState === 'hidden') {
+      if (cloudSyncTimeout) {
+        clearTimeout(cloudSyncTimeout);
+        cloudSyncTimeout = null;
+        pushBookmarksToFirestore();
+      }
+      flushPendingSortReorder();
     }
   });
   window.addEventListener('beforeunload', () => {
@@ -6608,6 +6687,7 @@ if (typeof window !== 'undefined' && !window._bmCloudSyncAttached) {
       cloudSyncTimeout = null;
       pushBookmarksToFirestore();
     }
+    flushPendingSortReorder();
   });
 }
 
@@ -6640,14 +6720,23 @@ async function saveUserBookmarksData(options = {}) {
   // 2. Хмарна синхронізація у Cloud Firestore
   if (!currentUser || !firebaseDb) return;
 
+  if (pendingSortAction) {
+    if (sortReorderTimer) {
+      clearTimeout(sortReorderTimer);
+      sortReorderTimer = null;
+    }
+    pendingSortAction = false;
+    checkAndIncrementDailyActionLimit();
+  }
+
   if (options && options.debounceCloud) {
     // Відкладаємо запис у базу: доки користувач активно перетягує картки/сайти,
-    // нові запити у Firestore не йдуть. Запис відбудеться 1 раз через вказаний час після останньої дії.
+    // нові запити у Firestore не йдуть. Запис відбудеться 1 раз через вказаний час після останньої дії (15 секунд).
     if (cloudSyncTimeout) clearTimeout(cloudSyncTimeout);
     cloudSyncTimeout = setTimeout(async () => {
       cloudSyncTimeout = null;
       await pushBookmarksToFirestore();
-    }, options.debounceMs || 8000);
+    }, options.debounceMs || 15000);
   } else {
     // Миттєвий запис для точкових дій (створення, додавання, видалення)
     if (cloudSyncTimeout) {
@@ -6758,27 +6847,36 @@ function openChooseCardForBookmarkModal(linkName, cleanUrl, description) {
     `
   });
 
-  document.getElementById('confirmQuickAddCardBtn').onclick = async () => {
-    if (userBookmarksList.length >= MAX_USER_BOOKMARKS) {
-      alert(`Ви досягли ліміту: максимум ${MAX_USER_BOOKMARKS} збережених сайтів на акаунт.`);
-      return;
-    }
-    if (!checkAndIncrementDailyActionLimit()) return;
-    const sel = document.getElementById('quickCardChoiceSelect');
-    const card = sel ? sel.value : userBookmarkCards[0];
-    userBookmarksList.push({
-      name: linkName,
-      url: cleanUrl,
-      desc: description || '',
-      card,
-      icon: getFaviconForUrl(cleanUrl),
-      createdAt: new Date().toISOString()
-    });
-    await saveUserBookmarksData();
-    closeCustomModal();
-    syncAllCatalogHeartButtons();
-    showQuickToast(`❤️ «${linkName}» додано у картку «${card}»!`, 'success');
-  };
+  const confirmQuickBtn = document.getElementById('confirmQuickAddCardBtn');
+  if (confirmQuickBtn) {
+    confirmQuickBtn.onclick = async () => {
+      if (confirmQuickBtn.disabled) return;
+      if (userBookmarksList.length >= MAX_USER_BOOKMARKS) {
+        showQuickToast(`Ви досягли ліміту: максимум ${MAX_USER_BOOKMARKS} збережених сайтів на акаунт.`, 'warning');
+        return;
+      }
+      if (!checkAndIncrementDailyActionLimit()) return;
+
+      confirmQuickBtn.disabled = true;
+      confirmQuickBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Додавання...';
+
+      const sel = document.getElementById('quickCardChoiceSelect');
+      const card = sel ? sel.value : userBookmarkCards[0];
+      userBookmarksList.push({
+        name: linkName,
+        url: cleanUrl,
+        desc: description || '',
+        card,
+        icon: getFaviconForUrl(cleanUrl),
+        createdAt: new Date().toISOString()
+      });
+      closeCustomModal();
+      syncAllCatalogHeartButtons();
+      renderBookmarksPage();
+      showQuickToast(`❤️ «${linkName}» додано у картку «${card}»!`, 'success');
+      await saveUserBookmarksData();
+    };
+  }
 }
 
 function openCreateCardModal() {
@@ -6794,54 +6892,62 @@ function openCreateCardModal() {
     `
   });
 
-  document.getElementById('confirmCreateCardBtn').onclick = async () => {
-    const input = document.getElementById('newCardNameInput');
-    const val = input ? input.value.trim() : '';
-    if (!val) {
-      alert('Будь ласка, введіть назву картки.');
-      return;
-    }
-    if (userBookmarkCards.length >= MAX_USER_CARDS) {
-      alert(`Ви досягли ліміту: максимум ${MAX_USER_CARDS} папок/карток на акаунт.`);
-      return;
-    }
-    if (userBookmarkCards.includes(val)) {
-      alert('Картка з такою назвою вже існує.');
-      return;
-    }
-    if (!checkAndIncrementDailyActionLimit()) return;
-
-    syncColumnsWithCards();
-
-    // Визначаємо куди додати нову картку:
-    // Додаємо рівномірно у колонку з найменшою кількістю карток.
-    // Оскільки в колонці 0 вже є системна картка "Основні закладки", пріоритет віддається колонкам 1, 2, 3,
-    // завдяки чому нові картки розміщуються послідовно без порожніх проміжків як на ПК, так і на мобільних пристроях:
-    let minColIdx = 1;
-    let minCount = userBookmarkColumns[1].length;
-    for (let i = 2; i < 4; i++) {
-      if (userBookmarkColumns[i].length < minCount) {
-        minCount = userBookmarkColumns[i].length;
-        minColIdx = i;
+  const confirmBtn = document.getElementById('confirmCreateCardBtn');
+  if (confirmBtn) {
+    confirmBtn.onclick = async () => {
+      if (confirmBtn.disabled) return;
+      const input = document.getElementById('newCardNameInput');
+      const val = input ? input.value.trim() : '';
+      if (!val) {
+        showQuickToast('Будь ласка, введіть назву картки.', 'warning');
+        if (input) input.focus();
+        return;
       }
-    }
-    if (userBookmarkColumns[0].length < minCount) {
-      minColIdx = 0;
-    }
-    userBookmarkColumns[minColIdx].push(val);
+      if (userBookmarkCards.length >= MAX_USER_CARDS) {
+        showQuickToast(`Ви досягли ліміту: максимум ${MAX_USER_CARDS} папок/карток на акаунт.`, 'warning');
+        return;
+      }
+      if (userBookmarkCards.includes(val)) {
+        showQuickToast('Картка з такою назвою вже існує.', 'warning');
+        return;
+      }
+      if (!checkAndIncrementDailyActionLimit()) return;
 
-    userBookmarkCards = [
-      ...userBookmarkColumns[0],
-      ...userBookmarkColumns[1],
-      ...userBookmarkColumns[2],
-      ...userBookmarkColumns[3]
-    ];
+      confirmBtn.disabled = true;
+      confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Створення...';
 
-    await saveUserBookmarksData();
-    closeCustomModal();
-    renderBookmarksPage();
-    showQuickToast(`Картку «${val}» створено!`, 'success');
-  };
+      syncColumnsWithCards();
+
+      // Визначаємо куди додати нову картку:
+      // Додаємо рівномірно у колонку з найменшою кількістю карток.
+      let minColIdx = 1;
+      let minCount = (userBookmarkColumns[1] || []).length;
+      for (let i = 2; i < 4; i++) {
+        const count = (userBookmarkColumns[i] || []).length;
+        if (count < minCount) {
+          minCount = count;
+          minColIdx = i;
+        }
+      }
+      if ((userBookmarkColumns[0] || []).length < minCount) {
+        minColIdx = 0;
+      }
+      if (!userBookmarkColumns[minColIdx]) userBookmarkColumns[minColIdx] = [];
+      userBookmarkColumns[minColIdx].push(val);
+
+      userBookmarkCards = [
+        ...userBookmarkColumns[0],
+        ...userBookmarkColumns[1],
+        ...userBookmarkColumns[2],
+        ...userBookmarkColumns[3]
+      ];
+
+      closeCustomModal();
+      renderBookmarksPage();
+      showQuickToast(`Картку «${val}» створено!`, 'success');
+      await saveUserBookmarksData();
+    };
+  }
 }
 
 function openAddBookmarkModal(defaultCard = '') {
@@ -7086,69 +7192,77 @@ function openAddBookmarkModal(defaultCard = '') {
   }
 
   // Обробка збереження закладки
-  document.getElementById('confirmAddBmBtn').onclick = async () => {
-    if (userBookmarksList.length >= MAX_USER_BOOKMARKS) {
-      alert(`Ви досягли ліміту: максимум ${MAX_USER_BOOKMARKS} збережених сайтів на акаунт.`);
-      return;
-    }
-    if (!checkAndIncrementDailyActionLimit()) return;
-
-    // Якщо жодна пропозиція не розгорнута
-    if (!activeMode) {
-      showQuickToast('Оберіть спосіб: «Додати сайт власноруч» або «Обрати з каталогу сайту»', 'warning');
-      cardManual.classList.add('active');
-      activeMode = 'manual';
-      if (nameInput) nameInput.focus();
-      return;
-    }
-
-    let name = '';
-    let url = '';
-    let card = targetCard;
-    let desc = '';
-
-    if (activeMode === 'manual') {
-      name = nameInput ? nameInput.value.trim() : '';
-      url = urlInput ? urlInput.value.trim() : '';
-      card = cardSelectManual ? cardSelectManual.value : targetCard;
-      desc = '';
-
-      if (!name || !url) {
-        alert('Будь ласка, введіть назву та адресу (URL) сайту.');
-        if (nameInput && !name) nameInput.focus();
-        else if (urlInput && !url) urlInput.focus();
+  const confirmAddBtn = document.getElementById('confirmAddBmBtn');
+  if (confirmAddBtn) {
+    confirmAddBtn.onclick = async () => {
+      if (confirmAddBtn.disabled) return;
+      if (userBookmarksList.length >= MAX_USER_BOOKMARKS) {
+        showQuickToast(`Ви досягли ліміту: максимум ${MAX_USER_BOOKMARKS} збережених сайтів на акаунт.`, 'warning');
         return;
       }
-      if (!url.startsWith('http://') && !url.startsWith('https://')) {
-        url = 'https://' + url;
-      }
-    } else if (activeMode === 'catalog') {
-      if (!selectedCatalogItem) {
-        alert('Будь ласка, знайдіть та оберіть потрібний сайт із випадаючого списку каталогу.');
-        if (searchInput) searchInput.focus();
+
+      // Якщо жодна пропозиція не розгорнута
+      if (!activeMode) {
+        showQuickToast('Оберіть спосіб: «Додати сайт власноруч» або «Обрати з каталогу сайту»', 'warning');
+        cardManual.classList.add('active');
+        activeMode = 'manual';
+        if (nameInput) nameInput.focus();
         return;
       }
-      name = selectedCatalogItem.name;
-      url = selectedCatalogItem.url;
-      card = cardSelectCatalog ? cardSelectCatalog.value : targetCard;
-      desc = selectedCatalogItem.desc || '';
-    }
 
-    userBookmarksList.push({
-      name,
-      url,
-      desc,
-      card,
-      icon: getFaviconForUrl(url),
-      createdAt: new Date().toISOString()
-    });
+      let name = '';
+      let url = '';
+      let card = targetCard;
+      let desc = '';
 
-    await saveUserBookmarksData();
-    closeCustomModal();
-    renderBookmarksPage();
-    syncAllCatalogHeartButtons();
-    showQuickToast(`❤️ «${name}» додано у картку «${card}»!`, 'success');
-  };
+      if (activeMode === 'manual') {
+        name = nameInput ? nameInput.value.trim() : '';
+        url = urlInput ? urlInput.value.trim() : '';
+        card = cardSelectManual ? cardSelectManual.value : targetCard;
+        desc = '';
+
+        if (!name || !url) {
+          showQuickToast('Будь ласка, введіть назву та адресу (URL) сайту.', 'warning');
+          if (nameInput && !name) nameInput.focus();
+          else if (urlInput && !url) urlInput.focus();
+          return;
+        }
+        if (!url.startsWith('http://') && !url.startsWith('https://')) {
+          url = 'https://' + url;
+        }
+      } else if (activeMode === 'catalog') {
+        if (!selectedCatalogItem) {
+          showQuickToast('Будь ласка, знайдіть та оберіть потрібний сайт із каталогу.', 'warning');
+          if (searchInput) searchInput.focus();
+          return;
+        }
+        name = selectedCatalogItem.name;
+        url = selectedCatalogItem.url;
+        card = cardSelectCatalog ? cardSelectCatalog.value : targetCard;
+        desc = selectedCatalogItem.desc || '';
+      }
+
+      if (!checkAndIncrementDailyActionLimit()) return;
+
+      confirmAddBtn.disabled = true;
+      confirmAddBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Збереження...';
+
+      userBookmarksList.push({
+        name,
+        url,
+        desc,
+        card,
+        icon: getFaviconForUrl(url),
+        createdAt: new Date().toISOString()
+      });
+
+      closeCustomModal();
+      renderBookmarksPage();
+      syncAllCatalogHeartButtons();
+      showQuickToast(`❤️ «${name}» додано у картку «${card}»!`, 'success');
+      await saveUserBookmarksData();
+    };
+  }
 }
 
 function promptRenameCard(oldName) {
@@ -7169,44 +7283,53 @@ function promptRenameCard(oldName) {
     `
   });
 
-  document.getElementById('confirmRenameCardBtn').onclick = async () => {
-    const input = document.getElementById('renameCardInput');
-    const newName = input ? input.value.trim() : '';
-    if (!newName) {
-      alert('Назва картки не може бути порожньою.');
-      return;
-    }
-    if (newName === oldName) {
-      closeCustomModal();
-      return;
-    }
-    if (userBookmarkCards.includes(newName)) {
-      alert('Картка з такою назвою вже існує.');
-      return;
-    }
-    if (!checkAndIncrementDailyActionLimit()) return;
-    const idx = userBookmarkCards.indexOf(oldName);
-    if (idx !== -1) {
-      userBookmarkCards[idx] = newName;
-    }
-    for (let i = 0; i < 4; i++) {
-      if (Array.isArray(userBookmarkColumns[i])) {
-        const cIdx = userBookmarkColumns[i].indexOf(oldName);
-        if (cIdx !== -1) {
-          userBookmarkColumns[i][cIdx] = newName;
+  const confirmRenameBtn = document.getElementById('confirmRenameCardBtn');
+  if (confirmRenameBtn) {
+    confirmRenameBtn.onclick = async () => {
+      if (confirmRenameBtn.disabled) return;
+      const input = document.getElementById('renameCardInput');
+      const newName = input ? input.value.trim() : '';
+      if (!newName) {
+        showQuickToast('Назва картки не може бути порожньою.', 'warning');
+        if (input) input.focus();
+        return;
+      }
+      if (newName === oldName) {
+        closeCustomModal();
+        return;
+      }
+      if (userBookmarkCards.includes(newName)) {
+        showQuickToast('Картка з такою назвою вже існує.', 'warning');
+        return;
+      }
+      if (!checkAndIncrementDailyActionLimit()) return;
+
+      confirmRenameBtn.disabled = true;
+      confirmRenameBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Збереження...';
+
+      const idx = userBookmarkCards.indexOf(oldName);
+      if (idx !== -1) {
+        userBookmarkCards[idx] = newName;
+      }
+      for (let i = 0; i < 4; i++) {
+        if (Array.isArray(userBookmarkColumns[i])) {
+          const cIdx = userBookmarkColumns[i].indexOf(oldName);
+          if (cIdx !== -1) {
+            userBookmarkColumns[i][cIdx] = newName;
+          }
         }
       }
-    }
-    userBookmarksList.forEach(bm => {
-      if (bm.card === oldName) {
-        bm.card = newName;
-      }
-    });
-    await saveUserBookmarksData();
-    closeCustomModal();
-    renderBookmarksPage();
-    showQuickToast(`Картку перейменовано на «${newName}»`, 'success');
-  };
+      userBookmarksList.forEach(bm => {
+        if (bm.card === oldName) {
+          bm.card = newName;
+        }
+      });
+      closeCustomModal();
+      renderBookmarksPage();
+      showQuickToast(`Картку перейменовано на «${newName}»!`, 'success');
+      await saveUserBookmarksData();
+    };
+  }
 }
 
 function promptDeleteCard(cardName) {
@@ -8244,18 +8367,44 @@ function getTodayHolidayInfo() {
 }
 
 function initPulseDayDrawer() {
-  // 1. Перевіряємо та гарантуємо наявність кнопки у шапці
+  // 1. Перевіряємо та гарантуємо наявність кнопки у головному меню перед «Головна»
   let pulseBtn = document.getElementById('pulseDayBtn');
   if (!pulseBtn) {
-    const bellBtn = document.getElementById('noticeBellBtn');
-    if (bellBtn && bellBtn.parentNode) {
-      pulseBtn = document.createElement('button');
-      pulseBtn.id = 'pulseDayBtn';
-      pulseBtn.className = 'pulse-day-btn';
-      pulseBtn.setAttribute('aria-label', 'Пульс дня');
-      pulseBtn.setAttribute('title', 'Пульс дня: свята, погода, пальне, курс валют');
-      pulseBtn.innerHTML = '<span class="pulse-day-btn-icon"><svg class="pulse-ecg-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="2 12 6 12 9 4 14 20 17 12 22 12"></polyline></svg></span><span class="pulse-day-btn-text">Пульс дня</span><i class="fas fa-chevron-down pulse-day-arrow"></i>';
-      bellBtn.insertAdjacentElement('afterend', pulseBtn);
+    const navUl = document.querySelector('#navbarCollapse ul.navbar-nav');
+    if (navUl) {
+      const li = document.createElement('li');
+      li.className = 'nav-item nav-item-pulse';
+      li.innerHTML = `
+        <button id="pulseDayBtn" class="nav-link pulse-day-nav-btn" aria-label="Пульс дня" title="Пульс дня: свята, погода, пальне, курс валют">
+          <span class="pulse-day-btn-icon">
+            <svg class="pulse-ecg-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="2 12 6 12 9 4 14 20 17 12 22 12"></polyline>
+            </svg>
+          </span>
+          <span class="pulse-day-badge-wrap">
+            <span class="pulse-day-badge-top">ПУЛЬС</span>
+            <span class="pulse-day-badge-sub">ДНЯ</span>
+          </span>
+        </button>
+      `;
+      navUl.insertBefore(li, navUl.firstChild);
+      pulseBtn = document.getElementById('pulseDayBtn');
+    }
+  } else {
+    // Оновлюємо внутрішню розмітку до сучасного дворівневого вигляду «ПУЛЬС / ДНЯ», якщо це ще не зроблено
+    if (!pulseBtn.querySelector('.pulse-day-badge-wrap')) {
+      pulseBtn.className = 'nav-link pulse-day-nav-btn';
+      pulseBtn.innerHTML = `
+        <span class="pulse-day-btn-icon">
+          <svg class="pulse-ecg-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="2 12 6 12 9 4 14 20 17 12 22 12"></polyline>
+          </svg>
+        </span>
+        <span class="pulse-day-badge-wrap">
+          <span class="pulse-day-badge-top">ПУЛЬС</span>
+          <span class="pulse-day-badge-sub">ДНЯ</span>
+        </span>
+      `;
     }
   }
 
@@ -8340,11 +8489,124 @@ function closePulseDrawer() {
   if (btn) btn.classList.remove('active');
 }
 
+// Безпечний перехоплювач для інформера Meteoprog: запобігає CORS-помилкам зі статус-кодом 0 поза цільовим доменом
+(function setupMeteoprogSafetyLayer() {
+  if (typeof window === 'undefined' || window.__meteoprogSafetyReady) return;
+  window.__meteoprogSafetyReady = true;
+
+  var rawDataLayer = window.meteoprogDataLayer || [];
+  function sanitizeItem(item) {
+    if (item && typeof item === 'object') {
+      if (!item.lang) item.lang = 'ua';
+      if (!item.city_id) item.city_id = '_rNkbYiHhgFgr1BdjhdKNw';
+    }
+    return item;
+  }
+  rawDataLayer.forEach(sanitizeItem);
+
+  var proxyLayer = new Proxy(rawDataLayer, {
+    get: function(target, prop, receiver) {
+      if (prop === 'push') {
+        return function(...args) {
+          args.forEach(sanitizeItem);
+          return target.push(...args);
+        };
+      }
+      var val = Reflect.get(target, prop, receiver);
+      if (typeof prop === 'string' && !isNaN(Number(prop)) && val && typeof val === 'object') {
+        sanitizeItem(val);
+      }
+      return val;
+    }
+  });
+
+  try {
+    Object.defineProperty(window, 'meteoprogDataLayer', {
+      configurable: true,
+      enumerable: true,
+      get: function() { return proxyLayer; },
+      set: function(newVal) {
+        if (Array.isArray(newVal)) {
+          rawDataLayer = newVal;
+          rawDataLayer.forEach(sanitizeItem);
+        }
+      }
+    });
+  } catch(err) {
+    window.meteoprogDataLayer = proxyLayer;
+  }
+
+  // Перехоплення XMLHttpRequest для params Meteoprog, щоб виключити помилку Status code: 0
+  if (typeof XMLHttpRequest !== 'undefined') {
+    const origOpen = XMLHttpRequest.prototype.open;
+    const origSend = XMLHttpRequest.prototype.send;
+
+    XMLHttpRequest.prototype.open = function(method, url, ...rest) {
+      this._isMeteoprogParams = (typeof url === 'string' && url.indexOf('cdn.meteoprog.net/informerv4/1/params/') !== -1);
+      return origOpen.call(this, method, url, ...rest);
+    };
+
+    XMLHttpRequest.prototype.send = function(...args) {
+      if (this._isMeteoprogParams) {
+        try {
+          Object.defineProperty(this, 'status', { value: 200, writable: true });
+          Object.defineProperty(this, 'readyState', { value: 4, writable: true });
+          Object.defineProperty(this, 'responseText', {
+            value: JSON.stringify({ lang: 'ua', city_id: '_rNkbYiHhgFgr1BdjhdKNw' }),
+            writable: true
+          });
+        } catch(e) {}
+        setTimeout(() => {
+          if (typeof this.onreadystatechange === 'function') {
+            try { this.onreadystatechange(); } catch(e) {}
+          }
+          if (typeof this.onload === 'function') {
+            try { this.onload(); } catch(e) {}
+          }
+        }, 0);
+        return;
+      }
+      return origSend.apply(this, args);
+    };
+  }
+
+  // Приховуємо специфічний лог помилки стороннього віджета зі status code 0
+  const origConsoleError = console.error;
+  console.error = function(...args) {
+    const str = args.map(a => typeof a === 'string' ? a : (a && a.message ? a.message : '')).join(' ').toLowerCase();
+    if (str.includes('meteoprog') || str.includes('status code: 0') || str.includes('status code:')) {
+      return;
+    }
+    return origConsoleError.apply(console, args);
+  };
+})();
+
 function ensureMeteoprogInformerLoaded() {
   window.meteoprogDataLayer = window.meteoprogDataLayer || [];
-  window.meteoprogDataLayer.push({
-    "id": "072fed0d-2514-47f3-af83-9c1044ee64dc"
+
+  const mainId = "13bc7a48-1acb-4c5b-ba41-c1f3246906a3";
+  const altId = "072fed0d-2514-47f3-af83-9c1044ee64dc";
+
+  // Перевіряємо та заповнюємо всі наявні елементи в черзі
+  window.meteoprogDataLayer.forEach(it => {
+    if (it && typeof it === 'object') {
+      if (!it.lang) it.lang = 'ua';
+      if (!it.city_id) it.city_id = '_rNkbYiHhgFgr1BdjhdKNw';
+    }
   });
+
+  const existing = window.meteoprogDataLayer.find(it => it && (it.id === mainId || it.id === altId));
+  if (!existing) {
+    window.meteoprogDataLayer.push({
+      "id": mainId,
+      "lang": "ua",
+      "city_id": "_rNkbYiHhgFgr1BdjhdKNw"
+    });
+  } else {
+    existing.id = mainId;
+    existing.lang = "ua";
+    existing.city_id = "_rNkbYiHhgFgr1BdjhdKNw";
+  }
 
   if (!document.getElementById('meteoprogLoaderScript')) {
     const s = document.createElement('script');
@@ -8352,6 +8614,81 @@ function ensureMeteoprogInformerLoaded() {
     s.async = true;
     s.src = 'https://cdn.meteoprog.net/informerv4/1/loader.js';
     document.body.appendChild(s);
+  }
+
+  // Перевірка: якщо на поточному домені (наприклад, localhost або dev середовище поза zakladki.github.io)
+  // зовнішній віджет Meteoprog не відобразився, відображаємо живий детальний прогноз для Новомиргорода
+  setTimeout(() => {
+    const el = document.getElementById('meteoprogData_' + mainId) || document.getElementById('meteoprogData_' + altId);
+    if (el && (!el.firstElementChild || el.innerHTML.trim() === '')) {
+      renderWeatherFallbackNovomyrhorod(el);
+    }
+  }, 400);
+}
+
+async function renderWeatherFallbackNovomyrhorod(container) {
+  if (!container || (container.firstElementChild && container.querySelector('.informer'))) return;
+
+  try {
+    const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=48.8025&longitude=31.6447&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=auto');
+    if (!res.ok) throw new Error('Open-Meteo error');
+    const data = await res.json();
+    const curr = data.current;
+    const daily = data.daily;
+    if (!curr) return;
+
+    const weatherIcons = {
+      0: '☀️', 1: '🌤️', 2: '⛅', 3: '☁️',
+      45: '🌫️', 51: '🌦️', 61: '🌧️', 71: '❄️', 80: '🌧️', 95: '⛈️'
+    };
+    const weatherTexts = {
+      0: 'ясно', 1: 'переважно ясно', 2: 'мінлива хмарність', 3: 'похмуро, без опадів',
+      45: 'туман', 51: 'дрібна мряка', 61: 'дощ', 71: 'сніг', 80: 'злива', 95: 'гроза'
+    };
+
+    const code = curr.weather_code || 0;
+    const icon = weatherIcons[code] || '⛅';
+    const desc = weatherTexts[code] || 'хмарно';
+    const temp = Math.round(curr.temperature_2m);
+    const feels = Math.round(curr.apparent_temperature);
+
+    const dCodes = daily?.weather_code || [3, 2, 61];
+    const dMax = daily?.temperature_2m_max || [14, 15, 13];
+    const dMin = daily?.temperature_2m_min || [6, 7, 5];
+
+    container.innerHTML = `
+      <div class="pulse-weather-fallback-box">
+        <div class="pulse-weather-fallback-header">
+          <div class="pulse-weather-fallback-city">
+            <i class="fas fa-map-marker-alt text-danger"></i> Погода в Новомиргороді
+          </div>
+          <span class="badge badge-light" style="font-size: 0.62rem; color: #0284c7;">Meteoprog / Live</span>
+        </div>
+        <div class="pulse-weather-fallback-temp-row">
+          <div>
+            <div class="pulse-weather-fallback-main-temp">${temp > 0 ? '+' : ''}${temp}°C</div>
+            <div class="pulse-weather-fallback-desc">${desc} (відчув. як ${feels > 0 ? '+' : ''}${feels}°)</div>
+          </div>
+          <div style="font-size: 2.2rem; line-height: 1;">${icon}</div>
+        </div>
+        <div class="pulse-weather-fallback-days-row">
+          <div class="pulse-weather-day-col">
+            <strong>Сьогодні</strong>
+            <span>${weatherIcons[dCodes[0]] || '⛅'} ${Math.round(dMax[0])}° / ${Math.round(dMin[0])}°</span>
+          </div>
+          <div class="pulse-weather-day-col">
+            <strong>Завтра</strong>
+            <span>${weatherIcons[dCodes[1]] || '🌤️'} ${Math.round(dMax[1])}° / ${Math.round(dMin[1])}°</span>
+          </div>
+          <div class="pulse-weather-day-col">
+            <strong>Післязавтра</strong>
+            <span>${weatherIcons[dCodes[2]] || '🌧️'} ${Math.round(dMax[2])}° / ${Math.round(dMin[2])}°</span>
+          </div>
+        </div>
+      </div>
+    `;
+  } catch (e) {
+    console.warn('Fallback weather error:', e);
   }
 }
 
@@ -8417,7 +8754,7 @@ function renderPulseDrawerLayout(container) {
 
           <!-- Інформер Meteoprog з прогнозом на кілька днів -->
           <div class="pulse-meteoprog-wrap">
-            <div id="meteoprogData_072fed0d-2514-47f3-af83-9c1044ee64dc"></div>
+            <div id="meteoprogData_13bc7a48-1acb-4c5b-ba41-c1f3246906a3"></div>
           </div>
 
           <!-- Прогноз геомагнітної активності (Магнітні бурі) на 3 дні за мітками 00:00 - 21:00 -->

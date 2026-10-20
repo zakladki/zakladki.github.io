@@ -184,7 +184,7 @@ body {
     justify-content: center !important;
     border-radius: 0 !important; /* Прибираємо закруглення кнопок */
     margin: 0 !important; /* Прибираємо відступи між ними */
-    padding: 0 16px !important; /* Оптимальна ширина пунктів */
+    padding: 0 15px !important; /* Оптимальна ширина пунктів (-1px зліва та справа для більшої компактності) */
     border-bottom: 3px solid transparent !important; /* Забезпечує плавний перехід без підстрибувань */
     transition: all 0.2s ease-in-out !important;
   }
@@ -6104,6 +6104,7 @@ body.dark-mode .user-cabinet-modal {
 
 /* Універсальне модальне вікно дій (створення папки, додавання сайту тощо) */
 .universal-modal-backdrop {
+  display: none !important;
   position: fixed;
   inset: 0;
   top: 0;
@@ -6113,7 +6114,6 @@ body.dark-mode .user-cabinet-modal {
   width: 100%;
   height: 100%;
   z-index: 10050;
-  display: flex;
   align-items: center;
   justify-content: center;
   background: rgba(0, 0, 0, 0.65);
@@ -6122,6 +6122,9 @@ body.dark-mode .user-cabinet-modal {
   -webkit-backdrop-filter: blur(2px);
   box-sizing: border-box;
   overflow: hidden;
+}
+.universal-modal-backdrop.show {
+  display: flex !important;
 }
 .universal-modal-card {
   background: var(--card-bg, #ffffff);
@@ -6168,6 +6171,9 @@ body.dark-mode .user-cabinet-modal {
 }
 @media (max-width: 576px) {
   .universal-modal-backdrop {
+    display: none !important;
+  }
+  .universal-modal-backdrop.show {
     padding: 6px !important;
     display: flex !important;
     flex-direction: column !important;
@@ -10330,6 +10336,75 @@ body.dark-mode .guest-bm-modal-footer {
 /* ==========================================================================
    КНОПКА «ПУЛЬС ДНЯ» У ШАПЦІ ТА ВИЇЗНА ШТОРКА (TOP DRAWER)
    ========================================================================== */
+/* Кнопка «Пульс дня» у головному меню (розміщується перед «Головна») */
+.nav-item-pulse {
+  display: flex !important;
+  align-items: stretch !important;
+}
+.pulse-day-nav-btn {
+  background: transparent !important;
+  border: none !important;
+  border-bottom: 3px solid transparent !important;
+  cursor: pointer;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 5px;
+  color: #38bdf8 !important;
+  padding: 0 11px !important;
+  height: 100% !important;
+  outline: none !important;
+  transition: all 0.2s ease-in-out !important;
+  user-select: none;
+  font-family: inherit;
+  letter-spacing: normal;
+}
+.pulse-day-nav-btn:hover {
+  background-color: rgba(56, 189, 248, 0.12) !important;
+  color: #7dd3fc !important;
+  border-bottom-color: rgba(56, 189, 248, 0.5) !important;
+}
+.pulse-day-nav-btn.active {
+  background-color: rgba(56, 189, 248, 0.22) !important;
+  color: #ffffff !important;
+  border-bottom: 3px solid #38bdf8 !important;
+}
+.pulse-day-badge-wrap {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  line-height: 1;
+}
+.pulse-day-badge-top {
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: #38bdf8;
+  line-height: 1;
+  text-transform: uppercase;
+}
+.pulse-day-badge-sub {
+  font-size: 0.54rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: #cbd5e1;
+  line-height: 1;
+  margin-top: 1.5px;
+  text-transform: uppercase;
+  opacity: 0.9;
+}
+.pulse-day-nav-btn:hover .pulse-day-badge-top {
+  color: #7dd3fc;
+}
+.pulse-day-nav-btn:hover .pulse-day-badge-sub {
+  color: #ffffff;
+}
+.pulse-day-nav-btn.active .pulse-day-badge-top {
+  color: #ffffff;
+}
+
+/* Стара кнопка утилітарного ряду (для зворотної сумісності) */
 .pulse-day-btn {
   background: rgba(255, 255, 255, 0.16) !important;
   border: 1px solid rgba(255, 255, 255, 0.3) !important;
@@ -10749,6 +10824,58 @@ body.dark-mode .pulse-holiday-subnote {
 body.dark-mode .pulse-meteoprog-wrap {
   background: #1e293b;
   border-color: #334155;
+}
+
+/* Резервний адаптивний віджет погоди Новомиргорода з прогнозом на 3 дні */
+.pulse-weather-fallback-box {
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #1e3a8a 0%, #0284c7 100%);
+  color: #ffffff;
+}
+.pulse-weather-fallback-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+.pulse-weather-fallback-city {
+  font-size: 0.82rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.pulse-weather-fallback-temp-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.pulse-weather-fallback-main-temp {
+  font-size: 1.55rem;
+  font-weight: 800;
+  line-height: 1;
+}
+.pulse-weather-fallback-desc {
+  font-size: 0.72rem;
+  opacity: 0.9;
+}
+.pulse-weather-fallback-days-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  padding-top: 6px;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+.pulse-weather-day-col {
+  text-align: center;
+  font-size: 0.68rem;
+}
+.pulse-weather-day-col strong {
+  display: block;
+  font-size: 0.70rem;
+  margin-bottom: 2px;
 }
 
 /* Блок прогнозу геомагнітного поля на 3 дні */

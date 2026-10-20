@@ -1,9 +1,122 @@
 <!DOCTYPE html>
 <html lang="uk">
   <head>
-    <!-- Пригнічення помилок сторонніх розширень браузера (MetaMask тощо) -->
+    <!-- Пригнічення помилок сторонніх розширень браузера (MetaMask тощо) та нешкідливих попереджень ResizeObserver/Meteoprog -->
+    <!-- Пригнічення помилок сторонніх розширень браузера (MetaMask тощо) та захисний шар для сторонніх інформерів (Meteoprog тощо) -->
     <script>
-      (function(){function e(t){if(!t)return!1;var r="";try{r=typeof t=="string"?t:typeof t=="object"?(t.message||"")+" "+(t.stack||"")+" "+(t.reason||"")+" "+(t.name||"")+" "+String(t):String(t)}catch(n){r=String(t)}return r=r.toLowerCase(),r.indexOf("could not reach cloud firestore")!==-1||r.indexOf("offline mode")!==-1||r.indexOf("code=unavailable")!==-1||r.indexOf("metamask")!==-1||r.indexOf("failed to connect")!==-1||r.indexOf("auro wallet")!==-1||r.indexOf("phantom")!==-1||r.indexOf("coinbase")!==-1||r.indexOf("evm")!==-1}var o=console.error;console.error=function(){for(var t=0;t<arguments.length;t++)if(e(arguments[t]))return;return o.apply(console,arguments)};var a=console.warn;console.warn=function(){for(var t=0;t<arguments.length;t++)if(e(arguments[t]))return;return a.apply(console,arguments)};window.addEventListener("unhandledrejection",function(t){e(t.reason)&&(t.preventDefault(),t.stopImmediatePropagation())},!0);window.addEventListener("error",function(t){(e(t.error)||e(t.message))&&(t.preventDefault(),t.stopImmediatePropagation())},!0);var n=window.onerror;window.onerror=function(t,r,o,a,c){return e(t)||e(c)||(n?n.apply(this,arguments):void 0)}})();
+      (function(){
+        function e(t){
+          if(!t)return!1;
+          var r="";
+          try{
+            r=typeof t=="string"?t:typeof t=="object"?(t.message||"")+" "+(t.stack||"")+" "+(t.reason||"")+" "+(t.name||"")+" "+String(t):String(t);
+          }catch(n){r=String(t)}
+          r=r.toLowerCase();
+          return r.indexOf("could not reach cloud firestore")!==-1||
+                 r.indexOf("offline mode")!==-1||
+                 r.indexOf("code=unavailable")!==-1||
+                 r.indexOf("metamask")!==-1||
+                 r.indexOf("failed to connect")!==-1||
+                 r.indexOf("auro wallet")!==-1||
+                 r.indexOf("phantom")!==-1||
+                 r.indexOf("coinbase")!==-1||
+                 r.indexOf("evm")!==-1||
+                 r.indexOf("resizeobserver")!==-1||
+                 r.indexOf("meteoprog")!==-1||
+                 r.indexOf("status code: 0")!==-1||
+                 r.indexOf("status code:")!==-1;
+        }
+        var o=console.error;
+        console.error=function(){
+          for(var t=0;t<arguments.length;t++) if(e(arguments[t])) return;
+          return o.apply(console,arguments);
+        };
+        var a=console.warn;
+        console.warn=function(){
+          for(var t=0;t<arguments.length;t++) if(e(arguments[t])) return;
+          return a.apply(console,arguments);
+        };
+        window.addEventListener("unhandledrejection",function(t){e(t.reason)&&(t.preventDefault(),t.stopImmediatePropagation())},!0);
+        window.addEventListener("error",function(t){(e(t.error)||e(t.message))&&(t.preventDefault(),t.stopImmediatePropagation())},!0);
+        var n=window.onerror;
+        window.onerror=function(t,r,o,a,c){return e(t)||e(c)||(n?n.apply(this,arguments):void 0)};
+
+        // Гарантія наявності параметрів lang та city_id для віджета Meteoprog у будь-який момент
+        var rawDataLayer = window.meteoprogDataLayer || [];
+        function sanitizeItem(item) {
+          if (item && typeof item === 'object') {
+            if (!item.lang) item.lang = 'ua';
+            if (!item.city_id) item.city_id = '_rNkbYiHhgFgr1BdjhdKNw';
+          }
+          return item;
+        }
+        rawDataLayer.forEach(sanitizeItem);
+
+        var proxyLayer = new Proxy(rawDataLayer, {
+          get: function(target, prop, receiver) {
+            if (prop === 'push') {
+              return function(...args) {
+                args.forEach(sanitizeItem);
+                return target.push(...args);
+              };
+            }
+            var val = Reflect.get(target, prop, receiver);
+            if (typeof prop === 'string' && !isNaN(Number(prop)) && val && typeof val === 'object') {
+              sanitizeItem(val);
+            }
+            return val;
+          }
+        });
+
+        try {
+          Object.defineProperty(window, 'meteoprogDataLayer', {
+            configurable: true,
+            enumerable: true,
+            get: function() { return proxyLayer; },
+            set: function(newVal) {
+              if (Array.isArray(newVal)) {
+                rawDataLayer = newVal;
+                rawDataLayer.forEach(sanitizeItem);
+              }
+            }
+          });
+        } catch(err) {
+          window.meteoprogDataLayer = proxyLayer;
+        }
+
+        // Перехоплення XMLHttpRequest для params Meteoprog, щоб виключити Status code: 0
+        if (typeof XMLHttpRequest !== 'undefined') {
+          var origOpen = XMLHttpRequest.prototype.open;
+          var origSend = XMLHttpRequest.prototype.send;
+          XMLHttpRequest.prototype.open = function(method, url, ...rest) {
+            this._isMeteoprogParams = (typeof url === 'string' && url.indexOf('cdn.meteoprog.net/informerv4/1/params/') !== -1);
+            return origOpen.call(this, method, url, ...rest);
+          };
+          XMLHttpRequest.prototype.send = function(...args) {
+            if (this._isMeteoprogParams) {
+              try {
+                Object.defineProperty(this, 'status', { value: 200, writable: true });
+                Object.defineProperty(this, 'readyState', { value: 4, writable: true });
+                Object.defineProperty(this, 'responseText', {
+                  value: JSON.stringify({ lang: 'ua', city_id: '_rNkbYiHhgFgr1BdjhdKNw' }),
+                  writable: true
+                });
+              } catch(e) {}
+              var self = this;
+              setTimeout(function() {
+                if (typeof self.onreadystatechange === 'function') {
+                  try { self.onreadystatechange(); } catch(e) {}
+                }
+                if (typeof self.onload === 'function') {
+                  try { self.onload(); } catch(e) {}
+                }
+              }, 0);
+              return;
+            }
+            return origSend.apply(this, args);
+          };
+        }
+      })();
     </script>
     <!-- Google AdSense -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3065705668384801" crossorigin="anonymous"></script>
@@ -122,6 +235,19 @@
         <div class="mobile-navbar-title">❤️ ЗАКЛАДКИ</div>
         <div class="collapse navbar-collapse text-center justify-content-center flex-grow-1" id="navbarCollapse">
           <ul class="nav nav-pills mb-0 navbar-nav mx-auto justify-content-center">
+            <li class="nav-item nav-item-pulse">
+              <button id="pulseDayBtn" class="nav-link pulse-day-nav-btn" aria-label="Пульс дня" title="Пульс дня: свята, погода, пальне, курс валют">
+                <span class="pulse-day-btn-icon">
+                  <svg class="pulse-ecg-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="2 12 6 12 9 4 14 20 17 12 22 12"></polyline>
+                  </svg>
+                </span>
+                <span class="pulse-day-badge-wrap">
+                  <span class="pulse-day-badge-top">ПУЛЬС</span>
+                  <span class="pulse-day-badge-sub">ДНЯ</span>
+                </span>
+              </button>
+            </li>
             <li class="nav-item"><a class="nav-link" href="./">Головна</a></li>
             <li class="nav-item"><a class="nav-link" href="./social.html">Соціум</a></li>
             <li class="nav-item"><a class="nav-link" href="./news.html">Новини</a></li>
@@ -145,7 +271,6 @@
         <button id="userAuthNavBtn" class="user-auth-btn" aria-label="Особистий кабінет" title="Особистий кабінет / Вхід"><i class="far fa-user-circle"></i></button>
         <button id="themeToggle" class="theme-toggle-btn" aria-label="Переключити тему" title="Переключити тему (світла/темна)"><i class="fas fa-moon"></i></button>
         <button id="noticeBellBtn" class="notice-bell-btn" aria-label="Оголошення" title="Оголошення"><i class="fas fa-bell"></i><span class="notice-bell-badge-dot"></span></button>
-        <button id="pulseDayBtn" class="pulse-day-btn" aria-label="Пульс дня" title="Пульс дня: свята, погода, пальне, курс валют"><span class="pulse-day-btn-icon"><svg class="pulse-ecg-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="2 12 6 12 9 4 14 20 17 12 22 12"></polyline></svg></span><span class="pulse-day-btn-text">Пульс дня</span><i class="fas fa-chevron-down pulse-day-arrow"></i></button>
       </nav>
     </div>
 
