@@ -2,6 +2,7 @@ import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import http from 'http';
+import https from 'https';
 import fs from 'fs';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -71,6 +72,43 @@ app.get('/api/radio', (req, res) => {
 
   req.on('close', () => {
     proxyReq.destroy();
+  });
+});
+
+// Meteoprog proxy routes for dev/preview environments (bypasses CORS & host check)
+app.get('/api/meteoprog/params/:id', (req, res) => {
+  const { id } = req.params;
+  const clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+  const options = {
+    headers: {
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
+      'X-Forwarded-For': clientIp
+    }
+  };
+  https.get(`https://cdn.meteoprog.net/informerv4/1/params/${id}`, options, (pRes) => {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    pRes.pipe(res);
+  }).on('error', () => {
+    res.json({ lang: 'ua' });
+  });
+});
+
+app.get('/api/meteoprog/js/:id/:lang/:city_id', (req, res) => {
+  const { id, lang, city_id } = req.params;
+  const url = `https://cdn.meteoprog.net/informerv4/1/js/${id}/${lang}/${city_id}`;
+  https.get(url, { headers: { 'User-Agent': 'Mozilla/5.0' } }, (pRes) => {
+    let body = '';
+    pRes.on('data', chunk => body += chunk);
+    pRes.on('end', () => {
+      // Allow execution in dev/preview environment by matching any host
+      body = body.replace('window.location.host === "zakladki.github.io".replace(/^https?:\\/\\//, \'\')', 'true');
+      res.setHeader('Content-Type', 'text/javascript; charset=UTF-8');
+      res.setHeader('Access-Control-Allow-Origin', '*');
+      res.send(body);
+    });
+  }).on('error', () => {
+    res.status(500).send('// Error fetching meteoprog script');
   });
 });
 

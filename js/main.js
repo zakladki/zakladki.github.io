@@ -6942,13 +6942,17 @@ function openCreateCardModal() {
         ...userBookmarkColumns[3]
       ];
 
+      // 1. Негайно закриваємо модальне вікно (інтерфейс не зависає)
       closeCustomModal();
+      // 2. Оновлюємо відображення та показуємо повідомлення
       renderBookmarksPage();
       showQuickToast(`Картку «${val}» створено!`, 'success');
-      await saveUserBookmarksData();
+      // 3. Зберігаємо у localStorage та фоново синхронізуємо з Firestore
+      saveUserBookmarksData().catch(err => console.warn('Помилка збереження:', err));
     };
   }
 }
+window.openCreateCardModal = openCreateCardModal;
 
 function openAddBookmarkModal(defaultCard = '') {
   if (!userBookmarkCards || userBookmarkCards.length === 0) {
@@ -7256,14 +7260,18 @@ function openAddBookmarkModal(defaultCard = '') {
         createdAt: new Date().toISOString()
       });
 
+      // 1. Негайно закриваємо модалку (вікно не зависає)
       closeCustomModal();
+      // 2. Оновлюємо сторінку та показуємо повідомлення
       renderBookmarksPage();
       syncAllCatalogHeartButtons();
       showQuickToast(`❤️ «${name}» додано у картку «${card}»!`, 'success');
-      await saveUserBookmarksData();
+      // 3. Зберігаємо у localStorage та синхронізуємо з хмарою
+      saveUserBookmarksData().catch(err => console.warn('Помилка синхронізації:', err));
     };
   }
 }
+window.openAddBookmarkModal = openAddBookmarkModal;
 
 function promptRenameCard(oldName) {
   if (isDefaultCard(oldName)) {
@@ -7324,13 +7332,17 @@ function promptRenameCard(oldName) {
           bm.card = newName;
         }
       });
+      // 1. Закриваємо модалку миттєво
       closeCustomModal();
+      // 2. Рендеримо
       renderBookmarksPage();
       showQuickToast(`Картку перейменовано на «${newName}»!`, 'success');
-      await saveUserBookmarksData();
+      // 3. Зберігаємо локально та синхронізуємо у фоні
+      saveUserBookmarksData().catch(err => console.warn('Помилка синхронізації:', err));
     };
   }
 }
+window.promptRenameCard = promptRenameCard;
 
 function promptDeleteCard(cardName) {
   if (isDefaultCard(cardName)) {
@@ -7360,6 +7372,7 @@ function promptDeleteCard(cardName) {
     showQuickToast(`Картку «${cardName}» видалено`, 'info');
   });
 }
+window.promptDeleteCard = promptDeleteCard;
 
 // Керування виїзними діями рядка закладок (стрілочка вліво розгортає кнопки дій)
 function toggleBookmarkRowActions(event, toggleBtn) {
@@ -7507,11 +7520,11 @@ function promptEditBookmark(bookmarkIndex) {
       const rawIcon = getFaviconForUrl(newUrl);
       bm.icon = cleanFaviconDataUri(rawIcon);
 
-      await saveUserBookmarksData();
       closeCustomModal();
       renderBookmarksPage();
       syncAllCatalogHeartButtons();
       showQuickToast(`Сайт «${escapeHtml(newName)}» оновлено!`, 'success');
+      saveUserBookmarksData().catch(err => console.warn('Помилка синхронізації:', err));
     };
   }
 }
@@ -7545,12 +7558,13 @@ function promptMoveBookmark(bookmarkIndex) {
     if (!sel) return;
     const newCard = sel.value;
     bm.card = newCard;
-    await saveUserBookmarksData();
     closeCustomModal();
     renderBookmarksPage();
     showQuickToast(`«${bm.name}» переміщено у «${newCard}»!`, 'success');
+    saveUserBookmarksData().catch(err => console.warn('Помилка синхронізації:', err));
   };
 }
+window.promptMoveBookmark = promptMoveBookmark;
 
 async function deleteUserBookmarkFromPage(bookmarkIndex) {
   const bm = userBookmarksList[bookmarkIndex];
@@ -7563,6 +7577,7 @@ async function deleteUserBookmarkFromPage(bookmarkIndex) {
   syncAllCatalogHeartButtons();
   showQuickToast(`«${name}» видалено з закладок`, 'info');
 }
+window.deleteUserBookmarkFromPage = deleteUserBookmarkFromPage;
 
 async function renderBookmarksPage() {
   const pageContainer = document.getElementById('bookmarksPageContainer');
@@ -7638,7 +7653,10 @@ async function renderBookmarksPage() {
   }
 
   try {
-    await loadUserBookmarksData();
+    if (!window._initialBookmarksLoaded) {
+      window._initialBookmarksLoaded = true;
+      await loadUserBookmarksData();
+    }
 
     if (loadingEl) loadingEl.style.display = 'none';
     pageContainer.style.display = 'block';
@@ -7899,9 +7917,38 @@ async function initBookmarksSortable() {
           ...col2Cards,
           ...col3Cards
         ];
-        if (!checkAndIncrementDailyActionLimit()) return;
-        await saveUserBookmarksData({ debounceCloud: true, debounceMs: 8000 });
-        showQuickToast('Порядок карток оновлено та збережено!', 'success');
+        // 1. Миттєво зберігаємо новий порядок у localStorage (0 мс, збереження гарантовано навіть при перезавантаженні)
+        try {
+          const uid = currentUser ? currentUser.uid : null;
+          const bmJson = JSON.stringify(userBookmarksList);
+          const cardsJson = JSON.stringify(userBookmarkCards);
+          const colsJson = JSON.stringify(userBookmarkColumns);
+          localStorage.setItem(getBookmarksStorageKey(uid), bmJson);
+          localStorage.setItem(getCardsStorageKey(uid), cardsJson);
+          localStorage.setItem(getColumnsStorageKey(uid), colsJson);
+          localStorage.setItem(GENERAL_BM_KEY, bmJson);
+          localStorage.setItem(GENERAL_CARDS_KEY, cardsJson);
+          localStorage.setItem(GENERAL_COLS_KEY, colsJson);
+        } catch (e) {}
+
+        // 2. Відкладаємо списання дії та запис у Firestore на 15 секунд:
+        // Дії не списуються миттєво під час переміщення. Кожне нове перетягування скидає таймер на 15 секунд.
+        // Лише через 15 с після останньої дії списується рівно 1 дія на всю сесію сортування.
+        if (sortReorderTimer) {
+          clearTimeout(sortReorderTimer);
+          sortReorderTimer = null;
+        }
+        pendingSortAction = true;
+        sortReorderTimer = setTimeout(async () => {
+          sortReorderTimer = null;
+          if (pendingSortAction) {
+            pendingSortAction = false;
+            if (checkAndIncrementDailyActionLimit()) {
+              await pushBookmarksToFirestore();
+              showQuickToast('Порядок карток оновлено та збережено!', 'success');
+            }
+          }
+        }, 15000);
       }
     });
   });
@@ -8339,6 +8386,16 @@ const UKR_HOLIDAYS_CALENDAR = {
   '12-25': { title: 'Різдво Христове', fact: 'Світле свято народження Христа за новоюліанським календарем в Україні.' }
 };
 
+function getPulseDateBadge() {
+  const now = new Date();
+  const daysShort = ['Нд', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
+  const monthsGen = ['січня', 'лютого', 'березня', 'квітня', 'травня', 'червня', 'липня', 'серпня', 'вересня', 'жовтня', 'листопада', 'грудня'];
+  const dayName = daysShort[now.getDay()];
+  const dayNum = now.getDate();
+  const monthName = monthsGen[now.getMonth()];
+  return `${dayName} • ${dayNum} ${monthName}`;
+}
+
 function getTodayHolidayInfo() {
   const now = new Date();
   const day = String(now.getDate()).padStart(2, '0');
@@ -8489,88 +8546,11 @@ function closePulseDrawer() {
   if (btn) btn.classList.remove('active');
 }
 
-// Безпечний перехоплювач для інформера Meteoprog: запобігає CORS-помилкам зі статус-кодом 0 поза цільовим доменом
+// Безпечний шар для інформера Meteoprog: приховує технічні помилки сторонніх скриптів
 (function setupMeteoprogSafetyLayer() {
   if (typeof window === 'undefined' || window.__meteoprogSafetyReady) return;
   window.__meteoprogSafetyReady = true;
 
-  var rawDataLayer = window.meteoprogDataLayer || [];
-  function sanitizeItem(item) {
-    if (item && typeof item === 'object') {
-      if (!item.lang) item.lang = 'ua';
-      if (!item.city_id) item.city_id = '_rNkbYiHhgFgr1BdjhdKNw';
-    }
-    return item;
-  }
-  rawDataLayer.forEach(sanitizeItem);
-
-  var proxyLayer = new Proxy(rawDataLayer, {
-    get: function(target, prop, receiver) {
-      if (prop === 'push') {
-        return function(...args) {
-          args.forEach(sanitizeItem);
-          return target.push(...args);
-        };
-      }
-      var val = Reflect.get(target, prop, receiver);
-      if (typeof prop === 'string' && !isNaN(Number(prop)) && val && typeof val === 'object') {
-        sanitizeItem(val);
-      }
-      return val;
-    }
-  });
-
-  try {
-    Object.defineProperty(window, 'meteoprogDataLayer', {
-      configurable: true,
-      enumerable: true,
-      get: function() { return proxyLayer; },
-      set: function(newVal) {
-        if (Array.isArray(newVal)) {
-          rawDataLayer = newVal;
-          rawDataLayer.forEach(sanitizeItem);
-        }
-      }
-    });
-  } catch(err) {
-    window.meteoprogDataLayer = proxyLayer;
-  }
-
-  // Перехоплення XMLHttpRequest для params Meteoprog, щоб виключити помилку Status code: 0
-  if (typeof XMLHttpRequest !== 'undefined') {
-    const origOpen = XMLHttpRequest.prototype.open;
-    const origSend = XMLHttpRequest.prototype.send;
-
-    XMLHttpRequest.prototype.open = function(method, url, ...rest) {
-      this._isMeteoprogParams = (typeof url === 'string' && url.indexOf('cdn.meteoprog.net/informerv4/1/params/') !== -1);
-      return origOpen.call(this, method, url, ...rest);
-    };
-
-    XMLHttpRequest.prototype.send = function(...args) {
-      if (this._isMeteoprogParams) {
-        try {
-          Object.defineProperty(this, 'status', { value: 200, writable: true });
-          Object.defineProperty(this, 'readyState', { value: 4, writable: true });
-          Object.defineProperty(this, 'responseText', {
-            value: JSON.stringify({ lang: 'ua', city_id: '_rNkbYiHhgFgr1BdjhdKNw' }),
-            writable: true
-          });
-        } catch(e) {}
-        setTimeout(() => {
-          if (typeof this.onreadystatechange === 'function') {
-            try { this.onreadystatechange(); } catch(e) {}
-          }
-          if (typeof this.onload === 'function') {
-            try { this.onload(); } catch(e) {}
-          }
-        }, 0);
-        return;
-      }
-      return origSend.apply(this, args);
-    };
-  }
-
-  // Приховуємо специфічний лог помилки стороннього віджета зі status code 0
   const origConsoleError = console.error;
   console.error = function(...args) {
     const str = args.map(a => typeof a === 'string' ? a : (a && a.message ? a.message : '')).join(' ').toLowerCase();
@@ -8582,48 +8562,41 @@ function closePulseDrawer() {
 })();
 
 function ensureMeteoprogInformerLoaded() {
+  const informerId = "7404b19c-3b3b-4b89-b631-1069a627b443";
   window.meteoprogDataLayer = window.meteoprogDataLayer || [];
 
-  const mainId = "13bc7a48-1acb-4c5b-ba41-c1f3246906a3";
-  const altId = "072fed0d-2514-47f3-af83-9c1044ee64dc";
-
-  // Перевіряємо та заповнюємо всі наявні елементи в черзі
-  window.meteoprogDataLayer.forEach(it => {
-    if (it && typeof it === 'object') {
-      if (!it.lang) it.lang = 'ua';
-      if (!it.city_id) it.city_id = '_rNkbYiHhgFgr1BdjhdKNw';
-    }
-  });
-
-  const existing = window.meteoprogDataLayer.find(it => it && (it.id === mainId || it.id === altId));
-  if (!existing) {
+  if (!window.meteoprogDataLayer.some(it => it && it.id === informerId)) {
     window.meteoprogDataLayer.push({
-      "id": mainId,
-      "lang": "ua",
-      "city_id": "_rNkbYiHhgFgr1BdjhdKNw"
+      "id": informerId
     });
-  } else {
-    existing.id = mainId;
-    existing.lang = "ua";
-    existing.city_id = "_rNkbYiHhgFgr1BdjhdKNw";
   }
 
-  if (!document.getElementById('meteoprogLoaderScript')) {
-    const s = document.createElement('script');
-    s.id = 'meteoprogLoaderScript';
-    s.async = true;
-    s.src = 'https://cdn.meteoprog.net/informerv4/1/loader.js';
-    document.body.appendChild(s);
+  const container = document.getElementById('meteoprogData_' + informerId);
+  if (!container) return;
+
+  // Якщо віджет вже завантажився та успішно відмалювався
+  if (container.querySelector('.meteoprog-informer-container, .informer, .hourly-item')) {
+    return;
   }
 
-  // Перевірка: якщо на поточному домені (наприклад, localhost або dev середовище поза zakladki.github.io)
-  // зовнішній віджет Meteoprog не відобразився, відображаємо живий детальний прогноз для Новомиргорода
-  setTimeout(() => {
-    const el = document.getElementById('meteoprogData_' + mainId) || document.getElementById('meteoprogData_' + altId);
-    if (el && (!el.firstElementChild || el.innerHTML.trim() === '')) {
-      renderWeatherFallbackNovomyrhorod(el);
+  // Перепідключаємо скрипт loader.js (гарантує відображення на мобільних пристроях при відкритті шторки)
+  const existingScript = document.getElementById('meteoprogLoaderScript');
+  if (existingScript) existingScript.remove();
+
+  const s = document.createElement('script');
+  s.id = 'meteoprogLoaderScript';
+  s.async = true;
+  s.src = 'https://cdn.meteoprog.net/informerv4/1/loader.js';
+  document.body.appendChild(s);
+
+  // Резервна перевірка через 4.5 с (без передчасного мерехтіння на 400 мс)
+  clearTimeout(window._meteoprogFallbackTimer);
+  window._meteoprogFallbackTimer = setTimeout(() => {
+    const targetEl = document.getElementById('meteoprogData_' + informerId);
+    if (targetEl && (!targetEl.firstElementChild || targetEl.querySelector('#meteoprogLoadingHint'))) {
+      renderWeatherFallbackNovomyrhorod(targetEl);
     }
-  }, 400);
+  }, 4500);
 }
 
 async function renderWeatherFallbackNovomyrhorod(container) {
@@ -8716,35 +8689,24 @@ function renderPulseDrawerLayout(container) {
     </div>
 
     <div class="pulse-cards-grid">
-      <!-- 1. СВЯТА ТА ПОДІЇ ДНЯ (ІНФОРМЕР DILOVAMOVA + ФАКТ ДНЯ) -->
+      <!-- 1. СВЯТА ТА ПОДІЇ ДНЯ (ІНФОРМЕР DILOVAMOVA) -->
       <div class="pulse-card" id="pulseCardHoliday">
         <div>
           <div class="pulse-card-header">
             <span class="pulse-card-title"><i class="fas fa-calendar-day text-info"></i> Свята та події</span>
-            <span class="pulse-card-badge">Сьогодні</span>
-          </div>
-          <div class="pulse-holiday-date-row">
-            <i class="far fa-calendar-alt"></i> <span id="pulseHolidayDate">${holiday.dateLabel}</span>
+            <span class="pulse-card-badge" id="pulseHolidayDateBadge">${getPulseDateBadge()}</span>
           </div>
 
-          <!-- Інформер календаря Dilovamova -->
-          <div class="pulse-dilovamova-wrap">
+          <!-- Інформер календаря Dilovamova (відразу після заголовка) -->
+          <div class="pulse-dilovamova-wrap" style="margin-top: 6px; margin-bottom: 0;">
             <a href="https://www.dilovamova.com/" target="_blank" rel="noopener" title="Календар свят. Мова, граматика, спілкування">
               <img src="https://www.dilovamova.com/images/wpi.cache/informer/informer_300_01.png" alt="Календар свят України" class="pulse-dilovamova-img" loading="lazy">
             </a>
           </div>
-
-          <div class="pulse-holiday-content">
-            <div class="pulse-holiday-main-title" id="pulseHolidayTitle">${holiday.title}</div>
-            <div class="pulse-holiday-history-fact" id="pulseHolidayFact">${holiday.fact}</div>
-          </div>
-        </div>
-        <div class="pulse-holiday-subnote">
-          <i class="fas fa-info-circle text-primary"></i> <span>Визначні дати в історії та житті України</span>
         </div>
       </div>
 
-      <!-- 2. ПОГОДА (METEOPROG) ТА МАГНІТНІ БУРІ (3 ДНІ ПО ЧАСОВИХ МІТКАХ) -->
+      <!-- 2. ПОГОДА (METEOPROG) ТА МАГНІТНІ БУРІ (3 ДНІ У ТАБЛИЧНОМУ ВИГЛЯДІ) -->
       <div class="pulse-card" id="pulseCardWeather">
         <div>
           <div class="pulse-card-header">
@@ -8754,23 +8716,23 @@ function renderPulseDrawerLayout(container) {
 
           <!-- Інформер Meteoprog з прогнозом на кілька днів -->
           <div class="pulse-meteoprog-wrap">
-            <div id="meteoprogData_13bc7a48-1acb-4c5b-ba41-c1f3246906a3"></div>
+            <div id="meteoprogData_7404b19c-3b3b-4b89-b631-1069a627b443">
+              <div class="text-center py-4 text-muted small" id="meteoprogLoadingHint" style="font-size: 0.72rem;">
+                <i class="fas fa-spinner fa-spin me-2 text-info"></i>Завантаження погоди...
+              </div>
+            </div>
           </div>
 
-          <!-- Прогноз геомагнітної активності (Магнітні бурі) на 3 дні за мітками 00:00 - 21:00 -->
+          <!-- Прогноз геомагнітної активності (Магнітні бурі) на 3 дні у табличному вигляді -->
           <div class="pulse-geomag-forecast-wrap" id="pulseGeomagWrap">
             <div class="pulse-geomag-forecast-header">
               <span><i class="fas fa-magnet text-primary me-1"></i> Магнітні бурі (Kp прогноз на 3 дні):</span>
               <span class="pulse-geomag-now-badge green" id="pulseGeomagNowBadge">🟢 Спокійно</span>
             </div>
             
-            <div class="pulse-geomag-days-container" id="pulseGeomagDaysContainer">
-              <!-- Заповнюється динамічно функцією renderGeomagForecastUI -->
+            <div class="pulse-geomag-table-wrap" id="pulseGeomagTableWrap">
+              <!-- Заповнюється таблицею функцією renderGeomagForecastUI -->
               <div class="text-center py-2 text-muted small"><i class="fas fa-spinner fa-spin me-1"></i> Завантаження прогнозу...</div>
-            </div>
-
-            <div class="pulse-kp-time-header">
-              <span>00:00</span><span>03:00</span><span>06:00</span><span>09:00</span><span>12:00</span><span>15:00</span><span>18:00</span><span>21:00</span>
             </div>
           </div>
         </div>
@@ -8810,11 +8772,11 @@ function renderPulseDrawerLayout(container) {
           <div class="p-2 mb-2 rounded" style="background: rgba(0,0,0,0.02); border: 1px solid rgba(226,232,240,0.8); font-size: 0.69rem;">
             <div class="d-flex justify-content-between mb-1">
               <span class="text-muted">Мережа ОККО:</span>
-              <span class="font-weight-bold">А-95: 92.90 • ДП: 104.90 грн</span>
+              <span class="font-weight-bold">А-95: 92.90 / ДП: 104.90 грн</span>
             </div>
             <div class="d-flex justify-content-between">
               <span class="text-muted">Мережа WOG:</span>
-              <span class="font-weight-bold">А-95: 92.90 • ДП: 104.50 грн</span>
+              <span class="font-weight-bold">А-95: 92.90 / ДП: 104.50 грн</span>
             </div>
           </div>
         </div>
@@ -9086,7 +9048,7 @@ function formatDateToYMD(d) {
 }
 
 function renderGeomagForecastUI(daysForecast) {
-  const container = document.getElementById('pulseGeomagDaysContainer');
+  const container = document.getElementById('pulseGeomagTableWrap') || document.getElementById('pulseGeomagDaysContainer');
   if (!container || !Array.isArray(daysForecast)) return;
 
   // Оцінюємо максимальний Kp на сьогодні для шапки
@@ -9107,30 +9069,39 @@ function renderGeomagForecastUI(daysForecast) {
     }
   }
 
-  container.innerHTML = daysForecast.map(day => `
-    <div class="pulse-geomag-day-row">
-      <div class="pulse-geomag-day-label">
-        <span>${day.label} (${day.date.split('-').slice(1).reverse().join('.')})</span>
-      </div>
-      <div class="pulse-geomag-slots-grid">
-        ${day.slots.map(slot => {
-          const val = slot.kp;
-          let colorClass = 'green';
-          if (val >= 5.0) colorClass = 'red';
-          else if (val >= 3.0) colorClass = 'yellow';
-          const heightPct = Math.max(16, Math.min(100, Math.round((val / 9) * 100)));
-          return `
-            <div class="pulse-kp-slot" title="${day.label} ${slot.time} - Kp ${val.toFixed(1)}">
-              <div class="pulse-kp-bar-wrap">
-                <div class="pulse-kp-bar ${colorClass}" style="height: ${heightPct}%;"></div>
-              </div>
-              <span class="pulse-kp-val ${colorClass}">${val.toFixed(1)}</span>
-            </div>
-          `;
-        }).join('')}
-      </div>
-    </div>
-  `).join('');
+  const timeHeaders = ['00:00', '03:00', '06:00', '09:00', '12:00', '15:00', '18:00', '21:00'];
+
+  const rowsHtml = daysForecast.map(day => {
+    const slotsHtml = (day.slots || []).map(slot => {
+      const val = typeof slot.kp === 'number' ? slot.kp : 1.5;
+      let colorClass = 'green';
+      if (val >= 5.0) colorClass = 'red';
+      else if (val >= 3.0) colorClass = 'yellow';
+      return `<td class="kp-cell ${colorClass}" title="${day.label} ${slot.time} - Kp ${val.toFixed(1)}">${val.toFixed(1)}</td>`;
+    }).join('');
+
+    const shortDate = day.date ? day.date.split('-').slice(1).reverse().join('.') : '';
+    return `
+      <tr>
+        <td class="kp-td-day">${day.label} <span style="font-weight: normal; opacity: 0.75; font-size: 0.58rem;">${shortDate}</span></td>
+        ${slotsHtml}
+      </tr>
+    `;
+  }).join('');
+
+  container.innerHTML = `
+    <table class="pulse-kp-table">
+      <thead>
+        <tr>
+          <th class="kp-th-day">Період</th>
+          ${timeHeaders.map(t => `<th>${t}</th>`).join('')}
+        </tr>
+      </thead>
+      <tbody>
+        ${rowsHtml}
+      </tbody>
+    </table>
+  `;
 }
 
 

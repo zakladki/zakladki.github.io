@@ -41,79 +41,55 @@
         var n=window.onerror;
         window.onerror=function(t,r,o,a,c){return e(t)||e(c)||(n?n.apply(this,arguments):void 0)};
 
-        // Гарантія наявності параметрів lang та city_id для віджета Meteoprog у будь-який момент
-        var rawDataLayer = window.meteoprogDataLayer || [];
-        function sanitizeItem(item) {
-          if (item && typeof item === 'object') {
-            if (!item.lang) item.lang = 'ua';
-            if (!item.city_id) item.city_id = '_rNkbYiHhgFgr1BdjhdKNw';
-          }
-          return item;
-        }
-        rawDataLayer.forEach(sanitizeItem);
-
-        var proxyLayer = new Proxy(rawDataLayer, {
-          get: function(target, prop, receiver) {
-            if (prop === 'push') {
-              return function(...args) {
-                args.forEach(sanitizeItem);
-                return target.push(...args);
-              };
-            }
-            var val = Reflect.get(target, prop, receiver);
-            if (typeof prop === 'string' && !isNaN(Number(prop)) && val && typeof val === 'object') {
-              sanitizeItem(val);
-            }
-            return val;
-          }
-        });
-
-        try {
-          Object.defineProperty(window, 'meteoprogDataLayer', {
-            configurable: true,
-            enumerable: true,
-            get: function() { return proxyLayer; },
-            set: function(newVal) {
-              if (Array.isArray(newVal)) {
-                rawDataLayer = newVal;
-                rawDataLayer.forEach(sanitizeItem);
-              }
-            }
+        // Підтримка інформера Meteoprog (id: 7404b19c-3b3b-4b89-b631-1069a627b443)
+        window.meteoprogDataLayer = window.meteoprogDataLayer || [];
+        if (!window.meteoprogDataLayer.some(function(it) { return it && it.id === '7404b19c-3b3b-4b89-b631-1069a627b443'; })) {
+          window.meteoprogDataLayer.push({
+            "id": "7404b19c-3b3b-4b89-b631-1069a627b443"
           });
-        } catch(err) {
-          window.meteoprogDataLayer = proxyLayer;
         }
 
-        // Перехоплення XMLHttpRequest для params Meteoprog, щоб виключити Status code: 0
-        if (typeof XMLHttpRequest !== 'undefined') {
-          var origOpen = XMLHttpRequest.prototype.open;
-          var origSend = XMLHttpRequest.prototype.send;
-          XMLHttpRequest.prototype.open = function(method, url, ...rest) {
-            this._isMeteoprogParams = (typeof url === 'string' && url.indexOf('cdn.meteoprog.net/informerv4/1/params/') !== -1);
-            return origOpen.call(this, method, url, ...rest);
-          };
-          XMLHttpRequest.prototype.send = function(...args) {
-            if (this._isMeteoprogParams) {
-              try {
-                Object.defineProperty(this, 'status', { value: 200, writable: true });
-                Object.defineProperty(this, 'readyState', { value: 4, writable: true });
-                Object.defineProperty(this, 'responseText', {
-                  value: JSON.stringify({ lang: 'ua', city_id: '_rNkbYiHhgFgr1BdjhdKNw' }),
-                  writable: true
-                });
-              } catch(e) {}
-              var self = this;
-              setTimeout(function() {
-                if (typeof self.onreadystatechange === 'function') {
-                  try { self.onreadystatechange(); } catch(e) {}
+        // Проксі запитів виключно для dev/preview середовищ (поза доменом zakladki.github.io)
+        if (typeof window !== 'undefined' && window.location.hostname !== 'zakladki.github.io') {
+          if (typeof XMLHttpRequest !== 'undefined') {
+            var origOpen = XMLHttpRequest.prototype.open;
+            XMLHttpRequest.prototype.open = function(method, url, ...rest) {
+               if (typeof url === 'string') {
+                var m = url.match(/cdn\.meteoprog\.net\/informerv4\/1\/params\/([a-zA-Z0-9-]+)/);
+                if (m) {
+                  url = '/api/meteoprog/params/' + m[1];
                 }
-                if (typeof self.onload === 'function') {
-                  try { self.onload(); } catch(e) {}
+              }
+              return origOpen.call(this, method, url, ...rest);
+            };
+          }
+
+          var origCreateElement = document.createElement;
+          document.createElement = function(tagName, ...args) {
+            var el = origCreateElement.call(document, tagName, ...args);
+            if (tagName && tagName.toLowerCase() === 'script') {
+              var origSetAttribute = el.setAttribute;
+              el.setAttribute = function(name, val) {
+                if (name === 'src' && typeof val === 'string') {
+                  var m = val.match(/cdn\.meteoprog\.net\/informerv4\/1\/js\/([a-zA-Z0-9-]+)\/([^/]+)\/([^/]+)/);
+                  if (m) val = '/api/meteoprog/js/' + m[1] + '/' + m[2] + '/' + m[3];
                 }
-              }, 0);
-              return;
+                return origSetAttribute.call(this, name, val);
+              };
+              Object.defineProperty(el, 'src', {
+                set: function(val) {
+                  if (typeof val === 'string') {
+                    var m = val.match(/cdn\.meteoprog\.net\/informerv4\/1\/js\/([a-zA-Z0-9-]+)\/([^/]+)\/([^/]+)/);
+                    if (m) val = '/api/meteoprog/js/' + m[1] + '/' + m[2] + '/' + m[3];
+                  }
+                  el.setAttribute('src', val);
+                },
+                get: function() {
+                  return el.getAttribute('src');
+                }
+              });
             }
-            return origSend.apply(this, args);
+            return el;
           };
         }
       })();
