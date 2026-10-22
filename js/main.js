@@ -6093,31 +6093,33 @@ async function addUserBookmark() {
     url = 'https://' + url;
   }
 
-  userBookmarksList.push({ name, url, createdAt: new Date().toISOString() });
+  removeDeletedBookmarkRecord(url);
+  userBookmarksList.push({ name, url, card: DEFAULT_CARD_NAME, icon: getFaviconForUrl(url), createdAt: new Date().toISOString() });
 
   try {
-    await firebaseDb.collection('users').doc(currentUser.uid).set({
-      bookmarks: userBookmarksList
-    }, { merge: true });
+    await saveUserBookmarksData();
     renderUserBookmarksTab();
     renderBookmarksPage();
+    syncAllCatalogHeartButtons();
   } catch (err) {
     alert("Не вдалося зберегти закладку: " + err.message);
   }
 }
 
 async function deleteUserBookmark(index) {
-  if (!currentUser || !firebaseDb) return;
+  const bm = userBookmarksList[index];
+  if (!bm) return;
+  if (!confirm(`Видалити «${bm.name}» із ваших закладок?`)) return;
+  if (!checkAndIncrementDailyActionLimit()) return;
+
+  const targetUrl = normalizeUrl(bm.url);
+  recordDeletedBookmarkUrl(targetUrl);
   userBookmarksList.splice(index, 1);
-  try {
-    await firebaseDb.collection('users').doc(currentUser.uid).set({
-      bookmarks: userBookmarksList
-    }, { merge: true });
-    renderUserBookmarksTab();
-    renderBookmarksPage();
-  } catch (err) {
-    alert("Помилка видалення: " + err.message);
-  }
+  await saveUserBookmarksData();
+  renderUserBookmarksTab();
+  renderBookmarksPage();
+  syncAllCatalogHeartButtons();
+  showQuickToast(`«${bm.name}» видалено з закладок`, 'info');
 }
 
 // Синхронізація вкладки «❤️ Закладки» у навігаційній панелі (відображається завжди)
@@ -6378,6 +6380,51 @@ const GENERAL_BM_KEY = 'topz_bm_all_saved';
 const GENERAL_CARDS_KEY = 'topz_bm_cards_all';
 const GENERAL_COLS_KEY = 'topz_bm_columns_v4';
 
+// Реєстр видалених користувачем закладок (запобігає випадковому поверненню зі старого кешу чи хмари)
+function getDeletedBookmarkUrls() {
+  const uid = currentUser ? currentUser.uid : 'guest';
+  const key = `topz_deleted_bm_${uid}`;
+  try {
+    const raw = localStorage.getItem(key);
+    if (!raw) return new Set();
+    const list = JSON.parse(raw);
+    const now = Date.now();
+    const valid = list.filter(item => item && (now - item.t < 14 * 24 * 3600 * 1000));
+    return new Set(valid.map(v => v.u));
+  } catch (e) {
+    return new Set();
+  }
+}
+
+function recordDeletedBookmarkUrl(url) {
+  if (!url) return;
+  const uid = currentUser ? currentUser.uid : 'guest';
+  const key = `topz_deleted_bm_${uid}`;
+  try {
+    const raw = localStorage.getItem(key);
+    let list = raw ? JSON.parse(raw) : [];
+    const norm = normalizeUrl(url);
+    const now = Date.now();
+    list = list.filter(item => item && item.u !== norm && (now - item.t < 14 * 24 * 3600 * 1000));
+    list.push({ u: norm, t: now });
+    localStorage.setItem(key, JSON.stringify(list));
+  } catch (e) {}
+}
+
+function removeDeletedBookmarkRecord(url) {
+  if (!url) return;
+  const uid = currentUser ? currentUser.uid : 'guest';
+  const key = `topz_deleted_bm_${uid}`;
+  try {
+    const raw = localStorage.getItem(key);
+    if (!raw) return;
+    let list = JSON.parse(raw);
+    const norm = normalizeUrl(url);
+    list = list.filter(item => item && item.u !== norm);
+    localStorage.setItem(key, JSON.stringify(list));
+  } catch (e) {}
+}
+
 // Ліміти тарифного плану Spark та захист від спаму (DAILY_ACTION_LIMIT оголошено вище)
 function checkAndIncrementDailyActionLimit() {
   const uid = currentUser ? currentUser.uid : 'guest';
@@ -6555,18 +6602,21 @@ async function loadUserBookmarksData() {
 
       let needsSyncBackToCloud = false;
 
-      // Надійне об'єднання закладок: жодна локально додана закладка не буде стерта застарілою відповіддю хмари
+      // Надійне об'єднання закладок: жодна локально додана закладка не буде стерта, і жодна видалена не повернеться
       if (Array.isArray(remoteBm) && remoteBm.length > 0) {
+        const deletedSet = getDeletedBookmarkUrls();
+        const cleanedRemoteBm = remoteBm.filter(b => b && b.url && !deletedSet.has(normalizeUrl(b.url)));
+
         if (userBookmarksList.length === 0) {
-          userBookmarksList = remoteBm;
+          userBookmarksList = cleanedRemoteBm;
         } else {
-          const remoteUrlSet = new Set(remoteBm.map(b => normalizeUrl(b.url)));
-          const localOnlyBm = userBookmarksList.filter(b => !remoteUrlSet.has(normalizeUrl(b.url)));
-          if (localOnlyBm.length > 0) {
-            userBookmarksList = [...remoteBm, ...localOnlyBm];
+          // Відфільтровуємо будь-які видалені закладки з поточного локального списку
+          userBookmarksList = userBookmarksList.filter(b => b && b.url && !deletedSet.has(normalizeUrl(b.url)));
+          const localUrlSet = new Set(userBookmarksList.map(b => normalizeUrl(b.url)));
+          const newFromRemote = cleanedRemoteBm.filter(b => !localUrlSet.has(normalizeUrl(b.url)));
+          if (newFromRemote.length > 0) {
+            userBookmarksList = [...userBookmarksList, ...newFromRemote];
             needsSyncBackToCloud = true;
-          } else if (remoteBm.length >= userBookmarksList.length) {
-            userBookmarksList = remoteBm;
           }
         }
       } else if (userBookmarksList.length > 0) {
@@ -6789,7 +6839,8 @@ async function handleQuickBookmarkClick(link, description, heartBtn) {
     const card = bm.card || userBookmarkCards[0] || DEFAULT_CARD_NAME;
     if (confirm(`Сайт «${bm.name}» уже є у ваших закладках (Картка: «${card}»).\n\nВидалити його з «❤️ Закладок»?`)) {
       if (!checkAndIncrementDailyActionLimit()) return;
-      userBookmarksList.splice(existingIdx, 1);
+      recordDeletedBookmarkUrl(cleanUrl);
+      userBookmarksList = userBookmarksList.filter(b => normalizeUrl(b.url) !== normalizeUrl(cleanUrl));
       await saveUserBookmarksData();
       syncAllCatalogHeartButtons();
       showQuickToast(`«${bm.name}» видалено з «❤️ Закладок»`, 'info');
@@ -6800,6 +6851,7 @@ async function handleQuickBookmarkClick(link, description, heartBtn) {
       return;
     }
     if (!checkAndIncrementDailyActionLimit()) return;
+    removeDeletedBookmarkRecord(cleanUrl);
     if (!userBookmarkCards || userBookmarkCards.length <= 1) {
       const targetCard = (userBookmarkCards && userBookmarkCards[0]) || DEFAULT_CARD_NAME;
       userBookmarksList.push({
@@ -6862,6 +6914,7 @@ function openChooseCardForBookmarkModal(linkName, cleanUrl, description) {
 
       const sel = document.getElementById('quickCardChoiceSelect');
       const card = sel ? sel.value : userBookmarkCards[0];
+      removeDeletedBookmarkRecord(cleanUrl);
       userBookmarksList.push({
         name: linkName,
         url: cleanUrl,
@@ -7251,6 +7304,7 @@ function openAddBookmarkModal(defaultCard = '') {
       confirmAddBtn.disabled = true;
       confirmAddBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Збереження...';
 
+      removeDeletedBookmarkRecord(url);
       userBookmarksList.push({
         name,
         url,
@@ -7566,12 +7620,36 @@ function promptMoveBookmark(bookmarkIndex) {
 }
 window.promptMoveBookmark = promptMoveBookmark;
 
-async function deleteUserBookmarkFromPage(bookmarkIndex) {
-  const bm = userBookmarksList[bookmarkIndex];
-  const name = bm ? bm.name : 'цей сайт';
+async function deleteUserBookmarkFromPage(bookmarkIndex, bookmarkUrl, bookmarkCard) {
+  // Шукаємо закладку за індексом або URL + card
+  let bm = userBookmarksList[bookmarkIndex];
+  if ((!bm || (bookmarkUrl && normalizeUrl(bm.url) !== normalizeUrl(bookmarkUrl))) && bookmarkUrl) {
+    const norm = normalizeUrl(bookmarkUrl);
+    bm = userBookmarksList.find(b => normalizeUrl(b.url) === norm && (!bookmarkCard || (b.card || DEFAULT_CARD_NAME) === bookmarkCard))
+         || userBookmarksList.find(b => normalizeUrl(b.url) === norm);
+  }
+  const name = bm ? bm.name : (bookmarkUrl || 'цей сайт');
   if (!confirm(`Видалити «${name}» із ваших закладок?`)) return;
   if (!checkAndIncrementDailyActionLimit()) return;
-  userBookmarksList.splice(bookmarkIndex, 1);
+
+  const targetUrl = bm ? normalizeUrl(bm.url) : (bookmarkUrl ? normalizeUrl(bookmarkUrl) : null);
+  const targetCard = bm ? (bm.card || DEFAULT_CARD_NAME) : bookmarkCard;
+
+  if (targetUrl) {
+    recordDeletedBookmarkUrl(targetUrl);
+  }
+
+  // Видаляємо сайт та всі його можливі дублікати з відповідної картки
+  if (targetUrl) {
+    userBookmarksList = userBookmarksList.filter(b => {
+      const matchUrl = normalizeUrl(b.url) === targetUrl;
+      const matchCard = !targetCard || (b.card || DEFAULT_CARD_NAME) === targetCard;
+      return !(matchUrl && matchCard);
+    });
+  } else if (typeof bookmarkIndex === 'number' && bookmarkIndex >= 0) {
+    userBookmarksList.splice(bookmarkIndex, 1);
+  }
+
   await saveUserBookmarksData();
   renderBookmarksPage();
   syncAllCatalogHeartButtons();
@@ -7735,7 +7813,7 @@ async function renderBookmarksPage() {
                     <button type="button" class="bm-icon-btn btn-edit" onclick="promptEditBookmark(${bm.origIdx})" title="Редагувати сайт (назву та адресу)">
                       <i class="fas fa-pen"></i>
                     </button>
-                    <button type="button" class="bm-icon-btn btn-del" onclick="deleteUserBookmarkFromPage(${bm.origIdx})" title="Видалити сайт/ресурс">
+                    <button type="button" class="bm-icon-btn btn-del" onclick="deleteUserBookmarkFromPage(${bm.origIdx}, '${escapeHtml(bm.url).replace(/'/g, "\\'")}', '${escapeHtml(bm.card || DEFAULT_CARD_NAME).replace(/'/g, "\\"')}')" title="Видалити сайт/ресурс">
                       <i class="far fa-trash-alt"></i>
                     </button>
                   </div>
@@ -8529,6 +8607,23 @@ function openPulseDrawer() {
   if (backdrop) backdrop.classList.add('is-open');
   if (btn) btn.classList.add('active');
 
+  // Автоматично згортаємо мобільне меню при відкритті «Пульсу дня»
+  try {
+    const navbarCollapse = document.getElementById('navbarCollapse');
+    if (navbarCollapse) {
+      if (typeof $ !== 'undefined' && $(navbarCollapse).collapse) {
+        $(navbarCollapse).collapse('hide');
+      } else {
+        navbarCollapse.classList.remove('show');
+      }
+    }
+    const hamburger = document.querySelector('.hamburger');
+    if (hamburger) {
+      hamburger.classList.remove('is-active');
+      hamburger.setAttribute('aria-expanded', 'false');
+    }
+  } catch (e) {}
+
   // Ініціалізуємо інформер Meteoprog при відкритті
   ensureMeteoprogInformerLoaded();
 
@@ -8689,7 +8784,7 @@ function renderPulseDrawerLayout(container) {
     </div>
 
     <div class="pulse-cards-grid">
-      <!-- 1. СВЯТА ТА ПОДІЇ ДНЯ (ІНФОРМЕР DILOVAMOVA) -->
+      <!-- 1. СВЯТА ТА ПОДІЇ ДНЯ + МАГНІТНІ БУРІ -->
       <div class="pulse-card" id="pulseCardHoliday">
         <div>
           <div class="pulse-card-header">
@@ -8697,36 +8792,20 @@ function renderPulseDrawerLayout(container) {
             <span class="pulse-card-badge" id="pulseHolidayDateBadge">${getPulseDateBadge()}</span>
           </div>
 
-          <!-- Інформер календаря Dilovamova (відразу після заголовка) -->
-          <div class="pulse-dilovamova-wrap" style="margin-top: 6px; margin-bottom: 0;">
+          <!-- Інформер календаря Dilovamova (без зайвої матрьошної рамки) -->
+          <div class="pulse-dilovamova-wrap" style="margin-top: 4px; margin-bottom: 2px;">
             <a href="https://www.dilovamova.com/" target="_blank" rel="noopener" title="Календар свят. Мова, граматика, спілкування">
               <img src="https://www.dilovamova.com/images/wpi.cache/informer/informer_300_01.png" alt="Календар свят України" class="pulse-dilovamova-img" loading="lazy">
             </a>
           </div>
-        </div>
-      </div>
 
-      <!-- 2. ПОГОДА (METEOPROG) ТА МАГНІТНІ БУРІ (3 ДНІ У ТАБЛИЧНОМУ ВИГЛЯДІ) -->
-      <div class="pulse-card" id="pulseCardWeather">
-        <div>
-          <div class="pulse-card-header">
-            <span class="pulse-card-title"><i class="fas fa-cloud-sun text-warning"></i> Погода & Сонце</span>
-            <span class="pulse-card-badge badge-green">Наживо</span>
-          </div>
-
-          <!-- Інформер Meteoprog з прогнозом на кілька днів -->
-          <div class="pulse-meteoprog-wrap">
-            <div id="meteoprogData_7404b19c-3b3b-4b89-b631-1069a627b443">
-              <div class="text-center py-4 text-muted small" id="meteoprogLoadingHint" style="font-size: 0.72rem;">
-                <i class="fas fa-spinner fa-spin me-2 text-info"></i>Завантаження погоди...
-              </div>
-            </div>
-          </div>
+          <!-- Лагідна роздільна лінія між Святами та Магнітними бурями -->
+          <div class="pulse-card-divider"></div>
 
           <!-- Прогноз геомагнітної активності (Магнітні бурі) на 3 дні у табличному вигляді -->
           <div class="pulse-geomag-forecast-wrap" id="pulseGeomagWrap">
             <div class="pulse-geomag-forecast-header">
-              <span><i class="fas fa-magnet text-primary me-1"></i> Магнітні бурі (Kp прогноз на 3 дні):</span>
+              <span><i class="fas fa-magnet text-primary me-1"></i> Магнітні бурі:</span>
               <span class="pulse-geomag-now-badge green" id="pulseGeomagNowBadge">🟢 Спокійно</span>
             </div>
             
@@ -8741,6 +8820,25 @@ function renderPulseDrawerLayout(container) {
           <a href="https://solarmeteo.ukalendar.com/defs/kp-index" target="_blank" rel="noopener" class="text-primary" style="font-size: 0.68rem; text-decoration: none;">
             Детальніше <i class="fas fa-external-link-alt ms-1"></i>
           </a>
+        </div>
+      </div>
+
+      <!-- 2. ПОГОДА (METEOPROG) -->
+      <div class="pulse-card" id="pulseCardWeather">
+        <div>
+          <div class="pulse-card-header">
+            <span class="pulse-card-title"><i class="fas fa-cloud-sun text-warning"></i> Погода</span>
+            <span class="pulse-card-badge badge-green">Наживо</span>
+          </div>
+
+          <!-- Інформер Meteoprog з прогнозом на кілька днів (без матрьошної рамки) -->
+          <div class="pulse-meteoprog-wrap">
+            <div id="meteoprogData_7404b19c-3b3b-4b89-b631-1069a627b443">
+              <div class="text-center py-4 text-muted small" id="meteoprogLoadingHint" style="font-size: 0.72rem;">
+                <i class="fas fa-spinner fa-spin me-2 text-info"></i>Завантаження погоди...
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -8988,18 +9086,31 @@ function applyRatesToUI(rates) {
   }
 }
 
+function getGeomagCompactDayBadge(dateObj) {
+  const uaDays = ['Нд', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
+  const dayName = uaDays[dateObj.getDay()];
+  const dayNum = dateObj.getDate();
+  return `${dayName}•${dayNum}`;
+}
+
 async function fetchLiveGeomag3DayForecast() {
+  const now = new Date();
+  const d1Obj = new Date(now.getTime() + 24 * 3600 * 1000);
+  const d2Obj = new Date(now.getTime() + 48 * 3600 * 1000);
+
+  const d0 = formatDateToYMD(now);
+  const d1 = formatDateToYMD(d1Obj);
+  const d2 = formatDateToYMD(d2Obj);
+
+  const badge0 = getGeomagCompactDayBadge(now);
+  const badge1 = getGeomagCompactDayBadge(d1Obj);
+  const badge2 = getGeomagCompactDayBadge(d2Obj);
+
   try {
     const res = await fetch('https://services.swpc.noaa.gov/products/noaa-planetary-k-index-forecast.json');
     if (!res.ok) throw new Error('NOAA forecast API error');
     const data = await res.json();
     if (!Array.isArray(data) || data.length === 0) throw new Error('Empty forecast');
-
-    // Групуємо дані по 3 днях
-    const now = new Date();
-    const d0 = formatDateToYMD(now);
-    const d1 = formatDateToYMD(new Date(now.getTime() + 24 * 3600 * 1000));
-    const d2 = formatDateToYMD(new Date(now.getTime() + 48 * 3600 * 1000));
 
     const timeSlots = ['00:00', '03:00', '06:00', '09:00', '12:00', '15:00', '18:00', '21:00'];
 
@@ -9015,16 +9126,11 @@ async function fetchLiveGeomag3DayForecast() {
     };
 
     return [
-      { label: 'Сьогодні', date: d0, slots: getDaySlots(d0) },
-      { label: 'Завтра', date: d1, slots: getDaySlots(d1) },
-      { label: 'Післязавтра', date: d2, slots: getDaySlots(d2) }
+      { label: badge0, badge: badge0, date: d0, slots: getDaySlots(d0) },
+      { label: badge1, badge: badge1, date: d1, slots: getDaySlots(d1) },
+      { label: badge2, badge: badge2, date: d2, slots: getDaySlots(d2) }
     ];
   } catch (e) {
-    // Безпечний запасний прогноз на 3 дні
-    const now = new Date();
-    const d0 = formatDateToYMD(now);
-    const d1 = formatDateToYMD(new Date(now.getTime() + 24 * 3600 * 1000));
-    const d2 = formatDateToYMD(new Date(now.getTime() + 48 * 3600 * 1000));
     const timeSlots = ['00:00', '03:00', '06:00', '09:00', '12:00', '15:00', '18:00', '21:00'];
 
     const makeFallback = (base) => timeSlots.map((t, idx) => ({
@@ -9033,9 +9139,9 @@ async function fetchLiveGeomag3DayForecast() {
     }));
 
     return [
-      { label: 'Сьогодні', date: d0, slots: makeFallback(1.7) },
-      { label: 'Завтра', date: d1, slots: makeFallback(2.3) },
-      { label: 'Післязавтра', date: d2, slots: makeFallback(1.5) }
+      { label: badge0, badge: badge0, date: d0, slots: makeFallback(1.7) },
+      { label: badge1, badge: badge1, date: d1, slots: makeFallback(2.3) },
+      { label: badge2, badge: badge2, date: d2, slots: makeFallback(1.5) }
     ];
   }
 }
@@ -9077,13 +9183,12 @@ function renderGeomagForecastUI(daysForecast) {
       let colorClass = 'green';
       if (val >= 5.0) colorClass = 'red';
       else if (val >= 3.0) colorClass = 'yellow';
-      return `<td class="kp-cell ${colorClass}" title="${day.label} ${slot.time} - Kp ${val.toFixed(1)}">${val.toFixed(1)}</td>`;
+      return `<td class="kp-cell ${colorClass}" title="${day.badge || day.label} ${slot.time} - Kp ${val.toFixed(1)}">${val.toFixed(1)}</td>`;
     }).join('');
 
-    const shortDate = day.date ? day.date.split('-').slice(1).reverse().join('.') : '';
     return `
       <tr>
-        <td class="kp-td-day">${day.label} <span style="font-weight: normal; opacity: 0.75; font-size: 0.58rem;">${shortDate}</span></td>
+        <td class="kp-td-day">${day.badge || day.label}</td>
         ${slotsHtml}
       </tr>
     `;
@@ -9093,7 +9198,7 @@ function renderGeomagForecastUI(daysForecast) {
     <table class="pulse-kp-table">
       <thead>
         <tr>
-          <th class="kp-th-day">Період</th>
+          <th class="kp-th-day">Час</th>
           ${timeHeaders.map(t => `<th>${t}</th>`).join('')}
         </tr>
       </thead>

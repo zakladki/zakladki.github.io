@@ -872,6 +872,49 @@ footer.footer .btn-primary:active {
     overflow: hidden !important;
     text-overflow: ellipsis !important;
   }
+  .navbar-nav .nav-item.nav-item-pulse {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100% !important;
+    margin: 0 !important;
+  }
+  .navbar-nav .nav-link.pulse-day-nav-btn {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 38px !important;
+    padding: 4px 6px !important;
+    text-align: center !important;
+    margin: 0 auto !important;
+    gap: 6px !important;
+  }
+  .pulse-day-nav-btn .pulse-day-btn-icon {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    align-self: center !important;
+    line-height: 1 !important;
+    margin: 0 !important;
+    flex-shrink: 0 !important;
+  }
+  .pulse-day-nav-btn .pulse-day-btn-icon .pulse-ecg-icon {
+    display: block !important;
+    margin: 0 !important;
+    vertical-align: middle !important;
+  }
+  .pulse-day-nav-btn .pulse-day-badge-wrap {
+    display: inline-flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    align-self: center !important;
+    line-height: 1.1 !important;
+    margin: 0 !important;
+  }
 
   /* 1. Закріплюємо шапку зверху (fixed) для мобільних */
   .navbar, .nav-container, .header { 
@@ -10341,7 +10384,8 @@ body.dark-mode .guest-bm-modal-footer {
 /* Кнопка «Пульс дня» у головному меню (розміщується перед «Головна») */
 .nav-item-pulse {
   display: flex !important;
-  align-items: stretch !important;
+  align-items: center !important;
+  justify-content: center !important;
 }
 .pulse-day-nav-btn {
   background: transparent !important;
@@ -10351,7 +10395,7 @@ body.dark-mode .guest-bm-modal-footer {
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
-  gap: 5px;
+  gap: 6px;
   color: #38bdf8 !important;
   padding: 0 8px !important;
   height: 100% !important;
@@ -10376,6 +10420,7 @@ body.dark-mode .guest-bm-modal-footer {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  align-self: center;
   line-height: 1.05;
 }
 .pulse-day-badge-top {
@@ -10750,25 +10795,35 @@ body.dark-mode .pulse-holiday-date-row {
   color: #38bdf8;
 }
 .pulse-dilovamova-wrap {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  padding: 6px;
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
   text-align: center;
-  margin-bottom: 8px;
+  margin-bottom: 2px;
 }
 body.dark-mode .pulse-dilovamova-wrap {
-  background: #1e293b;
-  border-color: #334155;
+  background: transparent !important;
+  border: none !important;
 }
 .pulse-dilovamova-img {
   max-width: 100%;
-  width: 220px;
+  width: auto;
+  max-height: 310px;
   height: auto;
   border-radius: 6px;
   display: block;
   margin: 0 auto;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.pulse-card-divider {
+  height: 1px;
+  background: #e2e8f0;
+  margin: 8px 0;
+  border: none;
+}
+body.dark-mode .pulse-card-divider {
+  background: rgba(255, 255, 255, 0.08);
 }
 .pulse-holiday-content {
   background: #ffffff;
@@ -10815,17 +10870,16 @@ body.dark-mode .pulse-holiday-subnote {
    КАРТКА 2: ПОГОДА (METEOPROG) ТА МАГНІТНІ БУРІ (3 ДНІ ПО ЧАСОВИХ МІТКАХ)
    ========================================================================== */
 .pulse-meteoprog-wrap {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 7px;
-  padding: 4px;
-  margin-bottom: 8px;
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  margin-bottom: 4px;
   min-height: 80px;
   overflow: hidden;
 }
 body.dark-mode .pulse-meteoprog-wrap {
-  background: #1e293b;
-  border-color: #334155;
+  background: transparent !important;
+  border: none !important;
 }
 
 /* Резервний адаптивний віджет погоди Новомиргорода з прогнозом на 3 дні */
@@ -10882,26 +10936,25 @@ body.dark-mode .pulse-meteoprog-wrap {
 
 /* Блок прогнозу геомагнітного поля на 3 дні */
 .pulse-geomag-forecast-wrap {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 7px;
-  padding: 6px 8px;
+  background: transparent;
+  border: none;
+  padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 4px;
 }
 body.dark-mode .pulse-geomag-forecast-wrap {
-  background: #1e293b;
-  border-color: #334155;
+  background: transparent;
+  border: none;
 }
 .pulse-geomag-forecast-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-size: 0.71rem;
+  font-size: 0.73rem;
   font-weight: 700;
   color: #334155;
-  padding-bottom: 4px;
+  padding-bottom: 3px;
   border-bottom: 1px solid #f1f5f9;
 }
 body.dark-mode .pulse-geomag-forecast-header {
@@ -10925,7 +10978,7 @@ body.dark-mode .pulse-geomag-now-badge.red { background: rgba(239, 68, 68, 0.3);
   width: 100%;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
-  margin-top: 4px;
+  margin-top: 3px;
 }
 .pulse-kp-table {
   width: 100%;
@@ -10937,7 +10990,7 @@ body.dark-mode .pulse-geomag-now-badge.red { background: rgba(239, 68, 68, 0.3);
 .pulse-kp-table th {
   padding: 3px 2px;
   font-size: 0.62rem;
-  font-weight: 700;
+  font-weight: 500;
   color: #64748b;
   background: rgba(0, 0, 0, 0.03);
   border-radius: 4px;
@@ -10948,19 +11001,23 @@ body.dark-mode .pulse-kp-table th {
   background: rgba(255, 255, 255, 0.05);
 }
 .pulse-kp-table .kp-th-day {
-  text-align: left;
-  padding-left: 6px;
-  min-width: 78px;
+  text-align: center;
+  padding: 3px 4px;
+  min-width: 44px;
+  width: 44px;
+  font-weight: 600;
 }
 .pulse-kp-table .kp-td-day {
-  text-align: left;
-  padding: 3px 6px;
+  text-align: center;
+  padding: 3px 4px;
   font-size: 0.64rem;
   font-weight: 700;
   color: #0284c7;
   white-space: nowrap;
   background: rgba(0, 0, 0, 0.02);
   border-radius: 4px;
+  min-width: 44px;
+  width: 44px;
 }
 body.dark-mode .pulse-kp-table .kp-td-day {
   color: #38bdf8;
