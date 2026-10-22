@@ -671,6 +671,13 @@ nav.navbar {
   background-color: rgba(59, 130, 246, 0.2);
 }
 
+/* Коли «Пульс дня» відкритий, виділення активної сторінки («Головна» тощо) приховується */
+body.pulse-drawer-open .navbar-nav a.nav-link.active,
+body.pulse-drawer-open .navbar-nav a.nav-link.pulse-paused-active {
+  color: #cbd5e1 !important;
+  background-color: transparent !important;
+}
+
 .navbar-nav .nav-link.home-highlight:hover {
   background: rgba(59, 130, 246, 0.25);
   border-color: rgba(59, 130, 246, 0.9);

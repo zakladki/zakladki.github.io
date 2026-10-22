@@ -7813,7 +7813,7 @@ async function renderBookmarksPage() {
                     <button type="button" class="bm-icon-btn btn-edit" onclick="promptEditBookmark(${bm.origIdx})" title="Редагувати сайт (назву та адресу)">
                       <i class="fas fa-pen"></i>
                     </button>
-                    <button type="button" class="bm-icon-btn btn-del" onclick="deleteUserBookmarkFromPage(${bm.origIdx}, '${escapeHtml(bm.url).replace(/'/g, "\\'")}', '${escapeHtml(bm.card || DEFAULT_CARD_NAME).replace(/'/g, "\\"')}')" title="Видалити сайт/ресурс">
+                    <button type="button" class="bm-icon-btn btn-del" onclick="deleteUserBookmarkFromPage(${bm.origIdx})" title="Видалити сайт/ресурс">
                       <i class="far fa-trash-alt"></i>
                     </button>
                   </div>
@@ -8606,6 +8606,14 @@ function openPulseDrawer() {
   if (drawer) drawer.classList.add('is-open');
   if (backdrop) backdrop.classList.add('is-open');
   if (btn) btn.classList.add('active');
+  document.body.classList.add('pulse-drawer-open');
+
+  // Знімаємо активне виділення з поточної вкладки сторінки (наприклад, «Головна») доки відкритий «Пульс дня»
+  const activeNavLinks = document.querySelectorAll('.navbar-nav a.nav-link.active');
+  activeNavLinks.forEach(link => {
+    link.classList.add('pulse-paused-active');
+    link.classList.remove('active');
+  });
 
   // Автоматично згортаємо мобільне меню при відкритті «Пульсу дня»
   try {
@@ -8639,6 +8647,14 @@ function closePulseDrawer() {
   if (drawer) drawer.classList.remove('is-open');
   if (backdrop) backdrop.classList.remove('is-open');
   if (btn) btn.classList.remove('active');
+  document.body.classList.remove('pulse-drawer-open');
+
+  // Повертаємо активне виділення на вкладку поточної сторінки
+  const pausedLinks = document.querySelectorAll('.navbar-nav a.nav-link.pulse-paused-active');
+  pausedLinks.forEach(link => {
+    link.classList.add('active');
+    link.classList.remove('pulse-paused-active');
+  });
 }
 
 // Безпечний шар для інформера Meteoprog: приховує технічні помилки сторонніх скриптів
