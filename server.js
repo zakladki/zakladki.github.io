@@ -86,29 +86,52 @@ app.get('/api/meteoprog/params/:id', (req, res) => {
     }
   };
   https.get(`https://cdn.meteoprog.net/informerv4/1/params/${id}`, options, (pRes) => {
+    let body = '';
+    pRes.on('data', chunk => body += chunk);
+    pRes.on('end', () => {
+      res.setHeader('Content-Type', 'application/json');
+      res.setHeader('Access-Control-Allow-Origin', '*');
+      if (pRes.statusCode === 200 && body.trim().startsWith('{')) {
+        try {
+          const parsed = JSON.parse(body);
+          if (parsed && !parsed.city_id) {
+            parsed.city_id = '_rNkbYiHhgFgr1BdjhdKNw';
+          }
+          return res.json(parsed);
+        } catch (e) {}
+      }
+      res.json({ lang: 'ua', city_id: '_rNkbYiHhgFgr1BdjhdKNw' });
+    });
+  }).on('error', () => {
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Access-Control-Allow-Origin', '*');
-    pRes.pipe(res);
-  }).on('error', () => {
-    res.json({ lang: 'ua' });
+    res.json({ lang: 'ua', city_id: '_rNkbYiHhgFgr1BdjhdKNw' });
   });
 });
 
 app.get('/api/meteoprog/js/:id/:lang/:city_id', (req, res) => {
   const { id, lang, city_id } = req.params;
+  res.setHeader('Content-Type', 'application/javascript; charset=UTF-8');
+  res.setHeader('Access-Control-Allow-Origin', '*');
+
+  if (!city_id || city_id === 'undefined') {
+    return res.send('/* Meteoprog city undefined */');
+  }
+
   const url = `https://cdn.meteoprog.net/informerv4/1/js/${id}/${lang}/${city_id}`;
   https.get(url, { headers: { 'User-Agent': 'Mozilla/5.0' } }, (pRes) => {
     let body = '';
     pRes.on('data', chunk => body += chunk);
     pRes.on('end', () => {
+      if (pRes.statusCode !== 200 || body.trim().startsWith('<') || body.trim().startsWith('{')) {
+        return res.send('/* Meteoprog unavailable or non-JS response */');
+      }
       // Allow execution in dev/preview environment by matching any host
       body = body.replace('window.location.host === "zakladki.github.io".replace(/^https?:\\/\\//, \'\')', 'true');
-      res.setHeader('Content-Type', 'text/javascript; charset=UTF-8');
-      res.setHeader('Access-Control-Allow-Origin', '*');
       res.send(body);
     });
   }).on('error', () => {
-    res.status(500).send('// Error fetching meteoprog script');
+    res.send('// Error fetching meteoprog script');
   });
 });
 
@@ -123,7 +146,18 @@ app.use(express.static(__dirname, {
   }
 }));
 
+// Fallback for any missing .js files: return valid JS comment instead of Express HTML 404 page
+// This prevents "Uncaught SyntaxError: Unexpected token '<'" if any script is not found
+app.use((req, res, next) => {
+  if (req.path.endsWith('.js') || req.url.includes('.js?')) {
+    res.setHeader('Content-Type', 'application/javascript; charset=UTF-8');
+    return res.status(404).send('/* 404 Script Not Found: ' + req.path + ' */');
+  }
+  next();
+});
+
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server running on http://0.0.0.0:${PORT}`);
 });
+
 

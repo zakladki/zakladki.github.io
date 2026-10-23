@@ -24,7 +24,9 @@
                  r.indexOf("resizeobserver")!==-1||
                  r.indexOf("meteoprog")!==-1||
                  r.indexOf("status code: 0")!==-1||
-                 r.indexOf("status code:")!==-1;
+                 r.indexOf("status code:")!==-1||
+                 r.indexOf("unexpected token '<'")!==-1||
+                 r.indexOf("unexpected token <")!==-1;
         }
         var o=console.error;
         console.error=function(){
@@ -64,33 +66,33 @@
             };
           }
 
-          var origCreateElement = document.createElement;
-          document.createElement = function(tagName, ...args) {
-            var el = origCreateElement.call(document, tagName, ...args);
-            if (tagName && tagName.toLowerCase() === 'script') {
-              var origSetAttribute = el.setAttribute;
-              el.setAttribute = function(name, val) {
-                if (name === 'src' && typeof val === 'string') {
-                  var m = val.match(/cdn\.meteoprog\.net\/informerv4\/1\/js\/([a-zA-Z0-9-]+)\/([^/]+)\/([^/]+)/);
-                  if (m) val = '/api/meteoprog/js/' + m[1] + '/' + m[2] + '/' + m[3];
-                }
-                return origSetAttribute.call(this, name, val);
-              };
-              Object.defineProperty(el, 'src', {
+          if (typeof HTMLScriptElement !== 'undefined') {
+            var origSrcDesc = Object.getOwnPropertyDescriptor(HTMLScriptElement.prototype, 'src');
+            if (origSrcDesc && origSrcDesc.set) {
+              var origSet = origSrcDesc.set;
+              var origGet = origSrcDesc.get;
+              Object.defineProperty(HTMLScriptElement.prototype, 'src', {
                 set: function(val) {
-                  if (typeof val === 'string') {
-                    var m = val.match(/cdn\.meteoprog\.net\/informerv4\/1\/js\/([a-zA-Z0-9-]+)\/([^/]+)\/([^/]+)/);
-                    if (m) val = '/api/meteoprog/js/' + m[1] + '/' + m[2] + '/' + m[3];
+                  if (typeof val === 'string' && val.indexOf('cdn.meteoprog.net/informerv4/1/js/') !== -1) {
+                    val = val.replace(/https?:\/\/cdn\.meteoprog\.net\/informerv4\/1\/js\/([a-zA-Z0-9-]+)\/([^/]+)\/([^/]+)/, '/api/meteoprog/js/$1/$2/$3');
                   }
-                  el.setAttribute('src', val);
+                  return origSet.call(this, val);
                 },
                 get: function() {
-                  return el.getAttribute('src');
-                }
+                  return origGet.call(this);
+                },
+                configurable: true
               });
             }
-            return el;
-          };
+
+            var origSetAttr = HTMLScriptElement.prototype.setAttribute;
+            HTMLScriptElement.prototype.setAttribute = function(name, val) {
+              if (name === 'src' && typeof val === 'string' && val.indexOf('cdn.meteoprog.net/informerv4/1/js/') !== -1) {
+                val = val.replace(/https?:\/\/cdn\.meteoprog\.net\/informerv4\/1\/js\/([a-zA-Z0-9-]+)\/([^/]+)\/([^/]+)/, '/api/meteoprog/js/$1/$2/$3');
+              }
+              return origSetAttr.call(this, name, val);
+            };
+          }
         }
       })();
     </script>
