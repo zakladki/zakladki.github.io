@@ -4882,6 +4882,20 @@ async function initFirebaseAuthAndDb() {
         syncAllCatalogHeartButtons();
         renderBookmarksPage();
         if (currentUser && firebaseDb) {
+          firebaseDb.collection('users').doc(currentUser.uid).get().then(docSnap => {
+            if (docSnap && docSnap.exists) {
+              const uData = docSnap.data();
+              if (uData && uData.fuelRegion) {
+                localStorage.setItem('user_fuel_region', uData.fuelRegion);
+                const regSelect = document.getElementById('pulseFuelRegionSelect');
+                if (regSelect) regSelect.value = uData.fuelRegion;
+                if (typeof renderPulseFuelTable === 'function') {
+                  renderPulseFuelTable(uData.fuelRegion);
+                }
+              }
+            }
+          }).catch(() => {});
+
           firebaseDb.collection('users').doc(currentUser.uid).set({
             uid: currentUser.uid,
             email: currentUser.email || '',
@@ -8805,6 +8819,89 @@ async function renderWeatherFallbackNovomyrhorod(container) {
   }
 }
 
+// ==========================================================================
+// ДАНІ ТА ЛОГІКА ЦІН НА ПАЛЬНЕ (РЕГІОНИ УКРАЇНИ ТА ПРОВІДНІ МЕРЕЖІ АЗС)
+// ==========================================================================
+const UKRAINE_FUEL_REGIONS = [
+  { id: 'ua', name: 'Вся Україна (середнє)', delta: 0 },
+  { id: 'kyiv', name: 'м. Київ', delta: 0 },
+  { id: 'kyiv_obl', name: 'Київська обл.', delta: -0.10 },
+  { id: 'vinnytsia', name: 'Вінницька обл.', delta: -0.20 },
+  { id: 'volyn', name: 'Волинська обл.', delta: -0.40 },
+  { id: 'dnipro', name: 'Дніпропетровська обл.', delta: 0.20 },
+  { id: 'donetsk', name: 'Донецька обл.', delta: 0.60 },
+  { id: 'zhytomyr', name: 'Житомирська обл.', delta: -0.20 },
+  { id: 'zakarpattia', name: 'Закарпатська обл.', delta: -0.40 },
+  { id: 'zaporizhzhia', name: 'Запорізька обл.', delta: 0.40 },
+  { id: 'ivano_frankivsk', name: 'Івано-Франківська обл.', delta: -0.30 },
+  { id: 'kirovohrad', name: 'Кіровоградська обл.', delta: 0.10 },
+  { id: 'luhansk', name: 'Луганська обл.', delta: 0.60 },
+  { id: 'lviv', name: 'Львівська обл.', delta: -0.40 },
+  { id: 'mykolaiv', name: 'Миколаївська обл.', delta: 0.10 },
+  { id: 'odesa', name: 'Одеська обл.', delta: 0.00 },
+  { id: 'poltava', name: 'Полтавська обл.', delta: 0.10 },
+  { id: 'rivne', name: 'Рівненська обл.', delta: -0.30 },
+  { id: 'sumy', name: 'Сумська обл.', delta: 0.20 },
+  { id: 'ternopil', name: 'Тернопільська обл.', delta: -0.30 },
+  { id: 'kharkiv', name: 'Харківська обл.', delta: 0.40 },
+  { id: 'kherson', name: 'Херсонська обл.', delta: 0.50 },
+  { id: 'khmelnytskyi', name: 'Хмельницька обл.', delta: -0.20 },
+  { id: 'cherkasy', name: 'Черкаська обл.', delta: 0.00 },
+  { id: 'chernivtsi', name: 'Чернівецька обл.', delta: -0.30 },
+  { id: 'chernihiv', name: 'Чернігівська обл.', delta: 0.10 }
+];
+
+const BASE_FUEL_NETWORKS = [
+  { brand: 'OKKO', a95: 92.90, a95p: 95.90, dp: 105.90, dpp: 108.90, lpg: 52.90 },
+  { brand: 'WOG', a95: 92.90, a95p: 95.90, dp: 104.50, dpp: 107.50, lpg: 53.50 },
+  { brand: 'UPG', a95: 89.90, a95p: 92.90, dp: 101.90, dpp: 103.90, lpg: 51.90 },
+  { brand: 'SOCAR', a95: 94.90, a95p: 97.90, dp: 106.00, dpp: 109.00, lpg: 54.40 },
+  { brand: 'Укрнафта', a95: 88.90, a95p: 91.90, dp: 99.90, dpp: 101.90, lpg: 50.90 }
+];
+
+function formatDecimalsHtml(val, decimals = 2, useComma = true) {
+  if (val === undefined || val === null || isNaN(val)) return '';
+  const num = typeof val === 'number' ? val : parseFloat(val);
+  const formatted = num.toFixed(decimals);
+  const sep = useComma ? ',' : '.';
+  const parts = formatted.replace('.', sep).split(sep);
+  if (parts.length < 2) return parts[0];
+  return `${parts[0]}${sep}<span class="pulse-decimal">${parts[1]}</span>`;
+}
+
+function formatFuelPrice(val, delta = 0) {
+  const adjusted = Math.max(10, val + delta);
+  return formatDecimalsHtml(adjusted, 2, true);
+}
+
+function renderPulseFuelTable(selectedRegion = 'ua') {
+  const tbody = document.getElementById('pulseFuelTableBody');
+  if (!tbody) return;
+
+  const regInfo = UKRAINE_FUEL_REGIONS.find(r => r.id === selectedRegion) || UKRAINE_FUEL_REGIONS[0];
+  const delta = (window.LIVE_FUEL_DELTAS && window.LIVE_FUEL_DELTAS[selectedRegion] !== undefined)
+    ? window.LIVE_FUEL_DELTAS[selectedRegion]
+    : regInfo.delta;
+
+  const networks = window.LIVE_FUEL_NETWORKS || BASE_FUEL_NETWORKS;
+
+  tbody.innerHTML = networks.map(n => `
+    <tr>
+      <td class="fuel-td-brand">${n.brand}</td>
+      <td class="fuel-td-val">${formatFuelPrice(n.a95, delta)}</td>
+      <td class="fuel-td-val">${formatFuelPrice(n.a95p, delta)}</td>
+      <td class="fuel-td-val">${formatFuelPrice(n.dp, delta)}</td>
+      <td class="fuel-td-val">${formatFuelPrice(n.dpp, delta)}</td>
+      <td class="fuel-td-val">${formatFuelPrice(n.lpg, delta * 0.5)}</td>
+    </tr>
+  `).join('');
+
+  const badge = document.getElementById('pulseFuelRegionBadge');
+  if (badge) {
+    badge.textContent = regInfo.id === 'ua' ? 'АЗС України' : regInfo.name;
+  }
+}
+
 function renderPulseDrawerLayout(container) {
   const holiday = getTodayHolidayInfo();
 
@@ -8896,7 +8993,17 @@ function renderPulseDrawerLayout(container) {
         <div>
           <div class="pulse-card-header">
             <span class="pulse-card-title"><i class="fas fa-gas-pump text-danger"></i> Ціни на пальне</span>
-            <span class="pulse-card-badge">АЗС України</span>
+            <span class="pulse-card-badge" id="pulseFuelRegionBadge">АЗС України</span>
+          </div>
+
+          <!-- Вибір регіону / області (збереження в браузері та профілі) -->
+          <div class="pulse-fuel-region-bar">
+            <label for="pulseFuelRegionSelect" class="pulse-fuel-region-label">
+              <i class="fas fa-map-marker-alt text-danger"></i> Регіон:
+            </label>
+            <select id="pulseFuelRegionSelect" class="pulse-fuel-region-select" aria-label="Обрати область для перегляду цін на пальне">
+              ${UKRAINE_FUEL_REGIONS.map(r => `<option value="${r.id}">${r.name}</option>`).join('')}
+            </select>
           </div>
 
           <!-- Таблиця цін на пальне по провідних мережах АЗС (як у зведеннях RBC/Мінфін) -->
@@ -8912,53 +9019,16 @@ function renderPulseDrawerLayout(container) {
                   <th>Газ</th>
                 </tr>
               </thead>
-              <tbody>
-                <tr>
-                  <td class="fuel-td-brand">OKKO</td>
-                  <td class="fuel-td-val">92,90</td>
-                  <td class="fuel-td-val">95,90</td>
-                  <td class="fuel-td-val">105,90</td>
-                  <td class="fuel-td-val">108,90</td>
-                  <td class="fuel-td-val">52,90</td>
-                </tr>
-                <tr>
-                  <td class="fuel-td-brand">WOG</td>
-                  <td class="fuel-td-val">92,90</td>
-                  <td class="fuel-td-val">95,90</td>
-                  <td class="fuel-td-val">104,50</td>
-                  <td class="fuel-td-val">107,50</td>
-                  <td class="fuel-td-val">53,50</td>
-                </tr>
-                <tr>
-                  <td class="fuel-td-brand">UPG</td>
-                  <td class="fuel-td-val">89,90</td>
-                  <td class="fuel-td-val">92,90</td>
-                  <td class="fuel-td-val">101,90</td>
-                  <td class="fuel-td-val">103,90</td>
-                  <td class="fuel-td-val">51,90</td>
-                </tr>
-                <tr>
-                  <td class="fuel-td-brand">SOCAR</td>
-                  <td class="fuel-td-val">94,90</td>
-                  <td class="fuel-td-val">97,90</td>
-                  <td class="fuel-td-val">106,00</td>
-                  <td class="fuel-td-val">109,00</td>
-                  <td class="fuel-td-val">54,40</td>
-                </tr>
-                <tr>
-                  <td class="fuel-td-brand">Укрнафта</td>
-                  <td class="fuel-td-val">88,90</td>
-                  <td class="fuel-td-val">91,90</td>
-                  <td class="fuel-td-val">99,90</td>
-                  <td class="fuel-td-val">101,90</td>
-                  <td class="fuel-td-val">50,90</td>
-                </tr>
+              <tbody id="pulseFuelTableBody">
+                <!-- Заповнюється динамічно функцією renderPulseFuelTable -->
               </tbody>
             </table>
           </div>
         </div>
         <div class="pulse-fuel-bottom">
-          <span class="text-muted" style="font-size: 0.67rem;">Дані: жовтень 2026 • грн/л</span>
+          <span class="text-muted" style="font-size: 0.67rem;" title="Ціни оновлюються автоматично щодня о 08:10 за київським часом">
+            <i class="fas fa-clock text-info me-1"></i>Оновлення щодня о 08:10 • грн/л
+          </span>
           <a href="https://minfin.com.ua/ua/fuel/" target="_blank" rel="noopener" class="pulse-fuel-link" title="Моніторинг цін на пальне на Мінфін">
             Мінфін АЗС <i class="fas fa-external-link-alt ms-1"></i>
           </a>
@@ -8975,17 +9045,17 @@ function renderPulseDrawerLayout(container) {
           <div class="pulse-rates-row">
             <div class="pulse-rate-item">
               <div class="pulse-rate-code">🇺🇸 USD</div>
-              <div class="pulse-rate-value" id="pulseRateUsd">41.50</div>
+              <div class="pulse-rate-value" id="pulseRateUsd">41,<span class="pulse-decimal">50</span></div>
               <div class="pulse-rate-diff up" id="pulseDiffUsd">▲ +0.04</div>
             </div>
             <div class="pulse-rate-item">
               <div class="pulse-rate-code">🇪🇺 EUR</div>
-              <div class="pulse-rate-value" id="pulseRateEur">45.15</div>
+              <div class="pulse-rate-value" id="pulseRateEur">45,<span class="pulse-decimal">15</span></div>
               <div class="pulse-rate-diff up" id="pulseDiffEur">▲ +0.08</div>
             </div>
             <div class="pulse-rate-item">
               <div class="pulse-rate-code">🇵🇱 PLN</div>
-              <div class="pulse-rate-value" id="pulseRatePln">10.55</div>
+              <div class="pulse-rate-value" id="pulseRatePln">10,<span class="pulse-decimal">55</span></div>
               <div class="pulse-rate-diff down" id="pulseDiffPln">▼ -0.02</div>
             </div>
           </div>
@@ -9020,6 +9090,28 @@ function renderPulseDrawerLayout(container) {
       loadPulseDrawerData(true);
     };
   }
+
+  // Обробник вибору регіону цін на пальне (з плавним debounce хмарного збереження)
+  const fuelRegionSelect = container.querySelector('#pulseFuelRegionSelect');
+  const savedRegion = localStorage.getItem('user_fuel_region') || 'ua';
+  let fuelRegionSaveDebounce = null;
+  if (fuelRegionSelect) {
+    fuelRegionSelect.value = savedRegion;
+    fuelRegionSelect.onchange = (e) => {
+      const chosen = e.target.value;
+      localStorage.setItem('user_fuel_region', chosen);
+      renderPulseFuelTable(chosen);
+      clearTimeout(fuelRegionSaveDebounce);
+      fuelRegionSaveDebounce = setTimeout(() => {
+        if (currentUser && firebaseDb) {
+          firebaseDb.collection('users').doc(currentUser.uid).set({
+            fuelRegion: chosen
+          }, { merge: true }).catch(() => {});
+        }
+      }, 500);
+    };
+  }
+  renderPulseFuelTable(savedRegion);
 
   // Обробники конвертера валюти
   const calcAmount = container.querySelector('#pulseCalcAmount');
@@ -9061,6 +9153,7 @@ async function loadPulseDrawerData(forceRefresh = false) {
       if (label) label.textContent = `Оновлено: ${cached.lastUpdatedText}`;
     }
     ensureMeteoprogInformerLoaded();
+    fetchLiveFuelPrices();
     if (spin) spin.classList.remove('fa-spin');
     return;
   }
@@ -9089,6 +9182,7 @@ async function loadPulseDrawerData(forceRefresh = false) {
     if (label) label.textContent = `Оновлено: ${timeStr}`;
 
     ensureMeteoprogInformerLoaded();
+    fetchLiveFuelPrices();
 
     try {
       localStorage.setItem(cacheKey, JSON.stringify({
@@ -9106,6 +9200,22 @@ async function loadPulseDrawerData(forceRefresh = false) {
     console.warn('Помилка завантаження Пульсу дня:', err);
   } finally {
     if (spin) spin.classList.remove('fa-spin');
+  }
+}
+
+async function fetchLiveFuelPrices() {
+  try {
+    const res = await fetch('/api/fuel-prices');
+    if (!res.ok) return;
+    const data = await res.json();
+    if (data && data.base && Array.isArray(data.base)) {
+      window.LIVE_FUEL_NETWORKS = data.base;
+      if (data.regionDeltas) window.LIVE_FUEL_DELTAS = data.regionDeltas;
+      const curReg = localStorage.getItem('user_fuel_region') || 'ua';
+      renderPulseFuelTable(curReg);
+    }
+  } catch (e) {
+    // тихо продовжуємо з базовими даними
   }
 }
 
@@ -9143,9 +9253,9 @@ function applyRatesToUI(rates) {
   const eurEl = document.getElementById('pulseRateEur');
   const plnEl = document.getElementById('pulseRatePln');
 
-  if (usdEl) usdEl.textContent = (rates.USD || 41.50).toFixed(2);
-  if (eurEl) eurEl.textContent = (rates.EUR || 45.15).toFixed(2);
-  if (plnEl) plnEl.textContent = (rates.PLN || 10.55).toFixed(2);
+  if (usdEl) usdEl.innerHTML = formatDecimalsHtml(rates.USD || 41.50, 2, true);
+  if (eurEl) eurEl.innerHTML = formatDecimalsHtml(rates.EUR || 45.15, 2, true);
+  if (plnEl) plnEl.innerHTML = formatDecimalsHtml(rates.PLN || 10.55, 2, true);
 
   // Оновлюємо розрахунок калькулятора
   const calcAmount = document.getElementById('pulseCalcAmount');
@@ -9239,13 +9349,13 @@ function renderGeomagForecastUI(daysForecast) {
   if (badgeEl) {
     if (maxTodayKp < 3.0) {
       badgeEl.className = 'pulse-geomag-now-badge green';
-      badgeEl.textContent = `🟢 Спокійно (Kp ${maxTodayKp.toFixed(1)})`;
+      badgeEl.innerHTML = `🟢 Спокійно (Kp ${formatDecimalsHtml(maxTodayKp, 1, false)})`;
     } else if (maxTodayKp < 5.0) {
       badgeEl.className = 'pulse-geomag-now-badge yellow';
-      badgeEl.textContent = `🟡 Помірно (Kp ${maxTodayKp.toFixed(1)})`;
+      badgeEl.innerHTML = `🟡 Помірно (Kp ${formatDecimalsHtml(maxTodayKp, 1, false)})`;
     } else {
       badgeEl.className = 'pulse-geomag-now-badge red';
-      badgeEl.textContent = `🔴 Буря (Kp ${maxTodayKp.toFixed(1)})`;
+      badgeEl.innerHTML = `🔴 Буря (Kp ${formatDecimalsHtml(maxTodayKp, 1, false)})`;
     }
   }
 
@@ -9257,7 +9367,7 @@ function renderGeomagForecastUI(daysForecast) {
       let colorClass = 'green';
       if (val >= 5.0) colorClass = 'red';
       else if (val >= 3.0) colorClass = 'yellow';
-      return `<td class="kp-cell ${colorClass}" title="${day.badge || day.label} ${slot.time} - Kp ${val.toFixed(1)}">${val.toFixed(1)}</td>`;
+      return `<td class="kp-cell ${colorClass}" title="${day.badge || day.label} ${slot.time} - Kp ${val.toFixed(1)}">${formatDecimalsHtml(val, 1, false)}</td>`;
     }).join('');
 
     return `

@@ -11170,6 +11170,61 @@ body.dark-mode .pulse-geomag-footer-more a:hover {
 /* ==========================================================================
    КАРТКА 3: ЦІНИ НА ПАЛЬНЕ (ТАБЛИЦЯ ПО МЕРЕЖАХ АЗС)
    ========================================================================== */
+.pulse-fuel-region-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  max-width: 300px;
+  margin: 0 auto 6px;
+  padding: 4px 6px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+}
+body.dark-mode .pulse-fuel-region-bar {
+  background: #0f172a;
+  border-color: #334155;
+}
+
+.pulse-fuel-region-label {
+  font-size: 0.69rem;
+  font-weight: 700;
+  color: #475569;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: 0;
+  white-space: nowrap;
+}
+body.dark-mode .pulse-fuel-region-label {
+  color: #94a3b8;
+}
+
+.pulse-fuel-region-select {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.69rem;
+  font-weight: 600;
+  padding: 2px 4px;
+  border-radius: 4px;
+  border: 1px solid #cbd5e1;
+  background-color: #ffffff;
+  color: #0f172a;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+}
+.pulse-fuel-region-select:focus {
+  border-color: #0284c7;
+  box-shadow: 0 0 0 2px rgba(2, 132, 199, 0.15);
+}
+body.dark-mode .pulse-fuel-region-select {
+  background-color: #1e293b;
+  border-color: #475569;
+  color: #f1f5f9;
+}
+
 .pulse-fuel-table-wrap {
   width: 100%;
   max-width: 300px;
@@ -11283,6 +11338,19 @@ body.dark-mode .pulse-fuel-table td.fuel-td-val {
 }
 body.dark-mode .pulse-fuel-link {
   color: #38bdf8;
+}
+
+/* Менші та менш примітні цифри після коми (пальне, валюта, магнітні бурі) */
+.pulse-decimal {
+  font-size: 0.77em;
+  opacity: 0.72;
+  font-weight: 500;
+  display: inline-block;
+  margin-left: 0.5px;
+  vertical-align: baseline;
+}
+body.dark-mode .pulse-decimal {
+  opacity: 0.76;
 }
 
 /* ==========================================================================

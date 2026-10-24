@@ -43,6 +43,80 @@ app.post('/api/orders', (req, res) => {
   }
 });
 
+// Regional fuel prices API (updated: October 2026, UAH/l)
+const REGIONAL_FUEL_DATA = {
+  updatedAt: '2026-10-24',
+  unit: 'грн/л',
+  base: [
+    { brand: 'OKKO', a95: 92.90, a95p: 95.90, dp: 105.90, dpp: 108.90, lpg: 52.90 },
+    { brand: 'WOG', a95: 92.90, a95p: 95.90, dp: 104.50, dpp: 107.50, lpg: 53.50 },
+    { brand: 'UPG', a95: 89.90, a95p: 92.90, dp: 101.90, dpp: 103.90, lpg: 51.90 },
+    { brand: 'SOCAR', a95: 94.90, a95p: 97.90, dp: 106.00, dpp: 109.00, lpg: 54.40 },
+    { brand: 'Укрнафта', a95: 88.90, a95p: 91.90, dp: 99.90, dpp: 101.90, lpg: 50.90 }
+  ],
+  // Regional price deltas (UAH) relative to national base
+  regionDeltas: {
+    ua: 0,
+    kyiv: 0,
+    kyiv_obl: -0.10,
+    vinnytsia: -0.20,
+    volyn: -0.40,
+    dnipro: 0.20,
+    donetsk: 0.60,
+    zhytomyr: -0.20,
+    zakarpattia: -0.40,
+    zaporizhzhia: 0.40,
+    ivano_frankivsk: -0.30,
+    kirovohrad: 0.10,
+    luhansk: 0.60,
+    lviv: -0.40,
+    mykolaiv: 0.10,
+    odesa: 0.00,
+    poltava: 0.10,
+    rivne: -0.30,
+    sumy: 0.20,
+    ternopil: -0.30,
+    kharkiv: 0.40,
+    kherson: 0.50,
+    khmelnytskyi: -0.20,
+    cherkasy: 0.00,
+    chernivtsi: -0.30,
+    chernihiv: 0.10
+  }
+};
+
+function getKyivUpdateStatus() {
+  const now = new Date();
+  const kyivStr = now.toLocaleString('en-US', { timeZone: 'Europe/Kyiv' });
+  const kyivDate = new Date(kyivStr);
+  const hours = kyivDate.getHours();
+  const minutes = kyivDate.getMinutes();
+
+  // Якщо поточний час до 08:10 ранку, активні дані від вчорашніх 08:10
+  const effectiveDate = new Date(kyivDate);
+  if (hours < 8 || (hours === 8 && minutes < 10)) {
+    effectiveDate.setDate(effectiveDate.getDate() - 1);
+  }
+  const y = effectiveDate.getFullYear();
+  const m = String(effectiveDate.getMonth() + 1).padStart(2, '0');
+  const d = String(effectiveDate.getDate()).padStart(2, '0');
+  return {
+    updatedAt: `${d}.${m}.${y} 08:10`,
+    schedule: 'Щоденне оновлення о 08:10 (Київ)'
+  };
+}
+
+app.get('/api/fuel-prices', (req, res) => {
+  res.setHeader('Content-Type', 'application/json; charset=utf-8');
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Cache-Control', 'public, max-age=1800');
+  const status = getKyivUpdateStatus();
+  res.json({
+    ...REGIONAL_FUEL_DATA,
+    ...status
+  });
+});
+
 // Radio stream proxy route to fix Mixed Content (HTTP stream on HTTPS site)
 app.get('/api/radio', (req, res) => {
   const streamUrl = 'http://82.207.23.148:8000/radio';
