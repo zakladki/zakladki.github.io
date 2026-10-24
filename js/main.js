@@ -8891,50 +8891,75 @@ function renderPulseDrawerLayout(container) {
         </div>
       </div>
 
-      <!-- 3. ЦІНИ НА ПАЛЬНЕ (РЕАЛЬНІ АКТУАЛЬНІ ДАНІ 2026 РОКУ) -->
+      <!-- 3. ЦІНИ НА ПАЛЬНЕ (ТАБЛИЦЯ ПО ТОП МЕРЕЖАХ АЗС 2026) -->
       <div class="pulse-card" id="pulseCardFuel">
         <div>
           <div class="pulse-card-header">
             <span class="pulse-card-title"><i class="fas fa-gas-pump text-danger"></i> Ціни на пальне</span>
-            <span class="pulse-card-badge">АЗС України 2026</span>
+            <span class="pulse-card-badge">АЗС України</span>
           </div>
-          <div class="pulse-fuel-grid">
-            <div class="pulse-fuel-item" title="Преміальний бензин А-95+">
-              <span class="pulse-fuel-label">А-95+</span>
-              <span class="pulse-fuel-val">93.59 грн</span>
-            </div>
-            <div class="pulse-fuel-item" title="Бензин А-95 Євро">
-              <span class="pulse-fuel-label">А-95</span>
-              <span class="pulse-fuel-val">89.79 грн</span>
-            </div>
-            <div class="pulse-fuel-item" title="Дизельне пальне (ДП)">
-              <span class="pulse-fuel-label">Дизель</span>
-              <span class="pulse-fuel-val">101.75 грн</span>
-            </div>
-            <div class="pulse-fuel-item" title="Автомобільний газ (LPG)">
-              <span class="pulse-fuel-label">Газ (LPG)</span>
-              <span class="pulse-fuel-val">50.57 грн</span>
-            </div>
-          </div>
-          <div class="pulse-fuel-networks-box">
-            <div class="d-flex justify-content-between mb-1">
-              <span class="text-muted">Мережа ОККО:</span>
-              <span class="font-weight-bold">А-95: 92.90 / ДП: 104.90 грн</span>
-            </div>
-            <div class="d-flex justify-content-between">
-              <span class="text-muted">Мережа WOG:</span>
-              <span class="font-weight-bold">А-95: 92.90 / ДП: 104.50 грн</span>
-            </div>
+
+          <!-- Таблиця цін на пальне по провідних мережах АЗС (як у зведеннях RBC/Мінфін) -->
+          <div class="pulse-fuel-table-wrap">
+            <table class="pulse-fuel-table">
+              <thead>
+                <tr>
+                  <th class="fuel-th-brand">АЗС</th>
+                  <th>А-95</th>
+                  <th>А-95+</th>
+                  <th>ДП</th>
+                  <th>ДП+</th>
+                  <th>Газ</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="fuel-td-brand">OKKO</td>
+                  <td class="fuel-td-val">92,90</td>
+                  <td class="fuel-td-val">95,90</td>
+                  <td class="fuel-td-val">105,90</td>
+                  <td class="fuel-td-val">108,90</td>
+                  <td class="fuel-td-val">52,90</td>
+                </tr>
+                <tr>
+                  <td class="fuel-td-brand">WOG</td>
+                  <td class="fuel-td-val">92,90</td>
+                  <td class="fuel-td-val">95,90</td>
+                  <td class="fuel-td-val">104,50</td>
+                  <td class="fuel-td-val">107,50</td>
+                  <td class="fuel-td-val">53,50</td>
+                </tr>
+                <tr>
+                  <td class="fuel-td-brand">UPG</td>
+                  <td class="fuel-td-val">89,90</td>
+                  <td class="fuel-td-val">92,90</td>
+                  <td class="fuel-td-val">101,90</td>
+                  <td class="fuel-td-val">103,90</td>
+                  <td class="fuel-td-val">51,90</td>
+                </tr>
+                <tr>
+                  <td class="fuel-td-brand">SOCAR</td>
+                  <td class="fuel-td-val">94,90</td>
+                  <td class="fuel-td-val">97,90</td>
+                  <td class="fuel-td-val">106,00</td>
+                  <td class="fuel-td-val">109,00</td>
+                  <td class="fuel-td-val">54,40</td>
+                </tr>
+                <tr>
+                  <td class="fuel-td-brand">Укрнафта</td>
+                  <td class="fuel-td-val">88,90</td>
+                  <td class="fuel-td-val">91,90</td>
+                  <td class="fuel-td-val">99,90</td>
+                  <td class="fuel-td-val">101,90</td>
+                  <td class="fuel-td-val">50,90</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
         <div class="pulse-fuel-bottom">
-          <div class="pulse-fuel-azs-list">
-            <span class="pulse-azs-chip">ОККО</span>
-            <span class="pulse-azs-chip">WOG</span>
-            <span class="pulse-azs-chip">SOCAR</span>
-            <span class="pulse-azs-chip">UPG</span>
-          </div>
-          <a href="https://minfin.com.ua/ua/fuel/" target="_blank" rel="noopener" class="pulse-fuel-link" title="Моніторинг цін на Мінфін">
+          <span class="text-muted" style="font-size: 0.67rem;">Дані: жовтень 2026 • грн/л</span>
+          <a href="https://minfin.com.ua/ua/fuel/" target="_blank" rel="noopener" class="pulse-fuel-link" title="Моніторинг цін на пальне на Мінфін">
             Мінфін АЗС <i class="fas fa-external-link-alt ms-1"></i>
           </a>
         </div>

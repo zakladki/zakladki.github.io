@@ -11168,56 +11168,99 @@ body.dark-mode .pulse-geomag-footer-more a:hover {
 }
 
 /* ==========================================================================
-   КАРТКА 3: ЦІНИ НА ПАЛЬНЕ (АКТУАЛЬНІ ДАНІ 2026 РОКУ)
+   КАРТКА 3: ЦІНИ НА ПАЛЬНЕ (ТАБЛИЦЯ ПО МЕРЕЖАХ АЗС)
    ========================================================================== */
-.pulse-fuel-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 6px;
-  margin: 0 auto 8px;
-  max-width: 300px;
-}
-.pulse-fuel-networks-box {
+.pulse-fuel-table-wrap {
+  width: 100%;
   max-width: 300px;
   margin: 0 auto 8px;
-  padding: 6px 8px;
+  overflow-x: auto;
   border-radius: 6px;
-  background: rgba(0, 0, 0, 0.02);
-  border: 1px solid rgba(226, 232, 240, 0.8);
-  font-size: 0.69rem;
-}
-body.dark-mode .pulse-fuel-networks-box {
-  background: rgba(255, 255, 255, 0.03);
-  border-color: rgba(255, 255, 255, 0.08);
-}
-.pulse-fuel-item {
-  padding: 6px 7px;
-  border-radius: 6px;
-  background: #ffffff;
   border: 1px solid #e2e8f0;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  background: #ffffff;
 }
-body.dark-mode .pulse-fuel-item {
+body.dark-mode .pulse-fuel-table-wrap {
   background: #1e293b;
   border-color: #334155;
 }
-.pulse-fuel-label {
-  font-size: 0.72rem;
+
+.pulse-fuel-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.69rem;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.25;
+}
+
+.pulse-fuel-table thead {
+  background: #f1f5f9;
+  border-bottom: 1px solid #cbd5e1;
+}
+body.dark-mode .pulse-fuel-table thead {
+  background: #0f172a;
+  border-bottom-color: #334155;
+}
+
+.pulse-fuel-table th {
+  padding: 4px 2px;
+  font-size: 0.65rem;
   font-weight: 700;
   color: #475569;
+  text-align: center;
+  white-space: nowrap;
 }
-body.dark-mode .pulse-fuel-label {
+body.dark-mode .pulse-fuel-table th {
   color: #94a3b8;
 }
-.pulse-fuel-val {
-  font-size: 0.84rem;
-  font-weight: 800;
-  color: #0f172a;
+
+.pulse-fuel-table th.fuel-th-brand {
+  text-align: left;
+  padding-left: 6px;
 }
-body.dark-mode .pulse-fuel-val {
-  color: #38bdf8;
+
+.pulse-fuel-table tbody tr {
+  border-bottom: 1px solid #f1f5f9;
+  transition: background 0.12s ease;
+}
+body.dark-mode .pulse-fuel-table tbody tr {
+  border-bottom-color: rgba(255, 255, 255, 0.05);
+}
+
+.pulse-fuel-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.pulse-fuel-table tbody tr:hover {
+  background: rgba(2, 132, 199, 0.04);
+}
+body.dark-mode .pulse-fuel-table tbody tr:hover {
+  background: rgba(56, 189, 248, 0.06);
+}
+
+.pulse-fuel-table td {
+  padding: 4px 2px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.pulse-fuel-table td.fuel-td-brand {
+  text-align: left;
+  padding-left: 6px;
+  font-weight: 700;
+  color: #1e293b;
+  font-size: 0.68rem;
+}
+body.dark-mode .pulse-fuel-table td.fuel-td-brand {
+  color: #f1f5f9;
+}
+
+.pulse-fuel-table td.fuel-td-val {
+  font-weight: 600;
+  color: #0f172a;
+  font-size: 0.67rem;
+}
+body.dark-mode .pulse-fuel-table td.fuel-td-val {
+  color: #e2e8f0;
 }
 
 .pulse-fuel-bottom {
@@ -11227,27 +11270,6 @@ body.dark-mode .pulse-fuel-val {
   gap: 4px;
   max-width: 300px;
   margin: 0 auto;
-}
-.pulse-fuel-azs-list {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 0.68rem;
-  color: #64748b;
-  flex-wrap: wrap;
-}
-body.dark-mode .pulse-fuel-azs-list {
-  color: #94a3b8;
-}
-.pulse-azs-chip {
-  padding: 1px 5px;
-  border-radius: 3px;
-  background: #e2e8f0;
-  font-weight: 600;
-}
-body.dark-mode .pulse-azs-chip {
-  background: #334155;
-  color: #e2e8f0;
 }
 .pulse-fuel-link {
   font-size: 0.70rem;
