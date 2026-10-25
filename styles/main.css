@@ -10660,14 +10660,15 @@ body.dark-mode .pulse-day-drawer {
 
 /* Шапка всередині виїзної шторки */
 .pulse-drawer-header {
-  max-width: 1320px;
-  margin: 0 auto;
-  padding: 10px 18px 8px;
+  max-width: 100%;
+  margin: 0;
+  padding: 8px 10px 7px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: 8px;
   border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+  box-sizing: border-box;
 }
 body.dark-mode .pulse-drawer-header {
   border-bottom-color: rgba(255, 255, 255, 0.08);
@@ -10756,33 +10757,44 @@ body.dark-mode .pulse-close-btn {
   background: rgba(239, 68, 68, 0.18) !important;
 }
 
-/* Сітка 4 карток */
+/* Сітка 4 колонок: бокові відступи та зазори між картками (gap: 4px, бічні поля: 6px) */
 .pulse-cards-grid {
-  max-width: 1440px;
+  max-width: 100%;
   width: 100%;
-  margin: 0 auto;
-  padding: 12px 16px 16px;
+  margin: 0;
+  padding: 8px 6px 14px;
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 14px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 4px;
   justify-content: center;
+  box-sizing: border-box;
 }
-@media (min-width: 1360px) {
+@media (min-width: 1200px) {
   .pulse-cards-grid {
-    grid-template-columns: repeat(4, minmax(316px, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 4px;
+    padding: 8px 6px 14px;
   }
 }
-@media (max-width: 1359.98px) and (min-width: 681px) {
+@media (max-width: 1199.98px) and (min-width: 860px) {
   .pulse-cards-grid {
-    grid-template-columns: repeat(2, minmax(310px, 460px));
-    justify-content: center;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+    padding: 8px 6px 14px;
   }
 }
-@media (max-width: 680.98px) {
+@media (max-width: 859.98px) and (min-width: 601px) {
+  .pulse-cards-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+    padding: 8px 6px 14px;
+  }
+}
+@media (max-width: 600.98px) {
   .pulse-cards-grid {
     grid-template-columns: 1fr;
-    padding: 10px 12px 14px;
-    gap: 12px;
+    gap: 6px;
+    padding: 6px 5px 12px;
   }
   .pulse-drawer-tagline {
     display: none;
@@ -10792,7 +10804,7 @@ body.dark-mode .pulse-close-btn {
 /* Стиль кожної окремої картки */
 .pulse-card {
   border-radius: 9px;
-  padding: 10px 10px 12px;
+  padding: 10px 6px 12px;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
@@ -10801,6 +10813,7 @@ body.dark-mode .pulse-close-btn {
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
   min-width: 0;
+  box-sizing: border-box;
 }
 body.dark-mode .pulse-card {
   background: rgba(30, 41, 59, 0.7);
@@ -10903,7 +10916,7 @@ body.dark-mode .pulse-dilovamova-wrap {
   height: 1px;
   background: #e2e8f0;
   margin: 8px auto;
-  max-width: 300px;
+  max-width: 100%;
   width: 100%;
   border: none;
 }
@@ -11164,13 +11177,13 @@ body.dark-mode .pulse-kp-table td.kp-cell.red {
   color: #f87171;
 }
 
-/* Підвал блоку магнітних бур: 2 окремі рядки по центру відразу під таблицею */
+/* Підвал блоку магнітних бур: вирівнювання по лівому краю за побажанням користувача */
 .pulse-geomag-footer {
-  text-align: center;
+  text-align: left;
   max-width: 300px;
   width: 100%;
   margin: 5px auto 0;
-  padding-top: 0;
+  padding-left: 2px;
   border-top: none;
 }
 body.dark-mode .pulse-geomag-footer {
@@ -11181,13 +11194,13 @@ body.dark-mode .pulse-geomag-footer {
   line-height: 1.35;
   color: #64748b;
   margin-bottom: 2px;
-  text-align: center;
+  text-align: left;
 }
 body.dark-mode .pulse-geomag-footer-legend {
   color: #94a3b8;
 }
 .pulse-geomag-footer-more {
-  text-align: center;
+  text-align: left;
 }
 .pulse-geomag-footer-more a {
   font-size: 0.72rem;
@@ -11196,7 +11209,7 @@ body.dark-mode .pulse-geomag-footer-legend {
   text-decoration: none;
   display: inline-flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 4px;
   transition: color 0.15s ease;
 }
@@ -11212,7 +11225,175 @@ body.dark-mode .pulse-geomag-footer-more a:hover {
 }
 
 /* ==========================================================================
-   КАРТКА 3: ЦІНИ НА ПАЛЬНЕ (ТАБЛИЦЯ ПО МЕРЕЖАХ АЗС)
+   КАРТКА 3: ЯКІСТЬ ПОВІТРЯ (AQI) ТА РАДІАЦІЙНИЙ ФОН (SAVEECOBOT / ECOCITY)
+   ========================================================================== */
+.pulse-eco-metrics-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5px;
+  margin: 0 0 6px;
+  width: 100%;
+  box-sizing: border-box;
+}
+.pulse-eco-metric-box {
+  padding: 6px 6px;
+  border-radius: 7px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+body.dark-mode .pulse-eco-metric-box {
+  background: #1e293b;
+  border-color: #334155;
+}
+.pulse-eco-metric-title {
+  font-size: 0.67rem;
+  font-weight: 700;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  line-height: 1.1;
+  margin-bottom: 2px;
+}
+body.dark-mode .pulse-eco-metric-title {
+  color: #94a3b8;
+}
+.pulse-eco-metric-val {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #0f172a;
+  line-height: 1.2;
+  margin: 2px 0 3px;
+  font-variant-numeric: tabular-nums;
+}
+body.dark-mode .pulse-eco-metric-val {
+  color: #f8fafc;
+}
+.pulse-eco-metric-badge {
+  font-size: 0.64rem;
+  font-weight: 700;
+  padding: 1.5px 5px;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  width: fit-content;
+}
+.pulse-eco-metric-badge.green {
+  background: rgba(16, 185, 129, 0.15);
+  color: #059669;
+}
+body.dark-mode .pulse-eco-metric-badge.green {
+  background: rgba(16, 185, 129, 0.25);
+  color: #34d399;
+}
+.pulse-eco-metric-badge.yellow {
+  background: rgba(245, 158, 11, 0.18);
+  color: #d97706;
+}
+body.dark-mode .pulse-eco-metric-badge.yellow {
+  background: rgba(245, 158, 11, 0.28);
+  color: #fbbf24;
+}
+.pulse-eco-metric-badge.red {
+  background: rgba(239, 68, 68, 0.2);
+  color: #dc2626;
+}
+body.dark-mode .pulse-eco-metric-badge.red {
+  background: rgba(239, 68, 68, 0.3);
+  color: #f87171;
+}
+
+.pulse-eco-ref-hint {
+  font-size: 0.58rem;
+  color: #94a3b8;
+  margin-top: 2px;
+  line-height: 1.15;
+}
+body.dark-mode .pulse-eco-ref-hint {
+  color: #64748b;
+}
+
+.pulse-eco-details-box {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 5px 7px;
+  margin-bottom: 6px;
+  width: 100%;
+  box-sizing: border-box;
+}
+body.dark-mode .pulse-eco-details-box {
+  background: #1e293b;
+  border-color: #334155;
+}
+.pulse-eco-detail-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.67rem;
+  padding: 2.5px 0;
+  border-bottom: 1px solid #f1f5f9;
+}
+body.dark-mode .pulse-eco-detail-row {
+  border-bottom-color: rgba(255, 255, 255, 0.05);
+}
+.pulse-eco-detail-row:last-child {
+  border-bottom: none;
+}
+.pulse-eco-detail-label {
+  color: #64748b;
+  font-weight: 500;
+}
+body.dark-mode .pulse-eco-detail-label {
+  color: #94a3b8;
+}
+.pulse-eco-detail-val {
+  font-weight: 700;
+  color: #0f172a;
+  font-variant-numeric: tabular-nums;
+}
+body.dark-mode .pulse-eco-detail-val {
+  color: #f1f5f9;
+}
+
+.pulse-eco-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  width: 100%;
+  margin-top: auto;
+  padding-top: 4px;
+}
+.pulse-eco-footer-text {
+  font-size: 0.66rem;
+  color: #64748b;
+}
+body.dark-mode .pulse-eco-footer-text {
+  color: #94a3b8;
+}
+.pulse-eco-link {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: #0284c7;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.pulse-eco-link:hover {
+  text-decoration: underline;
+}
+body.dark-mode .pulse-eco-link {
+  color: #38bdf8;
+}
+
+/* ==========================================================================
+   КАРТКА 4: ЦІНИ НА ПАЛЬНЕ (ТАБЛИЦЯ ПО МЕРЕЖАХ АЗС)
    ========================================================================== */
 .pulse-fuel-region-bar {
   display: flex;
@@ -11486,6 +11667,7 @@ body.dark-mode .pulse-calc-heading {
   width: 100%;
   margin: 0;
   box-sizing: border-box;
+  gap: 6px;
 }
 
 .pulse-conv-box {
@@ -11494,9 +11676,10 @@ body.dark-mode .pulse-calc-heading {
   background: #ffffff;
   border: 1px solid #cbd5e1;
   border-radius: 8px;
-  padding: 5px 7px;
+  padding: 6px 10px;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
   transition: border-color 0.15s ease;
+  box-sizing: border-box;
 }
 .pulse-conv-box:focus-within {
   border-color: #0284c7;
@@ -11524,7 +11707,7 @@ body.dark-mode .pulse-conv-label {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 4px;
+  gap: 6px;
 }
 
 .pulse-conv-input {
@@ -11585,7 +11768,7 @@ body.dark-mode .pulse-conv-rate-ref {
   justify-content: center;
   cursor: pointer;
   flex-shrink: 0;
-  margin: 0 -7px;
+  margin: 0;
   z-index: 2;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   font-size: 0.70rem;
