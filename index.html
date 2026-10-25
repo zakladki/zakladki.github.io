@@ -242,32 +242,79 @@
         transform: translateY(-50%) !important; height: 30px !important; border-radius: 7px !important;
         background: rgba(255, 255, 255, 0.16) !important; border: 1px solid rgba(255, 255, 255, 0.3) !important;
         color: #ffffff !important; display: inline-flex !important; align-items: center !important; justify-content: center !important;
-        gap: 6px !important; padding: 0 10px !important; cursor: pointer; z-index: 1050 !important; font-size: 0.82rem !important;
+        gap: 5px !important; padding: 0 8px !important; cursor: pointer; z-index: 1050 !important; font-size: 0.82rem !important;
         font-weight: 600 !important; line-height: 1; outline: none; transition: all 0.2s ease; white-space: nowrap !important;
+        box-sizing: border-box !important;
       }
       .pulse-day-btn:hover {
         background: rgba(255, 255, 255, 0.28) !important;
-        border-color: rgba(56, 189, 248, 0.6) !important;
+        border-color: rgba(56, 189, 248, 0.7) !important;
         color: #38bdf8 !important;
       }
       .pulse-day-btn.active {
-        background: rgba(56, 189, 248, 0.22) !important;
+        background: rgba(56, 189, 248, 0.25) !important;
         border-color: #38bdf8 !important;
         color: #ffffff !important;
+        box-shadow: 0 0 10px rgba(56, 189, 248, 0.4) !important;
       }
-      .pulse-day-arrow {
-        font-size: 0.68rem;
-        transition: transform 0.25s ease;
+      .pulse-day-btn .pulse-day-btn-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        line-height: 1;
       }
-      .pulse-day-btn.active .pulse-day-arrow {
-        transform: rotate(180deg);
+      .pulse-day-btn .pulse-ecg-icon {
+        width: 16px;
+        height: 16px;
+        stroke: #38bdf8;
+        stroke-width: 2.3;
+        fill: none;
+        vertical-align: middle;
+        transition: transform 0.25s ease, stroke 0.25s ease;
       }
-      @media (max-width: 1279.98px) {
+      .pulse-day-btn:hover .pulse-ecg-icon {
+        transform: scale(1.1);
+        stroke: #7dd3fc;
+      }
+      .pulse-day-btn.active .pulse-ecg-icon {
+        stroke: #ffffff;
+      }
+      .pulse-day-btn .pulse-day-badge-wrap {
+        display: inline-flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        line-height: 1.05 !important;
+      }
+      .pulse-day-btn .pulse-day-badge-top {
+        font-size: 0.54rem !important;
+        font-weight: 800 !important;
+        letter-spacing: 0.08em !important;
+        color: #38bdf8 !important;
+        line-height: 1 !important;
+        text-transform: uppercase !important;
+      }
+      .pulse-day-btn .pulse-day-badge-sub {
+        font-size: 0.68rem !important;
+        font-weight: 800 !important;
+        letter-spacing: 0.04em !important;
+        color: #ffffff !important;
+        line-height: 1 !important;
+        margin-top: 1px !important;
+        text-transform: uppercase !important;
+        opacity: 0.95 !important;
+      }
+      .pulse-day-btn:hover .pulse-day-badge-top {
+        color: #7dd3fc !important;
+      }
+      .pulse-day-btn.active .pulse-day-badge-top {
+        color: #ffffff !important;
+      }
+      @media (max-width: 359.98px) {
         .pulse-day-btn {
-          left: 84px !important; width: 30px !important; min-width: 30px !important; max-width: 30px !important; padding: 0 !important;
+          width: 30px !important; min-width: 30px !important; max-width: 30px !important; padding: 0 !important;
         }
-        .pulse-day-btn .pulse-day-btn-text,
-        .pulse-day-btn .pulse-day-arrow {
+        .pulse-day-btn .pulse-day-badge-wrap {
           display: none !important;
         }
       }
@@ -313,37 +360,35 @@
         <div class="mobile-navbar-title">ГОЛОВНА</div>
         <div class="collapse navbar-collapse text-center justify-content-center flex-grow-1" id="navbarCollapse">
           <ul class="nav nav-pills mb-0 navbar-nav mx-auto justify-content-center">
-                          <li class="nav-item nav-item-pulse">
-                            <button id="pulseDayBtn" class="nav-link pulse-day-nav-btn" aria-label="Пульс дня" title="Пульс дня: свята, погода, пальне, курс валют">
-                              <span class="pulse-day-btn-icon">
-                                <svg class="pulse-ecg-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-                                  <polyline points="2 12 6 12 9 4 14 20 17 12 22 12"></polyline>
-                                </svg>
-                              </span>
-                              <span class="pulse-day-badge-wrap">
-                                <span class="pulse-day-badge-top">ПУЛЬС</span>
-                                <span class="pulse-day-badge-sub">ДНЯ</span>
-                              </span>
-                            </button>
-                          </li>
-                          <li class="nav-item"><a class="nav-link active" href="./">Головна</a></li>
-                          <li class="nav-item"><a class="nav-link" href="./social.html">Соціум</a></li>
-                          <li class="nav-item"><a class="nav-link" href="./news.html">Новини</a></li>
-                          <li class="nav-item"><a class="nav-link" href="./media.html">Медіа</a></li>
-                          <li class="nav-item"><a class="nav-link" href="./games.html">Ігри</a></li>
-                          <li class="nav-item"><a class="nav-link" href="./communal.html">Комуналка</a></li>
-                          <li class="nav-item"><a class="nav-link" href="./bank.html">Банкінг</a></li>
-                          <li class="nav-item"><a class="nav-link" href="./market.html">Ринок</a></li>
-                          <li class="nav-item"><a class="nav-link" href="./shops.html">Магазини</a></li>
-                          <li class="nav-item"><a class="nav-link" href="./others.html">Інше</a></li>
-                          <li class="nav-item"><a class="nav-link" href="./city.html">Місто</a></li>
-                          <li class="nav-item"><a class="nav-link" href="./ai.html">AI</a></li>
-                          <li class="nav-item"><a class="nav-link" href="./programs.html">Soft</a></li>
-            </ul>
+            <li class="nav-item"><a class="nav-link active" href="./">Головна</a></li>
+            <li class="nav-item"><a class="nav-link" href="./social.html">Соціум</a></li>
+            <li class="nav-item"><a class="nav-link" href="./news.html">Новини</a></li>
+            <li class="nav-item"><a class="nav-link" href="./media.html">Медіа</a></li>
+            <li class="nav-item"><a class="nav-link" href="./games.html">Ігри</a></li>
+            <li class="nav-item"><a class="nav-link" href="./communal.html">Комуналка</a></li>
+            <li class="nav-item"><a class="nav-link" href="./bank.html">Банкінг</a></li>
+            <li class="nav-item"><a class="nav-link" href="./market.html">Ринок</a></li>
+            <li class="nav-item"><a class="nav-link" href="./shops.html">Магазини</a></li>
+            <li class="nav-item"><a class="nav-link" href="./others.html">Інше</a></li>
+            <li class="nav-item"><a class="nav-link" href="./city.html">Місто</a></li>
+            <li class="nav-item"><a class="nav-link" href="./ai.html">AI</a></li>
+            <li class="nav-item"><a class="nav-link" href="./programs.html">Soft</a></li>
+          </ul>
         </div>
         <button id="userAuthNavBtn" class="user-auth-btn" aria-label="Особистий кабінет" title="Особистий кабінет / Вхід"><i class="far fa-user-circle"></i></button>
         <button id="themeToggle" class="theme-toggle-btn" aria-label="Переключити тему" title="Переключити тему (світла/темна)"><i class="fas fa-moon"></i></button>
         <button id="noticeBellBtn" class="notice-bell-btn" aria-label="Оголошення" title="Оголошення"><i class="fas fa-bell"></i><span class="notice-bell-badge-dot"></span></button>
+        <button id="pulseDayBtn" class="pulse-day-btn" aria-label="Пульс дня" title="Пульс дня: свята, погода, пальне, курс валют">
+          <span class="pulse-day-btn-icon">
+            <svg class="pulse-ecg-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="2 12 6 12 9 4 14 20 17 12 22 12"></polyline>
+            </svg>
+          </span>
+          <span class="pulse-day-badge-wrap">
+            <span class="pulse-day-badge-top">ПУЛЬС</span>
+            <span class="pulse-day-badge-sub">ДНЯ</span>
+          </span>
+        </button>
       </nav>
     </div>
     <main class="container-fluid main" id="main-content" role="main">

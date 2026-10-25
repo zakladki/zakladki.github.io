@@ -8648,35 +8648,65 @@ body.dark-mode .bm-card-add-link-btn:hover {
   position: fixed;
   bottom: 24px;
   right: 24px;
-  z-index: 10000;
-  background: #1e293b;
-  color: #ffffff;
-  padding: 10px 18px;
-  border-radius: 10px;
-  font-size: 0.88rem;
+  z-index: 100100 !important;
+  background: #0f172a !important;
+  color: #ffffff !important;
+  padding: 12px 20px;
+  border-radius: 12px;
+  font-size: 0.92rem;
   font-weight: 600;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  line-height: 1.4;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.15);
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   opacity: 0;
-  transform: translateY(15px);
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-  pointer-events: none;
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  transform: translateY(16px) scale(0.97);
+  transition: opacity 0.25s ease, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: auto;
+  max-width: 440px;
+  border: 1.5px solid rgba(255, 255, 255, 0.25);
+  box-sizing: border-box;
 }
 .custom-quick-toast.show {
-  opacity: 1;
-  transform: translateY(0);
+  opacity: 1 !important;
+  transform: translateY(0) scale(1) !important;
 }
 .custom-quick-toast.success {
-  border-color: rgba(16, 185, 129, 0.5);
+  border: 1.5px solid #10b981 !important;
+  background: #062b1b !important;
+  color: #d1fae5 !important;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.65), 0 0 20px rgba(16, 185, 129, 0.25) !important;
 }
 .custom-quick-toast.info {
-  border-color: rgba(59, 130, 246, 0.5);
+  border: 1.5px solid #0ea5e9 !important;
+  background: #08283e !important;
+  color: #e0f2fe !important;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.65), 0 0 20px rgba(14, 165, 233, 0.25) !important;
 }
 .custom-quick-toast.warning {
-  border-color: rgba(245, 158, 11, 0.5);
+  border: 1.5px solid #f59e0b !important;
+  background: #271a06 !important;
+  color: #fef3c7 !important;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.7), 0 0 24px rgba(245, 158, 11, 0.3) !important;
+}
+.custom-quick-toast.error,
+.custom-quick-toast.danger {
+  border: 1.5px solid #ef4444 !important;
+  background: #2a0b0e !important;
+  color: #fee2e2 !important;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.7), 0 0 24px rgba(239, 68, 68, 0.3) !important;
+}
+@media (max-width: 576px) {
+  .custom-quick-toast {
+    left: 12px !important;
+    right: 12px !important;
+    bottom: 20px !important;
+    max-width: calc(100% - 24px) !important;
+    font-size: 0.88rem !important;
+    padding: 11px 14px !important;
+    border-radius: 10px !important;
+  }
 }
 .bm-empty-box {
   background: var(--card-bg, #ffffff);
@@ -10471,19 +10501,19 @@ body.dark-mode .guest-bm-modal-footer {
   color: #ffffff;
 }
 
-/* Стара кнопка утилітарного ряду (для зворотної сумісності) */
+/* Кнопка «Пульс дня» у верхньому утилітарному меню (розташована зліва після «Ніч/День» та «Дзвіночок») */
 .pulse-day-btn {
   background: rgba(255, 255, 255, 0.16) !important;
   border: 1px solid rgba(255, 255, 255, 0.3) !important;
   color: #ffffff !important;
-  height: 30px;
-  border-radius: 7px;
+  height: 30px !important;
+  border-radius: 7px !important;
   cursor: pointer;
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
-  gap: 6px;
-  padding: 0 10px !important;
+  gap: 5px !important;
+  padding: 0 8px !important;
   font-size: 0.82rem;
   font-weight: 600;
   line-height: 1;
@@ -10491,6 +10521,12 @@ body.dark-mode .guest-bm-modal-footer {
   transition: all 0.2s ease;
   white-space: nowrap;
   z-index: 1050;
+  position: absolute !important;
+  left: 84px !important;
+  right: auto !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  box-sizing: border-box !important;
 }
 .pulse-day-btn:hover {
   background: rgba(255, 255, 255, 0.28) !important;
@@ -10503,16 +10539,16 @@ body.dark-mode .guest-bm-modal-footer {
   color: #ffffff !important;
   box-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
 }
-.pulse-day-btn-icon {
+.pulse-day-btn .pulse-day-btn-icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   line-height: 1;
 }
-.pulse-ecg-icon {
-  width: 17px;
-  height: 17px;
-  stroke: currentColor;
+.pulse-day-btn .pulse-ecg-icon {
+  width: 16px;
+  height: 16px;
+  stroke: #38bdf8;
   stroke-width: 2.3;
   fill: none;
   vertical-align: middle;
@@ -10520,43 +10556,51 @@ body.dark-mode .guest-bm-modal-footer {
 }
 .pulse-day-btn:hover .pulse-ecg-icon {
   transform: scale(1.1);
-  stroke: #38bdf8;
+  stroke: #7dd3fc;
 }
 .pulse-day-btn.active .pulse-ecg-icon {
   stroke: #ffffff;
 }
-.pulse-day-arrow {
-  font-size: 0.68rem;
-  transition: transform 0.25s ease;
-  opacity: 0.85;
+.pulse-day-btn .pulse-day-badge-wrap {
+  display: inline-flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  line-height: 1.05 !important;
 }
-.pulse-day-btn.active .pulse-day-arrow {
-  transform: rotate(180deg);
+.pulse-day-btn .pulse-day-badge-top {
+  font-size: 0.54rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.08em !important;
+  color: #38bdf8 !important;
+  line-height: 1 !important;
+  text-transform: uppercase !important;
+}
+.pulse-day-btn .pulse-day-badge-sub {
+  font-size: 0.68rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.04em !important;
+  color: #ffffff !important;
+  line-height: 1 !important;
+  margin-top: 1px !important;
+  text-transform: uppercase !important;
+  opacity: 0.95 !important;
+}
+.pulse-day-btn:hover .pulse-day-badge-top {
+  color: #7dd3fc !important;
+}
+.pulse-day-btn.active .pulse-day-badge-top {
+  color: #ffffff !important;
 }
 
-@media (min-width: 1280px) {
+@media (max-width: 359.98px) {
   .pulse-day-btn {
-    position: absolute !important;
-    left: 84px !important;
-    right: auto !important;
-    top: 50% !important;
-    transform: translateY(-50%) !important;
-  }
-}
-@media (max-width: 1279.98px) {
-  .pulse-day-btn {
-    position: absolute !important;
-    left: 84px !important;
-    right: auto !important;
-    top: 50% !important;
-    transform: translateY(-50%) !important;
     width: 30px !important;
     min-width: 30px !important;
     max-width: 30px !important;
     padding: 0 !important;
   }
-  .pulse-day-btn .pulse-day-btn-text,
-  .pulse-day-btn .pulse-day-arrow {
+  .pulse-day-btn .pulse-day-badge-wrap {
     display: none !important;
   }
 }
@@ -11174,13 +11218,14 @@ body.dark-mode .pulse-geomag-footer-more a:hover {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 6px;
-  max-width: 300px;
-  margin: 0 auto 6px;
-  padding: 4px 6px;
+  gap: 8px;
+  width: 100%;
+  margin: 0 0 7px;
+  padding: 5px 8px;
   background: #f8fafc;
   border: 1px solid #e2e8f0;
   border-radius: 6px;
+  box-sizing: border-box;
 }
 body.dark-mode .pulse-fuel-region-bar {
   background: #0f172a;
@@ -11188,7 +11233,7 @@ body.dark-mode .pulse-fuel-region-bar {
 }
 
 .pulse-fuel-region-label {
-  font-size: 0.69rem;
+  font-size: 0.72rem;
   font-weight: 700;
   color: #475569;
   display: flex;
@@ -11204,10 +11249,10 @@ body.dark-mode .pulse-fuel-region-label {
 .pulse-fuel-region-select {
   flex: 1;
   min-width: 0;
-  font-size: 0.69rem;
+  font-size: 0.72rem;
   font-weight: 600;
-  padding: 2px 4px;
-  border-radius: 4px;
+  padding: 3px 6px;
+  border-radius: 5px;
   border: 1px solid #cbd5e1;
   background-color: #ffffff;
   color: #0f172a;
@@ -11227,12 +11272,12 @@ body.dark-mode .pulse-fuel-region-select {
 
 .pulse-fuel-table-wrap {
   width: 100%;
-  max-width: 300px;
-  margin: 0 auto 5px;
+  margin: 0 0 6px;
   overflow-x: auto;
   border-radius: 6px;
   border: 1px solid #e2e8f0;
   background: #ffffff;
+  box-sizing: border-box;
 }
 body.dark-mode .pulse-fuel-table-wrap {
   background: #1e293b;
@@ -11242,7 +11287,7 @@ body.dark-mode .pulse-fuel-table-wrap {
 .pulse-fuel-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.69rem;
+  font-size: 0.70rem;
   font-variant-numeric: tabular-nums;
   line-height: 1.25;
 }
@@ -11322,10 +11367,10 @@ body.dark-mode .pulse-fuel-table td.fuel-td-val {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 4px;
-  max-width: 300px;
+  gap: 6px;
   width: 100%;
-  margin: 5px auto 0;
+  margin: 6px 0 0;
+  box-sizing: border-box;
 }
 .pulse-fuel-link {
   font-size: 0.70rem;
@@ -11360,60 +11405,74 @@ body.dark-mode .pulse-decimal {
 .pulse-rates-row {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 6px;
-  margin: 0 auto 6px;
-  max-width: 300px;
+  gap: 8px;
+  margin: 0 0 8px;
+  width: 100%;
+  box-sizing: border-box;
 }
 .pulse-rate-item {
-  padding: 6px 4px;
-  border-radius: 6px;
+  padding: 8px 6px;
+  border-radius: 7px;
   background: #ffffff;
   border: 1px solid #e2e8f0;
   text-align: center;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.pulse-rate-item:hover {
+  border-color: rgba(56, 189, 248, 0.45);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 body.dark-mode .pulse-rate-item {
   background: #1e293b;
   border-color: #334155;
 }
+body.dark-mode .pulse-rate-item:hover {
+  border-color: rgba(56, 189, 248, 0.45);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
 .pulse-rate-code {
-  font-size: 0.72rem;
+  font-size: 0.74rem;
   font-weight: 700;
   color: #64748b;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 3px;
+  gap: 4px;
 }
 body.dark-mode .pulse-rate-code {
   color: #94a3b8;
 }
 .pulse-rate-value {
-  font-size: 0.94rem;
+  font-size: 1rem;
   font-weight: 800;
   color: #0f172a;
-  line-height: 1.15;
-  margin: 2px 0 1px;
+  line-height: 1.2;
+  margin: 3px 0 2px;
 }
 body.dark-mode .pulse-rate-value {
   color: #38bdf8;
 }
 .pulse-rate-diff {
-  font-size: 0.65rem;
-  font-weight: 600;
+  font-size: 0.68rem;
+  font-weight: 700;
 }
 .pulse-rate-diff.up { color: #16a34a; }
 .pulse-rate-diff.down { color: #dc2626; }
 
 /* Двосторонній інтерактивний конвертер валют за зразком користувача */
 .pulse-calc-heading {
-  font-size: 0.72rem;
+  font-size: 0.74rem;
   font-weight: 700;
   color: #475569;
-  margin: 0 auto 6px;
-  max-width: 300px;
+  margin: 0 0 6px;
+  width: 100%;
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 5px;
 }
 body.dark-mode .pulse-calc-heading {
   color: #94a3b8;
@@ -11424,8 +11483,9 @@ body.dark-mode .pulse-calc-heading {
   align-items: center;
   justify-content: space-between;
   position: relative;
-  max-width: 300px;
-  margin: 0 auto;
+  width: 100%;
+  margin: 0;
+  box-sizing: border-box;
 }
 
 .pulse-conv-box {

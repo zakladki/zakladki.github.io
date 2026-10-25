@@ -6312,13 +6312,31 @@ function showQuickToast(msg, type = 'info') {
     toast.id = 'customQuickToast';
     toast.className = 'custom-quick-toast';
     document.body.appendChild(toast);
+  } else {
+    // Завжди переміщуємо у кінець body, щоб гарантувати найвищий рівень накладання
+    if (toast.parentElement !== document.body || toast !== document.body.lastElementChild) {
+      document.body.appendChild(toast);
+    }
   }
+
+  let iconHtml = '';
+  if (type === 'warning') {
+    iconHtml = '<i class="fas fa-exclamation-triangle" style="color: #f59e0b; font-size: 1.25rem; flex-shrink: 0;" aria-hidden="true"></i>';
+  } else if (type === 'error' || type === 'danger') {
+    iconHtml = '<i class="fas fa-exclamation-circle" style="color: #ef4444; font-size: 1.25rem; flex-shrink: 0;" aria-hidden="true"></i>';
+  } else if (type === 'success') {
+    iconHtml = '<i class="fas fa-check-circle" style="color: #10b981; font-size: 1.25rem; flex-shrink: 0;" aria-hidden="true"></i>';
+  } else {
+    iconHtml = '<i class="fas fa-info-circle" style="color: #0ea5e9; font-size: 1.25rem; flex-shrink: 0;" aria-hidden="true"></i>';
+  }
+
   toast.className = `custom-quick-toast ${type} show`;
-  toast.innerHTML = `<span>${msg}</span>`;
+  toast.innerHTML = `${iconHtml}<div style="flex: 1; min-width: 0; word-break: break-word;">${msg}</div>`;
   clearTimeout(toast._timer);
+  const duration = (type === 'warning' || type === 'error' || type === 'danger') ? 4200 : 3200;
   toast._timer = setTimeout(() => {
     toast.classList.remove('show');
-  }, 3200);
+  }, duration);
 }
 
 function showCustomModal({ title, bodyHtml, footerHtml }) {
@@ -6341,6 +6359,20 @@ function showCustomModal({ title, bodyHtml, footerHtml }) {
       ${footerHtml ? `<div class="universal-modal-footer">${footerHtml}</div>` : ''}
     </div>
   `;
+
+  // Автоматична підтримка клавіші Enter для текстових полів модального вікна
+  const modalInputs = modalWrap.querySelectorAll('.universal-modal-body input:not([type="checkbox"]):not([type="radio"]):not([type="button"]):not([type="submit"])');
+  modalInputs.forEach(inp => {
+    inp.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        const primaryBtn = modalWrap.querySelector('.universal-modal-footer button.btn-danger, .universal-modal-footer button.btn-primary, .universal-modal-footer button:last-child');
+        if (primaryBtn && !primaryBtn.disabled) {
+          primaryBtn.click();
+        }
+      }
+    });
+  });
 
   // Гарантоване підключення обробників закриття для мобільних пристроїв та ПК
   const closeTriggers = modalWrap.querySelectorAll('.universal-modal-close-btn, [onclick*="closeCustomModal"], [data-dismiss="modal"]');
@@ -6861,7 +6893,7 @@ async function handleQuickBookmarkClick(link, description, heartBtn) {
     }
   } else {
     if (userBookmarksList.length >= MAX_USER_BOOKMARKS) {
-      alert(`Ви досягли ліміту: максимум ${MAX_USER_BOOKMARKS} збережених сайтів на акаунт.`);
+      showQuickToast(`Ви досягли ліміту: максимум ${MAX_USER_BOOKMARKS} збережених сайтів на акаунт.`, 'warning');
       return;
     }
     if (!checkAndIncrementDailyActionLimit()) return;
@@ -6952,6 +6984,7 @@ function openCreateCardModal() {
     bodyHtml: `
       <p class="small text-muted mb-2">Введіть назву для вашої нової тематичної картки закладок:</p>
       <input type="text" id="newCardNameInput" class="form-control" placeholder="Наприклад: 💼 Робота, 🛒 Покупки, 🎵 Музика, 📰 Новини" autofocus>
+      <div id="createCardModalAlert" style="display: none;" class="alert py-2 px-3 mt-2 mb-0 small font-weight-bold" role="alert"></div>
     `,
     footerHtml: `
       <button type="button" class="btn btn-secondary btn-sm" onclick="closeCustomModal()">Скасувати</button>
@@ -6960,21 +6993,51 @@ function openCreateCardModal() {
   });
 
   const confirmBtn = document.getElementById('confirmCreateCardBtn');
+  const input = document.getElementById('newCardNameInput');
+  const alertBox = document.getElementById('createCardModalAlert');
+
+  if (input && confirmBtn) {
+    // Підтримка підтвердження клавішею Enter
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        confirmBtn.click();
+      }
+    });
+    input.addEventListener('input', () => {
+      if (alertBox) alertBox.style.display = 'none';
+    });
+  }
+
   if (confirmBtn) {
     confirmBtn.onclick = async () => {
       if (confirmBtn.disabled) return;
-      const input = document.getElementById('newCardNameInput');
       const val = input ? input.value.trim() : '';
       if (!val) {
+        if (alertBox) {
+          alertBox.innerHTML = '<i class="fas fa-exclamation-triangle me-1"></i> Будь ласка, введіть назву картки.';
+          alertBox.className = 'alert alert-warning py-2 px-3 mt-2 mb-0 small font-weight-bold';
+          alertBox.style.display = 'block';
+        }
         showQuickToast('Будь ласка, введіть назву картки.', 'warning');
         if (input) input.focus();
         return;
       }
       if (userBookmarkCards.length >= MAX_USER_CARDS) {
+        if (alertBox) {
+          alertBox.innerHTML = `<i class="fas fa-exclamation-triangle me-1"></i> Ви досягли ліміту: максимум ${MAX_USER_CARDS} папок/карток на акаунт.`;
+          alertBox.className = 'alert alert-danger py-2 px-3 mt-2 mb-0 small font-weight-bold';
+          alertBox.style.display = 'block';
+        }
         showQuickToast(`Ви досягли ліміту: максимум ${MAX_USER_CARDS} папок/карток на акаунт.`, 'warning');
         return;
       }
       if (userBookmarkCards.includes(val)) {
+        if (alertBox) {
+          alertBox.innerHTML = `<i class="fas fa-info-circle me-1"></i> Картка «${escapeHtml(val)}» вже існує.`;
+          alertBox.className = 'alert alert-info py-2 px-3 mt-2 mb-0 small font-weight-bold';
+          alertBox.style.display = 'block';
+        }
         showQuickToast('Картка з такою назвою вже існує.', 'warning');
         return;
       }
@@ -7033,6 +7096,7 @@ function openAddBookmarkModal(defaultCard = '') {
   showCustomModal({
     title: '❤️ Додати сайт у закладки',
     bodyHtml: `
+      <div id="addBmModalAlert" style="display: none;" class="alert py-2 px-3 mb-2 small font-weight-bold" role="alert"></div>
       <!-- Пропозиція 1 (вгорі): Додати сайт власноруч -->
       <div class="bm-add-choice-card" id="bmChoiceManualCard">
         <div class="bm-choice-header" id="bmChoiceManualHeader" title="Натисніть, щоб розгорнути / згорнути введення власноруч">
@@ -7268,6 +7332,12 @@ function openAddBookmarkModal(defaultCard = '') {
     confirmAddBtn.onclick = async () => {
       if (confirmAddBtn.disabled) return;
       if (userBookmarksList.length >= MAX_USER_BOOKMARKS) {
+        const bmAlertBox = document.getElementById('addBmModalAlert');
+        if (bmAlertBox) {
+          bmAlertBox.innerHTML = `<i class="fas fa-exclamation-triangle me-1"></i> Ви досягли ліміту: максимум ${MAX_USER_BOOKMARKS} збережених сайтів на акаунт.`;
+          bmAlertBox.className = 'alert alert-danger py-2 px-3 mb-2 small font-weight-bold';
+          bmAlertBox.style.display = 'block';
+        }
         showQuickToast(`Ви досягли ліміту: максимум ${MAX_USER_BOOKMARKS} збережених сайтів на акаунт.`, 'warning');
         return;
       }
@@ -8529,33 +8599,18 @@ function getTodayHolidayInfo() {
 }
 
 function initPulseDayDrawer() {
-  // 1. Перевіряємо та гарантуємо наявність кнопки у головному меню перед «Головна»
+  // 1. Перевіряємо та гарантуємо наявність кнопки «Пульс дня» у верхньому меню зліва (після «Ніч/День» та «Дзвіночок»)
   let pulseBtn = document.getElementById('pulseDayBtn');
+  const navbar = document.querySelector('nav.navbar');
+  const noticeBell = document.getElementById('noticeBellBtn');
+
   if (!pulseBtn) {
-    const navUl = document.querySelector('#navbarCollapse ul.navbar-nav');
-    if (navUl) {
-      const li = document.createElement('li');
-      li.className = 'nav-item nav-item-pulse';
-      li.innerHTML = `
-        <button id="pulseDayBtn" class="nav-link pulse-day-nav-btn" aria-label="Пульс дня" title="Пульс дня: свята, погода, пальне, курс валют">
-          <span class="pulse-day-btn-icon">
-            <svg class="pulse-ecg-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="2 12 6 12 9 4 14 20 17 12 22 12"></polyline>
-            </svg>
-          </span>
-          <span class="pulse-day-badge-wrap">
-            <span class="pulse-day-badge-top">ПУЛЬС</span>
-            <span class="pulse-day-badge-sub">ДНЯ</span>
-          </span>
-        </button>
-      `;
-      navUl.insertBefore(li, navUl.firstChild);
-      pulseBtn = document.getElementById('pulseDayBtn');
-    }
-  } else {
-    // Оновлюємо внутрішню розмітку до сучасного дворівневого вигляду «ПУЛЬС / ДНЯ», якщо це ще не зроблено
-    if (!pulseBtn.querySelector('.pulse-day-badge-wrap')) {
-      pulseBtn.className = 'nav-link pulse-day-nav-btn';
+    if (navbar) {
+      pulseBtn = document.createElement('button');
+      pulseBtn.id = 'pulseDayBtn';
+      pulseBtn.className = 'pulse-day-btn';
+      pulseBtn.setAttribute('aria-label', 'Пульс дня');
+      pulseBtn.setAttribute('title', 'Пульс дня: свята, погода, пальне, курс валют');
       pulseBtn.innerHTML = `
         <span class="pulse-day-btn-icon">
           <svg class="pulse-ecg-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
@@ -8567,6 +8622,36 @@ function initPulseDayDrawer() {
           <span class="pulse-day-badge-sub">ДНЯ</span>
         </span>
       `;
+      if (noticeBell && noticeBell.nextSibling) {
+        navbar.insertBefore(pulseBtn, noticeBell.nextSibling);
+      } else {
+        navbar.appendChild(pulseBtn);
+      }
+    }
+  } else {
+    pulseBtn.className = 'pulse-day-btn';
+    if (!pulseBtn.querySelector('.pulse-day-badge-wrap')) {
+      pulseBtn.innerHTML = `
+        <span class="pulse-day-btn-icon">
+          <svg class="pulse-ecg-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="2 12 6 12 9 4 14 20 17 12 22 12"></polyline>
+          </svg>
+        </span>
+        <span class="pulse-day-badge-wrap">
+          <span class="pulse-day-badge-top">ПУЛЬС</span>
+          <span class="pulse-day-badge-sub">ДНЯ</span>
+        </span>
+      `;
+    }
+    // Якщо кнопка опинилася всередині li.nav-item-pulse або collapse-меню, переміщуємо її нагору в nav.navbar
+    if (navbar && pulseBtn.parentElement && pulseBtn.parentElement !== navbar) {
+      const oldLi = pulseBtn.closest('.nav-item-pulse');
+      if (noticeBell && noticeBell.nextSibling) {
+        navbar.insertBefore(pulseBtn, noticeBell.nextSibling);
+      } else {
+        navbar.appendChild(pulseBtn);
+      }
+      if (oldLi) oldLi.remove();
     }
   }
 
