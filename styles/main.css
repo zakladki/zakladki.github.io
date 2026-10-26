@@ -10909,10 +10909,10 @@ body.dark-mode .pulse-dilovamova-wrap {
   max-width: 100%;
   aspect-ratio: 300 / 374;
   object-fit: contain;
-  border-radius: 6px;
   display: block;
   margin: 0 auto;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  border: none;
+  box-shadow: none;
 }
 
 .pulse-card-divider {

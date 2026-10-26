@@ -9177,10 +9177,10 @@ function renderPulseDrawerLayout(container) {
           <span class="pulse-card-badge" id="pulseHolidayDateBadge">${getPulseDateBadge()}</span>
         </div>
 
-        <!-- Інформер календаря Dilovamova (без зайвої матрьошної рамки) -->
+        <!-- Інформер календаря Dilovamova (безрамочний варіант без додаткового фону) -->
         <div class="pulse-dilovamova-wrap">
-          <a href="https://www.dilovamova.com/" target="_blank" rel="noopener" title="Календар свят. Мова, граматика, спілкування">
-            <img src="https://www.dilovamova.com/images/wpi.cache/informer/informer_300_01.png" alt="Календар свят України" class="pulse-dilovamova-img" width="300" height="374" loading="lazy">
+          <a href="https://www.dilovamova.com/" target="_blank" rel="noopener" title="Календар свят і подій. Листівки, вітання та побажання">
+            <img src="https://www.dilovamova.com/images/wpi.cache/informer/informer_300_02.png" alt="Календар свят і подій. Листівки, вітання та побажання" title="Календар свят і подій. Листівки, вітання та побажання" class="pulse-dilovamova-img" width="300" height="374" loading="lazy">
           </a>
         </div>
 
