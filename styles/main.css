@@ -10660,9 +10660,9 @@ body.dark-mode .pulse-day-drawer {
 
 /* Шапка всередині виїзної шторки */
 .pulse-drawer-header {
-  max-width: 100%;
-  margin: 0;
-  padding: 8px 10px 7px;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 8px 8px 7px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -10757,43 +10757,46 @@ body.dark-mode .pulse-close-btn {
   background: rgba(239, 68, 68, 0.18) !important;
 }
 
-/* Сітка 4 колонок: бокові відступи та зазори між картками (gap: 4px, бічні поля: 6px) */
+/* Сітка 4 колонок: компактна ширина близько 300+ px на картку (як було раніше, щільно один до одного) */
 .pulse-cards-grid {
-  max-width: 100%;
+  max-width: 1280px;
   width: 100%;
-  margin: 0;
+  margin: 0 auto;
   padding: 8px 6px 14px;
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 4px;
+  grid-template-columns: repeat(4, minmax(285px, 310px));
+  gap: 8px;
   justify-content: center;
   box-sizing: border-box;
 }
 @media (min-width: 1200px) {
   .pulse-cards-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 4px;
+    grid-template-columns: repeat(4, minmax(285px, 310px));
+    gap: 8px;
     padding: 8px 6px 14px;
   }
 }
-@media (max-width: 1199.98px) and (min-width: 860px) {
+@media (max-width: 1199.98px) and (min-width: 900px) {
   .pulse-cards-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 6px;
+    max-width: 960px;
+    grid-template-columns: repeat(3, minmax(280px, 310px));
+    gap: 8px;
     padding: 8px 6px 14px;
   }
 }
-@media (max-width: 859.98px) and (min-width: 601px) {
+@media (max-width: 899.98px) and (min-width: 630px) {
   .pulse-cards-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 6px;
+    max-width: 640px;
+    grid-template-columns: repeat(2, minmax(280px, 310px));
+    gap: 8px;
     padding: 8px 6px 14px;
   }
 }
-@media (max-width: 600.98px) {
+@media (max-width: 629.98px) {
   .pulse-cards-grid {
+    max-width: 330px;
     grid-template-columns: 1fr;
-    gap: 6px;
+    gap: 8px;
     padding: 6px 5px 12px;
   }
   .pulse-drawer-tagline {
@@ -11368,7 +11371,7 @@ body.dark-mode .pulse-eco-detail-val {
   justify-content: space-between;
   gap: 6px;
   width: 100%;
-  margin-top: auto;
+  margin-top: 4px;
   padding-top: 4px;
 }
 .pulse-eco-footer-text {
