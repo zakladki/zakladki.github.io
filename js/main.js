@@ -9035,31 +9035,34 @@ function renderPulseEcoUI(data, region) {
     if (data.radiation <= 0.20) {
       radBadgeEl.className = 'pulse-eco-metric-badge green';
       radBadgeEl.textContent = '🟢 Норма';
+      radBadgeEl.title = 'безпечно (до 0.30 мкЗв/год)';
     } else if (data.radiation <= 0.30) {
       radBadgeEl.className = 'pulse-eco-metric-badge yellow';
       radBadgeEl.textContent = '🟡 Допустимий';
+      radBadgeEl.title = 'допустимий рівень (до 0.30 мкЗв/год)';
     } else {
       radBadgeEl.className = 'pulse-eco-metric-badge red';
       radBadgeEl.textContent = '🔴 Підвищений';
+      radBadgeEl.title = 'увага: підвищений рівень (понад 0.30 мкЗв/год)';
     }
   }
 
   if (aqiValEl) {
     aqiValEl.textContent = `AQI ${data.aqi}`;
   }
-  if (aqiBadgeEl && aqiHintEl) {
+  if (aqiBadgeEl) {
     if (data.aqi <= 50) {
       aqiBadgeEl.className = 'pulse-eco-metric-badge green';
       aqiBadgeEl.textContent = '🟢 Чисте';
-      aqiHintEl.textContent = 'чисте та безпечне';
+      aqiBadgeEl.title = 'чисте та безпечне (до 50 AQI)';
     } else if (data.aqi <= 100) {
       aqiBadgeEl.className = 'pulse-eco-metric-badge yellow';
       aqiBadgeEl.textContent = '🟡 Помірне';
-      aqiHintEl.textContent = 'прийнятна якість';
+      aqiBadgeEl.title = 'прийнятна якість повітря (AQI 51-100)';
     } else {
       aqiBadgeEl.className = 'pulse-eco-metric-badge red';
       aqiBadgeEl.textContent = '🔴 Забруднене';
-      aqiHintEl.textContent = 'чутливим людям увага';
+      aqiBadgeEl.title = 'небезпечно для чутливих людей (AQI 101+)';
     }
   }
 
@@ -9222,7 +9225,7 @@ function renderPulseDrawerLayout(container) {
 
           <div class="pulse-geomag-footer">
             <div class="pulse-geomag-footer-legend">
-              Шкала Kp: 0-2 спокійно, 3-4 помірно, 5+ буря
+              Шкала-Kp: 0-2 спокійно / 3-4 помірно / 5+ буря
             </div>
             <div class="pulse-geomag-footer-more">
               <a href="https://solarmeteo.ukalendar.com/defs/kp-index" target="_blank" rel="noopener" title="Детальніше про Kp-індекс та шкалу геомагнітної активності">
@@ -9277,10 +9280,9 @@ function renderPulseDrawerLayout(container) {
             <div class="pulse-eco-metric-val" id="pulseEcoRadVal">
               0.11 <span style="font-size: 0.65rem; font-weight: normal; color: var(--text-muted, #64748b);">мкЗв/год</span>
             </div>
-            <div class="pulse-eco-metric-badge green" id="pulseEcoRadBadge">
+            <div class="pulse-eco-metric-badge green" id="pulseEcoRadBadge" title="безпечно (до 0.30 мкЗв/год)">
               🟢 Норма
             </div>
-            <div class="pulse-eco-ref-hint">безпечно (до 0.30)</div>
           </div>
 
           <!-- Якість повітря (AQI) -->
@@ -9291,10 +9293,9 @@ function renderPulseDrawerLayout(container) {
             <div class="pulse-eco-metric-val" id="pulseEcoAqiVal">
               AQI 28
             </div>
-            <div class="pulse-eco-metric-badge green" id="pulseEcoAqiBadge">
+            <div class="pulse-eco-metric-badge green" id="pulseEcoAqiBadge" title="чисте та безпечне (до 50 AQI)">
               🟢 Чисте
             </div>
-            <div class="pulse-eco-ref-hint" id="pulseEcoAqiHint">чисте та безпечне</div>
           </div>
         </div>
 
@@ -9389,34 +9390,34 @@ function renderPulseDrawerLayout(container) {
           </div>
         </div>
 
-        <!-- 1. СІТКА 8 ФІАТНИХ ВАЛЮТ (без прапорців, формат: USD ▲ 0.08 / 45,20) -->
+        <!-- 1. СІТКА 8 ФІАТНИХ ВАЛЮТ (без прапорців, формат: USD ▲ / 45,20) -->
         <div class="pulse-rates-grid" id="pulseFiatGrid">
           <!-- Верхня четвірка (Головні топ-валюти) -->
           <div class="pulse-rate-item" title="Долар США (USD)">
             <div class="pulse-rate-top-line">
               <span class="pulse-rate-code">USD</span>
-              <span class="pulse-rate-diff up" id="pulseDiffUsd">▲ 0.04</span>
+              <span class="pulse-rate-diff up" id="pulseDiffUsd" title="+0.04">▲</span>
             </div>
             <div class="pulse-rate-value" id="pulseRateUsd">41,<span class="pulse-decimal">50</span></div>
           </div>
           <div class="pulse-rate-item" title="Євро (EUR)">
             <div class="pulse-rate-top-line">
               <span class="pulse-rate-code">EUR</span>
-              <span class="pulse-rate-diff up" id="pulseDiffEur">▲ 0.08</span>
+              <span class="pulse-rate-diff up" id="pulseDiffEur" title="+0.08">▲</span>
             </div>
             <div class="pulse-rate-value" id="pulseRateEur">45,<span class="pulse-decimal">15</span></div>
           </div>
           <div class="pulse-rate-item" title="Польський злотий (PLN)">
             <div class="pulse-rate-top-line">
               <span class="pulse-rate-code">PLN</span>
-              <span class="pulse-rate-diff down" id="pulseDiffPln">▼ 0.02</span>
+              <span class="pulse-rate-diff down" id="pulseDiffPln" title="-0.02">▼</span>
             </div>
             <div class="pulse-rate-value" id="pulseRatePln">10,<span class="pulse-decimal">55</span></div>
           </div>
           <div class="pulse-rate-item" title="Британський фунт (GBP)">
             <div class="pulse-rate-top-line">
               <span class="pulse-rate-code">GBP</span>
-              <span class="pulse-rate-diff up" id="pulseDiffGbp">▲ 0.12</span>
+              <span class="pulse-rate-diff up" id="pulseDiffGbp" title="+0.12">▲</span>
             </div>
             <div class="pulse-rate-value" id="pulseRateGbp">53,<span class="pulse-decimal">90</span></div>
           </div>
@@ -9425,28 +9426,28 @@ function renderPulseDrawerLayout(container) {
           <div class="pulse-rate-item" title="Чеська крона (CZK)">
             <div class="pulse-rate-top-line">
               <span class="pulse-rate-code">CZK</span>
-              <span class="pulse-rate-diff up" id="pulseDiffCzk">▲ 0.01</span>
+              <span class="pulse-rate-diff up" id="pulseDiffCzk" title="+0.01">▲</span>
             </div>
             <div class="pulse-rate-value" id="pulseRateCzk">1,<span class="pulse-decimal">78</span></div>
           </div>
           <div class="pulse-rate-item" title="Швейцарський франк (CHF)">
             <div class="pulse-rate-top-line">
               <span class="pulse-rate-code">CHF</span>
-              <span class="pulse-rate-diff up" id="pulseDiffChf">▲ 0.05</span>
+              <span class="pulse-rate-diff up" id="pulseDiffChf" title="+0.05">▲</span>
             </div>
             <div class="pulse-rate-value" id="pulseRateChf">47,<span class="pulse-decimal">80</span></div>
           </div>
           <div class="pulse-rate-item" title="Канадський долар (CAD)">
             <div class="pulse-rate-top-line">
               <span class="pulse-rate-code">CAD</span>
-              <span class="pulse-rate-diff down" id="pulseDiffCad">▼ 0.03</span>
+              <span class="pulse-rate-diff down" id="pulseDiffCad" title="-0.03">▼</span>
             </div>
             <div class="pulse-rate-value" id="pulseRateCad">30,<span class="pulse-decimal">20</span></div>
           </div>
           <div class="pulse-rate-item" title="Китайський юань (CNY)">
             <div class="pulse-rate-top-line">
               <span class="pulse-rate-code">CNY</span>
-              <span class="pulse-rate-diff up" id="pulseDiffCny">▲ 0.01</span>
+              <span class="pulse-rate-diff up" id="pulseDiffCny" title="+0.01">▲</span>
             </div>
             <div class="pulse-rate-value" id="pulseRateCny">5,<span class="pulse-decimal">75</span></div>
           </div>
@@ -9458,28 +9459,28 @@ function renderPulseDrawerLayout(container) {
           <div class="pulse-rate-item" title="Bitcoin (BTC)">
             <div class="pulse-rate-top-line">
               <span class="pulse-rate-code">BTC</span>
-              <span class="pulse-rate-diff up" id="pulseDiffBtc">▲ 1.8%</span>
+              <span class="pulse-rate-diff up" id="pulseDiffBtc" title="+1.8%">▲</span>
             </div>
             <div class="pulse-rate-value" id="pulseRateBtc">68 450$</div>
           </div>
           <div class="pulse-rate-item" title="Ethereum (ETH)">
             <div class="pulse-rate-top-line">
               <span class="pulse-rate-code">ETH</span>
-              <span class="pulse-rate-diff up" id="pulseDiffEth">▲ 2.1%</span>
+              <span class="pulse-rate-diff up" id="pulseDiffEth" title="+2.1%">▲</span>
             </div>
             <div class="pulse-rate-value" id="pulseRateEth">2 520$</div>
           </div>
           <div class="pulse-rate-item" title="Solana (SOL)">
             <div class="pulse-rate-top-line">
               <span class="pulse-rate-code">SOL</span>
-              <span class="pulse-rate-diff up" id="pulseDiffSol">▲ 3.5%</span>
+              <span class="pulse-rate-diff up" id="pulseDiffSol" title="+3.5%">▲</span>
             </div>
             <div class="pulse-rate-value" id="pulseRateSol">176,40$</div>
           </div>
           <div class="pulse-rate-item" title="BNB Chain (BNB)">
             <div class="pulse-rate-top-line">
               <span class="pulse-rate-code">BNB</span>
-              <span class="pulse-rate-diff down" id="pulseDiffBnb">▼ 0.8%</span>
+              <span class="pulse-rate-diff down" id="pulseDiffBnb" title="-0.8%">▼</span>
             </div>
             <div class="pulse-rate-value" id="pulseRateBnb">594,20$</div>
           </div>
@@ -9488,28 +9489,28 @@ function renderPulseDrawerLayout(container) {
           <div class="pulse-rate-item" title="Gram / TON Telegram ecosystem (GRAM)">
             <div class="pulse-rate-top-line">
               <span class="pulse-rate-code">GRAM</span>
-              <span class="pulse-rate-diff up" id="pulseDiffGram">▲ 4.2%</span>
+              <span class="pulse-rate-diff up" id="pulseDiffGram" title="+4.2%">▲</span>
             </div>
             <div class="pulse-rate-value" id="pulseRateGram">0,016$</div>
           </div>
           <div class="pulse-rate-item" title="Ripple (XRP)">
             <div class="pulse-rate-top-line">
               <span class="pulse-rate-code">XRP</span>
-              <span class="pulse-rate-diff up" id="pulseDiffXrp">▲ 1.2%</span>
+              <span class="pulse-rate-diff up" id="pulseDiffXrp" title="+1.2%">▲</span>
             </div>
             <div class="pulse-rate-value" id="pulseRateXrp">0,535$</div>
           </div>
           <div class="pulse-rate-item" title="Litecoin (LTC)">
             <div class="pulse-rate-top-line">
               <span class="pulse-rate-code">LTC</span>
-              <span class="pulse-rate-diff down" id="pulseDiffLtc">▼ 0.5%</span>
+              <span class="pulse-rate-diff down" id="pulseDiffLtc" title="-0.5%">▼</span>
             </div>
             <div class="pulse-rate-value" id="pulseRateLtc">71,80$</div>
           </div>
           <div class="pulse-rate-item" title="Dogecoin (DOGE)">
             <div class="pulse-rate-top-line">
               <span class="pulse-rate-code">DOGE</span>
-              <span class="pulse-rate-diff up" id="pulseDiffDoge">▲ 2.8%</span>
+              <span class="pulse-rate-diff up" id="pulseDiffDoge" title="+2.8%">▲</span>
             </div>
             <div class="pulse-rate-value" id="pulseRateDoge">0,142$</div>
           </div>
@@ -9518,39 +9519,39 @@ function renderPulseDrawerLayout(container) {
         <!-- Роздільна лінія перед Конвертером Валют як просив користувач -->
         <div class="pulse-card-divider"></div>
 
-        <!-- Чіткий заголовок конвертера як просив користувач -->
-        <div class="pulse-calc-heading">
-          <i class="fas fa-calculator text-primary"></i> <strong>Конвертер валют:</strong>
+        <!-- Заголовок конвертера з перемикачем режимів [ Валюта ] та [ Крипта ] -->
+        <div class="pulse-conv-header">
+          <div class="pulse-calc-heading">
+            <i class="fas fa-calculator text-primary"></i> <strong>Конвертер:</strong>
+          </div>
+          <div class="pulse-rates-tab-group" id="pulseConvTabGroup">
+            <button type="button" class="pulse-rate-tab-btn active" id="pulseConvTabFiat" data-tab="fiat">
+              <i class="fas fa-money-bill-wave"></i> Валюта
+            </button>
+            <button type="button" class="pulse-rate-tab-btn" id="pulseConvTabCrypto" data-tab="crypto">
+              <i class="fab fa-bitcoin"></i> Крипта
+            </button>
+          </div>
         </div>
         <div class="pulse-converter-dual-wrap">
           <!-- Блок 1: Я маю -->
           <div class="pulse-conv-box">
-            <div class="pulse-conv-label">Я маю</div>
-            <div class="pulse-conv-input-row">
-              <input type="number" id="pulseConvAmountFrom" class="pulse-conv-input" value="100" min="0" step="any">
+            <div class="pulse-conv-top-row">
+              <span class="pulse-conv-label">Я маю</span>
               <select id="pulseConvCurrencyFrom" class="pulse-conv-select">
-                <optgroup label="Валюти">
-                  <option value="USD" selected>USD</option>
-                  <option value="EUR">EUR</option>
-                  <option value="PLN">PLN</option>
-                  <option value="GBP">GBP</option>
-                  <option value="CZK">CZK</option>
-                  <option value="CHF">CHF</option>
-                  <option value="CAD">CAD</option>
-                  <option value="CNY">CNY</option>
-                  <option value="UAH">UAH</option>
-                </optgroup>
-                <optgroup label="Криптовалюти">
-                  <option value="BTC">BTC</option>
-                  <option value="ETH">ETH</option>
-                  <option value="SOL">SOL</option>
-                  <option value="BNB">BNB</option>
-                  <option value="GRAM">GRAM</option>
-                  <option value="XRP">XRP</option>
-                  <option value="LTC">LTC</option>
-                  <option value="DOGE">DOGE</option>
-                </optgroup>
+                <option value="USD" selected>USD</option>
+                <option value="EUR">EUR</option>
+                <option value="PLN">PLN</option>
+                <option value="GBP">GBP</option>
+                <option value="CZK">CZK</option>
+                <option value="CHF">CHF</option>
+                <option value="CAD">CAD</option>
+                <option value="CNY">CNY</option>
+                <option value="UAH">UAH</option>
               </select>
+            </div>
+            <div class="pulse-conv-input-row">
+              <input type="number" id="pulseConvAmountFrom" class="pulse-conv-input" value="10" min="0" step="any">
             </div>
             <div class="pulse-conv-rate-ref" id="pulseConvRateFromRef">1 USD = 41.50 UAH</div>
           </div>
@@ -9562,32 +9563,22 @@ function renderPulseDrawerLayout(container) {
 
           <!-- Блок 2: Я отримую -->
           <div class="pulse-conv-box">
-            <div class="pulse-conv-label">Я отримую</div>
-            <div class="pulse-conv-input-row">
-              <input type="number" id="pulseConvAmountTo" class="pulse-conv-input" value="4150.00" min="0" step="any">
+            <div class="pulse-conv-top-row">
+              <span class="pulse-conv-label">Я отримую</span>
               <select id="pulseConvCurrencyTo" class="pulse-conv-select">
-                <optgroup label="Валюти">
-                  <option value="UAH" selected>UAH</option>
-                  <option value="USD">USD</option>
-                  <option value="EUR">EUR</option>
-                  <option value="PLN">PLN</option>
-                  <option value="GBP">GBP</option>
-                  <option value="CZK">CZK</option>
-                  <option value="CHF">CHF</option>
-                  <option value="CAD">CAD</option>
-                  <option value="CNY">CNY</option>
-                </optgroup>
-                <optgroup label="Криптовалюти">
-                  <option value="BTC">BTC</option>
-                  <option value="ETH">ETH</option>
-                  <option value="SOL">SOL</option>
-                  <option value="BNB">BNB</option>
-                  <option value="GRAM">GRAM</option>
-                  <option value="XRP">XRP</option>
-                  <option value="LTC">LTC</option>
-                  <option value="DOGE">DOGE</option>
-                </optgroup>
+                <option value="UAH" selected>UAH</option>
+                <option value="USD">USD</option>
+                <option value="EUR">EUR</option>
+                <option value="PLN">PLN</option>
+                <option value="GBP">GBP</option>
+                <option value="CZK">CZK</option>
+                <option value="CHF">CHF</option>
+                <option value="CAD">CAD</option>
+                <option value="CNY">CNY</option>
               </select>
+            </div>
+            <div class="pulse-conv-input-row">
+              <input type="number" id="pulseConvAmountTo" class="pulse-conv-input" value="415.00" min="0" step="any">
             </div>
             <div class="pulse-conv-rate-ref" id="pulseConvRateToRef">1 UAH = 0.0241 USD</div>
           </div>
@@ -9646,11 +9637,15 @@ function renderPulseDrawerLayout(container) {
   }
   renderPulseFuelTable(savedRegion);
 
-  // Перемикач вкладок Валюти / Крипта
+  // Перемикач вкладок Валюти / Крипта у сітці
   const tabBtnFiat = container.querySelector('#pulseTabBtnFiat');
   const tabBtnCrypto = container.querySelector('#pulseTabBtnCrypto');
   const gridFiat = container.querySelector('#pulseFiatGrid');
   const gridCrypto = container.querySelector('#pulseCryptoGrid');
+
+  // Перемикач вкладок Валюти / Крипта у Конвертері
+  const convTabFiat = container.querySelector('#pulseConvTabFiat');
+  const convTabCrypto = container.querySelector('#pulseConvTabCrypto');
 
   if (tabBtnFiat && tabBtnCrypto && gridFiat && gridCrypto) {
     tabBtnFiat.onclick = () => {
@@ -9658,12 +9653,18 @@ function renderPulseDrawerLayout(container) {
       tabBtnCrypto.classList.remove('active');
       gridFiat.style.display = 'grid';
       gridCrypto.style.display = 'none';
+      if (convTabFiat && !convTabFiat.classList.contains('active')) {
+        convTabFiat.click();
+      }
     };
     tabBtnCrypto.onclick = () => {
       tabBtnCrypto.classList.add('active');
       tabBtnFiat.classList.remove('active');
       gridFiat.style.display = 'none';
       gridCrypto.style.display = 'grid';
+      if (convTabCrypto && !convTabCrypto.classList.contains('active')) {
+        convTabCrypto.click();
+      }
     };
   }
 
@@ -9675,6 +9676,50 @@ function renderPulseDrawerLayout(container) {
   const btnSwap = container.querySelector('#pulseConvSwapBtn');
   const refFrom = container.querySelector('#pulseConvRateFromRef');
   const refTo = container.querySelector('#pulseConvRateToRef');
+
+  const FIAT_CURRENCIES = ['USD', 'EUR', 'PLN', 'GBP', 'CZK', 'CHF', 'CAD', 'CNY', 'UAH'];
+  const CRYPTO_CURRENCIES = ['BTC', 'ETH', 'SOL', 'BNB', 'GRAM', 'XRP', 'LTC', 'DOGE', 'USD', 'UAH'];
+
+  function updateConverterOptions(mode) {
+    if (!selFrom || !selTo) return;
+    const isCrypto = mode === 'crypto';
+    const listFrom = isCrypto ? CRYPTO_CURRENCIES : FIAT_CURRENCIES;
+    const listTo = isCrypto ? ['UAH', 'USD', 'BTC', 'ETH', 'SOL', 'BNB', 'GRAM', 'XRP', 'LTC', 'DOGE'] : FIAT_CURRENCIES;
+
+    const prevFrom = selFrom.value;
+    const prevTo = selTo.value;
+
+    selFrom.innerHTML = listFrom.map(c => `<option value="${c}">${c}</option>`).join('');
+    selTo.innerHTML = listTo.map(c => `<option value="${c}">${c}</option>`).join('');
+
+    if (isCrypto) {
+      selFrom.value = listFrom.includes(prevFrom) && prevFrom !== 'UAH' ? prevFrom : 'BTC';
+      selTo.value = listTo.includes(prevTo) && prevTo !== selFrom.value ? prevTo : 'UAH';
+      if (inpFrom && (inpFrom.value === '10' || !inpFrom.value)) {
+        inpFrom.value = '1';
+      }
+    } else {
+      selFrom.value = listFrom.includes(prevFrom) && prevFrom !== 'UAH' ? prevFrom : 'USD';
+      selTo.value = listTo.includes(prevTo) && prevTo !== selFrom.value ? prevTo : 'UAH';
+      if (inpFrom && (inpFrom.value === '1' || !inpFrom.value)) {
+        inpFrom.value = '10';
+      }
+    }
+    convertFromTo();
+  }
+
+  if (convTabFiat && convTabCrypto) {
+    convTabFiat.onclick = () => {
+      convTabFiat.classList.add('active');
+      convTabCrypto.classList.remove('active');
+      updateConverterOptions('fiat');
+    };
+    convTabCrypto.onclick = () => {
+      convTabCrypto.classList.add('active');
+      convTabFiat.classList.remove('active');
+      updateConverterOptions('crypto');
+    };
+  }
 
   function getCurrencyRateUah(cur) {
     if (cur === 'UAH') return 1.0;
@@ -9755,7 +9800,14 @@ function renderPulseDrawerLayout(container) {
     if (btnSwap) {
       btnSwap.onclick = () => {
         const tempCur = selFrom.value;
-        selFrom.value = selTo.value;
+        const targetCur = selTo.value;
+        if (!Array.from(selFrom.options).some(o => o.value === targetCur)) {
+          selFrom.innerHTML += `<option value="${targetCur}">${targetCur}</option>`;
+        }
+        if (!Array.from(selTo.options).some(o => o.value === tempCur)) {
+          selTo.innerHTML += `<option value="${tempCur}">${tempCur}</option>`;
+        }
+        selFrom.value = targetCur;
         selTo.value = tempCur;
         convertFromTo();
       };
@@ -9970,7 +10022,8 @@ function applyCryptoToUI(cryptoData) {
     if (elDiff && info.diff) {
       const isUp = info.diff.startsWith('+') || info.diff.startsWith('▲');
       elDiff.className = `pulse-rate-diff ${isUp ? 'up' : 'down'}`;
-      elDiff.textContent = `${isUp ? '▲' : '▼'} ${info.diff.replace(/^[+-▲▼\s]+/, '')}`;
+      elDiff.textContent = isUp ? '▲' : '▼';
+      elDiff.title = info.diff;
     }
   };
 
@@ -9999,7 +10052,8 @@ function applyRatesToUI(rates) {
     if (elDiff && diff) {
       const isUp = diff.startsWith('+') || diff.startsWith('▲');
       elDiff.className = `pulse-rate-diff ${isUp ? 'up' : 'down'}`;
-      elDiff.textContent = `${isUp ? '▲' : '▼'} ${diff.replace(/^[+-▲▼\s]+/, '')}`;
+      elDiff.textContent = isUp ? '▲' : '▼';
+      elDiff.title = diff;
     }
   };
 
