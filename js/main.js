@@ -8540,6 +8540,17 @@ let pulseRatesData = {
   diffCNY: '+0.01'
 };
 
+let pulseCryptoData = {
+  BTC: { name: 'Bitcoin', price: 68450, diff: '+1.8%', symbol: 'BTCUSDT' },
+  ETH: { name: 'Ethereum', price: 2520, diff: '+2.1%', symbol: 'ETHUSDT' },
+  SOL: { name: 'Solana', price: 176.4, diff: '+3.5%', symbol: 'SOLUSDT' },
+  BNB: { name: 'BNB Chain', price: 594.2, diff: '-0.8%', symbol: 'BNBUSDT' },
+  GRAM: { name: 'Gram', price: 0.016, diff: '+4.2%', symbol: null },
+  XRP: { name: 'Ripple', price: 0.535, diff: '+1.2%', symbol: 'XRPUSDT' },
+  LTC: { name: 'Litecoin', price: 71.8, diff: '-0.5%', symbol: 'LTCUSDT' },
+  DOGE: { name: 'Dogecoin', price: 0.142, diff: '+2.8%', symbol: 'DOGEUSDT' }
+};
+
 const UKR_HOLIDAYS_CALENDAR = {
   '01-01': { title: 'Новий Рік та День народження Степана Бандери', fact: '1909 рік - народився український політичний діяч Степан Бандера.' },
   '01-22': { title: 'День Соборності України', fact: '1919 рік - проголошено Акт Злуки УНР і ЗУНР на Софійському майдані в Києві.' },
@@ -9364,55 +9375,143 @@ function renderPulseDrawerLayout(container) {
         </div>
       </div>
 
-      <!-- 4. КУРС ВАЛЮТ ТА ДВОСТОРОННІЙ КОНВЕРТЕР ВАЛЮТ -->
+      <!-- 4. КУРС ВАЛЮТ ТА КРИПТОВАЛЮТИ (8 ВАЛЮТ / 8 МОНЕТ) + ДВОСТОРОННІЙ КОНВЕРТЕР -->
       <div class="pulse-card" id="pulseCardCurrency">
         <div class="pulse-card-header">
-          <span class="pulse-card-title"><i class="fas fa-money-bill-wave text-success"></i> Курс Валют</span>
-          <span class="pulse-card-badge">Офіційний НБУ</span>
+          <span class="pulse-card-title"><i class="fas fa-coins text-warning"></i> Фінанси</span>
+          <div class="pulse-rates-tab-group" id="pulseRatesTabGroup">
+            <button type="button" class="pulse-rate-tab-btn active" id="pulseTabBtnFiat" data-tab="fiat">
+              <i class="fas fa-money-bill-wave"></i> Валюта
+            </button>
+            <button type="button" class="pulse-rate-tab-btn" id="pulseTabBtnCrypto" data-tab="crypto">
+              <i class="fab fa-bitcoin"></i> Крипта
+            </button>
+          </div>
         </div>
-        <div class="pulse-rates-grid">
+
+        <!-- 1. СІТКА 8 ФІАТНИХ ВАЛЮТ (без прапорців, формат: USD ▲ 0.08 / 45,20) -->
+        <div class="pulse-rates-grid" id="pulseFiatGrid">
           <!-- Верхня четвірка (Головні топ-валюти) -->
           <div class="pulse-rate-item" title="Долар США (USD)">
-            <div class="pulse-rate-code">🇺🇸 USD</div>
+            <div class="pulse-rate-top-line">
+              <span class="pulse-rate-code">USD</span>
+              <span class="pulse-rate-diff up" id="pulseDiffUsd">▲ 0.04</span>
+            </div>
             <div class="pulse-rate-value" id="pulseRateUsd">41,<span class="pulse-decimal">50</span></div>
-            <div class="pulse-rate-diff up" id="pulseDiffUsd">▲ +0.04</div>
           </div>
           <div class="pulse-rate-item" title="Євро (EUR)">
-            <div class="pulse-rate-code">🇪🇺 EUR</div>
+            <div class="pulse-rate-top-line">
+              <span class="pulse-rate-code">EUR</span>
+              <span class="pulse-rate-diff up" id="pulseDiffEur">▲ 0.08</span>
+            </div>
             <div class="pulse-rate-value" id="pulseRateEur">45,<span class="pulse-decimal">15</span></div>
-            <div class="pulse-rate-diff up" id="pulseDiffEur">▲ +0.08</div>
           </div>
           <div class="pulse-rate-item" title="Польський злотий (PLN)">
-            <div class="pulse-rate-code">🇵🇱 PLN</div>
+            <div class="pulse-rate-top-line">
+              <span class="pulse-rate-code">PLN</span>
+              <span class="pulse-rate-diff down" id="pulseDiffPln">▼ 0.02</span>
+            </div>
             <div class="pulse-rate-value" id="pulseRatePln">10,<span class="pulse-decimal">55</span></div>
-            <div class="pulse-rate-diff down" id="pulseDiffPln">▼ -0.02</div>
           </div>
           <div class="pulse-rate-item" title="Британський фунт (GBP)">
-            <div class="pulse-rate-code">🇬🇧 GBP</div>
+            <div class="pulse-rate-top-line">
+              <span class="pulse-rate-code">GBP</span>
+              <span class="pulse-rate-diff up" id="pulseDiffGbp">▲ 0.12</span>
+            </div>
             <div class="pulse-rate-value" id="pulseRateGbp">53,<span class="pulse-decimal">90</span></div>
-            <div class="pulse-rate-diff up" id="pulseDiffGbp">▲ +0.12</div>
           </div>
 
           <!-- Нижня четвірка (Резервні та практичні додаткові валюти) -->
           <div class="pulse-rate-item" title="Чеська крона (CZK)">
-            <div class="pulse-rate-code">🇨🇿 CZK</div>
+            <div class="pulse-rate-top-line">
+              <span class="pulse-rate-code">CZK</span>
+              <span class="pulse-rate-diff up" id="pulseDiffCzk">▲ 0.01</span>
+            </div>
             <div class="pulse-rate-value" id="pulseRateCzk">1,<span class="pulse-decimal">78</span></div>
-            <div class="pulse-rate-diff up" id="pulseDiffCzk">▲ +0.01</div>
           </div>
           <div class="pulse-rate-item" title="Швейцарський франк (CHF)">
-            <div class="pulse-rate-code">🇨🇭 CHF</div>
+            <div class="pulse-rate-top-line">
+              <span class="pulse-rate-code">CHF</span>
+              <span class="pulse-rate-diff up" id="pulseDiffChf">▲ 0.05</span>
+            </div>
             <div class="pulse-rate-value" id="pulseRateChf">47,<span class="pulse-decimal">80</span></div>
-            <div class="pulse-rate-diff up" id="pulseDiffChf">▲ +0.05</div>
           </div>
           <div class="pulse-rate-item" title="Канадський долар (CAD)">
-            <div class="pulse-rate-code">🇨🇦 CAD</div>
+            <div class="pulse-rate-top-line">
+              <span class="pulse-rate-code">CAD</span>
+              <span class="pulse-rate-diff down" id="pulseDiffCad">▼ 0.03</span>
+            </div>
             <div class="pulse-rate-value" id="pulseRateCad">30,<span class="pulse-decimal">20</span></div>
-            <div class="pulse-rate-diff down" id="pulseDiffCad">▼ -0.03</div>
           </div>
           <div class="pulse-rate-item" title="Китайський юань (CNY)">
-            <div class="pulse-rate-code">🇨🇳 CNY</div>
+            <div class="pulse-rate-top-line">
+              <span class="pulse-rate-code">CNY</span>
+              <span class="pulse-rate-diff up" id="pulseDiffCny">▲ 0.01</span>
+            </div>
             <div class="pulse-rate-value" id="pulseRateCny">5,<span class="pulse-decimal">75</span></div>
-            <div class="pulse-rate-diff up" id="pulseDiffCny">▲ +0.01</div>
+          </div>
+        </div>
+
+        <!-- 2. СІТКА 8 КРИПТОВАЛЮТ (ТОП-4 ФЛАГМАНИ ТА 4 АКТИВНІ МОНЕТИ) -->
+        <div class="pulse-rates-grid" id="pulseCryptoGrid" style="display: none;">
+          <!-- Топ-4 флагмани -->
+          <div class="pulse-rate-item" title="Bitcoin (BTC)">
+            <div class="pulse-rate-top-line">
+              <span class="pulse-rate-code">BTC</span>
+              <span class="pulse-rate-diff up" id="pulseDiffBtc">▲ 1.8%</span>
+            </div>
+            <div class="pulse-rate-value" id="pulseRateBtc">68 450$</div>
+          </div>
+          <div class="pulse-rate-item" title="Ethereum (ETH)">
+            <div class="pulse-rate-top-line">
+              <span class="pulse-rate-code">ETH</span>
+              <span class="pulse-rate-diff up" id="pulseDiffEth">▲ 2.1%</span>
+            </div>
+            <div class="pulse-rate-value" id="pulseRateEth">2 520$</div>
+          </div>
+          <div class="pulse-rate-item" title="Solana (SOL)">
+            <div class="pulse-rate-top-line">
+              <span class="pulse-rate-code">SOL</span>
+              <span class="pulse-rate-diff up" id="pulseDiffSol">▲ 3.5%</span>
+            </div>
+            <div class="pulse-rate-value" id="pulseRateSol">176,40$</div>
+          </div>
+          <div class="pulse-rate-item" title="BNB Chain (BNB)">
+            <div class="pulse-rate-top-line">
+              <span class="pulse-rate-code">BNB</span>
+              <span class="pulse-rate-diff down" id="pulseDiffBnb">▼ 0.8%</span>
+            </div>
+            <div class="pulse-rate-value" id="pulseRateBnb">594,20$</div>
+          </div>
+
+          <!-- 4 активні монети -->
+          <div class="pulse-rate-item" title="Gram / TON Telegram ecosystem (GRAM)">
+            <div class="pulse-rate-top-line">
+              <span class="pulse-rate-code">GRAM</span>
+              <span class="pulse-rate-diff up" id="pulseDiffGram">▲ 4.2%</span>
+            </div>
+            <div class="pulse-rate-value" id="pulseRateGram">0,016$</div>
+          </div>
+          <div class="pulse-rate-item" title="Ripple (XRP)">
+            <div class="pulse-rate-top-line">
+              <span class="pulse-rate-code">XRP</span>
+              <span class="pulse-rate-diff up" id="pulseDiffXrp">▲ 1.2%</span>
+            </div>
+            <div class="pulse-rate-value" id="pulseRateXrp">0,535$</div>
+          </div>
+          <div class="pulse-rate-item" title="Litecoin (LTC)">
+            <div class="pulse-rate-top-line">
+              <span class="pulse-rate-code">LTC</span>
+              <span class="pulse-rate-diff down" id="pulseDiffLtc">▼ 0.5%</span>
+            </div>
+            <div class="pulse-rate-value" id="pulseRateLtc">71,80$</div>
+          </div>
+          <div class="pulse-rate-item" title="Dogecoin (DOGE)">
+            <div class="pulse-rate-top-line">
+              <span class="pulse-rate-code">DOGE</span>
+              <span class="pulse-rate-diff up" id="pulseDiffDoge">▲ 2.8%</span>
+            </div>
+            <div class="pulse-rate-value" id="pulseRateDoge">0,142$</div>
           </div>
         </div>
 
@@ -9430,22 +9529,34 @@ function renderPulseDrawerLayout(container) {
             <div class="pulse-conv-input-row">
               <input type="number" id="pulseConvAmountFrom" class="pulse-conv-input" value="100" min="0" step="any">
               <select id="pulseConvCurrencyFrom" class="pulse-conv-select">
-                <option value="USD" selected>USD 🇺🇸</option>
-                <option value="EUR">EUR 🇪🇺</option>
-                <option value="PLN">PLN 🇵🇱</option>
-                <option value="GBP">GBP 🇬🇧</option>
-                <option value="CZK">CZK 🇨🇿</option>
-                <option value="CHF">CHF 🇨🇭</option>
-                <option value="CAD">CAD 🇨🇦</option>
-                <option value="CNY">CNY 🇨🇳</option>
-                <option value="UAH">UAH 🇺🇦</option>
+                <optgroup label="Валюти">
+                  <option value="USD" selected>USD</option>
+                  <option value="EUR">EUR</option>
+                  <option value="PLN">PLN</option>
+                  <option value="GBP">GBP</option>
+                  <option value="CZK">CZK</option>
+                  <option value="CHF">CHF</option>
+                  <option value="CAD">CAD</option>
+                  <option value="CNY">CNY</option>
+                  <option value="UAH">UAH</option>
+                </optgroup>
+                <optgroup label="Криптовалюти">
+                  <option value="BTC">BTC</option>
+                  <option value="ETH">ETH</option>
+                  <option value="SOL">SOL</option>
+                  <option value="BNB">BNB</option>
+                  <option value="GRAM">GRAM</option>
+                  <option value="XRP">XRP</option>
+                  <option value="LTC">LTC</option>
+                  <option value="DOGE">DOGE</option>
+                </optgroup>
               </select>
             </div>
             <div class="pulse-conv-rate-ref" id="pulseConvRateFromRef">1 USD = 41.50 UAH</div>
           </div>
 
           <!-- Кругла кнопка обміну валют (⇄) -->
-          <button type="button" class="pulse-conv-swap-btn" id="pulseConvSwapBtn" title="Поміняти валюти місцями (⇄)">
+          <button type="button" class="pulse-conv-swap-btn" id="pulseConvSwapBtn" title="Поміняти місцями (⇄)">
             <i class="fas fa-exchange-alt"></i>
           </button>
 
@@ -9455,15 +9566,27 @@ function renderPulseDrawerLayout(container) {
             <div class="pulse-conv-input-row">
               <input type="number" id="pulseConvAmountTo" class="pulse-conv-input" value="4150.00" min="0" step="any">
               <select id="pulseConvCurrencyTo" class="pulse-conv-select">
-                <option value="UAH" selected>UAH 🇺🇦</option>
-                <option value="USD">USD 🇺🇸</option>
-                <option value="EUR">EUR 🇪🇺</option>
-                <option value="PLN">PLN 🇵🇱</option>
-                <option value="GBP">GBP 🇬🇧</option>
-                <option value="CZK">CZK 🇨🇿</option>
-                <option value="CHF">CHF 🇨🇭</option>
-                <option value="CAD">CAD 🇨🇦</option>
-                <option value="CNY">CNY 🇨🇳</option>
+                <optgroup label="Валюти">
+                  <option value="UAH" selected>UAH</option>
+                  <option value="USD">USD</option>
+                  <option value="EUR">EUR</option>
+                  <option value="PLN">PLN</option>
+                  <option value="GBP">GBP</option>
+                  <option value="CZK">CZK</option>
+                  <option value="CHF">CHF</option>
+                  <option value="CAD">CAD</option>
+                  <option value="CNY">CNY</option>
+                </optgroup>
+                <optgroup label="Криптовалюти">
+                  <option value="BTC">BTC</option>
+                  <option value="ETH">ETH</option>
+                  <option value="SOL">SOL</option>
+                  <option value="BNB">BNB</option>
+                  <option value="GRAM">GRAM</option>
+                  <option value="XRP">XRP</option>
+                  <option value="LTC">LTC</option>
+                  <option value="DOGE">DOGE</option>
+                </optgroup>
               </select>
             </div>
             <div class="pulse-conv-rate-ref" id="pulseConvRateToRef">1 UAH = 0.0241 USD</div>
@@ -9523,7 +9646,28 @@ function renderPulseDrawerLayout(container) {
   }
   renderPulseFuelTable(savedRegion);
 
-  // Двосторонній інтерактивний конвертер валют за зразком скриншоту
+  // Перемикач вкладок Валюти / Крипта
+  const tabBtnFiat = container.querySelector('#pulseTabBtnFiat');
+  const tabBtnCrypto = container.querySelector('#pulseTabBtnCrypto');
+  const gridFiat = container.querySelector('#pulseFiatGrid');
+  const gridCrypto = container.querySelector('#pulseCryptoGrid');
+
+  if (tabBtnFiat && tabBtnCrypto && gridFiat && gridCrypto) {
+    tabBtnFiat.onclick = () => {
+      tabBtnFiat.classList.add('active');
+      tabBtnCrypto.classList.remove('active');
+      gridFiat.style.display = 'grid';
+      gridCrypto.style.display = 'none';
+    };
+    tabBtnCrypto.onclick = () => {
+      tabBtnCrypto.classList.add('active');
+      tabBtnFiat.classList.remove('active');
+      gridFiat.style.display = 'none';
+      gridCrypto.style.display = 'grid';
+    };
+  }
+
+  // Двосторонній інтерактивний конвертер валют та криптовалют
   const inpFrom = container.querySelector('#pulseConvAmountFrom');
   const inpTo = container.querySelector('#pulseConvAmountTo');
   const selFrom = container.querySelector('#pulseConvCurrencyFrom');
@@ -9538,7 +9682,29 @@ function renderPulseDrawerLayout(container) {
       USD: 41.50, EUR: 45.15, PLN: 10.55, GBP: 53.90,
       CZK: 1.78, CHF: 47.80, CAD: 30.20, CNY: 5.75
     };
-    return pulseRatesData[cur] || fallbacks[cur] || 1.0;
+    if (pulseRatesData[cur]) return pulseRatesData[cur];
+    if (fallbacks[cur]) return fallbacks[cur];
+    if (pulseCryptoData && pulseCryptoData[cur]) {
+      const usdRate = pulseRatesData.USD || fallbacks.USD || 41.50;
+      return pulseCryptoData[cur].price * usdRate;
+    }
+    return 1.0;
+  }
+
+  function formatConvertedValue(val) {
+    if (val <= 0 || isNaN(val)) return '';
+    if (Number.isInteger(val)) return String(val);
+    if (val >= 100) return val.toFixed(2);
+    if (val >= 1) return val.toFixed(4);
+    if (val >= 0.0001) return val.toFixed(6);
+    return parseFloat(val.toPrecision(6)).toString();
+  }
+
+  function formatRefRate(val) {
+    if (val >= 1000) return Math.round(val).toLocaleString('uk-UA');
+    if (val >= 1) return val.toFixed(2);
+    if (val >= 0.001) return val.toFixed(4);
+    return parseFloat(val.toPrecision(4)).toString();
   }
 
   function updateConverterRatesRef() {
@@ -9550,8 +9716,8 @@ function renderPulseDrawerLayout(container) {
     const rateDirect = rFromUah / rToUah;
     const rateReverse = rToUah / rFromUah;
 
-    refFrom.textContent = `1 ${cFrom} = ${rateDirect < 1 ? rateDirect.toFixed(4) : rateDirect.toFixed(2)} ${cTo}`;
-    refTo.textContent = `1 ${cTo} = ${rateReverse < 1 ? rateReverse.toFixed(4) : rateReverse.toFixed(2)} ${cFrom}`;
+    refFrom.textContent = `1 ${cFrom} = ${formatRefRate(rateDirect)} ${cTo}`;
+    refTo.textContent = `1 ${cTo} = ${formatRefRate(rateReverse)} ${cFrom}`;
   }
 
   function convertFromTo() {
@@ -9562,7 +9728,7 @@ function renderPulseDrawerLayout(container) {
     const rFromUah = getCurrencyRateUah(cFrom);
     const rToUah = getCurrencyRateUah(cTo);
     const result = (amt * rFromUah) / rToUah;
-    inpTo.value = result > 0 ? (Number.isInteger(result) ? result : result.toFixed(2)) : '';
+    inpTo.value = formatConvertedValue(result);
     updateConverterRatesRef();
   }
 
@@ -9574,7 +9740,7 @@ function renderPulseDrawerLayout(container) {
     const rFromUah = getCurrencyRateUah(cFrom);
     const rToUah = getCurrencyRateUah(cTo);
     const result = (amt * rToUah) / rFromUah;
-    inpFrom.value = result > 0 ? (Number.isInteger(result) ? result : result.toFixed(2)) : '';
+    inpFrom.value = formatConvertedValue(result);
     updateConverterRatesRef();
   }
 
@@ -9613,6 +9779,12 @@ async function loadPulseDrawerData(forceRefresh = false) {
 
   if (!forceRefresh && isCacheFresh) {
     applyRatesToUI(cached.rates);
+    if (cached.crypto) {
+      applyCryptoToUI(cached.crypto);
+    } else {
+      applyCryptoToUI(pulseCryptoData);
+      fetchLiveCryptoRates();
+    }
     if (cached.geomagForecast) {
       renderGeomagForecastUI(cached.geomagForecast);
     }
@@ -9629,15 +9801,22 @@ async function loadPulseDrawerData(forceRefresh = false) {
 
   // Свіжий запит
   try {
-    const [ratesResult, geomagResult] = await Promise.allSettled([
+    const [ratesResult, geomagResult, cryptoResult] = await Promise.allSettled([
       fetchLiveNbuRates(),
-      fetchLiveGeomag3DayForecast()
+      fetchLiveGeomag3DayForecast(),
+      fetchLiveCryptoRates()
     ]);
 
     let finalRates = pulseRatesData;
     if (ratesResult.status === 'fulfilled' && ratesResult.value) {
       finalRates = ratesResult.value;
       applyRatesToUI(finalRates);
+    }
+
+    let finalCrypto = pulseCryptoData;
+    if (cryptoResult.status === 'fulfilled' && cryptoResult.value) {
+      finalCrypto = cryptoResult.value;
+      applyCryptoToUI(finalCrypto);
     }
 
     let finalForecast = null;
@@ -9659,6 +9838,7 @@ async function loadPulseDrawerData(forceRefresh = false) {
         timestamp: now,
         lastUpdatedText: timeStr,
         rates: finalRates,
+        crypto: finalCrypto,
         geomagForecast: finalForecast
       }));
     } catch (e) {}
@@ -9723,6 +9903,88 @@ async function fetchLiveNbuRates() {
     return rates;
   } catch (e) {
     return pulseRatesData;
+  }
+}
+
+async function fetchLiveCryptoRates() {
+  try {
+    const symbols = '["BTCUSDT","ETHUSDT","SOLUSDT","BNBUSDT","XRPUSDT","LTCUSDT","DOGEUSDT"]';
+    const res = await fetch(`https://api.binance.com/api/v3/ticker/24hr?symbols=${encodeURIComponent(symbols)}`);
+    if (!res.ok) throw new Error('Помилка Binance API');
+    const list = await res.json();
+    if (!Array.isArray(list)) return pulseCryptoData;
+
+    const map = {};
+    list.forEach(item => {
+      map[item.symbol] = item;
+    });
+
+    const updateCoin = (key, sym) => {
+      if (map[sym] && pulseCryptoData[key]) {
+        const p = parseFloat(map[sym].lastPrice);
+        const change = parseFloat(map[sym].priceChangePercent);
+        if (!isNaN(p)) {
+          pulseCryptoData[key].price = p;
+        }
+        if (!isNaN(change)) {
+          pulseCryptoData[key].diff = (change >= 0 ? '+' : '') + change.toFixed(1) + '%';
+        }
+      }
+    };
+
+    updateCoin('BTC', 'BTCUSDT');
+    updateCoin('ETH', 'ETHUSDT');
+    updateCoin('SOL', 'SOLUSDT');
+    updateCoin('BNB', 'BNBUSDT');
+    updateCoin('XRP', 'XRPUSDT');
+    updateCoin('LTC', 'LTCUSDT');
+    updateCoin('DOGE', 'DOGEUSDT');
+
+    applyCryptoToUI(pulseCryptoData);
+    return pulseCryptoData;
+  } catch (e) {
+    applyCryptoToUI(pulseCryptoData);
+    return pulseCryptoData;
+  }
+}
+
+function applyCryptoToUI(cryptoData) {
+  if (!cryptoData) return;
+  pulseCryptoData = cryptoData;
+
+  const formatCryptoPrice = (price) => {
+    if (price >= 1000) {
+      return Math.round(price).toLocaleString('uk-UA').replace(/\s/g, ' ') + '$';
+    } else if (price >= 1) {
+      return price.toFixed(2).replace('.', ',') + '$';
+    } else {
+      return price.toFixed(3).replace('.', ',') + '$';
+    }
+  };
+
+  const updateCryptoItem = (code, info) => {
+    if (!info) return;
+    const elVal = document.getElementById(`pulseRate${code}`);
+    const elDiff = document.getElementById(`pulseDiff${code}`);
+    if (elVal) elVal.textContent = formatCryptoPrice(info.price);
+    if (elDiff && info.diff) {
+      const isUp = info.diff.startsWith('+') || info.diff.startsWith('▲');
+      elDiff.className = `pulse-rate-diff ${isUp ? 'up' : 'down'}`;
+      elDiff.textContent = `${isUp ? '▲' : '▼'} ${info.diff.replace(/^[+-▲▼\s]+/, '')}`;
+    }
+  };
+
+  updateCryptoItem('Btc', pulseCryptoData.BTC);
+  updateCryptoItem('Eth', pulseCryptoData.ETH);
+  updateCryptoItem('Sol', pulseCryptoData.SOL);
+  updateCryptoItem('Bnb', pulseCryptoData.BNB);
+  updateCryptoItem('Gram', pulseCryptoData.GRAM);
+  updateCryptoItem('Xrp', pulseCryptoData.XRP);
+  updateCryptoItem('Ltc', pulseCryptoData.LTC);
+  updateCryptoItem('Doge', pulseCryptoData.DOGE);
+
+  if (typeof window.updatePulseConverterLive === 'function') {
+    window.updatePulseConverterLive();
   }
 }
 

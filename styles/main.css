@@ -11584,8 +11584,53 @@ body.dark-mode .pulse-decimal {
 }
 
 /* ==========================================================================
-   КАРТКА 4: КУРС ВАЛЮТ (8 ВАЛЮТ: 2 РЯДКИ ПО 4) ТА ДВОСТОРОННІЙ КОНВЕРТЕР
+   КАРТКА 4: КУРС ВАЛЮТ / КРИПТОВАЛЮТИ (8 ВАЛЮТ / 8 МОНЕТ) ТА КОНВЕРТЕР
    ========================================================================== */
+.pulse-rates-tab-group {
+  display: flex;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.05);
+  padding: 2px;
+  border-radius: 6px;
+  gap: 2px;
+}
+body.dark-mode .pulse-rates-tab-group {
+  background: rgba(255, 255, 255, 0.08);
+}
+.pulse-rate-tab-btn {
+  border: none;
+  background: transparent;
+  font-size: 0.70rem;
+  font-weight: 700;
+  color: #64748b;
+  padding: 2px 7px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.15s ease;
+}
+.pulse-rate-tab-btn:hover {
+  color: #0284c7;
+}
+.pulse-rate-tab-btn.active {
+  background: #ffffff;
+  color: #0284c7;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+body.dark-mode .pulse-rate-tab-btn {
+  color: #94a3b8;
+}
+body.dark-mode .pulse-rate-tab-btn:hover {
+  color: #38bdf8;
+}
+body.dark-mode .pulse-rate-tab-btn.active {
+  background: #1e293b;
+  color: #38bdf8;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
 .pulse-rates-grid,
 .pulse-rates-row {
   display: grid;
@@ -11621,40 +11666,46 @@ body.dark-mode .pulse-rate-item:hover {
   border-color: rgba(56, 189, 248, 0.45);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
 }
-.pulse-rate-code {
-  font-size: 0.62rem;
-  font-weight: 700;
-  color: #64748b;
+
+.pulse-rate-top-line {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 2px;
-  white-space: nowrap;
+  gap: 3px;
+  width: 100%;
   line-height: 1.1;
+  white-space: nowrap;
+}
+.pulse-rate-code {
+  font-size: 0.63rem;
+  font-weight: 700;
+  color: #475569;
+  letter-spacing: 0.2px;
 }
 body.dark-mode .pulse-rate-code {
   color: #94a3b8;
 }
-.pulse-rate-value {
-  font-size: 0.82rem;
-  font-weight: 800;
-  color: #0f172a;
-  line-height: 1.15;
-  margin: 2px 0 1px;
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-}
-body.dark-mode .pulse-rate-value {
-  color: #38bdf8;
-}
 .pulse-rate-diff {
-  font-size: 0.56rem;
+  font-size: 0.55rem;
   font-weight: 700;
   line-height: 1;
   white-space: nowrap;
 }
 .pulse-rate-diff.up { color: #16a34a; }
 .pulse-rate-diff.down { color: #dc2626; }
+
+.pulse-rate-value {
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: #0f172a;
+  line-height: 1.15;
+  margin: 2px 0 0;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+body.dark-mode .pulse-rate-value {
+  color: #f8fafc;
+}
 
 /* Двосторонній інтерактивний конвертер валют за зразком користувача */
 .pulse-calc-heading {
@@ -11679,7 +11730,7 @@ body.dark-mode .pulse-calc-heading {
   width: 100%;
   margin: 0;
   box-sizing: border-box;
-  gap: 6px;
+  gap: 8px;
 }
 
 .pulse-conv-box {
@@ -11688,7 +11739,7 @@ body.dark-mode .pulse-calc-heading {
   background: #ffffff;
   border: 1px solid #cbd5e1;
   border-radius: 8px;
-  padding: 6px 10px;
+  padding: 6px 11px;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
   transition: border-color 0.15s ease;
   box-sizing: border-box;
