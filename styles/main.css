@@ -11124,15 +11124,15 @@ body.dark-mode .pulse-kp-table th {
   background: rgba(255, 255, 255, 0.05);
 }
 .pulse-kp-table .kp-th-day {
-  text-align: center;
-  padding: 3px 2px;
+  text-align: right;
+  padding: 3px 5px 3px 2px;
   min-width: 48px;
   width: 48px;
   font-weight: 600;
 }
 .pulse-kp-table .kp-td-day {
-  text-align: center;
-  padding: 3px 2px;
+  text-align: right;
+  padding: 3px 5px 3px 2px;
   font-size: 0.64rem;
   font-weight: 700;
   color: #0284c7;
@@ -11584,19 +11584,20 @@ body.dark-mode .pulse-decimal {
 }
 
 /* ==========================================================================
-   КАРТКА 4: КУРС ВАЛЮТ ТА ДВОСТОРОННІЙ КОНВЕРТЕР ВАЛЮТ
+   КАРТКА 4: КУРС ВАЛЮТ (8 ВАЛЮТ: 2 РЯДКИ ПО 4) ТА ДВОСТОРОННІЙ КОНВЕРТЕР
    ========================================================================== */
+.pulse-rates-grid,
 .pulse-rates-row {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-  margin: 0 0 8px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
+  margin: 0 0 7px;
   width: 100%;
   box-sizing: border-box;
 }
 .pulse-rate-item {
-  padding: 8px 6px;
-  border-radius: 7px;
+  padding: 4px 2px 5px;
+  border-radius: 6px;
   background: #ffffff;
   border: 1px solid #e2e8f0;
   text-align: center;
@@ -11604,7 +11605,9 @@ body.dark-mode .pulse-decimal {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  align-items: center;
   transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+  min-width: 0;
 }
 .pulse-rate-item:hover {
   border-color: rgba(56, 189, 248, 0.45);
@@ -11619,30 +11622,36 @@ body.dark-mode .pulse-rate-item:hover {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
 }
 .pulse-rate-code {
-  font-size: 0.74rem;
+  font-size: 0.62rem;
   font-weight: 700;
   color: #64748b;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  gap: 2px;
+  white-space: nowrap;
+  line-height: 1.1;
 }
 body.dark-mode .pulse-rate-code {
   color: #94a3b8;
 }
 .pulse-rate-value {
-  font-size: 1rem;
+  font-size: 0.82rem;
   font-weight: 800;
   color: #0f172a;
-  line-height: 1.2;
-  margin: 3px 0 2px;
+  line-height: 1.15;
+  margin: 2px 0 1px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 body.dark-mode .pulse-rate-value {
   color: #38bdf8;
 }
 .pulse-rate-diff {
-  font-size: 0.68rem;
+  font-size: 0.56rem;
   font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
 }
 .pulse-rate-diff.up { color: #16a34a; }
 .pulse-rate-diff.down { color: #dc2626; }

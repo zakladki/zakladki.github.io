@@ -8525,9 +8525,19 @@ let pulseRatesData = {
   USD: 41.50,
   EUR: 45.15,
   PLN: 10.55,
+  GBP: 53.90,
+  CZK: 1.78,
+  CHF: 47.80,
+  CAD: 30.20,
+  CNY: 5.75,
   diffUSD: '+0.04',
   diffEUR: '+0.08',
-  diffPLN: '+0.02'
+  diffPLN: '-0.02',
+  diffGBP: '+0.12',
+  diffCZK: '+0.01',
+  diffCHF: '+0.05',
+  diffCAD: '-0.03',
+  diffCNY: '+0.01'
 };
 
 const UKR_HOLIDAYS_CALENDAR = {
@@ -9360,21 +9370,49 @@ function renderPulseDrawerLayout(container) {
           <span class="pulse-card-title"><i class="fas fa-money-bill-wave text-success"></i> Курс Валют</span>
           <span class="pulse-card-badge">Офіційний НБУ</span>
         </div>
-        <div class="pulse-rates-row">
-          <div class="pulse-rate-item">
+        <div class="pulse-rates-grid">
+          <!-- Верхня четвірка (Головні топ-валюти) -->
+          <div class="pulse-rate-item" title="Долар США (USD)">
             <div class="pulse-rate-code">🇺🇸 USD</div>
             <div class="pulse-rate-value" id="pulseRateUsd">41,<span class="pulse-decimal">50</span></div>
             <div class="pulse-rate-diff up" id="pulseDiffUsd">▲ +0.04</div>
           </div>
-          <div class="pulse-rate-item">
+          <div class="pulse-rate-item" title="Євро (EUR)">
             <div class="pulse-rate-code">🇪🇺 EUR</div>
             <div class="pulse-rate-value" id="pulseRateEur">45,<span class="pulse-decimal">15</span></div>
             <div class="pulse-rate-diff up" id="pulseDiffEur">▲ +0.08</div>
           </div>
-          <div class="pulse-rate-item">
+          <div class="pulse-rate-item" title="Польський злотий (PLN)">
             <div class="pulse-rate-code">🇵🇱 PLN</div>
             <div class="pulse-rate-value" id="pulseRatePln">10,<span class="pulse-decimal">55</span></div>
             <div class="pulse-rate-diff down" id="pulseDiffPln">▼ -0.02</div>
+          </div>
+          <div class="pulse-rate-item" title="Британський фунт (GBP)">
+            <div class="pulse-rate-code">🇬🇧 GBP</div>
+            <div class="pulse-rate-value" id="pulseRateGbp">53,<span class="pulse-decimal">90</span></div>
+            <div class="pulse-rate-diff up" id="pulseDiffGbp">▲ +0.12</div>
+          </div>
+
+          <!-- Нижня четвірка (Резервні та практичні додаткові валюти) -->
+          <div class="pulse-rate-item" title="Чеська крона (CZK)">
+            <div class="pulse-rate-code">🇨🇿 CZK</div>
+            <div class="pulse-rate-value" id="pulseRateCzk">1,<span class="pulse-decimal">78</span></div>
+            <div class="pulse-rate-diff up" id="pulseDiffCzk">▲ +0.01</div>
+          </div>
+          <div class="pulse-rate-item" title="Швейцарський франк (CHF)">
+            <div class="pulse-rate-code">🇨🇭 CHF</div>
+            <div class="pulse-rate-value" id="pulseRateChf">47,<span class="pulse-decimal">80</span></div>
+            <div class="pulse-rate-diff up" id="pulseDiffChf">▲ +0.05</div>
+          </div>
+          <div class="pulse-rate-item" title="Канадський долар (CAD)">
+            <div class="pulse-rate-code">🇨🇦 CAD</div>
+            <div class="pulse-rate-value" id="pulseRateCad">30,<span class="pulse-decimal">20</span></div>
+            <div class="pulse-rate-diff down" id="pulseDiffCad">▼ -0.03</div>
+          </div>
+          <div class="pulse-rate-item" title="Китайський юань (CNY)">
+            <div class="pulse-rate-code">🇨🇳 CNY</div>
+            <div class="pulse-rate-value" id="pulseRateCny">5,<span class="pulse-decimal">75</span></div>
+            <div class="pulse-rate-diff up" id="pulseDiffCny">▲ +0.01</div>
           </div>
         </div>
 
@@ -9395,6 +9433,11 @@ function renderPulseDrawerLayout(container) {
                 <option value="USD" selected>USD 🇺🇸</option>
                 <option value="EUR">EUR 🇪🇺</option>
                 <option value="PLN">PLN 🇵🇱</option>
+                <option value="GBP">GBP 🇬🇧</option>
+                <option value="CZK">CZK 🇨🇿</option>
+                <option value="CHF">CHF 🇨🇭</option>
+                <option value="CAD">CAD 🇨🇦</option>
+                <option value="CNY">CNY 🇨🇳</option>
                 <option value="UAH">UAH 🇺🇦</option>
               </select>
             </div>
@@ -9416,6 +9459,11 @@ function renderPulseDrawerLayout(container) {
                 <option value="USD">USD 🇺🇸</option>
                 <option value="EUR">EUR 🇪🇺</option>
                 <option value="PLN">PLN 🇵🇱</option>
+                <option value="GBP">GBP 🇬🇧</option>
+                <option value="CZK">CZK 🇨🇿</option>
+                <option value="CHF">CHF 🇨🇭</option>
+                <option value="CAD">CAD 🇨🇦</option>
+                <option value="CNY">CNY 🇨🇳</option>
               </select>
             </div>
             <div class="pulse-conv-rate-ref" id="pulseConvRateToRef">1 UAH = 0.0241 USD</div>
@@ -9486,7 +9534,11 @@ function renderPulseDrawerLayout(container) {
 
   function getCurrencyRateUah(cur) {
     if (cur === 'UAH') return 1.0;
-    return pulseRatesData[cur] || (cur === 'USD' ? 41.50 : cur === 'EUR' ? 45.15 : 10.55);
+    const fallbacks = {
+      USD: 41.50, EUR: 45.15, PLN: 10.55, GBP: 53.90,
+      CZK: 1.78, CHF: 47.80, CAD: 30.20, CNY: 5.75
+    };
+    return pulseRatesData[cur] || fallbacks[cur] || 1.0;
   }
 
   function updateConverterRatesRef() {
@@ -9644,17 +9696,28 @@ async function fetchLiveNbuRates() {
     const data = await res.json();
     if (!Array.isArray(data)) return null;
 
-    const usdItem = data.find(item => item.cc === 'USD');
-    const eurItem = data.find(item => item.cc === 'EUR');
-    const plnItem = data.find(item => item.cc === 'PLN');
+    const findRate = (code, fallback) => {
+      const it = data.find(item => item.cc === code);
+      return it ? Number(it.rate.toFixed(2)) : fallback;
+    };
 
     const rates = {
-      USD: usdItem ? Number(usdItem.rate.toFixed(2)) : 41.50,
-      EUR: eurItem ? Number(eurItem.rate.toFixed(2)) : 45.15,
-      PLN: plnItem ? Number(plnItem.rate.toFixed(2)) : 10.55,
+      USD: findRate('USD', 41.50),
+      EUR: findRate('EUR', 45.15),
+      PLN: findRate('PLN', 10.55),
+      GBP: findRate('GBP', 53.90),
+      CZK: findRate('CZK', 1.78),
+      CHF: findRate('CHF', 47.80),
+      CAD: findRate('CAD', 30.20),
+      CNY: findRate('CNY', 5.75),
       diffUSD: '+0.04',
       diffEUR: '+0.06',
-      diffPLN: '-0.02'
+      diffPLN: '-0.02',
+      diffGBP: '+0.12',
+      diffCZK: '+0.01',
+      diffCHF: '+0.05',
+      diffCAD: '-0.03',
+      diffCNY: '+0.01'
     };
     pulseRatesData = rates;
     return rates;
@@ -9667,13 +9730,25 @@ function applyRatesToUI(rates) {
   if (!rates) return;
   pulseRatesData = rates;
 
-  const usdEl = document.getElementById('pulseRateUsd');
-  const eurEl = document.getElementById('pulseRateEur');
-  const plnEl = document.getElementById('pulseRatePln');
+  const updateItem = (code, val, diff) => {
+    const elVal = document.getElementById(`pulseRate${code}`);
+    const elDiff = document.getElementById(`pulseDiff${code}`);
+    if (elVal) elVal.innerHTML = formatDecimalsHtml(val, 2, true);
+    if (elDiff && diff) {
+      const isUp = diff.startsWith('+') || diff.startsWith('▲');
+      elDiff.className = `pulse-rate-diff ${isUp ? 'up' : 'down'}`;
+      elDiff.textContent = `${isUp ? '▲' : '▼'} ${diff.replace(/^[+-▲▼\s]+/, '')}`;
+    }
+  };
 
-  if (usdEl) usdEl.innerHTML = formatDecimalsHtml(rates.USD || 41.50, 2, true);
-  if (eurEl) eurEl.innerHTML = formatDecimalsHtml(rates.EUR || 45.15, 2, true);
-  if (plnEl) plnEl.innerHTML = formatDecimalsHtml(rates.PLN || 10.55, 2, true);
+  updateItem('Usd', rates.USD || 41.50, rates.diffUSD || '+0.04');
+  updateItem('Eur', rates.EUR || 45.15, rates.diffEUR || '+0.06');
+  updateItem('Pln', rates.PLN || 10.55, rates.diffPLN || '-0.02');
+  updateItem('Gbp', rates.GBP || 53.90, rates.diffGBP || '+0.12');
+  updateItem('Czk', rates.CZK || 1.78, rates.diffCZK || '+0.01');
+  updateItem('Chf', rates.CHF || 47.80, rates.diffCHF || '+0.05');
+  updateItem('Cad', rates.CAD || 30.20, rates.diffCAD || '-0.03');
+  updateItem('Cny', rates.CNY || 5.75, rates.diffCNY || '+0.01');
 
   // Оновлюємо новий конвертер валют при оновленні курсів
   if (typeof window.updatePulseConverterLive === 'function') {
@@ -9685,7 +9760,7 @@ function getGeomagCompactDayBadge(dateObj) {
   const uaDays = ['Нд', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
   const dayName = uaDays[dateObj.getDay()];
   const dayNum = dateObj.getDate();
-  return `${dayName} • ${dayNum}`;
+  return `${dayNum} • ${dayName}`;
 }
 
 async function fetchLiveGeomag3DayForecast() {
@@ -9773,7 +9848,11 @@ function renderGeomagForecastUI(daysForecast) {
   const timeHeaders = ['00:00', '03:00', '06:00', '09:00', '12:00', '15:00', '18:00', '21:00'];
 
   const rowsHtml = daysForecast.map(day => {
-    const dayLabel = (day.badge || day.label || '').replace(/\s*•\s*/g, ' • ');
+    let dayLabel = (day.badge || day.label || '').replace(/\s*•\s*/g, ' • ');
+    const m = dayLabel.match(/^([А-Яа-яЇїІіЄєҐґ]+)\s*•\s*(\d+)$/);
+    if (m) {
+      dayLabel = `${m[2]} • ${m[1]}`;
+    }
     const slotsHtml = (day.slots || []).map(slot => {
       const val = typeof slot.kp === 'number' ? slot.kp : 1.5;
       let colorClass = 'green';
