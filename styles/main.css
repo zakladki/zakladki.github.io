@@ -2469,6 +2469,12 @@ body.dark-mode .torrent-badge:hover {
 .group li .telegram-badge, .telegram-badge, .group li .tg-badge, .tg-badge,
 .group li .youtube-badge, .youtube-badge, .group li .yt-badge, .yt-badge,
 .group li .facebook-badge, .facebook-badge, .group li .fb-badge, .fb-badge,
+.group li .instagram-badge, .instagram-badge, .group li .ig-badge, .ig-badge,
+.group li .twitter-badge, .twitter-badge, .group li .x-badge, .x-badge,
+.group li .tiktok-badge, .tiktok-badge,
+.group li .discord-badge, .discord-badge,
+.group li .spotify-badge, .spotify-badge, .group li .music-stream-badge, .music-stream-badge,
+.group li .linkedin-badge, .linkedin-badge,
 .group li .app-badge, .app-badge, .group li .mobile-badge, .mobile-badge,
 .group li .chat-badge, .chat-badge, .group li .bot-badge, .bot-badge,
 .group li .mirror-badge, .mirror-badge,
@@ -2502,6 +2508,12 @@ body.dark-mode .torrent-badge:hover {
 .group li:hover .telegram-badge, .group li:hover .tg-badge,
 .group li:hover .youtube-badge, .group li:hover .yt-badge,
 .group li:hover .facebook-badge, .group li:hover .fb-badge,
+.group li:hover .instagram-badge, .group li:hover .ig-badge,
+.group li:hover .twitter-badge, .group li:hover .x-badge,
+.group li:hover .tiktok-badge,
+.group li:hover .discord-badge,
+.group li:hover .spotify-badge, .group li:hover .music-stream-badge,
+.group li:hover .linkedin-badge,
 .group li:hover .app-badge, .group li:hover .mobile-badge,
 .group li:hover .chat-badge, .group li:hover .bot-badge,
 .group li:hover .mirror-badge,
@@ -2515,10 +2527,25 @@ body.dark-mode .torrent-badge:hover {
 .group li .telegram-badge::before, .telegram-badge::before, .group li .tg-badge::before, .tg-badge::before,
 .group li .youtube-badge::before, .youtube-badge::before, .group li .yt-badge::before, .yt-badge::before,
 .group li .facebook-badge::before, .facebook-badge::before, .group li .fb-badge::before, .fb-badge::before,
+.group li .instagram-badge::before, .instagram-badge::before, .group li .ig-badge::before, .ig-badge::before,
+.group li .twitter-badge::before, .twitter-badge::before, .group li .x-badge::before, .x-badge::before,
+.group li .tiktok-badge::before, .tiktok-badge::before,
+.group li .discord-badge::before, .discord-badge::before,
+.group li .spotify-badge::before, .spotify-badge::before, .group li .music-stream-badge::before, .music-stream-badge::before,
+.group li .linkedin-badge::before, .linkedin-badge::before,
 .group li .app-badge::before, .app-badge::before, .group li .mobile-badge::before, .mobile-badge::before,
 .group li .chat-badge::before, .chat-badge::before, .group li .bot-badge::before, .bot-badge::before,
 .group li .mirror-badge::before, .mirror-badge::before,
 .group li .auth-badge::before, .auth-badge::before, .group li .lock-badge::before, .lock-badge::before,
+.group li .opensource-badge::before, .opensource-badge::before, .group li .free-badge::before, .free-badge::before,
+.group li .like-badge::before, .like-badge::before, .group li .sparkle-badge::before, .sparkle-badge::before {
+  content: '';
+  display: block;
+  width: 16px;
+  height: 16px;
+  background-color: currentColor;
+  transition: transform 0.15s ease;
+}
 .group li .opensource-badge::before, .opensource-badge::before, .group li .free-badge::before, .free-badge::before,
 .group li .like-badge::before, .like-badge::before, .group li .sparkle-badge::before, .sparkle-badge::before {
   content: '';
@@ -2573,14 +2600,303 @@ body.dark-mode .torrent-badge:hover {
   transform: scale(1.1);
 }
 
+/* 0c. Instagram-профіль (📷) */
+.group li .instagram-badge::before, .instagram-badge::before,
+.group li .ig-badge::before, .ig-badge::before {
+  width: 15px;
+  height: 15px;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 448 512' fill='currentColor'%3E%3Cpath d='M224.1 141c-63.6 0-114.9 51.3-114.9 114.9s51.3 114.9 114.9 114.9S339 319.5 339 255.9 287.7 141 224.1 141zm0 189.6c-41.1 0-74.7-33.5-74.7-74.7s33.5-74.7 74.7-74.7 74.7 33.5 74.7 74.7-33.6 74.7-74.7 74.7zm146.4-194.3c0 14.9-12 26.8-26.8 26.8-14.9 0-26.8-12-26.8-26.8s12-26.8 26.8-26.8 26.8 12 26.8 26.8zm76.1 27.2c-1.7-35.9-9.9-67.7-36.2-93.9-26.2-26.2-58-34.4-93.9-36.2-37-2.1-147.9-2.1-184.9 0-35.8 1.7-67.6 9.9-93.9 36.1s-34.4 58-36.2 93.9c-2.1 37-2.1 147.9 0 184.9 1.7 35.9 9.9 67.7 36.2 93.9s58 34.4 93.9 36.2c37 2.1 147.9 2.1 184.9 0 35.9-1.7 67.7-9.9 93.9-36.2 26.2-26.2 34.4-58 36.2-93.9 2.1-37 2.1-147.8 0-184.8zM398.8 388c-7.8 19.6-22.9 34.7-42.6 42.6-29.5 11.7-99.5 9-132.1 9s-102.7 2.6-132.1-9c-19.6-7.8-34.7-22.9-42.6-42.6-11.7-29.5-9-99.5-9-132.1s-2.6-102.7 9-132.1c7.8-19.6 22.9-34.7 42.6-42.6 29.5-11.7 99.5-9 132.1-9s102.7-2.6 132.1 9c19.6 7.8 34.7 22.9 42.6 42.6 11.7 29.5 9 99.5 9 132.1z'/%3E%3C/svg%3E") no-repeat center / contain;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 448 512' fill='currentColor'%3E%3Cpath d='M224.1 141c-63.6 0-114.9 51.3-114.9 114.9s51.3 114.9 114.9 114.9S339 319.5 339 255.9 287.7 141 224.1 141zm0 189.6c-41.1 0-74.7-33.5-74.7-74.7s33.5-74.7 74.7-74.7 74.7 33.5 74.7 74.7-33.6 74.7-74.7 74.7zm146.4-194.3c0 14.9-12 26.8-26.8 26.8-14.9 0-26.8-12-26.8-26.8s12-26.8 26.8-26.8 26.8 12 26.8 26.8zm76.1 27.2c-1.7-35.9-9.9-67.7-36.2-93.9-26.2-26.2-58-34.4-93.9-36.2-37-2.1-147.9-2.1-184.9 0-35.8 1.7-67.6 9.9-93.9 36.1s-34.4 58-36.2 93.9c-2.1 37-2.1 147.9 0 184.9 1.7 35.9 9.9 67.7 36.2 93.9s58 34.4 93.9 36.2c37 2.1 147.9 2.1 184.9 0 35.9-1.7 67.7-9.9 93.9-36.2 26.2-26.2 34.4-58 36.2-93.9 2.1-37 2.1-147.8 0-184.8zM398.8 388c-7.8 19.6-22.9 34.7-42.6 42.6-29.5 11.7-99.5 9-132.1 9s-102.7 2.6-132.1-9c-19.6-7.8-34.7-22.9-42.6-42.6-11.7-29.5-9-99.5-9-132.1s-2.6-102.7 9-132.1c7.8-19.6 22.9-34.7 42.6-42.6 29.5-11.7 99.5-9 132.1-9s102.7-2.6 132.1 9c19.6 7.8 34.7 22.9 42.6 42.6 11.7 29.5 9 99.5 9 132.1z'/%3E%3C/svg%3E") no-repeat center / contain;
+}
+.group li .instagram-badge:hover, .instagram-badge:hover,
+.group li .ig-badge:hover, .ig-badge:hover {
+  opacity: 1;
+  background-color: rgba(225, 48, 108, 0.12);
+  color: #e1306c !important;
+  border-color: rgba(225, 48, 108, 0.35);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+}
+.group li .instagram-badge:hover::before, .instagram-badge:hover::before,
+.group li .ig-badge:hover::before, .ig-badge:hover::before {
+  transform: scale(1.1);
+}
+
+/* 0d. X (Twitter) профіль */
+.group li .twitter-badge::before, .twitter-badge::before,
+.group li .x-badge::before, .x-badge::before {
+  width: 14px;
+  height: 14px;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' fill='currentColor'%3E%3Cpath d='M389.2 48h70.6L305.6 224.2 487 464H345L233.7 318.6 106.5 464H35.8L200.7 275.5 26.8 48H172.4L272.9 180.9 389.2 48zM364.4 421.8h39.1L151.1 88h-42L364.4 421.8z'/%3E%3C/svg%3E") no-repeat center / contain;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' fill='currentColor'%3E%3Cpath d='M389.2 48h70.6L305.6 224.2 487 464H345L233.7 318.6 106.5 464H35.8L200.7 275.5 26.8 48H172.4L272.9 180.9 389.2 48zM364.4 421.8h39.1L151.1 88h-42L364.4 421.8z'/%3E%3C/svg%3E") no-repeat center / contain;
+}
+.group li .twitter-badge:hover, .twitter-badge:hover,
+.group li .x-badge:hover, .x-badge:hover {
+  opacity: 1;
+  background-color: rgba(15, 20, 25, 0.12);
+  color: #0f1419 !important;
+  border-color: rgba(15, 20, 25, 0.35);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+}
+.group li .twitter-badge:hover::before, .twitter-badge:hover::before,
+.group li .x-badge:hover::before, .x-badge:hover::before {
+  transform: scale(1.1);
+}
+
+/* 0e. TikTok-профіль */
+.group li .tiktok-badge::before, .tiktok-badge::before {
+  width: 14px;
+  height: 15px;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 448 512' fill='currentColor'%3E%3Cpath d='M448,209.91a210.06,210.06,0,0,1-122.77-39.25V349.38A162.55,162.55,0,1,1,185,188.31V278.2a74.62,74.62,0,1,0,52.23,71.18V0l88,0a121.18,121.18,0,0,0,1.86,22.17h0A122.18,122.18,0,0,0,381,102.39a121.43,121.43,0,0,0,67,20.14Z'/%3E%3C/svg%3E") no-repeat center / contain;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 448 512' fill='currentColor'%3E%3Cpath d='M448,209.91a210.06,210.06,0,0,1-122.77-39.25V349.38A162.55,162.55,0,1,1,185,188.31V278.2a74.62,74.62,0,1,0,52.23,71.18V0l88,0a121.18,121.18,0,0,0,1.86,22.17h0A122.18,122.18,0,0,0,381,102.39a121.43,121.43,0,0,0,67,20.14Z'/%3E%3C/svg%3E") no-repeat center / contain;
+}
+.group li .tiktok-badge:hover, .tiktok-badge:hover {
+  opacity: 1;
+  background-color: rgba(0, 242, 254, 0.12);
+  color: #00f2fe !important;
+  border-color: rgba(0, 242, 254, 0.35);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+}
+.group li .tiktok-badge:hover::before, .tiktok-badge:hover::before {
+  transform: scale(1.1);
+}
+
+/* 0f. Discord-сервер спільноти */
+.group li .discord-badge::before, .discord-badge::before {
+  width: 15px;
+  height: 15px;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 512' fill='currentColor'%3E%3Cpath d='M524.531,69.836a1.5,1.5,0,0,0-.764-.7A485.065,485.065,0,0,0,404.081,32.03a1.816,1.816,0,0,0-1.923.91,337.461,337.461,0,0,0-14.9,30.6,447.848,447.848,0,0,0-134.426,0,309.54,309.54,0,0,0-15.135-30.6,1.89,1.89,0,0,0-1.924-.91A483.689,483.689,0,0,0,116.085,69.137a1.712,1.712,0,0,0-.788.676C39.068,183.651,18.186,294.69,28.43,404.354a2.016,2.016,0,0,0,.765,1.375A487.666,487.666,0,0,0,176.02,479.918a1.9,1.9,0,0,0,2.063-.676A348.2,348.2,0,0,0,208.12,430.4a1.86,1.86,0,0,0-1.019-2.588,321.173,321.173,0,0,1-45.868-21.853,1.885,1.885,0,0,1-.185-3.126c3.082-2.309,6.166-4.711,9.109-7.119a1.819,1.819,0,0,1,1.9-.256c96.229,43.917,200.41,43.917,295.5,0a1.812,1.812,0,0,1,1.924.233c2.944,2.421,6.027,4.81,9.132,7.142a1.885,1.885,0,0,1-.162,3.126,301.407,301.407,0,0,1-45.89,21.83,1.875,1.875,0,0,0-1,2.611,391.055,391.055,0,0,0,30.014,48.815,1.864,1.864,0,0,0,2.063.7A486.048,486.048,0,0,0,610.7,405.729a1.882,1.882,0,0,0,.765-1.352C623.544,277.594,590.933,167.465,524.531,69.836ZM222.491,337.58c-28.972,0-52.844-26.587-52.844-59.239S193.056,219.1,222.491,219.1c29.665,0,53.306,26.82,52.843,59.239C275.334,310.993,251.924,337.58,222.491,337.58Zm195.38,0c-28.971,0-52.843-26.587-52.843-59.239S388.437,219.1,417.871,219.1c29.667,0,53.307,26.82,52.844,59.239C470.715,310.993,447.538,337.58,417.871,337.58Z'/%3E%3C/svg%3E") no-repeat center / contain;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 512' fill='currentColor'%3E%3Cpath d='M524.531,69.836a1.5,1.5,0,0,0-.764-.7A485.065,485.065,0,0,0,404.081,32.03a1.816,1.816,0,0,0-1.923.91,337.461,337.461,0,0,0-14.9,30.6,447.848,447.848,0,0,0-134.426,0,309.54,309.54,0,0,0-15.135-30.6,1.89,1.89,0,0,0-1.924-.91A483.689,483.689,0,0,0,116.085,69.137a1.712,1.712,0,0,0-.788.676C39.068,183.651,18.186,294.69,28.43,404.354a2.016,2.016,0,0,0,.765,1.375A487.666,487.666,0,0,0,176.02,479.918a1.9,1.9,0,0,0,2.063-.676A348.2,348.2,0,0,0,208.12,430.4a1.86,1.86,0,0,0-1.019-2.588,321.173,321.173,0,0,1-45.868-21.853,1.885,1.885,0,0,1-.185-3.126c3.082-2.309,6.166-4.711,9.109-7.119a1.819,1.819,0,0,1,1.9-.256c96.229,43.917,200.41,43.917,295.5,0a1.812,1.812,0,0,1,1.924.233c2.944,2.421,6.027,4.81,9.132,7.142a1.885,1.885,0,0,1-.162,3.126,301.407,301.407,0,0,1-45.89,21.83,1.875,1.875,0,0,0-1,2.611,391.055,391.055,0,0,0,30.014,48.815,1.864,1.864,0,0,0,2.063.7A486.048,486.048,0,0,0,610.7,405.729a1.882,1.882,0,0,0,.765-1.352C623.544,277.594,590.933,167.465,524.531,69.836ZM222.491,337.58c-28.972,0-52.844-26.587-52.844-59.239S193.056,219.1,222.491,219.1c29.665,0,53.306,26.82,52.843,59.239C275.334,310.993,251.924,337.58,222.491,337.58Zm195.38,0c-28.971,0-52.843-26.587-52.843-59.239S388.437,219.1,417.871,219.1c29.667,0,53.307,26.82,52.844,59.239C470.715,310.993,447.538,337.58,417.871,337.58Z'/%3E%3C/svg%3E") no-repeat center / contain;
+}
+.group li .discord-badge:hover, .discord-badge:hover {
+  opacity: 1;
+  background-color: rgba(88, 101, 242, 0.12);
+  color: #5865f2 !important;
+  border-color: rgba(88, 101, 242, 0.35);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+}
+.group li .discord-badge:hover::before, .discord-badge:hover::before {
+  transform: scale(1.1);
+}
+
+/* 0g. Музичний стрімінг (Spotify / Apple Music / SoundCloud) */
+.group li .spotify-badge::before, .spotify-badge::before,
+.group li .music-stream-badge::before, .music-stream-badge::before {
+  width: 15px;
+  height: 15px;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 496 512' fill='currentColor'%3E%3Cpath d='M248 8C111.1 8 0 119.1 0 256s111.1 248 248 248 248-111.1 248-248S384.9 8 248 8zm114.7 357.4c-4.5 7.4-14.2 9.8-21.6 5.3-59.3-36.2-134-44.4-222-24.3-8.4 1.9-16.7-3.4-18.6-11.8-1.9-8.4 3.4-16.7 11.8-18.6 96.3-22 179.2-12.7 245.1 27.7 7.4 4.6 9.8 14.3 5.3 21.7zm30.5-67.9c-5.7 9.2-17.8 12.1-27 6.4-67.8-41.7-171.2-53.8-251.4-29.4-10.4 3.1-21.5-2.8-24.6-13.2-3.1-10.4 2.8-21.5 13.2-24.6 91.6-27.8 205.7-14.4 283.4 33.8 9.2 5.7 12.1 17.8 6.4 27zm2.6-71.9c-81.4-48.3-215.7-52.8-293.4-29.2-12.5 3.8-25.7-3.3-29.5-15.8s3.3-25.7 15.8-29.5c89.1-27.1 237.7-22 331 33.3 11.3 6.7 15.1 21.3 8.4 32.7-6.7 11.4-21.3 15.1-32.3 8.5z'/%3E%3C/svg%3E") no-repeat center / contain;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 496 512' fill='currentColor'%3E%3Cpath d='M248 8C111.1 8 0 119.1 0 256s111.1 248 248 248 248-111.1 248-248S384.9 8 248 8zm114.7 357.4c-4.5 7.4-14.2 9.8-21.6 5.3-59.3-36.2-134-44.4-222-24.3-8.4 1.9-16.7-3.4-18.6-11.8-1.9-8.4 3.4-16.7 11.8-18.6 96.3-22 179.2-12.7 245.1 27.7 7.4 4.6 9.8 14.3 5.3 21.7zm30.5-67.9c-5.7 9.2-17.8 12.1-27 6.4-67.8-41.7-171.2-53.8-251.4-29.4-10.4 3.1-21.5-2.8-24.6-13.2-3.1-10.4 2.8-21.5 13.2-24.6 91.6-27.8 205.7-14.4 283.4 33.8 9.2 5.7 12.1 17.8 6.4 27zm2.6-71.9c-81.4-48.3-215.7-52.8-293.4-29.2-12.5 3.8-25.7-3.3-29.5-15.8s3.3-25.7 15.8-29.5c89.1-27.1 237.7-22 331 33.3 11.3 6.7 15.1 21.3 8.4 32.7-6.7 11.4-21.3 15.1-32.3 8.5z'/%3E%3C/svg%3E") no-repeat center / contain;
+}
+.group li .spotify-badge:hover, .spotify-badge:hover,
+.group li .music-stream-badge:hover, .music-stream-badge:hover {
+  opacity: 1;
+  background-color: rgba(30, 215, 96, 0.12);
+  color: #1ed760 !important;
+  border-color: rgba(30, 215, 96, 0.35);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+}
+.group li .spotify-badge:hover::before, .spotify-badge:hover::before,
+.group li .music-stream-badge:hover::before, .music-stream-badge:hover::before {
+  transform: scale(1.1);
+}
+
+/* 0h. LinkedIn профіль компанії / фахівця */
+.group li .linkedin-badge::before, .linkedin-badge::before {
+  width: 14px;
+  height: 14px;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 448 512' fill='currentColor'%3E%3Cpath d='M100.28 448H7.4V148.9h92.88zM53.79 108.1C24.09 108.1 0 83.5 0 53.8a53.79 53.79 0 0 1 107.58 0c0 29.7-24.1 54.3-53.79 54.3zM447.9 448h-92.68V302.4c0-34.7-.7-79.2-48.29-79.2-48.29 0-55.69 37.7-55.69 76.7V448h-92.78V148.9h89.08v40.8h1.3c12.4-23.5 42.69-48.3 87.88-48.3 94 0 111.28 61.9 111.28 142.3V448z'/%3E%3C/svg%3E") no-repeat center / contain;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 448 512' fill='currentColor'%3E%3Cpath d='M100.28 448H7.4V148.9h92.88zM53.79 108.1C24.09 108.1 0 83.5 0 53.8a53.79 53.79 0 0 1 107.58 0c0 29.7-24.1 54.3-53.79 54.3zM447.9 448h-92.68V302.4c0-34.7-.7-79.2-48.29-79.2-48.29 0-55.69 37.7-55.69 76.7V448h-92.78V148.9h89.08v40.8h1.3c12.4-23.5 42.69-48.3 87.88-48.3 94 0 111.28 61.9 111.28 142.3V448z'/%3E%3C/svg%3E") no-repeat center / contain;
+}
+.group li .linkedin-badge:hover, .linkedin-badge:hover {
+  opacity: 1;
+  background-color: rgba(10, 102, 194, 0.12);
+  color: #0a66c2 !important;
+  border-color: rgba(10, 102, 194, 0.35);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+}
+.group li .linkedin-badge:hover::before, .linkedin-badge:hover::before {
+  transform: scale(1.1);
+}
+
+/* Dark mode для нових соц-бейджів */
+body.dark-mode .group li .instagram-badge, body.dark-mode .instagram-badge,
+body.dark-mode .group li .ig-badge, body.dark-mode .ig-badge,
+body.dark-mode .group li .twitter-badge, body.dark-mode .twitter-badge,
+body.dark-mode .group li .x-badge, body.dark-mode .x-badge,
+body.dark-mode .group li .tiktok-badge, body.dark-mode .tiktok-badge,
+body.dark-mode .group li .discord-badge, body.dark-mode .discord-badge,
+body.dark-mode .group li .spotify-badge, body.dark-mode .spotify-badge,
+body.dark-mode .group li .music-stream-badge, body.dark-mode .music-stream-badge,
+body.dark-mode .group li .linkedin-badge, body.dark-mode .linkedin-badge {
+  background-color: rgba(148, 163, 184, 0.1);
+  color: #94a3b8 !important;
+  border-color: rgba(148, 163, 184, 0.2);
+}
+body.dark-mode .group li .instagram-badge:hover, body.dark-mode .instagram-badge:hover,
+body.dark-mode .group li .ig-badge:hover, body.dark-mode .ig-badge:hover {
+  background-color: rgba(225, 48, 108, 0.22);
+  color: #f472b6 !important;
+  border-color: rgba(244, 114, 182, 0.45);
+}
+body.dark-mode .group li .twitter-badge:hover, body.dark-mode .twitter-badge:hover,
+body.dark-mode .group li .x-badge:hover, body.dark-mode .x-badge:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.45);
+}
+body.dark-mode .group li .tiktok-badge:hover, body.dark-mode .tiktok-badge:hover {
+  background-color: rgba(0, 242, 254, 0.2);
+  color: #22d3ee !important;
+  border-color: rgba(34, 211, 238, 0.45);
+}
+body.dark-mode .group li .discord-badge:hover, body.dark-mode .discord-badge:hover {
+  background-color: rgba(88, 101, 242, 0.22);
+  color: #818cf8 !important;
+  border-color: rgba(129, 140, 248, 0.45);
+}
+body.dark-mode .group li .spotify-badge:hover, body.dark-mode .spotify-badge:hover,
+body.dark-mode .group li .music-stream-badge:hover, body.dark-mode .music-stream-badge:hover {
+  background-color: rgba(30, 215, 96, 0.22);
+  color: #4ade80 !important;
+  border-color: rgba(74, 222, 128, 0.45);
+}
+body.dark-mode .group li .linkedin-badge:hover, body.dark-mode .linkedin-badge:hover {
+  background-color: rgba(10, 102, 194, 0.22);
+  color: #60a5fa !important;
+  border-color: rgba(96, 165, 250, 0.45);
+}
+
+/* ==========================================================================
+   MULTI-ACTION SLIDE-OUT DRAWER FOR CATALOG ITEMS
+   ========================================================================== */
+.group li .item-actions-wrap,
+.item-actions-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  margin-left: auto;
+  margin-right: 0;
+  flex-shrink: 0;
+  z-index: 3;
+}
+
+.group li .item-actions-slider,
+.item-actions-slider {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  max-width: 0;
+  opacity: 0;
+  overflow: hidden;
+  transform: translateX(8px);
+  pointer-events: none;
+  transition: max-width 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+              opacity 0.2s ease,
+              transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 0;
+}
+
+.item-actions-wrap.is-open .item-actions-slider {
+  max-width: 260px;
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+  padding-right: 4px;
+}
+
+/* Всередині слайдера скидаємо margin-left: auto для бейджів */
+.item-actions-slider [class*="-badge"],
+.item-actions-slider a {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  opacity: 0.9 !important;
+}
+
+.item-actions-slider [class*="-badge"]:hover,
+.item-actions-slider a:hover {
+  opacity: 1 !important;
+}
+
+/* Вертикально витягнутий значок несильно примітної стрілочки вліво */
+.group li .item-actions-toggle,
+.item-actions-toggle {
+  width: 15px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(148, 163, 184, 0.08);
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  border-radius: 4px;
+  color: var(--text-muted, #94a3b8);
+  font-size: 0.65rem;
+  padding: 0;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  outline: none;
+}
+
+.group li:hover .item-actions-toggle {
+  border-color: rgba(148, 163, 184, 0.45);
+  color: #64748b;
+}
+
+.item-actions-toggle:hover {
+  background: rgba(59, 130, 246, 0.12);
+  border-color: rgba(59, 130, 246, 0.45);
+  color: #2563eb;
+}
+
+.item-actions-wrap.is-open .item-actions-toggle {
+  background: #3b82f6;
+  border-color: #3b82f6;
+  color: #ffffff;
+  transform: rotate(180deg);
+  box-shadow: 0 1px 3px rgba(59, 130, 246, 0.35);
+}
+
+body.dark-mode .item-actions-toggle {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.12);
+  color: #94a3b8;
+}
+
+body.dark-mode .group li:hover .item-actions-toggle {
+  border-color: rgba(255, 255, 255, 0.25);
+  color: #cbd5e1;
+}
+
+body.dark-mode .item-actions-toggle:hover {
+  background: rgba(59, 130, 246, 0.22);
+  border-color: rgba(96, 165, 250, 0.5);
+  color: #60a5fa;
+}
+
+body.dark-mode .item-actions-wrap.is-open .item-actions-toggle {
+  background: #2563eb;
+  border-color: #2563eb;
+  color: #ffffff;
+}
+
 /* Коли перед кнопкою опису є значок або мікро-кнопка, скасовуємо подвійний margin-left: auto */
 .group li [class*="-badge"] ~ .desc-toggle-btn,
 .group li .sub-link ~ .desc-toggle-btn,
 .group li .torrent-badge ~ .desc-toggle-btn,
 .group li .radio-play-btn ~ .desc-toggle-btn,
 .group li .radio-live-btn ~ .desc-toggle-btn,
+.group li .icontoo ~ .desc-toggle-btn,
+.group li .item-actions-wrap ~ .desc-toggle-btn {
+  margin-left: -2px !important;
+  margin-right: 0px !important;
+}
+.group li .radio-live-btn ~ .desc-toggle-btn,
 .group li .icontoo ~ .desc-toggle-btn {
-  margin-left: 2px !important;
+  margin-left: -2px !important;
   margin-right: 0px !important;
 }
 
@@ -5957,23 +6273,15 @@ body.dark-mode .ad-terms-link {
 }
 .user-auth-btn:hover {
   background: rgba(255, 255, 255, 0.28) !important;
+  border-color: rgba(255, 255, 255, 0.55) !important;
   transform: translateY(-50%) scale(1.05) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25) !important;
+}
+.user-auth-btn:active {
+  transform: translateY(-50%) scale(0.96) !important;
 }
 .user-auth-btn:not(.logged-in) {
-  border-color: rgba(96, 165, 250, 0.8) !important;
-  animation: navUserGuestPulse 2.5s infinite ease-in-out;
-}
-@keyframes navUserGuestPulse {
-  0%, 100% {
-    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7), 0 0 6px rgba(37, 99, 235, 0.45);
-    border-color: rgba(96, 165, 250, 0.75);
-    transform: translateY(-50%) scale(1);
-  }
-  50% {
-    box-shadow: 0 0 0 4.5px rgba(59, 130, 246, 0), 0 0 16px rgba(96, 165, 250, 0.95);
-    border-color: rgba(186, 230, 253, 1);
-    transform: translateY(-50%) scale(1.06);
-  }
+  border-color: rgba(255, 255, 255, 0.3) !important;
 }
 .user-auth-btn.logged-in {
   padding: 0 !important;
@@ -10504,7 +10812,7 @@ body.dark-mode .guest-bm-modal-footer {
 /* Кнопка «Пульс дня» у верхньому утилітарному меню (розташована зліва після «Ніч/День» та «Дзвіночок») */
 .pulse-day-btn {
   background: rgba(255, 255, 255, 0.16) !important;
-  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  border: 1px solid rgba(56, 189, 248, 0.75) !important;
   color: #ffffff !important;
   height: 30px !important;
   border-radius: 7px !important;
@@ -10527,17 +10835,34 @@ body.dark-mode .guest-bm-modal-footer {
   top: 50% !important;
   transform: translateY(-50%) !important;
   box-sizing: border-box !important;
+  animation: pulseDayBtnNeonGlow 2.5s infinite ease-in-out;
+}
+@keyframes pulseDayBtnNeonGlow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.7), 0 0 6px rgba(14, 165, 233, 0.45);
+    border-color: rgba(56, 189, 248, 0.75);
+    transform: translateY(-50%) scale(1);
+  }
+  50% {
+    box-shadow: 0 0 0 4.5px rgba(56, 189, 248, 0), 0 0 16px rgba(56, 189, 248, 0.95);
+    border-color: rgba(186, 230, 253, 1);
+    transform: translateY(-50%) scale(1.04);
+  }
 }
 .pulse-day-btn:hover {
-  background: rgba(255, 255, 255, 0.28) !important;
-  border-color: rgba(56, 189, 248, 0.7) !important;
-  color: #38bdf8 !important;
+  background: rgba(56, 189, 248, 0.22) !important;
+  border-color: #38bdf8 !important;
+  color: #ffffff !important;
+  transform: translateY(-50%) scale(1.05) !important;
+  box-shadow: 0 0 14px rgba(56, 189, 248, 0.8) !important;
 }
 .pulse-day-btn.active {
+  animation: none !important;
   background: rgba(56, 189, 248, 0.25) !important;
   border-color: #38bdf8 !important;
   color: #ffffff !important;
-  box-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
+  box-shadow: 0 0 14px rgba(56, 189, 248, 0.75) !important;
+  transform: translateY(-50%) scale(1) !important;
 }
 .pulse-day-btn .pulse-day-btn-icon {
   display: inline-flex;
@@ -11124,15 +11449,15 @@ body.dark-mode .pulse-kp-table th {
   background: rgba(255, 255, 255, 0.05);
 }
 .pulse-kp-table .kp-th-day {
-  text-align: right;
-  padding: 3px 5px 3px 2px;
+  text-align: center;
+  padding: 3px 2px;
   min-width: 48px;
   width: 48px;
   font-weight: 600;
 }
 .pulse-kp-table .kp-td-day {
-  text-align: right;
-  padding: 3px 5px 3px 2px;
+  text-align: center;
+  padding: 3px 2px;
   font-size: 0.64rem;
   font-weight: 700;
   color: #0284c7;
@@ -11378,6 +11703,12 @@ body.dark-mode .pulse-eco-detail-val {
 .pulse-eco-footer-text {
   font-size: 0.66rem;
   color: #64748b;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.pulse-eco-footer-text i {
+  margin-right: 3px;
 }
 body.dark-mode .pulse-eco-footer-text {
   color: #94a3b8;

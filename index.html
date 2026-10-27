@@ -240,22 +240,38 @@
       .pulse-day-btn {
         position: absolute !important; left: 84px !important; right: auto !important; top: 50% !important;
         transform: translateY(-50%) !important; height: 30px !important; border-radius: 7px !important;
-        background: rgba(255, 255, 255, 0.16) !important; border: 1px solid rgba(255, 255, 255, 0.3) !important;
+        background: rgba(255, 255, 255, 0.16) !important; border: 1px solid rgba(56, 189, 248, 0.75) !important;
         color: #ffffff !important; display: inline-flex !important; align-items: center !important; justify-content: center !important;
         gap: 5px !important; padding: 0 8px !important; cursor: pointer; z-index: 1050 !important; font-size: 0.82rem !important;
         font-weight: 600 !important; line-height: 1; outline: none; transition: all 0.2s ease; white-space: nowrap !important;
-        box-sizing: border-box !important;
+        box-sizing: border-box !important; animation: pulseDayBtnNeonGlow 2.5s infinite ease-in-out;
+      }
+      @keyframes pulseDayBtnNeonGlow {
+        0%, 100% {
+          box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.7), 0 0 6px rgba(14, 165, 233, 0.45);
+          border-color: rgba(56, 189, 248, 0.75);
+          transform: translateY(-50%) scale(1);
+        }
+        50% {
+          box-shadow: 0 0 0 4.5px rgba(56, 189, 248, 0), 0 0 16px rgba(56, 189, 248, 0.95);
+          border-color: rgba(186, 230, 253, 1);
+          transform: translateY(-50%) scale(1.04);
+        }
       }
       .pulse-day-btn:hover {
-        background: rgba(255, 255, 255, 0.28) !important;
-        border-color: rgba(56, 189, 248, 0.7) !important;
-        color: #38bdf8 !important;
+        background: rgba(56, 189, 248, 0.22) !important;
+        border-color: #38bdf8 !important;
+        color: #ffffff !important;
+        transform: translateY(-50%) scale(1.05) !important;
+        box-shadow: 0 0 14px rgba(56, 189, 248, 0.8) !important;
       }
       .pulse-day-btn.active {
+        animation: none !important;
         background: rgba(56, 189, 248, 0.25) !important;
         border-color: #38bdf8 !important;
         color: #ffffff !important;
-        box-shadow: 0 0 10px rgba(56, 189, 248, 0.4) !important;
+        box-shadow: 0 0 14px rgba(56, 189, 248, 0.75) !important;
+        transform: translateY(-50%) scale(1) !important;
       }
       .pulse-day-btn .pulse-day-btn-icon {
         display: inline-flex;
@@ -334,6 +350,8 @@
       }
       .user-auth-btn:hover {
         background: rgba(255, 255, 255, 0.28) !important;
+        border-color: rgba(255, 255, 255, 0.55) !important;
+        transform: translateY(-50%) scale(1.05) !important;
       }
       .user-auth-avatar {
         width: 22px;
