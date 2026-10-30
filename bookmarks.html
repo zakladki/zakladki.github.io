@@ -42,58 +42,6 @@
         window.addEventListener("error",function(t){(e(t.error)||e(t.message))&&(t.preventDefault(),t.stopImmediatePropagation())},!0);
         var n=window.onerror;
         window.onerror=function(t,r,o,a,c){return e(t)||e(c)||(n?n.apply(this,arguments):void 0)};
-
-        // Підтримка інформера Meteoprog (id: 7404b19c-3b3b-4b89-b631-1069a627b443)
-        window.meteoprogDataLayer = window.meteoprogDataLayer || [];
-        if (!window.meteoprogDataLayer.some(function(it) { return it && it.id === '7404b19c-3b3b-4b89-b631-1069a627b443'; })) {
-          window.meteoprogDataLayer.push({
-            "id": "7404b19c-3b3b-4b89-b631-1069a627b443"
-          });
-        }
-
-        // Проксі запитів виключно для dev/preview середовищ (поза доменом zakladki.github.io)
-        if (typeof window !== 'undefined' && window.location.hostname !== 'zakladki.github.io') {
-          if (typeof XMLHttpRequest !== 'undefined') {
-            var origOpen = XMLHttpRequest.prototype.open;
-            XMLHttpRequest.prototype.open = function(method, url, ...rest) {
-               if (typeof url === 'string') {
-                var m = url.match(/cdn\.meteoprog\.net\/informerv4\/1\/params\/([a-zA-Z0-9-]+)/);
-                if (m) {
-                  url = '/api/meteoprog/params/' + m[1];
-                }
-              }
-              return origOpen.call(this, method, url, ...rest);
-            };
-          }
-
-          if (typeof HTMLScriptElement !== 'undefined') {
-            var origSrcDesc = Object.getOwnPropertyDescriptor(HTMLScriptElement.prototype, 'src');
-            if (origSrcDesc && origSrcDesc.set) {
-              var origSet = origSrcDesc.set;
-              var origGet = origSrcDesc.get;
-              Object.defineProperty(HTMLScriptElement.prototype, 'src', {
-                set: function(val) {
-                  if (typeof val === 'string' && val.indexOf('cdn.meteoprog.net/informerv4/1/js/') !== -1) {
-                    val = val.replace(/https?:\/\/cdn\.meteoprog\.net\/informerv4\/1\/js\/([a-zA-Z0-9-]+)\/([^/]+)\/([^/]+)/, '/api/meteoprog/js/$1/$2/$3');
-                  }
-                  return origSet.call(this, val);
-                },
-                get: function() {
-                  return origGet.call(this);
-                },
-                configurable: true
-              });
-            }
-
-            var origSetAttr = HTMLScriptElement.prototype.setAttribute;
-            HTMLScriptElement.prototype.setAttribute = function(name, val) {
-              if (name === 'src' && typeof val === 'string' && val.indexOf('cdn.meteoprog.net/informerv4/1/js/') !== -1) {
-                val = val.replace(/https?:\/\/cdn\.meteoprog\.net\/informerv4\/1\/js\/([a-zA-Z0-9-]+)\/([^/]+)\/([^/]+)/, '/api/meteoprog/js/$1/$2/$3');
-              }
-              return origSetAttr.call(this, name, val);
-            };
-          }
-        }
       })();
     </script>
     <!-- Google AdSense -->
@@ -335,7 +283,7 @@
         <button id="userAuthNavBtn" class="user-auth-btn" aria-label="Особистий кабінет" title="Особистий кабінет / Вхід"><i class="far fa-user-circle"></i></button>
         <button id="themeToggle" class="theme-toggle-btn" aria-label="Переключити тему" title="Переключити тему (світла/темна)"><i class="fas fa-moon"></i></button>
         <button id="noticeBellBtn" class="notice-bell-btn" aria-label="Оголошення" title="Оголошення"><i class="fas fa-bell"></i><span class="notice-bell-badge-dot"></span></button>
-        <button id="pulseDayBtn" class="pulse-day-btn" aria-label="Пульс дня" title="Пульс дня: свята, погода, пальне, курс валют">
+        <button id="pulseDayBtn" class="pulse-day-btn" onclick="window.togglePulseDrawer ? window.togglePulseDrawer() : null" aria-label="Пульс дня" title="Пульс дня: свята, погода, пальне, курс валют">
           <span class="pulse-day-btn-icon">
             <svg class="pulse-ecg-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
               <polyline points="2 12 6 12 9 4 14 20 17 12 22 12"></polyline>

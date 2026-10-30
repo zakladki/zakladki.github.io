@@ -8595,25 +8595,15 @@ function renderAdOrderClaimWrap(orderId) {
   }
 }
 
-// Запуск ініціалізації Firebase та Пульсу дня при старті
-function startupAppModules() {
+// Запуск ініціалізації Firebase при старті
+if (typeof initFirebaseAuthAndDb === 'function') {
   try {
     initFirebaseAuthAndDb();
   } catch (e) {
     console.warn("Помилка ініціалізації Firebase:", e);
   }
-  try {
-    initPulseDayDrawer();
-  } catch (e) {
-    console.warn("Помилка ініціалізації Пульсу дня:", e);
-  }
 }
 
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', startupAppModules);
-} else {
-  startupAppModules();
-}
 
 /* ==========================================================================
    МОДУЛЬ «ПУЛЬС ДНЯ» (TOP DRAWER / ШВИДКА ІНФОПАНЕЛЬ)
@@ -8673,36 +8663,564 @@ let pulseCryptoData = {
   DOGE: { name: 'Dogecoin', price: 0.142, diff: '+2.8%', symbol: 'DOGEUSDT' }
 };
 
-const UKR_HOLIDAYS_CALENDAR = {
-  '01-01': { title: 'Новий Рік та День народження Степана Бандери', fact: '1909 рік - народився український політичний діяч Степан Бандера.' },
-  '01-22': { title: 'День Соборності України', fact: '1919 рік - проголошено Акт Злуки УНР і ЗУНР на Софійському майдані в Києві.' },
-  '01-29': { title: 'День пам\'яті Героїв Крут', fact: '1918 рік - бій під Крутами, де київські студенти та гімназисти стримали наступ більшовиків.' },
-  '02-20': { title: 'День Героїв Небесної Сотні', fact: '2014 рік - вшанування подвигу учасників Революції Гідності під час розстрілів на Майдані.' },
-  '02-24': { title: 'День Національного Спротиву агресії РФ', fact: '2022 рік - початок героїчної всенародної відсічі повномасштабному вторгненню РФ.' },
-  '03-08': { title: 'Міжнародний день боротьби за права жінок', fact: 'День солідарності та вшанування внеску жінок у суспільство, науку та захист держави.' },
-  '03-09': { title: 'День народження Тараса Шевченка', fact: '1814 рік - народився видатний український Кобзар, поет і художник Тарас Шевченко.' },
-  '03-14': { title: 'День українського добровольця', fact: '2014 рік - перші добровольці вирушили на тренувальну базу для захисту України.' },
-  '04-12': { title: 'Всесвітній день авіації та космонавтики', fact: 'Внесок українських конструкторів (Корольов, Глушко) у розвиток космічної галузі.' },
-  '04-26': { title: 'День Чорнобильської трагедії', fact: '1986 рік - аварія на ЧАЕС, вшанування безстрашних ліквідаторів наслідків аварії.' },
-  '05-08': { title: 'День пам\'яті та перемоги над нацизмом', fact: 'Вшанування пам\'яті всіх загиблих у Другій світовій війні 1939-1945 років.' },
-  '05-09': { title: 'День Європи в Україні', fact: 'Спільне відзначення єдності європейських народів та прагнення до миру і демократії.' },
-  '06-01': { title: 'Міжнародний день захисту дітей', fact: 'Заклик до захисту прав, життя та безпеки кожної дитини в Україні та світі.' },
-  '06-28': { title: 'День Конституції України', fact: '1996 рік - Верховна Рада ухвалила Основний Закон незалежної Української держави.' },
-  '07-15': { title: 'День Української Державності', fact: 'Відзначення тисячолітньої історії державотворення, спадкоємиці Русі-України.' },
-  '08-23': { title: 'День Державного Прапора України', fact: '2004 рік - офіційне щорічне вшанування синьо-жовтого символу нашої свободи.' },
-  '08-24': { title: 'День Незалежності України', fact: '1991 рік - Верховна Рада ухвалила Акт проголошення незалежності України.' },
-  '08-29': { title: 'День пам\'яті захисників України', fact: 'Вшанування воїнів, які загинули в боротьбі за незалежність, суверенітет і територіальну цілісність.' },
-  '09-01': { title: 'День знань та початок нового навчального року', fact: 'Традиційний старт навчання для мільйонів українських школярів і студентів.' },
-  '10-01': { title: 'День захисників і захисниць України / День козацтва', fact: 'Свято Покрови Пресвятої Богородиці, вшанування хоробрості наших захисників.' },
-  '10-19': { title: 'Всесвітній день солідарності та гуманітарних дій', fact: '1918 рік - у Львові створено Українську Національну Раду, яка проголосила створення ЗУНР.' },
-  '10-27': { title: 'День української писемності та мови', fact: 'Традиційне написання Всеукраїнського радіодиктанту національної єдності.' },
-  '10-28': { title: 'День визволення України від нацистських загарбників', fact: '1944 рік - вигнання нацистських військ за межі кордонів України.' },
-  '11-09': { title: 'Всеукраїнський день працівників культури', fact: 'Вшанування митців, музикантів та майстрів народного мистецтва України.' },
-  '11-21': { title: 'День Гідності та Свободи', fact: '2013 рік - початок Євромайдану та вшанування незламного духу Помаранчевої революції.' },
-  '12-06': { title: 'День Збройних Сил України (ЗСУ)', fact: '1991 рік - ухвалення закону «Про Збройні Сили України», гордість нашої держави.' },
-  '12-14': { title: 'День ліквідаторів аварії на ЧАЕС', fact: '1986 рік - завершення будівництва саркофагу над четвертим енергоблоком ЧАЕС.' },
-  '12-25': { title: 'Різдво Христове', fact: 'Світле свято народження Христа за новоюліанським календарем в Україні.' }
+// ==========================================================================
+// КАЛЕНДАР ВИЗНАЧНИХ ДАТ ТА СВЯТ (ДЕРЖАВНІ, БІБЛІЙНІ ХРИСТИЯНСЬКІ, МІЖНАРОДНІ)
+// Враховує побажання: лише важливі події, без культів/ікон/неканонічних святих,
+// тільки біблійне християнство (Різдво 25 грудня, Воскресіння, Вознесіння, Трійця, День подяки Богові)
+// ==========================================================================
+
+const UKRAINE_EVENTS_DB = {
+  // Січень
+  '01-01': [
+    { title: 'Новий рік • Всесвітній день миру', icon: '🌍', cat: 'intl' },
+    { title: 'День народження Степана Бандери', icon: '🇺🇦', cat: 'ua' }
+  ],
+  '01-22': [
+    { title: 'День Соборності України (Акт Злуки УНР і ЗУНР 1919 р.)', icon: '🇺🇦', cat: 'ua' }
+  ],
+  '01-24': [
+    { title: 'День зовнішньої розвідки України', icon: '🇺🇦', cat: 'ua' }
+  ],
+  '01-27': [
+    { title: 'Міжнародний день пам\'яті жертв Голокосту', icon: '🎗️', cat: 'memo' }
+  ],
+  '01-29': [
+    { title: 'День пам\'яті Героїв Крут (1918 р.)', icon: '🎗️', cat: 'memo' }
+  ],
+
+  // Лютий
+  '02-04': [
+    { title: 'Всесвітній день боротьби проти раку', icon: '🌍', cat: 'intl' }
+  ],
+  '02-15': [
+    { title: 'День вшанування учасників бойових дій на території інших держав', icon: '🎗️', cat: 'memo' }
+  ],
+  '02-19': [
+    { title: 'День Державного Герба України (Тризуба)', icon: '🇺🇦', cat: 'ua' }
+  ],
+  '02-20': [
+    { title: 'День Героїв Небесної Сотні', icon: '🎗️', cat: 'memo' }
+  ],
+  '02-21': [
+    { title: 'Міжнародний день рідної мови (ЮНЕСКО)', icon: '🌍', cat: 'intl' }
+  ],
+  '02-24': [
+    { title: 'День початку всенародного спротиву збройній агресії РФ', icon: '🇺🇦', cat: 'ua' }
+  ],
+  '02-26': [
+    { title: 'День кримського спротиву російській окупації', icon: '🇺🇦', cat: 'ua' }
+  ],
+
+  // Березень
+  '03-03': [
+    { title: 'Всесвітній день дикої природи', icon: '🌍', cat: 'intl' }
+  ],
+  '03-08': [
+    { title: 'Міжнародний день боротьби за права жінок і мир', icon: '🌍', cat: 'intl' }
+  ],
+  '03-09': [
+    { title: 'День народження Тараса Григоровича Шевченка (1814 р.)', icon: '🇺🇦', cat: 'ua' }
+  ],
+  '03-14': [
+    { title: 'День українського добровольця', icon: '🇺🇦', cat: 'ua' }
+  ],
+  '03-20': [
+    { title: 'Міжнародний день щастя', icon: '🌍', cat: 'intl' }
+  ],
+  '03-21': [
+    { title: 'Всесвітній день поезії • Міжнародний день лісів', icon: '🌍', cat: 'intl' }
+  ],
+  '03-22': [
+    { title: 'Всесвітній день водних ресурсів', icon: '🌍', cat: 'intl' }
+  ],
+  '03-24': [
+    { title: 'Всесвітній день боротьби проти туберкульозу', icon: '🌍', cat: 'intl' }
+  ],
+  '03-25': [
+    { title: 'День Служби безпеки України (СБУ)', icon: '💼', cat: 'pro' }
+  ],
+  '03-26': [
+    { title: 'День Національної гвардії України', icon: '🇺🇦', cat: 'ua' }
+  ],
+  '03-27': [
+    { title: 'Міжнародний день театру', icon: '🌍', cat: 'intl' }
+  ],
+
+  // Квітень
+  '04-07': [
+    { title: 'Всесвітній день здоров\'я (ВООЗ)', icon: '🌍', cat: 'intl' }
+  ],
+  '04-12': [
+    { title: 'День працівників ракетно-космічної галузі України', icon: '💼', cat: 'pro' }
+  ],
+  '04-17': [
+    { title: 'День пожежної охорони України', icon: '💼', cat: 'pro' }
+  ],
+  '04-18': [
+    { title: 'День пам\'яток історії та культури України', icon: '🇺🇦', cat: 'ua' }
+  ],
+  '04-22': [
+    { title: 'Міжнародний День Матері-Землі', icon: '🌍', cat: 'intl' }
+  ],
+  '04-23': [
+    { title: 'Всесвітній день книги та авторського права', icon: '🌍', cat: 'intl' }
+  ],
+  '04-26': [
+    { title: 'День Чорнобильської трагедії та пам\'яті ліквідаторів (1986 р.)', icon: '🎗️', cat: 'memo' }
+  ],
+  '04-30': [
+    { title: 'День прикордонника України', icon: '🇺🇦', cat: 'ua' }
+  ],
+
+  // Травень
+  '05-01': [
+    { title: 'День праці', icon: '🌍', cat: 'intl' }
+  ],
+  '05-03': [
+    { title: 'Всесвітній день свободи преси', icon: '🌍', cat: 'intl' }
+  ],
+  '05-08': [
+    { title: 'День пам\'яті та перемоги над нацизмом у Другій світовій війні', icon: '🎗️', cat: 'memo' }
+  ],
+  '05-09': [
+    { title: 'День Європи в Україні', icon: '🇪🇺', cat: 'ua' }
+  ],
+  '05-15': [
+    { title: 'Міжнародний день сім\'ї (ООН)', icon: '🌍', cat: 'intl' }
+  ],
+  '05-18': [
+    { title: 'День боротьби за права кримськотатарського народу та пам\'яті жертв геноциду', icon: '🎗️', cat: 'memo' },
+    { title: 'Міжнародний день музеїв', icon: '🌍', cat: 'intl' }
+  ],
+  '05-20': [
+    { title: 'День банківських працівників України', icon: '💼', cat: 'pro' }
+  ],
+  '05-23': [
+    { title: 'День Героїв України • День морської піхоти України', icon: '🇺🇦', cat: 'ua' }
+  ],
+  '05-24': [
+    { title: 'День слов\'янської писемності і культури', icon: '🇺🇦', cat: 'ua' }
+  ],
+  '05-29': [
+    { title: 'Міжнародний день миротворців ООН', icon: '🌍', cat: 'intl' }
+  ],
+  '05-31': [
+    { title: 'Всесвітній день без тютюну', icon: '🌍', cat: 'intl' }
+  ],
+
+  // Червень
+  '06-01': [
+    { title: 'Міжнародний день захисту дітей', icon: '🌍', cat: 'intl' }
+  ],
+  '06-04': [
+    { title: 'День вшанування пам\'яті дітей, які загинули внаслідок збройної агресії РФ', icon: '🎗️', cat: 'memo' }
+  ],
+  '06-05': [
+    { title: 'Всесвітній день навколишнього середовища (ООН)', icon: '🌍', cat: 'intl' }
+  ],
+  '06-06': [
+    { title: 'День журналіста в Україні', icon: '💼', cat: 'pro' }
+  ],
+  '06-14': [
+    { title: 'Всесвітній день донора крові', icon: '🌍', cat: 'intl' }
+  ],
+  '06-20': [
+    { title: 'Всесвітній день біженців', icon: '🌍', cat: 'intl' }
+  ],
+  '06-22': [
+    { title: 'День скорботи і вшанування пам\'яті жертв війни в Україні', icon: '🎗️', cat: 'memo' }
+  ],
+  '06-23': [
+    { title: 'День державної служби України', icon: '💼', cat: 'pro' }
+  ],
+  '06-25': [
+    { title: 'День митника України', icon: '💼', cat: 'pro' }
+  ],
+  '06-28': [
+    { title: 'День Конституції України (1996 р.)', icon: '🇺🇦', cat: 'ua' }
+  ],
+
+  // Липень
+  '07-04': [
+    { title: 'День Національної поліції України', icon: '💼', cat: 'pro' }
+  ],
+  '07-07': [
+    { title: 'День працівника природно-заповідної справи', icon: '💼', cat: 'pro' }
+  ],
+  '07-15': [
+    { title: 'День Української Державності', icon: '🇺🇦', cat: 'ua' }
+  ],
+  '07-16': [
+    { title: 'День ухвалення Декларації про державний суверенітет України (1990 р.)', icon: '🇺🇦', cat: 'ua' },
+    { title: 'День бухгалтера та аудитора', icon: '💼', cat: 'pro' }
+  ],
+  '07-28': [
+    { title: 'День хрещення Київської Русі - України', icon: '🇺🇦', cat: 'ua' }
+  ],
+  '07-29': [
+    { title: 'День Сил спеціальних операцій ЗСУ', icon: '🇺🇦', cat: 'ua' }
+  ],
+  '07-30': [
+    { title: 'Всесвітній день боротьби з торгівлею людьми', icon: '🌍', cat: 'intl' }
+  ],
+
+  // Серпень
+  '08-08': [
+    { title: 'День військ зв\'язку Збройних Сил України', icon: '🇺🇦', cat: 'ua' },
+    { title: 'День ветеринарного лікаря', icon: '💼', cat: 'pro' }
+  ],
+  '08-12': [
+    { title: 'Міжнародний день молоді', icon: '🌍', cat: 'intl' }
+  ],
+  '08-19': [
+    { title: 'Всесвітній день гуманітарної допомоги', icon: '🌍', cat: 'intl' },
+    { title: 'День пасічника України', icon: '💼', cat: 'pro' }
+  ],
+  '08-23': [
+    { title: 'День Державного Прапора України', icon: '🇺🇦', cat: 'ua' }
+  ],
+  '08-24': [
+    { title: 'День Незалежності України (1991 р.)', icon: '🇺🇦', cat: 'ua' }
+  ],
+  '08-29': [
+    { title: 'День пам\'яті захисників України, які загинули в боротьбі за незалежність', icon: '🎗️', cat: 'memo' }
+  ],
+
+  // Вересень
+  '09-01': [
+    { title: 'День знань', icon: '💼', cat: 'pro' }
+  ],
+  '09-02': [
+    { title: 'День нотаріату України', icon: '💼', cat: 'pro' }
+  ],
+  '09-07': [
+    { title: 'День воєнної розвідки України', icon: '🇺🇦', cat: 'ua' }
+  ],
+  '09-08': [
+    { title: 'Міжнародний день грамотності', icon: '🌍', cat: 'intl' }
+  ],
+  '09-17': [
+    { title: 'День рятівника України', icon: '💼', cat: 'pro' }
+  ],
+  '09-21': [
+    { title: 'Міжнародний день миру (ООН)', icon: '🌍', cat: 'intl' }
+  ],
+  '09-22': [
+    { title: 'День партизанської слави України', icon: '🎗️', cat: 'memo' }
+  ],
+  '09-27': [
+    { title: 'Всесвітній день туризму', icon: '🌍', cat: 'intl' }
+  ],
+  '09-29': [
+    { title: 'День пам\'яті жертв трагедії Бабиного Яру', icon: '🎗️', cat: 'memo' }
+  ],
+  '09-30': [
+    { title: 'Всеукраїнський день бібліотек • День усиновлення', icon: '💼', cat: 'pro' }
+  ],
+
+  // Жовтень
+  '10-01': [
+    { title: 'День захисників і захисниць України', icon: '🇺🇦', cat: 'ua' },
+    { title: 'День ветерана та Міжнародний день людей похилого віку', icon: '🌍', cat: 'intl' }
+  ],
+  '10-04': [
+    { title: 'Всесвітній день захисту тварин', icon: '🌍', cat: 'intl' }
+  ],
+  '10-05': [
+    { title: 'Всесвітній день вчителів (ЮНЕСКО)', icon: '🌍', cat: 'intl' }
+  ],
+  '10-08': [
+    { title: 'День юриста України', icon: '💼', cat: 'pro' }
+  ],
+  '10-10': [
+    { title: 'Всесвітній день психічного здоров\'я', icon: '🌍', cat: 'intl' }
+  ],
+  '10-14': [
+    { title: 'День українського козацтва', icon: '🇺🇦', cat: 'ua' }
+  ],
+  '10-16': [
+    { title: 'Всесвітній день продовольства', icon: '🌍', cat: 'intl' },
+    { title: 'День анестезіолога', icon: '💼', cat: 'pro' }
+  ],
+  '10-19': [
+    { title: 'День створення Західноукраїнської Народної Республіки (ЗУНР 1918 р.)', icon: '🇺🇦', cat: 'ua' }
+  ],
+  '10-24': [
+    { title: 'День Організації Об\'єднаних Націй (ООН)', icon: '🌍', cat: 'intl' }
+  ],
+  '10-27': [
+    { title: 'День української писемності та мови', icon: '🇺🇦', cat: 'ua' }
+  ],
+  '10-28': [
+    { title: 'День визволення України від нацистських загарбників (1944 р.)', icon: '🇺🇦', cat: 'ua' },
+    { title: 'Міжнародний день анімації', icon: '🌍', cat: 'intl' }
+  ],
+  '10-29': [
+    { title: 'Всесвітній день боротьби з інсультом', icon: '🌍', cat: 'intl' },
+    { title: 'День служби охорони МВС України', icon: '💼', cat: 'pro' }
+  ],
+  '10-30': [
+    { title: 'День працівників підрозділів боротьби з наркозлочинністю', icon: '💼', cat: 'pro' },
+    { title: 'День тренера в Україні', icon: '💼', cat: 'pro' }
+  ],
+  '10-31': [
+    { title: 'Міжнародний день Чорного моря', icon: '🌍', cat: 'intl' },
+    { title: 'Всесвітній день міст', icon: '🌍', cat: 'intl' }
+  ],
+
+  // Листопад
+  '11-03': [
+    { title: 'День ракетних військ і артилерії України', icon: '🇺🇦', cat: 'ua' },
+    { title: 'День інженерних військ України', icon: '🇺🇦', cat: 'ua' }
+  ],
+  '11-04': [
+    { title: 'День залізничника України', icon: '💼', cat: 'pro' }
+  ],
+  '11-09': [
+    { title: 'Всеукраїнський день працівників культури та майстрів народного мистецтва', icon: '💼', cat: 'pro' }
+  ],
+  '11-10': [
+    { title: 'Всесвітній день науки в ім\'я миру та розвитку', icon: '🌍', cat: 'intl' }
+  ],
+  '11-14': [
+    { title: 'Всесвітній день боротьби з діабетом', icon: '🌍', cat: 'intl' }
+  ],
+  '11-16': [
+    { title: 'День працівників радіо, телебачення та зв\'язку України', icon: '💼', cat: 'pro' },
+    { title: 'Міжнародний день толерантності', icon: '🌍', cat: 'intl' }
+  ],
+  '11-17': [
+    { title: 'Міжнародний день студентів', icon: '🌍', cat: 'intl' }
+  ],
+  '11-18': [
+    { title: 'День сержанта Збройних Сил України', icon: '🇺🇦', cat: 'ua' }
+  ],
+  '11-20': [
+    { title: 'Всесвітній день дитини (ООН)', icon: '🌍', cat: 'intl' }
+  ],
+  '11-21': [
+    { title: 'День Гідності та Свободи (2013 р.)', icon: '🇺🇦', cat: 'ua' },
+    { title: 'День Десантно-штурмових військ ЗСУ', icon: '🇺🇦', cat: 'ua' }
+  ],
+  '11-25': [
+    { title: 'Міжнародний день боротьби за ліквідацію насильства щодо жінок', icon: '🌍', cat: 'intl' }
+  ],
+
+  // Грудень
+  '12-01': [
+    { title: 'Річниця Всеукраїнського референдуму 1991 року про незалежність', icon: '🇺🇦', cat: 'ua' },
+    { title: 'День працівників прокуратури України', icon: '💼', cat: 'pro' },
+    { title: 'Всесвітній день боротьби зі СНІДом', icon: '🌍', cat: 'intl' }
+  ],
+  '12-03': [
+    { title: 'Міжнародний день людей з інвалідністю', icon: '🌍', cat: 'intl' }
+  ],
+  '12-05': [
+    { title: 'Міжнародний день волонтера', icon: '🌍', cat: 'intl' }
+  ],
+  '12-06': [
+    { title: 'День Збройних Сил України (ЗСУ 1991 р.)', icon: '🇺🇦', cat: 'ua' }
+  ],
+  '12-07': [
+    { title: 'День місцевого самоврядування в Україні', icon: '💼', cat: 'pro' }
+  ],
+  '12-10': [
+    { title: 'День прав людини (ООН)', icon: '🌍', cat: 'intl' }
+  ],
+  '12-12': [
+    { title: 'День Сухопутних військ ЗСУ', icon: '🇺🇦', cat: 'ua' }
+  ],
+  '12-14': [
+    { title: 'День вшанування ліквідаторів наслідків аварії на ЧАЕС', icon: '🎗️', cat: 'memo' }
+  ],
+  '12-19': [
+    { title: 'День адвокатури України', icon: '💼', cat: 'pro' }
+  ],
+  '12-22': [
+    { title: 'День енергетика України', icon: '💼', cat: 'pro' },
+    { title: 'День дипломатичної служби України', icon: '💼', cat: 'pro' }
+  ],
+  '12-24': [
+    { title: 'День працівників архівних установ України', icon: '💼', cat: 'pro' }
+  ],
+  '12-25': [
+    { title: 'Різдво Христове (Народження Господа Ісуса Христа)', icon: '🕊️', cat: 'biblical' }
+  ]
 };
+
+// Обчислення біблійного Великодня (Пасхи) та рухомих християнських свят
+function getEasterSunday(year) {
+  const easterMap = {
+    2024: new Date(2024, 4, 5),
+    2025: new Date(2025, 3, 20),
+    2026: new Date(2026, 3, 12),
+    2027: new Date(2027, 4, 2),
+    2028: new Date(2028, 3, 16),
+    2029: new Date(2029, 3, 8),
+    2030: new Date(2030, 3, 28)
+  };
+  if (easterMap[year]) return easterMap[year];
+  const a = year % 19;
+  const b = Math.floor(year / 100);
+  const c = year % 100;
+  const d = Math.floor(b / 4);
+  const e = b % 4;
+  const f = Math.floor((b + 8) / 25);
+  const g = Math.floor((b - f + 1) / 3);
+  const h = (19 * a + b - d - g + 15) % 30;
+  const i = Math.floor(c / 4);
+  const k = c % 4;
+  const l = (32 + 2 * e + 2 * i - h - k) % 7;
+  const m = Math.floor((a + 11 * h + 22 * l) / 451);
+  const month = Math.floor((h + l - 7 * m + 114) / 31) - 1;
+  const day = ((h + l - 7 * m + 114) % 31) + 1;
+  return new Date(year, month, day);
+}
+
+// Отримання рухомих свят (християнських біблійних та офіційних цивільних) для конкретної дати
+function getRelativeEventsForDate(targetDate) {
+  const events = [];
+  const year = targetDate.getFullYear();
+  const month = targetDate.getMonth();
+  const day = targetDate.getDate();
+  const dayOfWeek = targetDate.getDay();
+
+  // 1. Біблійні християнські рухомі свята
+  const easter = getEasterSunday(year);
+  const isSameDay = (d1, d2) => d1.getFullYear() === d2.getFullYear() && d1.getMonth() === d2.getMonth() && d1.getDate() === d2.getDate();
+
+  if (isSameDay(targetDate, easter)) {
+    events.push({ title: 'Світле Христове Воскресіння (Пасха Господня / Великдень)', icon: '🕊️', cat: 'biblical' });
+  }
+
+  // Вознесіння Господнє (40-й день, четвер)
+  const ascension = new Date(easter);
+  ascension.setDate(easter.getDate() + 39);
+  if (isSameDay(targetDate, ascension)) {
+    events.push({ title: 'Вознесіння Господнє (Вознесіння Ісуса Христа на небо)', icon: '🕊️', cat: 'biblical' });
+  }
+
+  // День Святої Трійці / П'ятидесятниця (50-й день, неділя)
+  const pentecost = new Date(easter);
+  pentecost.setDate(easter.getDate() + 49);
+  if (isSameDay(targetDate, pentecost)) {
+    events.push({ title: 'День Святої Трійці (П\'ятидесятниця, Зішестя Святого Духа)', icon: '🕊️', cat: 'biblical' });
+  }
+
+  // 2. Всеукраїнський День подяки Богові (3-тя неділя вересня)
+  if (month === 8 && dayOfWeek === 0) {
+    const firstDayMonth = new Date(year, 8, 1).getDay();
+    const firstSunOffset = (7 - firstDayMonth) % 7 + 1;
+    const thirdSunday = firstSunOffset + 14;
+    if (day === thirdSunday) {
+      events.push({ title: 'Всеукраїнський День подяки Богові (біблійне свято жнив та подяки Господу за мир і хліб)', icon: '🕊️', cat: 'biblical' });
+    }
+  }
+
+  // 3. Рухомі офіційні свята України
+  // 2-га неділя травня: День матері
+  if (month === 4 && dayOfWeek === 0) {
+    const firstDayMay = new Date(year, 4, 1).getDay();
+    const secondSunday = ((7 - firstDayMay) % 7 + 1) + 7;
+    if (day === secondSunday) {
+      events.push({ title: 'День матері в Україні', icon: '💐', cat: 'ua' });
+    }
+  }
+
+  // 3-й четвер травня: День вишиванки
+  if (month === 4 && dayOfWeek === 4) {
+    const firstDayMay = new Date(year, 4, 1).getDay();
+    const firstThu = (11 - firstDayMay) % 7 + 1;
+    const thirdThu = firstThu + 14;
+    if (day === thirdThu) {
+      events.push({ title: 'Всесвітній день вишиванки', icon: '🇺🇦', cat: 'ua' });
+    }
+  }
+
+  // 3-тя неділя червня: День батька / День медичного працівника
+  if (month === 5 && dayOfWeek === 0) {
+    const firstDayJun = new Date(year, 5, 1).getDay();
+    const thirdSunJun = ((7 - firstDayJun) % 7 + 1) + 14;
+    if (day === thirdSunJun) {
+      events.push({ title: 'День батька в Україні • День медичного працівника', icon: '💼', cat: 'pro' });
+    }
+  }
+
+  // 1-ша неділя липня: День Військово-Морських Сил ЗСУ
+  if (month === 6 && dayOfWeek === 0) {
+    const firstSunJul = (7 - new Date(year, 6, 1).getDay()) % 7 + 1;
+    if (day === firstSunJul) {
+      events.push({ title: 'День Військово-Морських Сил Збройних Сил України', icon: '🇺🇦', cat: 'ua' });
+    }
+  }
+
+  // 1-ша неділя серпня: День Повітряних Сил ЗСУ
+  if (month === 7 && dayOfWeek === 0) {
+    const firstSunAug = (7 - new Date(year, 7, 1).getDay()) % 7 + 1;
+    if (day === firstSunAug) {
+      events.push({ title: 'День Повітряних Сил Збройних Сил України', icon: '🇺🇦', cat: 'ua' });
+    }
+  }
+
+  // Остання субота серпня: День авіації України
+  if (month === 7 && dayOfWeek === 6 && day >= 25) {
+    events.push({ title: 'День авіації України', icon: '💼', cat: 'pro' });
+  }
+
+  // 1-ша неділя жовтня: День працівників освіти (День вчителя)
+  if (month === 9 && dayOfWeek === 0) {
+    const firstSunOct = (7 - new Date(year, 9, 1).getDay()) % 7 + 1;
+    if (day === firstSunOct) {
+      events.push({ title: 'День працівників освіти України (День вчителя)', icon: '💼', cat: 'pro' });
+    }
+  }
+
+  // 1-ша неділя листопада: День працівника соціальної сфери
+  if (month === 10 && dayOfWeek === 0) {
+    const firstSunNov = (7 - new Date(year, 10, 1).getDay()) % 7 + 1;
+    if (day === firstSunNov) {
+      events.push({ title: 'День працівника соціальної сфери України', icon: '💼', cat: 'pro' });
+    }
+  }
+
+  // 3-тя неділя листопада: День працівників сільського господарства
+  if (month === 10 && dayOfWeek === 0) {
+    const firstSunNov = (7 - new Date(year, 10, 1).getDay()) % 7 + 1;
+    const thirdSunNov = firstSunNov + 14;
+    if (day === thirdSunNov) {
+      events.push({ title: 'День працівників сільського господарства України', icon: '💼', cat: 'pro' });
+    }
+  }
+
+  // 4-та субота листопада: День пам'яті жертв голодоморів
+  if (month === 10 && dayOfWeek === 6 && day >= 22 && day <= 28) {
+    events.push({ title: 'День пам\'яті жертв голодоморів в Україні', icon: '🎗️', cat: 'memo' });
+  }
+
+  return events;
+}
+
+// Отримання повного відсортованого списку подій для обраної дати
+function getEventsForDate(date) {
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  const key = `${m}-${d}`;
+
+  const fixed = UKRAINE_EVENTS_DB[key] ? [...UKRAINE_EVENTS_DB[key]] : [];
+  const relative = getRelativeEventsForDate(date);
+  const combined = [...relative, ...fixed];
+
+  if (combined.length === 0) {
+    return [
+      { title: 'Пам\'ятний день: щоденна праця для захисту та Перемоги України', icon: '🇺🇦', cat: 'ua' }
+    ];
+  }
+
+  // Пріоритет сортування: державні та біблійні > пам'ятні > професійні > міжнародні
+  const priority = { biblical: 1, ua: 2, memo: 3, pro: 4, intl: 5 };
+  combined.sort((a, b) => (priority[a.cat] || 10) - (priority[b.cat] || 10));
+  return combined;
+}
 
 function getPulseDateBadge() {
   const now = new Date();
@@ -8716,30 +9234,75 @@ function getPulseDateBadge() {
 
 function getTodayHolidayInfo() {
   const now = new Date();
-  const day = String(now.getDate()).padStart(2, '0');
-  const month = String(now.getMonth() + 1).padStart(2, '0');
-  const key = `${month}-${day}`;
-
   const monthsGen = ['січня', 'лютого', 'березня', 'квітня', 'травня', 'червня', 'липня', 'серпня', 'вересня', 'жовтня', 'листопада', 'грудня'];
   const daysWeek = ['Неділя', 'Понеділок', 'Вівторок', 'Середа', 'Четвер', 'П\'ятниця', 'Субота'];
-
   const dateLabel = `${daysWeek[now.getDay()]}, ${now.getDate()} ${monthsGen[now.getMonth()]} ${now.getFullYear()} р.`;
 
-  if (UKR_HOLIDAYS_CALENDAR[key]) {
-    return {
-      dateLabel,
-      title: UKR_HOLIDAYS_CALENDAR[key].title,
-      fact: UKR_HOLIDAYS_CALENDAR[key].fact
-    };
-  }
-
-  // Запасний варіант визначних подій на інші дні
+  const evs = getEventsForDate(now);
+  const top = evs[0];
   return {
     dateLabel,
-    title: 'День єдності та щоденної праці для Перемоги',
-    fact: 'Цей день в історії: кожна доба наближає мир та утверджує незалежність України завдяки спільній щоденній праці та підтримці Сил Оборони.'
+    title: top ? top.title : 'День єдності та праці для Перемоги',
+    fact: 'Кожна доба наближає мир та утверджує незалежність України завдяки спільній праці та підтримці Сил Оборони.'
   };
 }
+
+// Рендеринг власного віджета «Свята та події» на 3 дні: «Сьогодні», «Завтра» та «Післязавтра»
+function renderPulseHolidaysUI() {
+  const container = document.getElementById('pulseHolidaysContainer');
+  if (!container) return;
+
+  const now = new Date();
+  const daysUk = ['неділя', 'понеділок', 'вівторок', 'середа', 'четвер', 'п\'ятниця', 'субота'];
+  const monthsUk = ['січня', 'лютого', 'березня', 'квітня', 'травня', 'червня', 'липня', 'серпня', 'вересня', 'жовтня', 'листопада', 'грудня'];
+  const dayLabels = ['Сьогодні', 'Завтра', 'Післязавтра'];
+
+  let html = '';
+
+  for (let offset = 0; offset < 3; offset++) {
+    const dayLabel = dayLabels[offset] || '';
+    const targetDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + offset);
+    const rawDayOfWeek = daysUk[targetDate.getDay()];
+    const dayOfWeekCapitalized = rawDayOfWeek.charAt(0).toUpperCase() + rawDayOfWeek.slice(1);
+    const dateFormatted = `${targetDate.getDate()} ${monthsUk[targetDate.getMonth()]} • ${dayOfWeekCapitalized}`;
+
+    const events = getEventsForDate(targetDate);
+    // Обмеження: не більше 3 записів для сьогодні і не більше 2 для наступних днів (разом до 7 рядків)
+    const maxItems = offset === 0 ? 3 : 2;
+    const displayEvents = events.slice(0, maxItems);
+
+    let itemsHtml = '';
+    displayEvents.forEach((ev, idx) => {
+      const isMain = offset === 0 && idx === 0;
+      itemsHtml += `
+        <li class="pulse-holiday-item ${isMain ? 'is-main' : ''}" title="${ev.title}">
+          <span class="pulse-holiday-bullet" aria-hidden="true">${ev.icon || '📌'}</span>
+          <span class="pulse-holiday-text">${ev.title}</span>
+        </li>
+      `;
+    });
+
+    html += `
+      <div class="pulse-holiday-day-group">
+        <div class="pulse-holiday-day-header">
+          <span class="pulse-holiday-day-badge ${offset === 0 ? 'today' : ''}">${dayLabel}</span>
+          <span class="pulse-holiday-day-date">${dateFormatted}</span>
+        </div>
+        <ul class="pulse-holiday-day-list">
+          ${itemsHtml}
+        </ul>
+      </div>
+    `;
+  }
+
+  container.innerHTML = html;
+
+  const headerDateEl = document.getElementById('pulseDrawerHeaderDate');
+  if (headerDateEl) {
+    headerDateEl.textContent = `• ${getPulseDateBadge()}`;
+  }
+}
+window.renderPulseHolidaysUI = renderPulseHolidaysUI;
 
 function initPulseDayDrawer() {
   // 1. Перевіряємо та гарантуємо наявність кнопки «Пульс дня» у верхньому меню зліва (після «Ніч/День» та «Дзвіночок»)
@@ -8816,7 +9379,11 @@ function initPulseDayDrawer() {
   }
 
   // 3. Формуємо базову розмітку всередині шторки
-  renderPulseDrawerLayout(drawer);
+  try {
+    renderPulseDrawerLayout(drawer);
+  } catch (err) {
+    console.error("Помилка генерації розмітки Пульсу дня:", err);
+  }
 
   // 4. Події відкриття/закриття
   if (pulseBtn) {
@@ -8833,7 +9400,7 @@ function initPulseDayDrawer() {
   if (typeof document !== 'undefined' && !window._pulseDayDelegatedClickAttached) {
     window._pulseDayDelegatedClickAttached = true;
     document.addEventListener('click', (e) => {
-      const btn = e.target && e.target.closest ? e.target.closest('#pulseDayBtn') : null;
+      const btn = e.target && e.target.closest ? e.target.closest('#pulseDayBtn, .pulse-day-btn') : null;
       if (btn) {
         e.preventDefault();
         e.stopPropagation();
@@ -8853,7 +9420,9 @@ function initPulseDayDrawer() {
   });
 
   // Завантажуємо первинні дані (із кешу або свіжі)
-  loadPulseDrawerData(false);
+  try {
+    loadPulseDrawerData(false);
+  } catch (e) {}
 }
 
 function isPulseDrawerOpen() {
@@ -8903,12 +9472,25 @@ function openPulseDrawer() {
     }
   } catch (e) {}
 
-  // Ініціалізуємо інформер Meteoprog при відкритті
-  ensureMeteoprogInformerLoaded();
+  // Ініціалізуємо власний інформер погоди при відкритті
+  try {
+    loadPulseWeatherData(false);
+  } catch (e) {
+    console.warn("Помилка завантаження погоди Пульсу дня:", e);
+  }
 
   // При відкритті перевіряємо чи треба підвантажити дані
-  loadPulseDrawerData(false);
+  try {
+    loadPulseDrawerData(false);
+  } catch (e) {
+    console.warn("Помилка завантаження даних Пульсу дня:", e);
+  }
 }
+
+window.togglePulseDrawer = togglePulseDrawer;
+window.openPulseDrawer = openPulseDrawer;
+window.closePulseDrawer = closePulseDrawer;
+window.initPulseDayDrawer = initPulseDayDrawer;
 
 function closePulseDrawer() {
   const drawer = document.getElementById('pulseDayDrawer');
@@ -8943,122 +9525,582 @@ function closePulseDrawer() {
   };
 })();
 
-function ensureMeteoprogInformerLoaded() {
-  const informerId = "7404b19c-3b3b-4b89-b631-1069a627b443";
-  window.meteoprogDataLayer = window.meteoprogDataLayer || [];
+// ==========================================================================
+// ВЛАСНИЙ ІНФОРМЕР ПОГОДИ НА БАЗІ OPEN-METEO (БЕЗ ЛІМІТІВ ТА СТОРОННІХ ВІДЖЕТІВ)
+// ==========================================================================
 
-  if (!window.meteoprogDataLayer.some(it => it && it.id === informerId)) {
-    window.meteoprogDataLayer.push({
-      "id": informerId
-    });
+const UKRAINE_WEATHER_CITIES = [
+  { id: 'novomyrhorod', name: 'м. Новомиргород', genitive: 'Новомиргороді', lat: 48.8025, lon: 31.6447, region: 'Кіровоградська обл.' },
+  { id: 'kyiv', name: 'м. Київ', genitive: 'Києві', lat: 50.4501, lon: 30.5234, region: 'Столиця' },
+  { id: 'kropyvnytskyi', name: 'м. Кропивницький', genitive: 'Кропивницькому', lat: 48.5079, lon: 32.2623, region: 'Кіровоградська обл.' },
+  { id: 'cherkasy', name: 'м. Черкаси', genitive: 'Черкасах', lat: 49.4444, lon: 32.0598, region: 'Черкаська обл.' },
+  { id: 'uman', name: 'м. Умань', genitive: 'Умані', lat: 48.7484, lon: 30.2218, region: 'Черкаська обл.' },
+  { id: 'oleksandriia', name: 'м. Олександрія', genitive: 'Олександрії', lat: 48.6667, lon: 33.1167, region: 'Кіровоградська обл.' },
+  { id: 'dnipro', name: 'м. Дніпро', genitive: 'Дніпрі', lat: 48.4647, lon: 35.0462, region: 'Дніпропетровська обл.' },
+  { id: 'kryvyi_rih', name: 'м. Кривий Ріг', genitive: 'Кривому Розі', lat: 47.9105, lon: 33.3918, region: 'Дніпропетровська обл.' },
+  { id: 'odesa', name: 'м. Одеса', genitive: 'Одесі', lat: 46.4825, lon: 30.7233, region: 'Одеська обл.' },
+  { id: 'kharkiv', name: 'м. Харків', genitive: 'Харкові', lat: 49.9935, lon: 36.2304, region: 'Харківська обл.' },
+  { id: 'lviv', name: 'м. Львів', genitive: 'Львові', lat: 49.8397, lon: 24.0297, region: 'Львівська обл.' },
+  { id: 'zaporizhzhia', name: 'м. Запоріжжя', genitive: 'Запоріжжі', lat: 47.8388, lon: 35.1396, region: 'Запорізька обл.' },
+  { id: 'vinnytsia', name: 'м. Вінниця', genitive: 'Вінниці', lat: 49.2331, lon: 28.4682, region: 'Вінницька обл.' },
+  { id: 'poltava', name: 'м. Полтава', genitive: 'Полтаві', lat: 49.5883, lon: 34.5514, region: 'Полтавська обл.' },
+  { id: 'mykolaiv', name: 'м. Миколаїв', genitive: 'Миколаєві', lat: 46.9750, lon: 31.9946, region: 'Миколаївська обл.' },
+  { id: 'kherson', name: 'м. Херсон', genitive: 'Херсоні', lat: 46.6354, lon: 32.6169, region: 'Херсонська обл.' },
+  { id: 'chernihiv', name: 'м. Чернігів', genitive: 'Чернігові', lat: 51.4982, lon: 31.2893, region: 'Чернігівська обл.' },
+  { id: 'sumy', name: 'м. Суми', genitive: 'Сумах', lat: 50.9077, lon: 34.7981, region: 'Сумська обл.' },
+  { id: 'zhytomyr', name: 'м. Житомир', genitive: 'Житомирі', lat: 50.2547, lon: 28.6587, region: 'Житомирська обл.' },
+  { id: 'khmelnytskyi', name: 'м. Хмельницький', genitive: 'Хмельницькому', lat: 49.4230, lon: 26.9871, region: 'Хмельницька обл.' },
+  { id: 'rivne', name: 'м. Рівне', genitive: 'Рівному', lat: 50.6199, lon: 26.2516, region: 'Рівненська обл.' },
+  { id: 'lutsk', name: 'м. Луцьк', genitive: 'Луцьку', lat: 50.7472, lon: 25.3254, region: 'Волинська обл.' },
+  { id: 'ternopil', name: 'м. Тернопіль', genitive: 'Тернополі', lat: 49.5535, lon: 25.5948, region: 'Тернопільська обл.' },
+  { id: 'ivano_frankivsk', name: 'м. Івано-Франківськ', genitive: 'Івано-Франківську', lat: 48.9226, lon: 24.7111, region: 'Івано-Франківська обл.' },
+  { id: 'uzhhorod', name: 'м. Ужгород', genitive: 'Ужгороді', lat: 48.6208, lon: 22.2879, region: 'Закарпатська обл.' },
+  { id: 'chernivtsi', name: 'м. Чернівці', genitive: 'Чернівцях', lat: 48.2921, lon: 25.9358, region: 'Чернівецька обл.' }
+];
+
+function renderWeatherCityOptions() {
+  let customGeo = null;
+  try {
+    customGeo = JSON.parse(localStorage.getItem('pulse_weather_custom_geo') || 'null');
+  } catch (e) {}
+
+  let html = '';
+  if (customGeo && customGeo.id === 'custom_geo') {
+    html += `<option value="custom_geo">${customGeo.name || '📍 Моя локація'}</option>`;
   }
-
-  const container = document.getElementById('meteoprogData_' + informerId);
-  if (!container) return;
-
-  // Якщо віджет вже завантажився та успішно відмалювався
-  if (container.querySelector('.meteoprog-informer-container, .informer, .hourly-item')) {
-    return;
-  }
-
-  // Перепідключаємо скрипт loader.js (гарантує відображення на мобільних пристроях при відкритті шторки)
-  const existingScript = document.getElementById('meteoprogLoaderScript');
-  if (existingScript) existingScript.remove();
-
-  const s = document.createElement('script');
-  s.id = 'meteoprogLoaderScript';
-  s.async = true;
-  s.src = 'https://cdn.meteoprog.net/informerv4/1/loader.js';
-  document.body.appendChild(s);
-
-  // Резервна перевірка через 4.5 с (без передчасного мерехтіння на 400 мс)
-  clearTimeout(window._meteoprogFallbackTimer);
-  window._meteoprogFallbackTimer = setTimeout(() => {
-    const targetEl = document.getElementById('meteoprogData_' + informerId);
-    if (targetEl && (!targetEl.firstElementChild || targetEl.querySelector('#meteoprogLoadingHint'))) {
-      renderWeatherFallbackNovomyrhorod(targetEl);
-    }
-  }, 4500);
+  html += UKRAINE_WEATHER_CITIES.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+  return html;
 }
 
-async function renderWeatherFallbackNovomyrhorod(container) {
-  if (!container || (container.firstElementChild && container.querySelector('.informer'))) return;
+const WMO_WEATHER_MAP = {
+  0: { label: 'ясно', type: 'clear' },
+  1: { label: 'переважно ясно', type: 'partly' },
+  2: { label: 'мінлива хмарність', type: 'partly' },
+  3: { label: 'похмуро, без опадів', type: 'cloudy' },
+  45: { label: 'туман', type: 'fog' },
+  48: { label: 'паморозь, туман', type: 'fog' },
+  51: { label: 'дрібна мряка', type: 'drizzle' },
+  53: { label: 'помірна мряка', type: 'rain' },
+  55: { label: 'густа мряка', type: 'rain' },
+  61: { label: 'невеликий дощ', type: 'rain' },
+  63: { label: 'помірний дощ', type: 'rain' },
+  65: { label: 'сильний дощ', type: 'rain' },
+  71: { label: 'невеликий сніг', type: 'snow' },
+  73: { label: 'помірний сніг', type: 'snow' },
+  75: { label: 'сильний снігопад', type: 'snow' },
+  77: { label: 'снігова крупа', type: 'snow' },
+  80: { label: 'короткочасний дощ', type: 'rain' },
+  81: { label: 'злива', type: 'rain' },
+  82: { label: 'сильна злива', type: 'rain' },
+  85: { label: 'снігова злива', type: 'snow' },
+  86: { label: 'сніговий шквал', type: 'snow' },
+  95: { label: 'гроза', type: 'thunder' },
+  96: { label: 'гроза з градом', type: 'thunder' },
+  99: { label: 'сильна гроза з градом', type: 'thunder' }
+};
+
+function createWeatherSvg(type, isDay = 1, size = 18) {
+  if (type === 'clear') {
+    if (isDay) {
+      return `<svg class="pulse-weather-svg pulse-wsvg-sun" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4" fill="#fef08a"></circle><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M6.34 17.66l-1.41 1.41m12.73-12.73l-1.41 1.41"></path></svg>`;
+    } else {
+      return `<svg class="pulse-weather-svg pulse-wsvg-moon" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" fill="#f1f5f9"></path></svg>`;
+    }
+  }
+  if (type === 'partly') {
+    if (isDay) {
+      return `<svg class="pulse-weather-svg pulse-wsvg-partly-day" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v2M4.93 4.93l1.41 1.41M2 12h2" stroke="#f59e0b"></path><circle cx="12" cy="10" r="3.5" fill="#fef08a" stroke="#f59e0b"></circle><path d="M19 14.5a3.5 3.5 0 0 0-3.5-3.5 3.8 3.8 0 0 0-1.1.16A4.5 4.5 0 0 0 6 15a3.5 3.5 0 0 0 3.5 3.5h9.5a3.5 3.5 0 0 0 0-7z" fill="#e2e8f0" stroke="#64748b"></path></svg>`;
+    } else {
+      return `<svg class="pulse-weather-svg pulse-wsvg-partly-night" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 5a5 5 0 0 1 4 4" stroke="#94a3b8"></path><path d="M19 14.5a3.5 3.5 0 0 0-3.5-3.5 3.8 3.8 0 0 0-1.1.16A4.5 4.5 0 0 0 6 15a3.5 3.5 0 0 0 3.5 3.5h9.5a3.5 3.5 0 0 0 0-7z" fill="#e2e8f0" stroke="#64748b"></path></svg>`;
+    }
+  }
+  if (type === 'cloudy') {
+    return `<svg class="pulse-weather-svg pulse-wsvg-cloud" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14.5a3.5 3.5 0 0 0-3.5-3.5 3.8 3.8 0 0 0-1.1.16A4.5 4.5 0 0 0 6 15a3.5 3.5 0 0 0 3.5 3.5h9.5a3.5 3.5 0 0 0 0-7z" fill="#e2e8f0" stroke="#64748b"></path></svg>`;
+  }
+  if (type === 'fog') {
+    return `<svg class="pulse-weather-svg pulse-wsvg-fog" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14h16M6 18h12M4 10h16M6 6h12"></path></svg>`;
+  }
+  if (type === 'drizzle') {
+    return `<svg class="pulse-weather-svg pulse-wsvg-drizzle" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 13.5a3.5 3.5 0 0 0-3.5-3.5 3.8 3.8 0 0 0-1.1.16A4.5 4.5 0 0 0 6 14a3.5 3.5 0 0 0 3.5 3.5h9.5a3.5 3.5 0 0 0 0-7z" fill="#e2e8f0"></path><path d="M9 19.5v2m6-2v2" stroke="#0284c7" stroke-width="2"></path></svg>`;
+  }
+  if (type === 'rain') {
+    return `<svg class="pulse-weather-svg pulse-wsvg-rain" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 13.5a3.5 3.5 0 0 0-3.5-3.5 3.8 3.8 0 0 0-1.1.16A4.5 4.5 0 0 0 6 14a3.5 3.5 0 0 0 3.5 3.5h9.5a3.5 3.5 0 0 0 0-7z" fill="#e2e8f0"></path><path d="M8 19l-1 2.5m5-2.5l-1 2.5m5-2.5l-1 2.5" stroke="#0284c7" stroke-width="2"></path></svg>`;
+  }
+  if (type === 'snow') {
+    return `<svg class="pulse-weather-svg pulse-wsvg-snow" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 13.5a3.5 3.5 0 0 0-3.5-3.5 3.8 3.8 0 0 0-1.1.16A4.5 4.5 0 0 0 6 14a3.5 3.5 0 0 0 3.5 3.5h9.5a3.5 3.5 0 0 0 0-7z" fill="#e2e8f0"></path><path d="M8 19v2m-1-1h2m5-1v2m-1-1h2" stroke="#38bdf8" stroke-width="1.8"></path></svg>`;
+  }
+  if (type === 'thunder') {
+    return `<svg class="pulse-weather-svg pulse-wsvg-thunder" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 13a3.5 3.5 0 0 0-3.5-3.5 3.8 3.8 0 0 0-1.1.16A4.5 4.5 0 0 0 6 13.5a3.5 3.5 0 0 0 3.5 3.5h9.5a3.5 3.5 0 0 0 0-7z" fill="#cbd5e1"></path><path d="M13 14l-2.5 3.5h2.5l-1 3" stroke="#eab308" stroke-width="2" fill="#fef08a"></path></svg>`;
+  }
+  return `<svg class="pulse-weather-svg pulse-wsvg-cloud" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14.5a3.5 3.5 0 0 0-3.5-3.5 3.8 3.8 0 0 0-1.1.16A4.5 4.5 0 0 0 6 15a3.5 3.5 0 0 0 3.5 3.5h9.5a3.5 3.5 0 0 0 0-7z" fill="#e2e8f0" stroke="#64748b"></path></svg>`;
+}
+
+function getWindDirectionInfo(degrees) {
+  if (degrees === undefined || degrees === null || isNaN(degrees)) {
+    return { dirName: 'Змінний', code: 'Змін.', deg: 0, arrowDeg: 0 };
+  }
+  const deg = (Math.round(degrees) % 360 + 360) % 360;
+  let code = 'Пн';
+  let dirName = 'Північний';
+  if (deg >= 22.5 && deg < 67.5) {
+    code = 'Пн-Сх';
+    dirName = 'Північно-східний';
+  } else if (deg >= 67.5 && deg < 112.5) {
+    code = 'Сх';
+    dirName = 'Східний';
+  } else if (deg >= 112.5 && deg < 157.5) {
+    code = 'Пд-Сх';
+    dirName = 'Південно-східний';
+  } else if (deg >= 157.5 && deg < 202.5) {
+    code = 'Пд';
+    dirName = 'Південний';
+  } else if (deg >= 202.5 && deg < 247.5) {
+    code = 'Пд-Зх';
+    dirName = 'Південно-західний';
+  } else if (deg >= 247.5 && deg < 292.5) {
+    code = 'Зх';
+    dirName = 'Західний';
+  } else if (deg >= 292.5 && deg < 337.5) {
+    code = 'Пн-Зх';
+    dirName = 'Північно-західний';
+  }
+
+  // Стрілка вказує куди дме вітер (вектор руху повітряних мас):
+  const arrowDeg = (deg + 180) % 360;
+  return { dirName, code, deg, arrowDeg };
+}
+
+function getWeatherConditionInfo(code, isDay = 1, size = 18) {
+  const item = WMO_WEATHER_MAP[code] || { label: 'хмарно', type: 'cloudy' };
+  return {
+    label: item.label,
+    icon: createWeatherSvg(item.type, isDay, size)
+  };
+}
+
+function getActiveWeatherCity() {
+  const select = document.getElementById('pulseWeatherCitySelect');
+  let chosenId = select ? select.value : (localStorage.getItem('pulse_weather_city') || 'novomyrhorod');
+
+  if (chosenId === 'custom_geo') {
+    try {
+      const customGeo = JSON.parse(localStorage.getItem('pulse_weather_custom_geo') || 'null');
+      if (customGeo && customGeo.lat && customGeo.lon) {
+        return customGeo;
+      }
+    } catch (e) {}
+    chosenId = 'novomyrhorod';
+  }
+
+  const city = UKRAINE_WEATHER_CITIES.find(c => c.id === chosenId) || UKRAINE_WEATHER_CITIES[0];
+  return city;
+}
+
+async function loadPulseWeatherData(forceRefresh = false) {
+  const city = getActiveWeatherCity();
+  const container = document.getElementById('pulseWeatherContainer');
+  const refreshIcon = document.getElementById('pulseWeatherRefreshIcon');
+  if (refreshIcon) refreshIcon.classList.add('fa-spin');
+
+  const cacheKey = `pulse_weather_${city.id}`;
+  const now = Date.now();
+
+  if (!forceRefresh) {
+    try {
+      const cached = JSON.parse(localStorage.getItem(cacheKey) || 'null');
+      if (cached && (now - cached.timestamp < 30 * 60 * 1000) && cached.data) {
+        renderPulseWeatherUI(cached.data, city, cached.updatedText);
+        if (refreshIcon) refreshIcon.classList.remove('fa-spin');
+        return;
+      }
+    } catch (e) {}
+  }
 
   try {
-    const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=48.8025&longitude=31.6447&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=auto');
-    if (!res.ok) throw new Error('Open-Meteo error');
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${city.lat}&longitude=${city.lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,weather_code,surface_pressure,wind_speed_10m,wind_direction_10m&hourly=temperature_2m,weather_code,precipitation_probability,wind_speed_10m,wind_direction_10m&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,wind_speed_10m_max,wind_direction_10m_dominant,sunrise,sunset,uv_index_max&wind_speed_unit=ms&timezone=auto`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`Open-Meteo HTTP ${res.status}`);
     const data = await res.json();
-    const curr = data.current;
-    const daily = data.daily;
-    if (!curr) return;
+    const timeStr = new Date().toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' });
 
-    const weatherIcons = {
-      0: '☀️', 1: '🌤️', 2: '⛅', 3: '☁️',
-      45: '🌫️', 51: '🌦️', 61: '🌧️', 71: '❄️', 80: '🌧️', 95: '⛈️'
-    };
-    const weatherTexts = {
-      0: 'ясно', 1: 'переважно ясно', 2: 'мінлива хмарність', 3: 'похмуро, без опадів',
-      45: 'туман', 51: 'дрібна мряка', 61: 'дощ', 71: 'сніг', 80: 'злива', 95: 'гроза'
-    };
+    try {
+      localStorage.setItem(cacheKey, JSON.stringify({
+        timestamp: now,
+        updatedText: timeStr,
+        data: data
+      }));
+    } catch (e) {}
 
-    const code = curr.weather_code || 0;
-    const icon = weatherIcons[code] || '⛅';
-    const desc = weatherTexts[code] || 'хмарно';
-    const temp = Math.round(curr.temperature_2m);
-    const feels = Math.round(curr.apparent_temperature);
-
-    const dCodes = daily?.weather_code || [3, 2, 61];
-    const dMax = daily?.temperature_2m_max || [14, 15, 13];
-    const dMin = daily?.temperature_2m_min || [6, 7, 5];
-
-    container.innerHTML = `
-      <div class="pulse-weather-fallback-box">
-        <div class="pulse-weather-fallback-header">
-          <div class="pulse-weather-fallback-city">
-            <i class="fas fa-map-marker-alt text-danger"></i> Погода в Новомиргороді
-          </div>
-          <span class="badge badge-light" style="font-size: 0.62rem; color: #0284c7;">Meteoprog / Live</span>
+    renderPulseWeatherUI(data, city, timeStr);
+  } catch (err) {
+    console.warn('Помилка завантаження Open-Meteo:', err);
+    if (container && !container.querySelector('.pulse-weather-hero')) {
+      container.innerHTML = `
+        <div class="text-center py-3 text-muted small">
+          <i class="fas fa-exclamation-triangle text-warning me-1"></i> Не вдалося завантажити погоду.
+          <button type="button" class="btn btn-sm btn-outline-info mt-2 py-0 px-2" style="font-size: 0.72rem;" onclick="loadPulseWeatherData(true)">
+            Спробувати знову
+          </button>
         </div>
-        <div class="pulse-weather-fallback-temp-row">
-          <div>
-            <div class="pulse-weather-fallback-main-temp">${temp > 0 ? '+' : ''}${temp}°C</div>
-            <div class="pulse-weather-fallback-desc">${desc} (відчув. як ${feels > 0 ? '+' : ''}${feels}°)</div>
-          </div>
-          <div style="font-size: 2.2rem; line-height: 1;">${icon}</div>
-        </div>
-        <div class="pulse-weather-fallback-days-row">
-          <div class="pulse-weather-day-col">
-            <strong>Сьогодні</strong>
-            <span>${weatherIcons[dCodes[0]] || '⛅'} ${Math.round(dMax[0])}° / ${Math.round(dMin[0])}°</span>
-          </div>
-          <div class="pulse-weather-day-col">
-            <strong>Завтра</strong>
-            <span>${weatherIcons[dCodes[1]] || '🌤️'} ${Math.round(dMax[1])}° / ${Math.round(dMin[1])}°</span>
-          </div>
-          <div class="pulse-weather-day-col">
-            <strong>Післязавтра</strong>
-            <span>${weatherIcons[dCodes[2]] || '🌧️'} ${Math.round(dMax[2])}° / ${Math.round(dMin[2])}°</span>
-          </div>
-        </div>
-      </div>
-    `;
-  } catch (e) {
-    console.warn('Fallback weather error:', e);
+      `;
+    }
+  } finally {
+    if (refreshIcon) refreshIcon.classList.remove('fa-spin');
   }
 }
+
+function formatWindValHtml(speed) {
+  if (speed === undefined || speed === null || isNaN(speed)) return '0,<span class="pulse-decimal">0</span>';
+  const num = typeof speed === 'number' ? speed : parseFloat(speed);
+  const rounded = num.toFixed(1);
+  const parts = rounded.split('.');
+  return `${parts[0]},<span class="pulse-decimal">${parts[1]}</span>`;
+}
+
+function renderPulseWeatherUI(data, city, updatedTime = '') {
+  const container = document.getElementById('pulseWeatherContainer');
+  if (!container || !data || !data.current) return;
+
+  const curr = data.current;
+  const hourly = data.hourly || {};
+  const daily = data.daily || {};
+
+  const isDay = curr.is_day !== 0 ? 1 : 0;
+  const cond = getWeatherConditionInfo(curr.weather_code, isDay, 36);
+  const temp = Math.round(curr.temperature_2m);
+  const feels = Math.round(curr.apparent_temperature);
+
+  // Дата українською (наприклад: 28 Жовтня, Середа)
+  const now = new Date();
+  const monthsUk = ['Січня', 'Лютого', 'Березня', 'Квітня', 'Травня', 'Червня', 'Липня', 'Серпня', 'Вересня', 'Жовтня', 'Листопада', 'Грудня'];
+  const daysUk = ['Неділя', 'Понеділок', 'Вівторок', 'Середа', 'Четвер', 'Пʼятниця', 'Субота'];
+  const dateFormatted = `${now.getDate()} ${monthsUk[now.getMonth()]}, ${daysUk[now.getDay()]}`;
+  const currentTime = now.toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' });
+
+  // Назва міста у родовому/місцевому відмінку для заголовка
+  const cityDisplayName = city.genitive ? `в ${city.genitive}` : (city.name || '');
+
+  // Схід та захід сонця на сьогодні
+  const sunriseStr = daily.sunrise && daily.sunrise[0] ? daily.sunrise[0].slice(11, 16) : '06:35';
+  const sunsetStr = daily.sunset && daily.sunset[0] ? daily.sunset[0].slice(11, 16) : '16:38';
+
+  // 1. Погодинний прогноз (наступні 24 години)
+  let hourlyHtml = '';
+  let curPrecipProb = 0;
+  if (hourly.time && hourly.time.length) {
+    const curHourIso = now.toISOString().slice(0, 13);
+    let startIdx = hourly.time.findIndex(t => t.startsWith(curHourIso));
+    if (startIdx === -1) startIdx = 0;
+
+    curPrecipProb = (hourly.precipitation_probability && hourly.precipitation_probability[startIdx] !== undefined)
+      ? hourly.precipitation_probability[startIdx]
+      : ((daily.precipitation_probability_max && daily.precipitation_probability_max[0] !== undefined) ? daily.precipitation_probability_max[0] : 0);
+
+    const hourOffsets = [0, 1, 2, 3, 4, 5, 6, 8, 10, 12, 15, 18, 21, 24];
+    const hourIndices = [];
+    for (const offset of hourOffsets) {
+      const idx = startIdx + offset;
+      if (idx < hourly.time.length && !hourIndices.includes(idx)) {
+        hourIndices.push(idx);
+      }
+    }
+
+    for (let k = 0; k < hourIndices.length; k++) {
+      const i = hourIndices[k];
+      const hTime = hourly.time[i].slice(11, 16);
+      const hTemp = Math.round(hourly.temperature_2m[i]);
+      const hCode = hourly.weather_code[i];
+      const hHourNum = parseInt(hTime.slice(0, 2), 10);
+      const hIsDay = (hHourNum >= 6 && hHourNum < 18) ? 1 : 0;
+      const hCond = getWeatherConditionInfo(hCode, hIsDay, 18);
+      const hPrecipProb = (hourly.precipitation_probability && hourly.precipitation_probability[i] !== undefined) ? hourly.precipitation_probability[i] : 0;
+      const hWindSpeed = (hourly.wind_speed_10m && hourly.wind_speed_10m[i] !== undefined) ? hourly.wind_speed_10m[i] : 0;
+      const hWindDir = (hourly.wind_direction_10m && hourly.wind_direction_10m[i] !== undefined) ? hourly.wind_direction_10m[i] : 0;
+      const hWindInfo = getWindDirectionInfo(hWindDir);
+      const hWindHtml = formatWindValHtml(hWindSpeed);
+
+      hourlyHtml += `
+        <div class="pulse-weather-hour-item">
+          <span class="pulse-weather-hour-time">${i === startIdx ? 'Зараз' : hTime}</span>
+          <span class="pulse-weather-hour-temp">${hTemp > 0 ? '+' : ''}${hTemp}°</span>
+          <div class="pulse-weather-hour-bottom">
+            <span class="pulse-weather-hour-icon">${hCond.icon}</span>
+            <span class="pulse-weather-hour-precip-badge" title="Ймовірність опадів: ${hPrecipProb}%">${hPrecipProb}%</span>
+          </div>
+          <div class="pulse-weather-hour-wind" title="Вітер: ${hWindInfo.dirName} (${hWindInfo.code}, ${hWindInfo.deg}°), швидкість ${hWindSpeed.toFixed(1)} м/с">
+            <svg class="pulse-hour-wind-arrow" width="9" height="9" viewBox="0 0 24 24" fill="currentColor" stroke="none" style="transform: rotate(${hWindInfo.arrowDeg}deg); transform-origin: 50% 50%;">
+              <path d="M12 2L4.5 20.5l7.5-4 7.5 4L12 2z"></path>
+            </svg>
+            <span class="pulse-hour-wind-val">${hWindHtml}</span>
+          </div>
+        </div>
+      `;
+    }
+  }
+
+  // 2. Метеопоказники
+  const windSpeedRaw = curr.wind_speed_10m || 0;
+  const windVal = `${Math.round(windSpeedRaw * 10) / 10}`;
+  const windInfo = getWindDirectionInfo(curr.wind_direction_10m);
+  const humidityVal = `${Math.round(curr.relative_humidity_2m)}%`;
+  const precipVal = `${Math.round((curr.precipitation || 0) * 10) / 10} мм`;
+  const pressureVal = curr.surface_pressure ? `${Math.round(curr.surface_pressure * 0.750062)}` : '750';
+  const uvVal = daily.uv_index_max && daily.uv_index_max[0] ? `${Math.round(daily.uv_index_max[0])}/12` : '2/12';
+
+  // Дані на сьогодні (для шапки поточної погоди)
+  const todayCode = (daily.weather_code && daily.weather_code[0] !== undefined) ? daily.weather_code[0] : curr.weather_code;
+  const todayCond = getWeatherConditionInfo(todayCode, 1, 16);
+  const todayMax = (daily.temperature_2m_max && daily.temperature_2m_max[0] !== undefined) ? Math.round(daily.temperature_2m_max[0]) : null;
+  const todayMin = (daily.temperature_2m_min && daily.temperature_2m_min[0] !== undefined) ? Math.round(daily.temperature_2m_min[0]) : null;
+  const todayRangeStr = (todayMin !== null && todayMax !== null) ? `${todayMin > 0 ? '+' : ''}${todayMin}° / ${todayMax > 0 ? '+' : ''}${todayMax}°` : '';
+
+  // 3. Прогноз на наступні дні («Завтра» та «Післязавтра»)
+  let dailyHtml = '';
+  if (daily.time && daily.time.length >= 2) {
+    const dayLabels = { 1: 'Завтра', 2: 'Післязавтра' };
+    const maxDays = Math.min(daily.time.length - 1, 2);
+    for (let i = 1; i <= maxDays; i++) {
+      const dDate = new Date(daily.time[i] + 'T12:00:00');
+      const dDayName = dayLabels[i] || daysUk[dDate.getDay()];
+      const dShortDate = `${dDate.getDate()} ${monthsUk[dDate.getMonth()].toLowerCase()}`;
+      const dMax = Math.round(daily.temperature_2m_max[i]);
+      const dMin = Math.round(daily.temperature_2m_min[i]);
+      const dCode = daily.weather_code[i];
+      const dCond = getWeatherConditionInfo(dCode, 1, 16);
+      const dCondLabel = dCond.label ? (dCond.label.charAt(0).toUpperCase() + dCond.label.slice(1)) : 'Похмуро';
+      const dPrecipProb = (daily.precipitation_probability_max && daily.precipitation_probability_max[i] !== undefined) ? daily.precipitation_probability_max[i] : 0;
+      const dWindSpeedRaw = (daily.wind_speed_10m_max && daily.wind_speed_10m_max[i] !== undefined) ? daily.wind_speed_10m_max[i] : 0;
+      const dWindDir = (daily.wind_direction_10m_dominant && daily.wind_direction_10m_dominant[i] !== undefined) ? daily.wind_direction_10m_dominant[i] : 0;
+      const dWindInfo = getWindDirectionInfo(dWindDir);
+      const dWindSpeedHtml = formatWindValHtml(dWindSpeedRaw);
+
+      dailyHtml += `
+        <div class="pulse-weather-daily-row">
+          <div class="pulse-weather-daily-name">
+            <span>${dDayName}</span>
+            <span class="pulse-weather-daily-sub">${dShortDate}</span>
+          </div>
+          <div class="pulse-weather-daily-divider"></div>
+          <div class="pulse-weather-daily-temps" title="Температура: від ${dMin > 0 ? '+' : ''}${dMin}° до ${dMax > 0 ? '+' : ''}${dMax}°">
+            <span class="pulse-weather-daily-min">${dMin > 0 ? '+' : ''}${dMin}°</span> / 
+            <span>${dMax > 0 ? '+' : ''}${dMax}°</span>
+          </div>
+          <div class="pulse-weather-daily-divider"></div>
+          <div class="pulse-weather-daily-weather" title="${dCondLabel} (ймовірність опадів ${dPrecipProb}%)">
+            <span class="pulse-weather-daily-cond-icon" title="${dCondLabel}">${dCond.icon}</span>
+            <span class="pulse-weather-daily-precip">${dPrecipProb}%</span>
+          </div>
+          <div class="pulse-weather-daily-divider"></div>
+          <div class="pulse-weather-daily-wind" title="Вітер: ${dWindInfo.dirName} (${dWindInfo.code}, ${dWindInfo.deg}°), швидкість ${dWindSpeedRaw.toFixed(1)} м/с">
+            <svg class="pulse-daily-wind-arrow" width="10" height="10" viewBox="0 0 24 24" fill="currentColor" stroke="none" style="transform: rotate(${dWindInfo.arrowDeg}deg); transform-origin: 50% 50%;">
+              <path d="M12 2L4.5 20.5l7.5-4 7.5 4L12 2z"></path>
+            </svg>
+            <span class="pulse-daily-wind-val">${dWindSpeedHtml}</span>
+          </div>
+        </div>
+      `;
+    }
+  }
+
+  // Капіталізація першої літери
+  const curCondLabel = cond.label ? (cond.label.charAt(0).toUpperCase() + cond.label.slice(1)) : 'Хмарно';
+  const todayCondLabel = todayCond.label ? (todayCond.label.charAt(0).toUpperCase() + todayCond.label.slice(1)) : 'Без опадів';
+  const feelsLineText = `Відчувається як ${feels > 0 ? '+' : ''}${feels}°`;
+  const precipRaw = Math.round((curr.precipitation || 0) * 10) / 10;
+
+  container.innerHTML = `
+    <!-- Рядок джерела та синхронізації у самому верху картки -->
+    <div class="pulse-weather-meta-top">
+      <span>Open-Meteo • ${city.name || 'Новомиргород'}</span>
+      <span>${updatedTime ? `Оновлено: ${updatedTime}` : 'Наживо'}</span>
+    </div>
+
+    <!-- Головна картка поточної погоди -->
+    <div class="pulse-weather-hero">
+      <div class="pulse-weather-hero-left">
+        <div class="pulse-weather-condition-line">${curCondLabel}</div>
+        <div class="pulse-weather-expected-line" title="Очікуваний діапазон температури на добу">
+          ${todayRangeStr ? `Очікується: ${todayRangeStr}` : ''}
+        </div>
+        <div class="pulse-weather-rain-line" title="Погодні явища та опади на сьогодні">
+          <i class="fas fa-umbrella text-info" style="font-size: 0.62rem; margin-right: 2px;"></i>${todayCondLabel}
+        </div>
+      </div>
+      <div class="pulse-weather-hero-right">
+        <div class="pulse-weather-temp-main">
+          <div class="pulse-weather-temp-val">${temp > 0 ? '+' : ''}${temp}°</div>
+          <div class="pulse-weather-temp-icon" title="${cond.label}">${cond.icon}</div>
+          <span class="pulse-weather-hero-precip" title="Ймовірність опадів: ${curPrecipProb}%">${curPrecipProb}%</span>
+        </div>
+        <div class="pulse-weather-feels-line">${feelsLineText}</div>
+      </div>
+    </div>
+
+    <!-- Рядок 5 метеопоказників (компактний 2-рядковий вигляд із векторними SVG-піктограмами) -->
+    <div class="pulse-weather-metrics-grid">
+      <div class="pulse-weather-metric-item" title="Вітер: ${windInfo.dirName} (${windInfo.code}, ${windInfo.deg}°), швидкість ${windVal} м/с">
+        <span class="pulse-weather-metric-lbl">Вітер</span>
+        <div class="pulse-weather-metric-data">
+          <svg class="pulse-metric-svg pulse-metric-wind" width="11" height="11" viewBox="0 0 24 24" fill="currentColor" stroke="none" style="transform: rotate(${windInfo.arrowDeg}deg); transform-origin: 50% 50%;">
+            <path d="M12 2L4.5 20.5l7.5-4 7.5 4L12 2z"></path>
+          </svg>
+          <span class="pulse-weather-metric-val">${windVal}<span class="pulse-weather-metric-unit">м/с</span></span>
+        </div>
+      </div>
+      <div class="pulse-weather-metric-item" title="Кількість опадів, мм">
+        <span class="pulse-weather-metric-lbl">Опади</span>
+        <div class="pulse-weather-metric-data">
+          <svg class="pulse-metric-svg pulse-metric-rain" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 16.58A5 5 0 0 0 18 7h-1.26A8 8 0 1 0 4 15.25"></path><path d="M8 19v2m8-2v2m-4-1v2"></path></svg>
+          <span class="pulse-weather-metric-val">${precipRaw}<span class="pulse-weather-metric-unit">мм</span></span>
+        </div>
+      </div>
+      <div class="pulse-weather-metric-item" title="Відносна вологість повітря, %">
+        <span class="pulse-weather-metric-lbl">Вологість</span>
+        <div class="pulse-weather-metric-data">
+          <svg class="pulse-metric-svg pulse-metric-hum" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path></svg>
+          <span class="pulse-weather-metric-val">${humidityVal}</span>
+        </div>
+      </div>
+      <div class="pulse-weather-metric-item" title="Атмосферний тиск, мм рт.ст.">
+        <span class="pulse-weather-metric-lbl">Тиск</span>
+        <div class="pulse-weather-metric-data">
+          <svg class="pulse-metric-svg pulse-metric-press" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"></path></svg>
+          <span class="pulse-weather-metric-val">${pressureVal}</span>
+        </div>
+      </div>
+      <div class="pulse-weather-metric-item" title="УФ-індекс (ультрафіолет)">
+        <span class="pulse-weather-metric-lbl">УФ-індекс</span>
+        <div class="pulse-weather-metric-data">
+          <svg class="pulse-metric-svg pulse-metric-uv" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M6.34 17.66l-1.41 1.41m12.73-12.73l-1.41 1.41"></path></svg>
+          <span class="pulse-weather-metric-val">${uvVal}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Рядок сходу та заходу сонця -->
+    <div class="pulse-weather-sun-bar" title="Схід та захід сонця на сьогодні">
+      <div class="pulse-weather-sun-item" title="Схід сонця о ${sunriseStr}">
+        <span class="pulse-weather-sun-text"><strong>${sunriseStr}</strong> СХІД</span>
+      </div>
+      <div class="pulse-weather-sun-center" title="Сонце (світловий день)">
+        <span class="pulse-sun-spinner">
+          <svg class="pulse-sun-icon-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="4.5" fill="#fef08a" stroke="#f59e0b"></circle>
+            <path d="M12 2v2.5M12 19.5V22M4.93 4.93l1.77 1.77M17.3 17.3l1.77 1.77M2 12h2.5M19.5 12H22M4.93 19.07l1.77-1.77M17.3 6.7l1.77-1.77"></path>
+          </svg>
+        </span>
+      </div>
+      <div class="pulse-weather-sun-item" title="Захід сонця о ${sunsetStr}">
+        <span class="pulse-weather-sun-text">ЗАХІД <strong>${sunsetStr}</strong></span>
+      </div>
+    </div>
+
+    <!-- Горизонтальний погодинний прогноз (на 24 години) -->
+    <div class="pulse-weather-hourly-wrap">
+      <div class="pulse-weather-hourly-slider">
+        ${hourlyHtml}
+      </div>
+    </div>
+
+    <!-- Прогноз на наступні дні (Завтра та Післязавтра) -->
+    <div class="pulse-weather-daily-rows">
+      ${dailyHtml}
+    </div>
+  `;
+}
+
+async function detectUserWeatherLocation() {
+  const geoBtn = document.getElementById('pulseWeatherGeoBtn');
+  if (geoBtn) {
+    geoBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+  }
+
+  const applyDetectedCity = async (cityName, genitive, lat, lon, region = 'Автовизначено') => {
+    const customCity = {
+      id: 'custom_geo',
+      name: `📍 ${cityName}`,
+      genitive: genitive || cityName,
+      lat: Math.round(lat * 10000) / 10000,
+      lon: Math.round(lon * 10000) / 10000,
+      region: region
+    };
+    try {
+      localStorage.setItem('pulse_weather_custom_geo', JSON.stringify(customCity));
+      localStorage.setItem('pulse_weather_city', 'custom_geo');
+    } catch (e) {}
+
+    const select = document.getElementById('pulseWeatherCitySelect');
+    if (select) {
+      select.innerHTML = renderWeatherCityOptions();
+      select.value = 'custom_geo';
+    }
+
+    await loadPulseWeatherData(true);
+    showQuickToast(`Локацію визначено: ${customCity.name}`, 'success');
+    if (geoBtn) geoBtn.innerHTML = '<i class="fas fa-crosshairs"></i>';
+  };
+
+  if ('geolocation' in navigator) {
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        const lat = pos.coords.latitude;
+        const lon = pos.coords.longitude;
+        let detectedName = 'Моя локація';
+        let detectedGenitive = 'вашій локації';
+
+        try {
+          const r = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=uk`);
+          if (r.ok) {
+            const res = await r.json();
+            const town = res.city || res.locality || res.principalSubdivision;
+            if (town) {
+              detectedName = town;
+              detectedGenitive = town;
+            }
+          }
+        } catch (e) {}
+
+        await applyDetectedCity(detectedName, detectedGenitive, lat, lon, 'GPS / Геолокація');
+      },
+      async (err) => {
+        // Якщо GPS відхилено користувачем, пробуємо IP-геокодування
+        try {
+          const ipRes = await fetch('https://ipapi.co/json/');
+          if (ipRes.ok) {
+            const ipData = await ipRes.json();
+            if (ipData && ipData.latitude && ipData.longitude) {
+              await applyDetectedCity(ipData.city || 'Моє місто', ipData.city || 'вашому місті', ipData.latitude, ipData.longitude, ipData.region || 'За IP');
+              return;
+            }
+          }
+        } catch (e) {}
+
+        showQuickToast('Не вдалося визначити координати. Обрано м. Новомиргород', 'warning');
+        if (geoBtn) geoBtn.innerHTML = '<i class="fas fa-crosshairs"></i>';
+      },
+      { timeout: 7000, enableHighAccuracy: true }
+    );
+  } else {
+    showQuickToast('Геолокація не підтримується браузером', 'warning');
+    if (geoBtn) geoBtn.innerHTML = '<i class="fas fa-crosshairs"></i>';
+  }
+}
+window.loadPulseWeatherData = loadPulseWeatherData;
+window.detectUserWeatherLocation = detectUserWeatherLocation;
 
 // ==========================================================================
 // ДАНІ ТА ЛОГІКА ЯКОСТІ ПОВІТРЯ (AQI) ТА РАДІАЦІЙНОГО ФОНУ (SAVEECOBOT / ECOCITY)
 // ==========================================================================
 const UKRAINE_ECO_REGIONS = [
+  { id: 'novomyrhorod', name: 'м. Новомиргород', lat: 48.8025, lon: 31.6447, baseRad: 0.13 },
   { id: 'kyiv', name: 'м. Київ', lat: 50.45, lon: 30.52, baseRad: 0.11 },
+  { id: 'kropyvnytskyi', name: 'м. Кропивницький', lat: 48.51, lon: 32.26, baseRad: 0.14 },
   { id: 'vinnytsia', name: 'Вінниця', lat: 49.23, lon: 28.47, baseRad: 0.12 },
   { id: 'dnipro', name: 'Дніпро', lat: 48.46, lon: 35.04, baseRad: 0.13 },
   { id: 'donetsk', name: 'Донецьк', lat: 48.00, lon: 37.80, baseRad: 0.12 },
   { id: 'zhytomyr', name: 'Житомир', lat: 50.25, lon: 28.67, baseRad: 0.13 },
   { id: 'zaporizhzhia', name: 'Запоріжжя', lat: 47.84, lon: 35.14, baseRad: 0.12 },
   { id: 'ivano_frankivsk', name: 'Івано-Франківськ', lat: 48.92, lon: 24.71, baseRad: 0.10 },
-  { id: 'kropyvnytskyi', name: 'Кропивницький', lat: 48.51, lon: 32.26, baseRad: 0.14 },
   { id: 'kryvyi_rih', name: 'Кривий Ріг', lat: 47.91, lon: 33.39, baseRad: 0.13 },
   { id: 'luhansk', name: 'Луганськ', lat: 48.57, lon: 39.31, baseRad: 0.11 },
   { id: 'lutsk', name: 'Луцьк', lat: 50.75, lon: 25.32, baseRad: 0.10 },
@@ -9078,9 +10120,17 @@ const UKRAINE_ECO_REGIONS = [
   { id: 'chernihiv', name: 'Чернігів', lat: 51.50, lon: 31.28, baseRad: 0.11 }
 ];
 
+function getEffectiveEcoRegionId() {
+  const saved = localStorage.getItem('pulse_eco_region');
+  if (!saved || saved === 'kyiv') {
+    return 'novomyrhorod';
+  }
+  return saved;
+}
+
 async function loadPulseEcoData(forceRefresh = false) {
   const select = document.getElementById('pulseEcoRegionSelect');
-  const chosenId = select ? select.value : (localStorage.getItem('pulse_eco_region') || 'kyiv');
+  const chosenId = select ? select.value : getEffectiveEcoRegionId();
   const region = UKRAINE_ECO_REGIONS.find(r => r.id === chosenId) || UKRAINE_ECO_REGIONS[0];
 
   const cacheKey = `pulse_eco_${region.id}`;
@@ -9138,54 +10188,74 @@ async function loadPulseEcoData(forceRefresh = false) {
   renderPulseEcoUI(ecoData, region);
 }
 
+function formatEcoMetricHtml(val, unit = 'мкг/м³') {
+  if (val === undefined || val === null || isNaN(val)) {
+    return `<span class="pulse-eco-int">-</span> <span class="pulse-eco-unit">${unit}</span>`;
+  }
+  const s = String(val);
+  const dotIdx = s.indexOf('.');
+  const commaIdx = s.indexOf(',');
+  const splitIdx = dotIdx !== -1 ? dotIdx : commaIdx;
+
+  if (splitIdx !== -1) {
+    const intPart = s.slice(0, splitIdx);
+    const decPart = s.slice(splitIdx);
+    return `<span class="pulse-eco-int">${intPart}</span><span class="pulse-eco-dec">${decPart}</span> <span class="pulse-eco-unit">${unit}</span>`;
+  }
+  return `<span class="pulse-eco-int">${s}</span> <span class="pulse-eco-unit">${unit}</span>`;
+}
+
 function renderPulseEcoUI(data, region) {
-  const radValEl = document.getElementById('pulseEcoRadVal');
   const radBadgeEl = document.getElementById('pulseEcoRadBadge');
-  const aqiValEl = document.getElementById('pulseEcoAqiVal');
   const aqiBadgeEl = document.getElementById('pulseEcoAqiBadge');
-  const aqiHintEl = document.getElementById('pulseEcoAqiHint');
   const pm25El = document.getElementById('pulseEcoPm25');
   const pm10El = document.getElementById('pulseEcoPm10');
   const no2El = document.getElementById('pulseEcoNo2');
   const o3El = document.getElementById('pulseEcoO3');
   const statusBadge = document.getElementById('pulseEcoStatusBadge');
 
-  if (radValEl) {
-    radValEl.innerHTML = `${data.radiation.toFixed(2)} <span style="font-size: 0.65rem; font-weight: normal; color: var(--text-muted, #64748b);">мкЗв/год</span>`;
-  }
   if (radBadgeEl) {
+    let circle = '🟢';
+    let cls = 'green';
+    let tooltip = 'Норма: радіаційний фон у межах природної безпеки (до 0.30 мкЗв/год)';
     if (data.radiation <= 0.20) {
-      radBadgeEl.className = 'pulse-eco-metric-badge green';
-      radBadgeEl.textContent = '🟢 Норма';
-      radBadgeEl.title = 'безпечно (до 0.30 мкЗв/год)';
+      circle = '🟢';
+      cls = 'green';
+      tooltip = 'Норма: радіаційний фон у межах природної безпеки (до 0.30 мкЗв/год)';
     } else if (data.radiation <= 0.30) {
-      radBadgeEl.className = 'pulse-eco-metric-badge yellow';
-      radBadgeEl.textContent = '🟡 Допустимий';
-      radBadgeEl.title = 'допустимий рівень (до 0.30 мкЗв/год)';
+      circle = '🟡';
+      cls = 'yellow';
+      tooltip = 'Помірне: допустимий природний рівень (до 0.30 мкЗв/год)';
     } else {
-      radBadgeEl.className = 'pulse-eco-metric-badge red';
-      radBadgeEl.textContent = '🔴 Підвищений';
-      radBadgeEl.title = 'увага: підвищений рівень (понад 0.30 мкЗв/год)';
+      circle = '🔴';
+      cls = 'red';
+      tooltip = 'Підвищений: увага, перевищення норми (понад 0.30 мкЗв/год)';
     }
+    radBadgeEl.className = `pulse-eco-metric-badge ${cls}`;
+    radBadgeEl.title = tooltip;
+    radBadgeEl.innerHTML = `<span class="pulse-eco-badge-dot">${circle}</span> <span id="pulseEcoRadVal" class="pulse-eco-badge-val">${data.radiation.toFixed(2)}</span> <span class="pulse-eco-badge-unit">мкЗв/год</span>`;
   }
 
-  if (aqiValEl) {
-    aqiValEl.textContent = `AQI ${data.aqi}`;
-  }
   if (aqiBadgeEl) {
+    let circle = '🟢';
+    let cls = 'green';
+    let tooltip = 'Чисте: безпечне для дихання (до 50 AQI)';
     if (data.aqi <= 50) {
-      aqiBadgeEl.className = 'pulse-eco-metric-badge green';
-      aqiBadgeEl.textContent = '🟢 Чисте';
-      aqiBadgeEl.title = 'чисте та безпечне (до 50 AQI)';
+      circle = '🟢';
+      cls = 'green';
+      tooltip = 'Чисте: якість повітря відмінна та безпечна (до 50 AQI)';
     } else if (data.aqi <= 100) {
-      aqiBadgeEl.className = 'pulse-eco-metric-badge yellow';
-      aqiBadgeEl.textContent = '🟡 Помірне';
-      aqiBadgeEl.title = 'прийнятна якість повітря (AQI 51-100)';
+      circle = '🟡';
+      cls = 'yellow';
+      tooltip = 'Помірне: якість повітря прийнятна (AQI 51-100)';
     } else {
-      aqiBadgeEl.className = 'pulse-eco-metric-badge red';
-      aqiBadgeEl.textContent = '🔴 Забруднене';
-      aqiBadgeEl.title = 'небезпечно для чутливих людей (AQI 101+)';
+      circle = '🔴';
+      cls = 'red';
+      tooltip = 'Забруднене: небезпечно для людей із захворюваннями дихальних шляхів (AQI 101+)';
     }
+    aqiBadgeEl.className = `pulse-eco-metric-badge ${cls}`;
+    aqiBadgeEl.title = tooltip;
+    aqiBadgeEl.innerHTML = `<span class="pulse-eco-badge-dot">${circle}</span> <span id="pulseEcoAqiVal" class="pulse-eco-badge-val">AQI ${data.aqi}</span>`;
   }
 
   if (statusBadge) {
@@ -9203,10 +10273,10 @@ function renderPulseEcoUI(data, region) {
     }
   }
 
-  if (pm25El) pm25El.textContent = `${data.pm25} мкг/м³`;
-  if (pm10El) pm10El.textContent = `${data.pm10} мкг/м³`;
-  if (no2El) no2El.textContent = `${data.no2} мкг/м³`;
-  if (o3El) o3El.textContent = `${data.o3} мкг/м³`;
+  if (pm25El) pm25El.innerHTML = formatEcoMetricHtml(data.pm25, 'мкг/м³');
+  if (pm10El) pm10El.innerHTML = formatEcoMetricHtml(data.pm10, 'мкг/м³');
+  if (no2El) no2El.innerHTML = formatEcoMetricHtml(data.no2, 'мкг/м³');
+  if (o3El) o3El.innerHTML = formatEcoMetricHtml(data.o3, 'мкг/м³');
 }
 
 // ==========================================================================
@@ -9302,6 +10372,7 @@ function renderPulseDrawerLayout(container) {
           <svg class="pulse-ecg-icon text-info" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2 12 6 12 9 4 14 20 17 12 22 12"></polyline></svg>
           Пульс дня
         </h4>
+        <span class="pulse-drawer-date" id="pulseDrawerHeaderDate">• ${getPulseDateBadge()}</span>
         <span class="pulse-drawer-tagline">• Щоденний експрес-огляд для українця</span>
       </div>
       <div class="pulse-drawer-controls">
@@ -9320,14 +10391,11 @@ function renderPulseDrawerLayout(container) {
       <div class="pulse-card" id="pulseCardHoliday">
         <div class="pulse-card-header">
           <span class="pulse-card-title"><i class="fas fa-calendar-day text-info"></i> Свята та події</span>
-          <span class="pulse-card-badge" id="pulseHolidayDateBadge">${getPulseDateBadge()}</span>
         </div>
 
-        <!-- Інформер календаря Dilovamova (безрамочний варіант без додаткового фону) -->
-        <div class="pulse-dilovamova-wrap">
-          <a href="https://www.dilovamova.com/" target="_blank" rel="noopener" title="Календар свят і подій. Листівки, вітання та побажання">
-            <img src="https://www.dilovamova.com/images/wpi.cache/informer/informer_300_02.png" alt="Календар свят і подій. Листівки, вітання та побажання" title="Календар свят і подій. Листівки, вітання та побажання" class="pulse-dilovamova-img" width="300" height="374" loading="lazy">
-          </a>
+        <!-- Власний адаптивний інформер «Свята та події» на 3 дні (Сьогодні, Завтра, Післязавтра) -->
+        <div class="pulse-holidays-container" id="pulseHolidaysContainer">
+          <!-- Заповнюється динамічно функцією renderPulseHolidaysUI -->
         </div>
 
         <!-- Лагідна роздільна лінія між Святами та Магнітними бурями -->
@@ -9358,19 +10426,35 @@ function renderPulseDrawerLayout(container) {
         </div>
       </div>
 
-      <!-- 2. ПОГОДА (METEOPROG) -->
+      <!-- 2. ПОГОДА (ВЛАСНИЙ ВІДЖЕТ OPEN-METEO) -->
       <div class="pulse-card" id="pulseCardWeather">
         <div class="pulse-card-header">
           <span class="pulse-card-title"><i class="fas fa-cloud-sun text-warning"></i> Погода</span>
-          <span class="pulse-card-badge badge-green">Наживо</span>
+          <div class="d-flex align-items-center" style="gap: 5px;">
+            <span class="pulse-card-badge badge-green" id="pulseWeatherLiveBadge">Наживо</span>
+            <button type="button" id="pulseWeatherRefreshBtn" class="pulse-weather-refresh-action-btn" title="Оновити погоду" aria-label="Оновити погоду">
+              <i class="fas fa-sync-alt" id="pulseWeatherRefreshIcon"></i>
+            </button>
+          </div>
         </div>
 
-        <!-- Інформер Meteoprog з прогнозом на кілька днів (без матрьошної рамки) -->
-        <div class="pulse-meteoprog-wrap">
-          <div id="meteoprogData_7404b19c-3b3b-4b89-b631-1069a627b443">
-            <div class="text-center py-4 text-muted small" id="meteoprogLoadingHint" style="font-size: 0.72rem;">
-              <i class="fas fa-spinner fa-spin me-2 text-info"></i>Завантаження погоди...
-            </div>
+        <!-- Вибір місцевості (міста) з автоматичним збереженням -->
+        <div class="pulse-weather-city-bar">
+          <label for="pulseWeatherCitySelect" class="pulse-weather-city-label">
+            <i class="fas fa-map-marker-alt text-danger me-1"></i> Місто:
+          </label>
+          <select id="pulseWeatherCitySelect" class="pulse-weather-city-select" aria-label="Обрати місто для прогнозу погоди">
+            ${renderWeatherCityOptions()}
+          </select>
+          <button type="button" id="pulseWeatherGeoBtn" class="pulse-weather-tool-btn pulse-weather-geo-btn-inline" title="Визначити моє місто автоматично (GPS / IP)" aria-label="Автовизначення локації">
+            <i class="fas fa-crosshairs"></i>
+          </button>
+        </div>
+
+        <!-- Контейнер власного прогнозу погоди -->
+        <div id="pulseWeatherContainer" class="pulse-weather-container">
+          <div class="text-center py-4 text-muted small" style="font-size: 0.72rem;">
+            <i class="fas fa-spinner fa-spin me-2 text-info"></i>Завантаження прогнозу погоди...
           </div>
         </div>
       </div>
@@ -9382,28 +10466,28 @@ function renderPulseDrawerLayout(container) {
           <span class="pulse-card-badge badge-green" id="pulseEcoStatusBadge">🟢 Норма</span>
         </div>
 
-        <!-- Вибір місцевості (міста) з автоматичним збереженням -->
-        <div class="pulse-fuel-region-bar" style="margin-bottom: 7px;">
-          <label for="pulseEcoRegionSelect" class="pulse-fuel-region-label">
-            <i class="fas fa-map-marker-alt text-success"></i> Місто:
+        <!-- Вибір місцевості (міста) з автоматичним збереженням (уніфіковано з погодою) -->
+        <div class="pulse-weather-city-bar">
+          <label for="pulseEcoRegionSelect" class="pulse-weather-city-label">
+            <i class="fas fa-map-marker-alt text-success me-1"></i> Місто:
           </label>
-          <select id="pulseEcoRegionSelect" class="pulse-fuel-region-select" aria-label="Обрати місто для якості повітря та радіаційного фону">
-            ${UKRAINE_ECO_REGIONS.map(r => `<option value="${r.id}">${r.name}</option>`).join('')}
+          <select id="pulseEcoRegionSelect" class="pulse-weather-city-select" aria-label="Обрати місто для якості повітря та радіаційного фону">
+            ${UKRAINE_ECO_REGIONS.map(r => `<option value="${r.id}" ${r.id === getEffectiveEcoRegionId() ? 'selected' : ''}>${r.name}</option>`).join('')}
           </select>
+          <button type="button" id="pulseEcoGeoBtn" class="pulse-weather-tool-btn pulse-weather-geo-btn-inline" title="Визначити найближче місто автоматично (GPS / IP)" aria-label="Автовизначення найближчого регіону">
+            <i class="fas fa-crosshairs"></i>
+          </button>
         </div>
 
-        <!-- Лаконічний віджет із ключовими показниками -->
+        <!-- Лаконічний віджет із ключовими показниками (2-рядковий вигляд: заголовок + кольоровий бейдж зі значенням) -->
         <div class="pulse-eco-metrics-row">
           <!-- Радіаційний фон -->
           <div class="pulse-eco-metric-box">
             <div class="pulse-eco-metric-title">
               <i class="fas fa-radiation text-warning"></i> Радіація
             </div>
-            <div class="pulse-eco-metric-val" id="pulseEcoRadVal">
-              0.11 <span style="font-size: 0.65rem; font-weight: normal; color: var(--text-muted, #64748b);">мкЗв/год</span>
-            </div>
-            <div class="pulse-eco-metric-badge green" id="pulseEcoRadBadge" title="безпечно (до 0.30 мкЗв/год)">
-              🟢 Норма
+            <div class="pulse-eco-metric-badge green" id="pulseEcoRadBadge" title="Норма: радіаційний фон у межах безпеки (до 0.30 мкЗв/год)">
+              <span class="pulse-eco-badge-dot">🟢</span> <span id="pulseEcoRadVal" class="pulse-eco-badge-val">0.11</span> <span class="pulse-eco-badge-unit">мкЗв/год</span>
             </div>
           </div>
 
@@ -9412,11 +10496,8 @@ function renderPulseDrawerLayout(container) {
             <div class="pulse-eco-metric-title">
               <i class="fas fa-wind text-info"></i> Повітря (AQI)
             </div>
-            <div class="pulse-eco-metric-val" id="pulseEcoAqiVal">
-              AQI 28
-            </div>
-            <div class="pulse-eco-metric-badge green" id="pulseEcoAqiBadge" title="чисте та безпечне (до 50 AQI)">
-              🟢 Чисте
+            <div class="pulse-eco-metric-badge green" id="pulseEcoAqiBadge" title="Чисте: безпечне для дихання (до 50 AQI)">
+              <span class="pulse-eco-badge-dot">🟢</span> <span id="pulseEcoAqiVal" class="pulse-eco-badge-val">AQI 28</span>
             </div>
           </div>
         </div>
@@ -9425,19 +10506,19 @@ function renderPulseDrawerLayout(container) {
         <div class="pulse-eco-details-box">
           <div class="pulse-eco-detail-row">
             <span class="pulse-eco-detail-label">Дрібний пил PM2.5:</span>
-            <span class="pulse-eco-detail-val" id="pulseEcoPm25">7.2 мкг/м³</span>
+            <span class="pulse-eco-detail-val" id="pulseEcoPm25">${formatEcoMetricHtml(7.2, 'мкг/м³')}</span>
           </div>
           <div class="pulse-eco-detail-row">
             <span class="pulse-eco-detail-label">Зважений пил PM10:</span>
-            <span class="pulse-eco-detail-val" id="pulseEcoPm10">14.5 мкг/м³</span>
+            <span class="pulse-eco-detail-val" id="pulseEcoPm10">${formatEcoMetricHtml(14.5, 'мкг/м³')}</span>
           </div>
           <div class="pulse-eco-detail-row">
             <span class="pulse-eco-detail-label">Діоксид азоту (NO₂):</span>
-            <span class="pulse-eco-detail-val" id="pulseEcoNo2">11.8 мкг/м³</span>
+            <span class="pulse-eco-detail-val" id="pulseEcoNo2">${formatEcoMetricHtml(11.8, 'мкг/м³')}</span>
           </div>
           <div class="pulse-eco-detail-row">
             <span class="pulse-eco-detail-label">Приземний озон (O₃):</span>
-            <span class="pulse-eco-detail-val" id="pulseEcoO3">46.2 мкг/м³</span>
+            <span class="pulse-eco-detail-val" id="pulseEcoO3">${formatEcoMetricHtml(46.2, 'мкг/м³')}</span>
           </div>
         </div>
 
@@ -9720,9 +10801,46 @@ function renderPulseDrawerLayout(container) {
     };
   }
 
+  // Обробник вибору міста для погоди (Open-Meteo)
+  const weatherCitySelect = container.querySelector('#pulseWeatherCitySelect');
+  const savedWeatherCity = localStorage.getItem('pulse_weather_city') || 'novomyrhorod';
+  if (weatherCitySelect) {
+    weatherCitySelect.value = savedWeatherCity;
+    weatherCitySelect.onchange = (e) => {
+      const chosen = e.target.value;
+      localStorage.setItem('pulse_weather_city', chosen);
+      loadPulseWeatherData(false);
+      if (currentUser && firebaseDb) {
+        firebaseDb.collection('users').doc(currentUser.uid).set({
+          weatherCity: chosen
+        }, { merge: true }).catch(() => {});
+      }
+    };
+  }
+
+  // Кнопка автовизначення локації погоди
+  const weatherGeoBtn = container.querySelector('#pulseWeatherGeoBtn');
+  if (weatherGeoBtn) {
+    weatherGeoBtn.onclick = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      detectUserWeatherLocation();
+    };
+  }
+
+  // Кнопка примусового оновлення погоди
+  const weatherRefreshBtn = container.querySelector('#pulseWeatherRefreshBtn');
+  if (weatherRefreshBtn) {
+    weatherRefreshBtn.onclick = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      loadPulseWeatherData(true);
+    };
+  }
+
   // Обробник вибору міста для екології та радіаційного фону (SaveEcoBot / EcoCity)
   const ecoRegionSelect = container.querySelector('#pulseEcoRegionSelect');
-  const savedEcoRegion = localStorage.getItem('pulse_eco_region') || 'kyiv';
+  const savedEcoRegion = getEffectiveEcoRegionId();
   if (ecoRegionSelect) {
     ecoRegionSelect.value = savedEcoRegion;
     ecoRegionSelect.onchange = (e) => {
@@ -9733,6 +10851,70 @@ function renderPulseDrawerLayout(container) {
         firebaseDb.collection('users').doc(currentUser.uid).set({
           ecoRegion: chosen
         }, { merge: true }).catch(() => {});
+      }
+    };
+  }
+
+  // Кнопка автовизначення найближчої станції моніторингу для екології (GPS / IP)
+  const ecoGeoBtn = container.querySelector('#pulseEcoGeoBtn');
+  if (ecoGeoBtn) {
+    ecoGeoBtn.onclick = async (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      ecoGeoBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+      const applyNearestEco = (lat, lon) => {
+        let nearest = UKRAINE_ECO_REGIONS[0];
+        let minDist = Infinity;
+        for (const r of UKRAINE_ECO_REGIONS) {
+          const dist = Math.hypot(r.lat - lat, r.lon - lon);
+          if (dist < minDist) {
+            minDist = dist;
+            nearest = r;
+          }
+        }
+        if (ecoRegionSelect) {
+          ecoRegionSelect.value = nearest.id;
+          localStorage.setItem('pulse_eco_region', nearest.id);
+          loadPulseEcoData(false);
+          showQuickToast(`Екомоніторинг: обрано найближчий центр (${nearest.name})`, 'success');
+        }
+        ecoGeoBtn.innerHTML = '<i class="fas fa-crosshairs"></i>';
+      };
+
+      // Перевіряємо збережені координати з блоку погоди
+      try {
+        const customGeo = JSON.parse(localStorage.getItem('pulse_weather_custom_geo') || 'null');
+        if (customGeo && customGeo.lat && customGeo.lon) {
+          applyNearestEco(customGeo.lat, customGeo.lon);
+          return;
+        }
+      } catch (err) {}
+
+      if ('geolocation' in navigator) {
+        navigator.geolocation.getCurrentPosition(
+          (pos) => {
+            applyNearestEco(pos.coords.latitude, pos.coords.longitude);
+          },
+          async () => {
+            try {
+              const ipRes = await fetch('https://ipapi.co/json/');
+              if (ipRes.ok) {
+                const ipData = await ipRes.json();
+                if (ipData && ipData.latitude && ipData.longitude) {
+                  applyNearestEco(ipData.latitude, ipData.longitude);
+                  return;
+                }
+              }
+            } catch (e2) {}
+            showQuickToast('Не вдалося визначити координати. Обрано Київ', 'warning');
+            ecoGeoBtn.innerHTML = '<i class="fas fa-crosshairs"></i>';
+          },
+          { timeout: 6000 }
+        );
+      } else {
+        showQuickToast('Геолокація не підтримується браузером', 'warning');
+        ecoGeoBtn.innerHTML = '<i class="fas fa-crosshairs"></i>';
       }
     };
   }
@@ -9936,6 +11118,9 @@ function renderPulseDrawerLayout(container) {
     }
     convertFromTo();
   }
+
+  // Рендеримо власний віджет «Свята та події» на 3 дні (Сьогодні, Завтра, Післязавтра)
+  renderPulseHolidaysUI();
 }
 
 async function loadPulseDrawerData(forceRefresh = false) {
@@ -9966,9 +11151,10 @@ async function loadPulseDrawerData(forceRefresh = false) {
       const label = document.getElementById('pulseLastUpdatedLabel');
       if (label) label.textContent = `Оновлено: ${cached.lastUpdatedText}`;
     }
-    ensureMeteoprogInformerLoaded();
+    loadPulseWeatherData(false);
     fetchLiveFuelPrices();
     loadPulseEcoData(false);
+    renderPulseHolidaysUI();
     if (spin) spin.classList.remove('fa-spin');
     return;
   }
@@ -10003,9 +11189,10 @@ async function loadPulseDrawerData(forceRefresh = false) {
     const label = document.getElementById('pulseLastUpdatedLabel');
     if (label) label.textContent = `Оновлено: ${timeStr}`;
 
-    ensureMeteoprogInformerLoaded();
+    loadPulseWeatherData(forceRefresh);
     fetchLiveFuelPrices();
     loadPulseEcoData(forceRefresh);
+    renderPulseHolidaysUI();
 
     try {
       localStorage.setItem(cacheKey, JSON.stringify({
@@ -10321,6 +11508,19 @@ function renderGeomagForecastUI(daysForecast) {
     </table>
   `;
 }
+window.renderGeomagForecastUI = renderGeomagForecastUI;
 
+// Запуск ініціалізації Пульсу дня після повного завантаження всіх констант та функцій
+function startupPulseModule() {
+  try {
+    initPulseDayDrawer();
+  } catch (e) {
+    console.warn("Помилка ініціалізації Пульсу дня:", e);
+  }
+}
 
-
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', startupPulseModule);
+} else {
+  startupPulseModule();
+}

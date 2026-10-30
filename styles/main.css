@@ -10837,6 +10837,9 @@ body.dark-mode .guest-bm-modal-footer {
   box-sizing: border-box !important;
   animation: pulseDayBtnNeonGlow 2.5s infinite ease-in-out;
 }
+.pulse-day-btn * {
+  pointer-events: none;
+}
 @keyframes pulseDayBtnNeonGlow {
   0%, 100% {
     box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.7), 0 0 6px rgba(14, 165, 233, 0.45);
@@ -11016,6 +11019,17 @@ body.dark-mode .pulse-drawer-header {
 body.dark-mode .pulse-drawer-title {
   color: #38bdf8;
 }
+.pulse-drawer-date {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #334155;
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+}
+body.dark-mode .pulse-drawer-date {
+  color: #cbd5e1;
+}
 .pulse-drawer-tagline {
   font-size: 0.75rem;
   color: #64748b;
@@ -11127,6 +11141,9 @@ body.dark-mode .pulse-close-btn {
   .pulse-drawer-tagline {
     display: none;
   }
+  .pulse-drawer-date {
+    font-size: 0.72rem;
+  }
 }
 
 /* Стиль кожної окремої картки */
@@ -11156,9 +11173,13 @@ body.dark-mode .pulse-card {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  height: 28px;
+  min-height: 28px;
+  max-height: 28px;
   margin-bottom: 8px;
   padding-bottom: 6px;
   border-bottom: 1px solid #e2e8f0;
+  box-sizing: border-box;
 }
 body.dark-mode .pulse-card-header {
   border-bottom-color: rgba(255, 255, 255, 0.07);
@@ -11167,18 +11188,24 @@ body.dark-mode .pulse-card-header {
   margin: 0;
   font-size: 0.85rem;
   font-weight: 700;
-  display: flex;
+  line-height: 1;
+  display: inline-flex;
   align-items: center;
   gap: 6px;
 }
 .pulse-card-badge {
   font-size: 0.68rem;
   font-weight: 600;
+  line-height: 1;
   padding: 2px 6px;
   border-radius: 4px;
   background: #e2e8f0;
   color: #475569;
   letter-spacing: 0.02em;
+  display: inline-flex;
+  align-items: center;
+  height: 20px;
+  box-sizing: border-box;
 }
 body.dark-mode .pulse-card-badge {
   background: rgba(255, 255, 255, 0.1);
@@ -11191,6 +11218,14 @@ body.dark-mode .pulse-card-badge {
 body.dark-mode .pulse-card-badge.badge-green {
   background: rgba(16, 185, 129, 0.2);
   color: #34d399;
+}
+
+.pulse-card-header .pulse-weather-tool-btn {
+  width: 20px;
+  height: 20px;
+  min-width: 20px;
+  font-size: 0.65rem;
+  box-sizing: border-box;
 }
 
 /* ==========================================================================
@@ -11208,36 +11243,134 @@ body.dark-mode .pulse-card-badge.badge-green {
 body.dark-mode .pulse-holiday-date-row {
   color: #38bdf8;
 }
-.pulse-dilovamova-wrap {
-  background: transparent !important;
-  border: none !important;
-  padding: 0 !important;
-  text-align: center;
-  margin: 4px auto 6px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+/* Власний календар «Свята та події» на 3 дні (Сьогодні, Завтра, Післязавтра) */
+.pulse-holidays-container {
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 6px 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+  box-sizing: border-box;
+  max-height: 275px;
+  overflow-y: auto;
+  scrollbar-width: thin;
 }
-body.dark-mode .pulse-dilovamova-wrap {
-  background: transparent !important;
-  border: none !important;
+body.dark-mode .pulse-holidays-container {
+  background: rgba(15, 23, 42, 0.6);
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
 }
-.pulse-dilovamova-wrap a {
-  display: inline-block;
-  margin: 0 auto;
-  line-height: 0;
+.pulse-holidays-container::-webkit-scrollbar {
+  width: 3px;
 }
-.pulse-dilovamova-img {
-  width: 300px;
-  height: 374px;
-  max-width: 100%;
-  aspect-ratio: 300 / 374;
-  object-fit: contain;
-  display: block;
-  margin: 0 auto;
-  border: none;
-  box-shadow: none;
+.pulse-holidays-container::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.4);
+  border-radius: 2px;
+}
+
+.pulse-holiday-day-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  border-bottom: 1px dashed rgba(226, 232, 240, 0.85);
+  padding-bottom: 3px;
+}
+.pulse-holiday-day-group:last-child {
+  border-bottom: none;
+  padding-bottom: 1px;
+}
+body.dark-mode .pulse-holiday-day-group {
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.pulse-holiday-day-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  margin-bottom: 2px;
+}
+.pulse-holiday-day-badge {
+  font-size: 0.64rem;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: #f1f5f9;
+  color: #475569;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+}
+body.dark-mode .pulse-holiday-day-badge {
+  background: rgba(51, 65, 85, 0.7);
+  color: #cbd5e1;
+}
+.pulse-holiday-day-badge.today {
+  background: rgba(14, 165, 233, 0.14);
+  color: #0284c7;
+}
+body.dark-mode .pulse-holiday-day-badge.today {
+  background: rgba(14, 165, 233, 0.25);
+  color: #38bdf8;
+}
+
+.pulse-holiday-day-date {
+  font-size: 0.67rem;
+  font-weight: 600;
+  color: #64748b;
+}
+body.dark-mode .pulse-holiday-day-date {
+  color: #94a3b8;
+}
+
+.pulse-holiday-day-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.pulse-holiday-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 5px;
+  font-size: 0.72rem;
+  line-height: 1.22;
+  color: #1e293b;
+  padding: 1px 2px;
+  border-radius: 4px;
+  transition: background 0.15s ease;
+}
+.pulse-holiday-item:hover {
+  background: rgba(241, 245, 249, 0.7);
+}
+body.dark-mode .pulse-holiday-item {
+  color: #f1f5f9;
+}
+body.dark-mode .pulse-holiday-item:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.pulse-holiday-bullet {
+  font-size: 0.75rem;
+  flex-shrink: 0;
+  line-height: 1.2;
+}
+.pulse-holiday-text {
+  flex: 1;
+  min-width: 0;
+  word-break: break-word;
+}
+.pulse-holiday-item.is-main .pulse-holiday-text {
+  font-weight: 700;
+  color: #0f172a;
+}
+body.dark-mode .pulse-holiday-item.is-main .pulse-holiday-text {
+  color: #38bdf8;
 }
 
 .pulse-card-divider {
@@ -11251,127 +11384,760 @@ body.dark-mode .pulse-dilovamova-wrap {
 body.dark-mode .pulse-card-divider {
   background: rgba(255, 255, 255, 0.08);
 }
-.pulse-holiday-content {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 6px;
-  padding: 7px 9px;
-  margin-bottom: 6px;
-}
-body.dark-mode .pulse-holiday-content {
-  background: #1e293b;
-  border-color: #334155;
-}
-.pulse-holiday-main-title {
-  font-size: 0.82rem;
-  font-weight: 800;
-  color: #0f172a;
-  line-height: 1.25;
-  margin-bottom: 3px;
-}
-body.dark-mode .pulse-holiday-main-title {
-  color: #f8fafc;
-}
-.pulse-holiday-history-fact {
-  font-size: 0.71rem;
-  color: #475569;
-  line-height: 1.35;
-  margin-top: 3px;
-}
-body.dark-mode .pulse-holiday-history-fact {
-  color: #94a3b8;
-}
-.pulse-holiday-subnote {
-  font-size: 0.68rem;
-  color: #64748b;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-body.dark-mode .pulse-holiday-subnote {
-  color: #94a3b8;
-}
 
 /* ==========================================================================
-   КАРТКА 2: ПОГОДА (METEOPROG) ТА МАГНІТНІ БУРІ (3 ДНІ ПО ЧАСОВИХ МІТКАХ)
+   КАРТКА 2: ПОГОДА (ВЛАСНИЙ ВІДЖЕТ OPEN-METEO)
    ========================================================================== */
-.pulse-meteoprog-wrap {
-  background: transparent !important;
-  border: none !important;
-  padding: 0 !important;
-  margin: 0 auto 4px;
-  min-height: 80px;
-  width: 100%;
-  display: flex;
-  justify-content: center;
+.pulse-weather-tool-btn {
+  width: 22px;
+  height: 22px;
+  min-width: 22px;
+  border-radius: 5px;
+  background: rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  color: #475569;
+  display: inline-flex;
   align-items: center;
-  text-align: center;
-  overflow: visible;
+  justify-content: center;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  font-size: 0.68rem;
+  line-height: 1;
+  transition: all 0.2s ease;
 }
-body.dark-mode .pulse-meteoprog-wrap {
-  background: transparent !important;
-  border: none !important;
+body.dark-mode .pulse-weather-tool-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.16);
+  color: #cbd5e1;
 }
-.pulse-meteoprog-wrap > div,
-.pulse-meteoprog-wrap iframe,
-.pulse-meteoprog-wrap .meteoprog-informer-container {
-  margin: 0 auto !important;
-  max-width: 100% !important;
+.pulse-weather-tool-btn:hover {
+  background: rgba(56, 189, 248, 0.2);
+  border-color: #38bdf8;
+  color: #0284c7;
+}
+body.dark-mode .pulse-weather-tool-btn:hover {
+  color: #38bdf8;
 }
 
-/* Резервний адаптивний віджет погоди Новомиргорода з прогнозом на 3 дні */
-.pulse-weather-fallback-box {
-  width: 100%;
-  max-width: 300px;
-  margin: 0 auto;
-  padding: 8px 10px;
-  border-radius: 8px;
-  background: linear-gradient(135deg, #1e3a8a 0%, #0284c7 100%);
-  color: #ffffff;
+.pulse-weather-refresh-action-btn {
+  width: 20px;
+  height: 20px;
+  min-width: 20px;
+  padding: 0;
+  border-radius: 5px;
+  background: rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  color: #475569;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  cursor: pointer;
+  font-size: 0.68rem;
+  line-height: 1;
+  transition: all 0.2s ease;
 }
-.pulse-weather-fallback-header {
+body.dark-mode .pulse-weather-refresh-action-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.16);
+  color: #cbd5e1;
+}
+.pulse-weather-refresh-action-btn:hover {
+  background: rgba(56, 189, 248, 0.2);
+  border-color: #38bdf8;
+  color: #0284c7;
+}
+body.dark-mode .pulse-weather-refresh-action-btn:hover {
+  color: #38bdf8;
+}
+
+.pulse-weather-tool-btn.pulse-weather-geo-btn-inline {
+  width: 25px;
+  height: 25px;
+  min-width: 25px;
+  font-size: 0.72rem;
+  border-radius: 5px;
+  flex-shrink: 0;
+}
+
+.pulse-weather-city-bar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  margin-bottom: 6px;
+  gap: 5px;
+  margin-bottom: 4px;
+  width: 100%;
 }
-.pulse-weather-fallback-city {
-  font-size: 0.82rem;
-  font-weight: 800;
+.pulse-weather-city-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #475569;
+  margin: 0;
+  white-space: nowrap;
   display: flex;
   align-items: center;
   gap: 5px;
 }
-.pulse-weather-fallback-temp-row {
+body.dark-mode .pulse-weather-city-label {
+  color: #94a3b8;
+}
+.pulse-weather-city-select {
+  flex-grow: 1;
+  min-width: 0;
+  font-size: 0.73rem;
+  font-weight: 600;
+  padding: 2px 6px;
+  height: 25px;
+  border-radius: 5px;
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  color: #0f172a;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+body.dark-mode .pulse-weather-city-select {
+  background: #1e293b;
+  border-color: #334155;
+  color: #f8fafc;
+}
+.pulse-weather-city-select:focus {
+  border-color: #38bdf8;
+}
+
+.pulse-weather-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 2.5px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 4px 7px 3px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+  box-sizing: border-box;
+}
+body.dark-mode .pulse-weather-container {
+  background: rgba(15, 23, 42, 0.6);
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+}
+
+.pulse-weather-hero {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 8px;
+  gap: 8px;
+  margin: 1px 0 2px;
 }
-.pulse-weather-fallback-main-temp {
-  font-size: 1.55rem;
-  font-weight: 800;
+.pulse-weather-hero-left {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  text-align: left;
+}
+.pulse-weather-hero-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 2px;
+  flex-shrink: 0;
+}
+.pulse-weather-temp-main {
+  display: flex;
+  align-items: center;
+  gap: 5px;
   line-height: 1;
 }
-.pulse-weather-fallback-desc {
-  font-size: 0.72rem;
-  opacity: 0.9;
+.pulse-weather-temp-val {
+  font-size: 1.55rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  color: #0f172a;
 }
-.pulse-weather-fallback-days-row {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 6px;
-  padding-top: 6px;
-  border-top: 1px solid rgba(255, 255, 255, 0.2);
+body.dark-mode .pulse-weather-temp-val {
+  color: #f8fafc;
+  text-shadow: 0 0 10px rgba(56, 189, 248, 0.2);
 }
-.pulse-weather-day-col {
+.pulse-weather-temp-icon {
+  font-size: 1.85rem;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.pulse-weather-hero-precip {
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: #0284c7;
+  line-height: 1;
+  white-space: nowrap;
+  align-self: center;
+  margin-left: 2px;
+}
+body.dark-mode .pulse-weather-hero-precip {
+  color: #38bdf8;
+}
+.pulse-weather-feels-line {
+  font-size: 0.65rem;
+  font-weight: 500;
+  color: #64748b;
+  line-height: 1.15;
+  text-align: right;
+  white-space: nowrap;
+}
+body.dark-mode .pulse-weather-feels-line {
+  color: #94a3b8;
+}
+
+.pulse-weather-condition-line {
+  font-size: 0.77rem;
+  font-weight: 700;
+  color: #1e293b;
+  line-height: 1.2;
+}
+body.dark-mode .pulse-weather-condition-line {
+  color: #f1f5f9;
+}
+.pulse-weather-expected-line {
+  font-size: 0.71rem;
+  font-weight: 600;
+  color: #0284c7;
+  line-height: 1.2;
+}
+body.dark-mode .pulse-weather-expected-line {
+  color: #38bdf8;
+}
+.pulse-weather-rain-line {
+  font-size: 0.71rem;
+  font-weight: 600;
+  color: #0284c7;
+  line-height: 1.2;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+body.dark-mode .pulse-weather-rain-line {
+  color: #38bdf8;
+}
+
+/* Погодинний прогноз (горизонтальна стрічка) */
+.pulse-weather-hourly-wrap {
+  margin: 0;
+  width: 100%;
+}
+.pulse-weather-hourly-slider {
+  display: flex;
+  gap: 5px;
+  overflow-x: auto;
+  padding: 0 1px 2px;
+  scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
+}
+.pulse-weather-hourly-slider::-webkit-scrollbar {
+  height: 3px;
+}
+.pulse-weather-hourly-slider::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.4);
+  border-radius: 2px;
+}
+.pulse-weather-hour-item {
+  flex: 0 0 auto;
+  min-width: 48px;
+  max-width: 56px;
+  padding: 3px 2px;
   text-align: center;
-  font-size: 0.68rem;
+  border-radius: 6px;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
 }
-.pulse-weather-day-col strong {
+body.dark-mode .pulse-weather-hour-item {
+  background: rgba(30, 41, 59, 0.65);
+  border-color: rgba(255, 255, 255, 0.06);
+}
+.pulse-weather-hour-time {
+  font-size: 0.64rem;
+  color: #64748b;
+  font-weight: 600;
+  line-height: 1;
+  margin-bottom: 3.5px;
+}
+body.dark-mode .pulse-weather-hour-time {
+  color: #94a3b8;
+}
+.pulse-weather-hour-temp {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #0f172a;
+  line-height: 1;
+  margin: 0 0 1.5px;
+}
+body.dark-mode .pulse-weather-hour-temp {
+  color: #f8fafc;
+}
+.pulse-weather-hour-bottom {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  margin-top: 0;
+  line-height: 1;
+}
+.pulse-weather-hour-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+.pulse-weather-hour-precip-badge {
+  font-size: 0.58rem;
+  font-weight: 700;
+  color: #0284c7;
+  line-height: 1;
+  white-space: nowrap;
+}
+body.dark-mode .pulse-weather-hour-precip-badge {
+  color: #38bdf8;
+}
+.pulse-weather-hour-wind {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  margin-top: 1px;
+  line-height: 1;
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: #334155;
+}
+body.dark-mode .pulse-weather-hour-wind {
+  color: #cbd5e1;
+}
+.pulse-hour-wind-arrow {
+  color: #0284c7;
+  flex-shrink: 0;
+  transition: transform 0.3s ease;
+}
+body.dark-mode .pulse-hour-wind-arrow {
+  color: #38bdf8;
+}
+.pulse-hour-wind-val {
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+/* Метеопоказники (єдиний суцільний горизонтальний блок із тонкими внутрішніми розділювачами) */
+.pulse-weather-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0;
+  margin: 0;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 7px;
+  overflow: hidden;
+}
+body.dark-mode .pulse-weather-metrics-grid {
+  background: rgba(30, 41, 59, 0.55);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+.pulse-weather-metric-item {
+  background: transparent;
+  border: none;
+  border-right: 1px solid #e2e8f0;
+  border-radius: 0;
+  padding: 3.5px 2px 3px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+}
+.pulse-weather-metric-item:last-child {
+  border-right: none;
+}
+body.dark-mode .pulse-weather-metric-item {
+  border-right-color: rgba(255, 255, 255, 0.08);
+}
+.pulse-weather-metric-lbl {
+  font-size: 0.59rem;
+  font-weight: 600;
+  color: #64748b;
+  line-height: 1;
+}
+body.dark-mode .pulse-weather-metric-lbl {
+  color: #94a3b8;
+}
+.pulse-weather-metric-data {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  line-height: 1;
+}
+.pulse-weather-metric-val {
+  font-size: 0.67rem;
+  font-weight: 700;
+  color: #0f172a;
+  line-height: 1;
+  white-space: nowrap;
+}
+body.dark-mode .pulse-weather-metric-val {
+  color: #f8fafc;
+}
+.pulse-weather-metric-unit {
+  font-size: 0.50rem;
+  font-weight: 500;
+  color: #64748b;
+  margin-left: 1px;
+}
+body.dark-mode .pulse-weather-metric-unit {
+  color: #94a3b8;
+}
+.pulse-metric-svg {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+  display: inline-block;
+  vertical-align: middle;
+}
+.pulse-metric-wind {
+  color: #0284c7;
+  display: inline-block;
+  vertical-align: middle;
+  flex-shrink: 0;
+  transition: transform 0.3s ease;
+}
+body.dark-mode .pulse-metric-wind {
+  color: #38bdf8;
+}
+.pulse-metric-rain {
+  color: #2563eb;
+}
+body.dark-mode .pulse-metric-rain {
+  color: #60a5fa;
+}
+.pulse-metric-hum {
+  color: #0891b2;
+}
+body.dark-mode .pulse-metric-hum {
+  color: #22d3ee;
+}
+.pulse-metric-press {
+  color: #64748b;
+}
+body.dark-mode .pulse-metric-press {
+  color: #94a3b8;
+}
+.pulse-metric-uv {
+  color: #d97706;
+}
+body.dark-mode .pulse-metric-uv {
+  color: #fbbf24;
+}
+
+/* Рядок сходу та заходу сонця */
+.pulse-weather-sun-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin: 0;
+  padding: 2.5px 6px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: #475569;
+  line-height: 1;
+}
+body.dark-mode .pulse-weather-sun-bar {
+  background: rgba(30, 41, 59, 0.45);
+  border-color: rgba(255, 255, 255, 0.07);
+  color: #cbd5e1;
+}
+.pulse-weather-sun-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.pulse-weather-sun-text {
+  font-size: 0.65rem;
+  color: #475569;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+.pulse-weather-sun-text strong {
+  font-weight: 700;
+  color: #0f172a;
+}
+body.dark-mode .pulse-weather-sun-text {
+  color: #94a3b8;
+}
+body.dark-mode .pulse-weather-sun-text strong {
+  color: #f1f5f9;
+}
+.pulse-weather-sun-center {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  padding: 0 1px;
+}
+@keyframes pulseSunSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+.pulse-sun-spinner {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  animation: pulseSunSpin 12s linear infinite;
+  transform-origin: 50% 50%;
+  flex-shrink: 0;
+}
+.pulse-sun-icon-svg {
   display: block;
-  font-size: 0.70rem;
-  margin-bottom: 2px;
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+body.dark-mode .pulse-sun-icon-svg circle {
+  fill: rgba(251, 191, 36, 0.25);
+  stroke: #fbbf24;
+}
+body.dark-mode .pulse-sun-icon-svg path {
+  stroke: #fbbf24;
+}
+.pulse-sun-svg {
+  width: 13px;
+  height: 13px;
+  flex-shrink: 0;
+  display: inline-block;
+  vertical-align: middle;
+}
+body.dark-mode .pulse-sun-sunrise {
+  stroke: #fbbf24;
+}
+body.dark-mode .pulse-sun-sunrise path[fill] {
+  fill: rgba(251, 191, 36, 0.25);
+  stroke: #fbbf24;
+}
+body.dark-mode .pulse-sun-sunset {
+  stroke: #fb923c;
+}
+body.dark-mode .pulse-sun-sunset path[fill] {
+  fill: rgba(251, 146, 60, 0.25);
+  stroke: #fb923c;
+}
+
+/* Векторні мінімалістичні погодні іконки (заміна емодзі) */
+.pulse-weather-svg {
+  display: inline-block;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+body.dark-mode .pulse-wsvg-cloud path,
+body.dark-mode .pulse-wsvg-partly-day path[stroke="#64748b"],
+body.dark-mode .pulse-wsvg-partly-night path,
+body.dark-mode .pulse-wsvg-rain path:first-child,
+body.dark-mode .pulse-wsvg-drizzle path:first-child,
+body.dark-mode .pulse-wsvg-snow path:first-child,
+body.dark-mode .pulse-wsvg-thunder path:first-child {
+  fill: #334155;
+  stroke: #94a3b8;
+}
+body.dark-mode .pulse-wsvg-fog path {
+  stroke: #94a3b8;
+}
+body.dark-mode .pulse-wsvg-moon path {
+  fill: #334155;
+  stroke: #94a3b8;
+}
+body.dark-mode .pulse-wsvg-sun circle {
+  fill: #78350f;
+}
+
+/* Прогноз на 3 дні - чітка сітка з вирівнюванням колонок */
+.pulse-weather-daily-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-top: 3px;
+  border-top: 1px solid #e2e8f0;
+}
+body.dark-mode .pulse-weather-daily-rows {
+  border-top-color: rgba(255, 255, 255, 0.08);
+}
+.pulse-weather-daily-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2px;
+  font-size: 0.72rem;
+  padding: 2.5px 4px;
+  border-radius: 5px;
+  background: rgba(0, 0, 0, 0.015);
+}
+body.dark-mode .pulse-weather-daily-row {
+  background: rgba(255, 255, 255, 0.02);
+}
+.pulse-weather-daily-name {
+  font-weight: 700;
+  color: #0f172a;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+  text-align: left;
+  flex: 0 0 72px;
+  min-width: 72px;
+}
+body.dark-mode .pulse-weather-daily-name {
+  color: #f8fafc;
+}
+.pulse-weather-daily-sub {
+  font-size: 0.60rem;
+  font-weight: normal;
+  color: #64748b;
+}
+body.dark-mode .pulse-weather-daily-sub {
+  color: #94a3b8;
+}
+.pulse-weather-daily-divider {
+  width: 1px;
+  height: 13px;
+  background: #cbd5e1;
+  opacity: 0.5;
+  flex-shrink: 0;
+  margin: 0 1px;
+}
+body.dark-mode .pulse-weather-daily-divider {
+  background: rgba(255, 255, 255, 0.12);
+}
+.pulse-weather-daily-temps {
+  font-weight: 700;
+  font-size: 0.73rem;
+  color: #0f172a;
+  white-space: nowrap;
+  text-align: center;
+  flex: 0 0 auto;
+  font-variant-numeric: tabular-nums;
+}
+body.dark-mode .pulse-weather-daily-temps {
+  color: #f8fafc;
+}
+.pulse-weather-daily-min {
+  color: #64748b;
+  font-weight: 600;
+}
+body.dark-mode .pulse-weather-daily-min {
+  color: #94a3b8;
+}
+.pulse-weather-daily-weather {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  flex: 0 0 auto;
+  cursor: help;
+}
+.pulse-weather-daily-cond-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+.pulse-weather-daily-precip {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #0284c7;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+body.dark-mode .pulse-weather-daily-precip {
+  color: #38bdf8;
+}
+.pulse-weather-daily-wind {
+  display: inline-flex;
+  align-items: center;
+  gap: 2.5px;
+  font-size: 0.69rem;
+  font-weight: 700;
+  color: #334155;
+  flex: 0 0 auto;
+  font-variant-numeric: tabular-nums;
+  cursor: help;
+}
+body.dark-mode .pulse-weather-daily-wind {
+  color: #cbd5e1;
+}
+.pulse-daily-wind-arrow {
+  color: #0284c7;
+  flex-shrink: 0;
+  transition: transform 0.3s ease;
+}
+body.dark-mode .pulse-daily-wind-arrow {
+  color: #38bdf8;
+}
+.pulse-daily-wind-val {
+  line-height: 1;
+}
+
+.pulse-weather-meta-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.62rem;
+  font-weight: 500;
+  color: #64748b;
+  margin-bottom: 0;
+  padding: 0 1px 2px;
+  border-bottom: 1px dashed rgba(226, 232, 240, 0.8);
+}
+body.dark-mode .pulse-weather-meta-top {
+  color: #94a3b8;
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+
+.pulse-weather-today-summary {
+  font-size: 0.67rem;
+  font-weight: 600;
+  color: #0284c7;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  margin-top: 1px;
+  line-height: 1.2;
+}
+body.dark-mode .pulse-weather-today-summary {
+  color: #38bdf8;
+}
+
+.pulse-weather-footer-note {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.62rem;
+  color: #94a3b8;
+  margin-top: 2px;
+  padding: 0 1px;
+}
+body.dark-mode .pulse-weather-footer-note {
+  color: #64748b;
 }
 
 /* Блок прогнозу геомагнітного поля на 3 дні */
@@ -11564,14 +12330,15 @@ body.dark-mode .pulse-geomag-footer-more a:hover {
   box-sizing: border-box;
 }
 .pulse-eco-metric-box {
-  padding: 6px 6px;
+  padding: 4.5px 6px;
   border-radius: 7px;
   background: #ffffff;
   border: 1px solid #e2e8f0;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: center;
+  gap: 3px;
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 body.dark-mode .pulse-eco-metric-box {
@@ -11586,7 +12353,7 @@ body.dark-mode .pulse-eco-metric-box {
   align-items: center;
   gap: 4px;
   line-height: 1.1;
-  margin-bottom: 2px;
+  margin: 0;
 }
 body.dark-mode .pulse-eco-metric-title {
   color: #94a3b8;
@@ -11603,15 +12370,16 @@ body.dark-mode .pulse-eco-metric-val {
   color: #cbd5e1;
 }
 .pulse-eco-metric-badge {
-  font-size: 0.64rem;
+  font-size: 0.74rem;
   font-weight: 700;
-  padding: 1.5px 5px;
-  border-radius: 4px;
+  padding: 2.5px 6px;
+  border-radius: 5px;
   display: inline-flex;
   align-items: center;
-  gap: 3px;
+  gap: 4px;
   width: fit-content;
   cursor: help;
+  line-height: 1.2;
 }
 .pulse-eco-metric-badge.green {
   background: rgba(16, 185, 129, 0.15);
@@ -11636,6 +12404,22 @@ body.dark-mode .pulse-eco-metric-badge.yellow {
 body.dark-mode .pulse-eco-metric-badge.red {
   background: rgba(239, 68, 68, 0.3);
   color: #f87171;
+}
+.pulse-eco-badge-dot {
+  font-size: 0.65rem;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+}
+.pulse-eco-badge-val {
+  font-weight: 700;
+  letter-spacing: -0.2px;
+}
+.pulse-eco-badge-unit {
+  font-size: 0.62rem;
+  font-weight: 600;
+  opacity: 0.85;
+  margin-left: 1px;
 }
 
 .pulse-eco-ref-hint {
@@ -11686,9 +12470,30 @@ body.dark-mode .pulse-eco-detail-label {
   font-weight: 700;
   color: #0f172a;
   font-variant-numeric: tabular-nums;
+  display: inline-flex;
+  align-items: baseline;
 }
 body.dark-mode .pulse-eco-detail-val {
   color: #f1f5f9;
+}
+.pulse-eco-detail-val .pulse-eco-int {
+  font-weight: 700;
+}
+.pulse-eco-detail-val .pulse-eco-dec {
+  font-weight: 400;
+  font-size: 0.88em;
+  opacity: 0.85;
+  margin-left: 0.5px;
+}
+.pulse-eco-detail-val .pulse-eco-unit {
+  font-weight: 400;
+  font-size: 0.82em;
+  opacity: 0.82;
+  margin-left: 2.5px;
+  color: #64748b;
+}
+body.dark-mode .pulse-eco-detail-val .pulse-eco-unit {
+  color: #94a3b8;
 }
 
 .pulse-eco-footer {
@@ -11922,9 +12727,11 @@ body.dark-mode .pulse-decimal {
   display: flex;
   align-items: center;
   background: rgba(0, 0, 0, 0.05);
-  padding: 2px;
-  border-radius: 6px;
+  padding: 1px;
+  border-radius: 5px;
   gap: 2px;
+  height: 20px;
+  box-sizing: border-box;
 }
 body.dark-mode .pulse-rates-tab-group {
   background: rgba(255, 255, 255, 0.08);
@@ -11932,15 +12739,18 @@ body.dark-mode .pulse-rates-tab-group {
 .pulse-rate-tab-btn {
   border: none;
   background: transparent;
-  font-size: 0.70rem;
+  font-size: 0.67rem;
   font-weight: 700;
   color: #64748b;
-  padding: 2px 7px;
+  padding: 1px 6px;
   border-radius: 4px;
+  height: 18px;
+  line-height: 1;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 3px;
+  box-sizing: border-box;
   transition: all 0.15s ease;
 }
 .pulse-rate-tab-btn:hover {
