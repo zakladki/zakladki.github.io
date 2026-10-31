@@ -10921,15 +10921,32 @@ body.dark-mode .guest-bm-modal-footer {
   color: #ffffff !important;
 }
 
-@media (max-width: 359.98px) {
+@media (max-width: 991.98px) {
   .pulse-day-btn {
-    width: 30px !important;
-    min-width: 30px !important;
-    max-width: 30px !important;
+    width: 32px !important;
+    min-width: 32px !important;
+    max-width: 32px !important;
     padding: 0 !important;
+    justify-content: center !important;
+    gap: 0 !important;
+    left: 80px !important;
   }
   .pulse-day-btn .pulse-day-badge-wrap {
     display: none !important;
+  }
+  .pulse-day-btn .pulse-ecg-icon {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+@media (max-width: 375px) {
+  .pulse-day-btn {
+    left: 76px !important;
+    width: 28px !important;
+    min-width: 28px !important;
+    max-width: 28px !important;
+    height: 28px !important;
   }
 }
 
@@ -11030,6 +11047,14 @@ body.dark-mode .pulse-drawer-title {
 body.dark-mode .pulse-drawer-date {
   color: #cbd5e1;
 }
+.pulse-drawer-date-bullet {
+  font-size: 0.78rem;
+  color: #64748b;
+  margin: 0 1px;
+}
+body.dark-mode .pulse-drawer-date-bullet {
+  color: #94a3b8;
+}
 .pulse-drawer-tagline {
   font-size: 0.75rem;
   color: #64748b;
@@ -11043,6 +11068,11 @@ body.dark-mode .pulse-drawer-tagline {
   display: flex;
   align-items: center;
   gap: 8px;
+}
+.pulse-drawer-btns-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 .pulse-last-updated {
   font-size: 0.72rem;
@@ -11132,17 +11162,69 @@ body.dark-mode .pulse-close-btn {
   }
 }
 @media (max-width: 629.98px) {
+  .pulse-day-drawer {
+    max-height: calc(100vh - 42px);
+    max-height: calc(100dvh - 42px);
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
+  }
   .pulse-cards-grid {
     max-width: 330px;
     grid-template-columns: 1fr;
     gap: 8px;
-    padding: 6px 5px 12px;
+    padding: 6px 5px calc(95px + env(safe-area-inset-bottom, 24px));
   }
-  .pulse-drawer-tagline {
+  .pulse-drawer-header {
+    padding: 6px 8px 7px;
+    align-items: flex-start;
+  }
+  .pulse-drawer-title-group {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1px;
+  }
+  .pulse-drawer-title {
+    font-size: 0.90rem;
+    line-height: 1.15;
+  }
+  .pulse-drawer-date-bullet {
     display: none;
   }
   .pulse-drawer-date {
     font-size: 0.72rem;
+    color: #475569;
+    line-height: 1.2;
+    padding-left: 24px;
+  }
+  body.dark-mode .pulse-drawer-date {
+    color: #94a3b8;
+  }
+  .pulse-drawer-tagline {
+    display: none;
+  }
+  .pulse-drawer-controls {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 3px;
+  }
+  .pulse-drawer-btns-row {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .pulse-ctrl-btn {
+    padding: 0 7px;
+    height: 26px;
+    font-size: 0.72rem;
+  }
+  .pulse-last-updated {
+    font-size: 0.67rem;
+    color: #64748b;
+    margin: 0;
+    text-align: right;
+    line-height: 1.15;
   }
 }
 
@@ -12192,19 +12274,26 @@ body.dark-mode .pulse-geomag-now-badge.red { background: rgba(239, 68, 68, 0.3);
   -webkit-overflow-scrolling: touch;
   display: flex;
   justify-content: center;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.pulse-geomag-table-wrap::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
 }
 .pulse-kp-table {
   width: 100%;
-  max-width: 300px;
+  max-width: 285px;
   margin: 0 auto;
   border-collapse: separate;
-  border-spacing: 2px;
-  font-size: 0.68rem;
+  border-spacing: 1.5px;
+  font-size: 0.65rem;
   text-align: center;
 }
 .pulse-kp-table th {
-  padding: 3px 2px;
-  font-size: 0.62rem;
+  padding: 2px 1px;
+  font-size: 0.58rem;
   font-weight: 500;
   color: #64748b;
   background: rgba(0, 0, 0, 0.03);
@@ -12217,34 +12306,35 @@ body.dark-mode .pulse-kp-table th {
 }
 .pulse-kp-table .kp-th-day {
   text-align: center;
-  padding: 3px 2px;
-  min-width: 48px;
-  width: 48px;
+  padding: 2px 1px;
+  min-width: 38px;
+  width: 38px;
   font-weight: 600;
 }
 .pulse-kp-table .kp-td-day {
   text-align: center;
-  padding: 3px 2px;
-  font-size: 0.64rem;
+  padding: 2px 1px;
+  font-size: 0.62rem;
   font-weight: 700;
   color: #0284c7;
   white-space: nowrap;
   background: rgba(0, 0, 0, 0.02);
   border-radius: 4px;
-  min-width: 48px;
-  width: 48px;
+  min-width: 38px;
+  width: 38px;
 }
 body.dark-mode .pulse-kp-table .kp-td-day {
   color: #38bdf8;
   background: rgba(255, 255, 255, 0.04);
 }
 .pulse-kp-table td.kp-cell {
-  padding: 3px 2px;
-  font-size: 0.66rem;
+  padding: 2px 1px;
+  font-size: 0.65rem;
   font-weight: 700;
   border-radius: 4px;
   transition: all 0.15s ease;
   line-height: 1.1;
+  min-width: 22px;
 }
 .pulse-kp-table td.kp-cell.green {
   background: rgba(16, 185, 129, 0.16);

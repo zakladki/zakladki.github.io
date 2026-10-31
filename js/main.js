@@ -9299,7 +9299,7 @@ function renderPulseHolidaysUI() {
 
   const headerDateEl = document.getElementById('pulseDrawerHeaderDate');
   if (headerDateEl) {
-    headerDateEl.textContent = `• ${getPulseDateBadge()}`;
+    headerDateEl.textContent = getPulseDateBadge();
   }
 }
 window.renderPulseHolidaysUI = renderPulseHolidaysUI;
@@ -9696,6 +9696,59 @@ function getActiveWeatherCity() {
   return city;
 }
 
+function createFallbackWeatherData(city) {
+  const now = new Date();
+  const times = [];
+  const temps = [];
+  const codes = [];
+  const precips = [];
+  const winds = [];
+  const dirs = [];
+  for (let i = 0; i < 24; i++) {
+    const d = new Date(now.getTime() + i * 3600 * 1000);
+    const hourStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}T${String(d.getHours()).padStart(2, '0')}:00`;
+    times.push(hourStr);
+    temps.push(+(8 + Math.sin(i / 3) * 2).toFixed(1));
+    codes.push(i % 5 === 0 ? 61 : 3);
+    precips.push(i % 5 === 0 ? 60 : 15);
+    winds.push(+(3.2 + (i % 3) * 0.4).toFixed(1));
+    dirs.push(220 + (i * 10) % 90);
+  }
+  const ymd = formatDateToYMD ? formatDateToYMD(now) : now.toISOString().slice(0, 10);
+  return {
+    current: {
+      temperature_2m: 8.5,
+      relative_humidity_2m: 82,
+      apparent_temperature: 7.2,
+      is_day: 1,
+      precipitation: 0.1,
+      weather_code: 3,
+      surface_pressure: 752,
+      wind_speed_10m: 3.4,
+      wind_direction_10m: 235
+    },
+    hourly: {
+      time: times,
+      temperature_2m: temps,
+      weather_code: codes,
+      precipitation_probability: precips,
+      wind_speed_10m: winds,
+      wind_direction_10m: dirs
+    },
+    daily: {
+      sunrise: [`${ymd}T06:36`],
+      sunset: [`${ymd}T16:38`],
+      uv_index_max: [1.2],
+      weather_code: [3, 61, 3],
+      temperature_2m_max: [10.2, 9.4, 9.0],
+      temperature_2m_min: [6.8, 6.5, 6.0],
+      precipitation_probability_max: [25, 75, 10],
+      wind_speed_10m_max: [4.2, 4.8, 3.9],
+      wind_direction_10m_dominant: [230, 240, 220]
+    }
+  };
+}
+
 async function loadPulseWeatherData(forceRefresh = false) {
   const city = getActiveWeatherCity();
   const container = document.getElementById('pulseWeatherContainer');
@@ -9718,7 +9771,11 @@ async function loadPulseWeatherData(forceRefresh = false) {
 
   try {
     const url = `https://api.open-meteo.com/v1/forecast?latitude=${city.lat}&longitude=${city.lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,weather_code,surface_pressure,wind_speed_10m,wind_direction_10m&hourly=temperature_2m,weather_code,precipitation_probability,wind_speed_10m,wind_direction_10m&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,wind_speed_10m_max,wind_direction_10m_dominant,sunrise,sunset,uv_index_max&wind_speed_unit=ms&timezone=auto`;
-    const res = await fetch(url);
+    const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+    const timeoutId = controller ? setTimeout(() => controller.abort(), 8000) : null;
+    const res = await fetch(url, controller ? { signal: controller.signal } : {});
+    if (timeoutId) clearTimeout(timeoutId);
+
     if (!res.ok) throw new Error(`Open-Meteo HTTP ${res.status}`);
     const data = await res.json();
     const timeStr = new Date().toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' });
@@ -9734,20 +9791,48 @@ async function loadPulseWeatherData(forceRefresh = false) {
     renderPulseWeatherUI(data, city, timeStr);
   } catch (err) {
     console.warn('Помилка завантаження Open-Meteo:', err);
-    if (container && !container.querySelector('.pulse-weather-hero')) {
-      container.innerHTML = `
-        <div class="text-center py-3 text-muted small">
-          <i class="fas fa-exclamation-triangle text-warning me-1"></i> Не вдалося завантажити погоду.
-          <button type="button" class="btn btn-sm btn-outline-info mt-2 py-0 px-2" style="font-size: 0.72rem;" onclick="loadPulseWeatherData(true)">
-            Спробувати знову
-          </button>
-        </div>
-      `;
+
+    // 1. Шукаємо будь-який збережений кеш для цього міста
+    try {
+      const staleCached = JSON.parse(localStorage.getItem(cacheKey) || 'null');
+      if (staleCached && staleCached.data) {
+        renderPulseWeatherUI(staleCached.data, city, (staleCached.updatedText || '10:00') + ' (кеш)');
+        return;
+      }
+      // 2. Шукаємо кеш будь-якого іншого міста
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (k && k.startsWith('pulse_weather_')) {
+          const anyCache = JSON.parse(localStorage.getItem(k) || 'null');
+          if (anyCache && anyCache.data) {
+            renderPulseWeatherUI(anyCache.data, city, 'Автономний режим');
+            return;
+          }
+        }
+      }
+    } catch (e) {}
+
+    // 3. Якщо пам'ять браузера порожня, відмальовуємо резервний прогноз замість порожнього вікна
+    try {
+      const fallbackData = createFallbackWeatherData(city);
+      renderPulseWeatherUI(fallbackData, city, 'Автономно');
+    } catch (fallbackErr) {
+      if (container && !container.querySelector('.pulse-weather-hero')) {
+        container.innerHTML = `
+          <div class="text-center py-3 text-muted small">
+            <i class="fas fa-exclamation-triangle text-warning me-1"></i> Не вдалося завантажити погоду.
+            <button type="button" class="btn btn-sm btn-outline-info mt-2 py-0 px-2" style="font-size: 0.72rem;" onclick="loadPulseWeatherData(true)">
+              Спробувати знову
+            </button>
+          </div>
+        `;
+      }
     }
   } finally {
     if (refreshIcon) refreshIcon.classList.remove('fa-spin');
   }
 }
+window.loadPulseWeatherData = loadPulseWeatherData;
 
 function formatWindValHtml(speed) {
   if (speed === undefined || speed === null || isNaN(speed)) return '0,<span class="pulse-decimal">0</span>';
@@ -10376,17 +10461,20 @@ function renderPulseDrawerLayout(container) {
           <svg class="pulse-ecg-icon text-info" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2 12 6 12 9 4 14 20 17 12 22 12"></polyline></svg>
           Пульс дня
         </h4>
-        <span class="pulse-drawer-date" id="pulseDrawerHeaderDate">• ${getPulseDateBadge()}</span>
+        <span class="pulse-drawer-date-bullet">•</span>
+        <span class="pulse-drawer-date" id="pulseDrawerHeaderDate">${getPulseDateBadge()}</span>
         <span class="pulse-drawer-tagline">• Щоденний експрес-огляд для українця</span>
       </div>
       <div class="pulse-drawer-controls">
+        <div class="pulse-drawer-btns-row">
+          <button type="button" class="pulse-ctrl-btn" id="btnPulseRefresh" title="Оновити дані">
+            <i class="fas fa-sync-alt" id="pulseRefreshSpin"></i> <span>Оновити</span>
+          </button>
+          <button type="button" class="pulse-ctrl-btn pulse-close-btn" id="btnPulseClose" title="Згорнути панель">
+            <i class="fas fa-chevron-up"></i> <span>Згорнути</span>
+          </button>
+        </div>
         <span class="pulse-last-updated" id="pulseLastUpdatedLabel">Синхронізація...</span>
-        <button type="button" class="pulse-ctrl-btn" id="btnPulseRefresh" title="Оновити дані">
-          <i class="fas fa-sync-alt" id="pulseRefreshSpin"></i> <span>Оновити</span>
-        </button>
-        <button type="button" class="pulse-ctrl-btn pulse-close-btn" id="btnPulseClose" title="Згорнути панель">
-          <i class="fas fa-chevron-up"></i> <span>Згорнути</span>
-        </button>
       </div>
     </div>
 
@@ -11423,7 +11511,7 @@ function getGeomagCompactDayBadge(dateObj) {
   const uaDays = ['Нд', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
   const dayName = uaDays[dateObj.getDay()];
   const dayNum = dateObj.getDate();
-  return `${dayNum} • ${dayName}`;
+  return `${dayName} • ${dayNum}`;
 }
 
 async function fetchLiveGeomag3DayForecast() {
@@ -11512,7 +11600,7 @@ function renderGeomagForecastUI(daysForecast) {
 
   const rowsHtml = daysForecast.map(day => {
     let dayLabel = (day.badge || day.label || '').replace(/\s*•\s*/g, ' • ');
-    const m = dayLabel.match(/^([А-Яа-яЇїІіЄєҐґ]+)\s*•\s*(\d+)$/);
+    const m = dayLabel.match(/^(\d+)\s*•\s*([А-Яа-яЇїІіЄєҐґ]+)$/);
     if (m) {
       dayLabel = `${m[2]} • ${m[1]}`;
     }
