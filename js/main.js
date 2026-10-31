@@ -9828,7 +9828,7 @@ function renderPulseWeatherUI(data, city, updatedTime = '') {
             <span class="pulse-weather-hour-precip-badge" title="Ймовірність опадів: ${hPrecipProb}%">${hPrecipProb}%</span>
           </div>
           <div class="pulse-weather-hour-wind" title="Вітер: ${hWindInfo.dirName} (${hWindInfo.code}, ${hWindInfo.deg}°), швидкість ${hWindSpeed.toFixed(1)} м/с">
-            <svg class="pulse-hour-wind-arrow" width="9" height="9" viewBox="0 0 24 24" fill="currentColor" stroke="none" style="transform: rotate(${hWindInfo.arrowDeg}deg); transform-origin: 50% 50%;">
+            <svg class="pulse-hour-wind-arrow" width="11" height="11" viewBox="0 0 24 24" fill="currentColor" stroke="none" style="transform: rotate(${hWindInfo.arrowDeg}deg); transform-origin: 50% 50%;">
               <path d="M12 2L4.5 20.5l7.5-4 7.5 4L12 2z"></path>
             </svg>
             <span class="pulse-hour-wind-val">${hWindHtml}</span>
@@ -9840,10 +9840,9 @@ function renderPulseWeatherUI(data, city, updatedTime = '') {
 
   // 2. Метеопоказники
   const windSpeedRaw = curr.wind_speed_10m || 0;
-  const windVal = `${Math.round(windSpeedRaw * 10) / 10}`;
   const windInfo = getWindDirectionInfo(curr.wind_direction_10m);
   const humidityVal = `${Math.round(curr.relative_humidity_2m)}%`;
-  const precipVal = `${Math.round((curr.precipitation || 0) * 10) / 10} мм`;
+  const precipRaw = Math.round((curr.precipitation || 0) * 10) / 10;
   const pressureVal = curr.surface_pressure ? `${Math.round(curr.surface_pressure * 0.750062)}` : '750';
   const uvVal = daily.uv_index_max && daily.uv_index_max[0] ? `${Math.round(daily.uv_index_max[0])}/12` : '2/12';
 
@@ -9892,7 +9891,7 @@ function renderPulseWeatherUI(data, city, updatedTime = '') {
           </div>
           <div class="pulse-weather-daily-divider"></div>
           <div class="pulse-weather-daily-wind" title="Вітер: ${dWindInfo.dirName} (${dWindInfo.code}, ${dWindInfo.deg}°), швидкість ${dWindSpeedRaw.toFixed(1)} м/с">
-            <svg class="pulse-daily-wind-arrow" width="10" height="10" viewBox="0 0 24 24" fill="currentColor" stroke="none" style="transform: rotate(${dWindInfo.arrowDeg}deg); transform-origin: 50% 50%;">
+            <svg class="pulse-daily-wind-arrow" width="11" height="11" viewBox="0 0 24 24" fill="currentColor" stroke="none" style="transform: rotate(${dWindInfo.arrowDeg}deg); transform-origin: 50% 50%;">
               <path d="M12 2L4.5 20.5l7.5-4 7.5 4L12 2z"></path>
             </svg>
             <span class="pulse-daily-wind-val">${dWindSpeedHtml}</span>
@@ -9902,11 +9901,16 @@ function renderPulseWeatherUI(data, city, updatedTime = '') {
     }
   }
 
-  // Капіталізація першої літери
+  // Капіталізація першої літери та вибір відповідної значкової піктограми
   const curCondLabel = cond.label ? (cond.label.charAt(0).toUpperCase() + cond.label.slice(1)) : 'Хмарно';
-  const todayCondLabel = todayCond.label ? (todayCond.label.charAt(0).toUpperCase() + todayCond.label.slice(1)) : 'Без опадів';
+  let leadIconClass = 'fa-cloud-sun';
+  if (cond.type === 'rain' || cond.type === 'drizzle') leadIconClass = 'fa-umbrella';
+  else if (cond.type === 'snow') leadIconClass = 'fa-snowflake';
+  else if (cond.type === 'thunder') leadIconClass = 'fa-bolt';
+  else if (cond.type === 'fog') leadIconClass = 'fa-smog';
+  else if (cond.type === 'clear') leadIconClass = isDay ? 'fa-sun' : 'fa-moon';
+
   const feelsLineText = `Відчувається як ${feels > 0 ? '+' : ''}${feels}°`;
-  const precipRaw = Math.round((curr.precipitation || 0) * 10) / 10;
 
   container.innerHTML = `
     <!-- Рядок джерела та синхронізації у самому верху картки -->
@@ -9918,12 +9922,12 @@ function renderPulseWeatherUI(data, city, updatedTime = '') {
     <!-- Головна картка поточної погоди -->
     <div class="pulse-weather-hero">
       <div class="pulse-weather-hero-left">
-        <div class="pulse-weather-condition-line">${curCondLabel}</div>
+        <div class="pulse-weather-condition-line">
+          <i class="fas ${leadIconClass} pulse-weather-hero-lead-icon" aria-hidden="true"></i>
+          <span>${curCondLabel}</span>
+        </div>
         <div class="pulse-weather-expected-line" title="Очікуваний діапазон температури на добу">
           ${todayRangeStr ? `Очікується: ${todayRangeStr}` : ''}
-        </div>
-        <div class="pulse-weather-rain-line" title="Погодні явища та опади на сьогодні">
-          <i class="fas fa-umbrella text-info" style="font-size: 0.62rem; margin-right: 2px;"></i>${todayCondLabel}
         </div>
       </div>
       <div class="pulse-weather-hero-right">
@@ -9938,20 +9942,20 @@ function renderPulseWeatherUI(data, city, updatedTime = '') {
 
     <!-- Рядок 5 метеопоказників (компактний 2-рядковий вигляд із векторними SVG-піктограмами) -->
     <div class="pulse-weather-metrics-grid">
-      <div class="pulse-weather-metric-item" title="Вітер: ${windInfo.dirName} (${windInfo.code}, ${windInfo.deg}°), швидкість ${windVal} м/с">
+      <div class="pulse-weather-metric-item" title="Вітер: ${windInfo.dirName} (${windInfo.code}, ${windInfo.deg}°), швидкість ${windSpeedRaw.toFixed(1)} м/с">
         <span class="pulse-weather-metric-lbl">Вітер</span>
         <div class="pulse-weather-metric-data">
           <svg class="pulse-metric-svg pulse-metric-wind" width="11" height="11" viewBox="0 0 24 24" fill="currentColor" stroke="none" style="transform: rotate(${windInfo.arrowDeg}deg); transform-origin: 50% 50%;">
             <path d="M12 2L4.5 20.5l7.5-4 7.5 4L12 2z"></path>
           </svg>
-          <span class="pulse-weather-metric-val">${windVal}<span class="pulse-weather-metric-unit">м/с</span></span>
+          <span class="pulse-weather-metric-val">${formatWindValHtml(windSpeedRaw)}</span>
         </div>
       </div>
-      <div class="pulse-weather-metric-item" title="Кількість опадів, мм">
+      <div class="pulse-weather-metric-item" title="Кількість опадів: ${precipRaw} мм">
         <span class="pulse-weather-metric-lbl">Опади</span>
         <div class="pulse-weather-metric-data">
           <svg class="pulse-metric-svg pulse-metric-rain" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 16.58A5 5 0 0 0 18 7h-1.26A8 8 0 1 0 4 15.25"></path><path d="M8 19v2m8-2v2m-4-1v2"></path></svg>
-          <span class="pulse-weather-metric-val">${precipRaw}<span class="pulse-weather-metric-unit">мм</span></span>
+          <span class="pulse-weather-metric-val">${precipRaw === 0 ? '0' : formatWindValHtml(precipRaw)}</span>
         </div>
       </div>
       <div class="pulse-weather-metric-item" title="Відносна вологість повітря, %">
@@ -10786,6 +10790,28 @@ function renderPulseDrawerLayout(container) {
             <div class="pulse-conv-rate-ref" id="pulseConvRateToRef">1 UAH = 0.0241 USD</div>
           </div>
         </div>
+
+        <!-- Швидкі суми для конвертера (баланс висоти картки) -->
+        <div class="pulse-conv-quick-row">
+          <span class="pulse-conv-quick-lbl">Швидкі суми:</span>
+          <div class="pulse-conv-quick-buttons">
+            <button type="button" class="pulse-conv-quick-btn" data-amount="50">50</button>
+            <button type="button" class="pulse-conv-quick-btn" data-amount="100">100</button>
+            <button type="button" class="pulse-conv-quick-btn" data-amount="500">500</button>
+            <button type="button" class="pulse-conv-quick-btn" data-amount="1000">1 000</button>
+            <button type="button" class="pulse-conv-quick-btn" data-amount="5000">5 000</button>
+          </div>
+        </div>
+
+        <div class="pulse-card-divider" style="margin: 6px 0 5px;"></div>
+
+        <!-- Рядок офіційного орієнтиру / джерела -->
+        <div class="pulse-finance-footer">
+          <span class="pulse-finance-footer-note" title="Офіційний курс НБУ та середньозважені міжбанківські котирування">
+            <i class="fas fa-university text-primary" style="margin-right: 3px;"></i>Курс НБУ / Міжбанк
+          </span>
+          <span class="pulse-finance-footer-date" id="pulseFinanceDateNote">Оновлення щодня</span>
+        </div>
       </div>
     </div>
   `;
@@ -11117,6 +11143,18 @@ function renderPulseDrawerLayout(container) {
       };
     }
     convertFromTo();
+
+    // Обробники кліків для швидких сум конвертера
+    const quickAmtBtns = container.querySelectorAll('.pulse-conv-quick-btn');
+    quickAmtBtns.forEach(b => {
+      b.onclick = () => {
+        const amt = b.getAttribute('data-amount');
+        if (amt && inpFrom) {
+          inpFrom.value = amt;
+          convertFromTo();
+        }
+      };
+    });
   }
 
   // Рендеримо власний віджет «Свята та події» на 3 дні (Сьогодні, Завтра, Післязавтра)

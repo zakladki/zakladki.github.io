@@ -11597,9 +11597,20 @@ body.dark-mode .pulse-weather-feels-line {
   font-weight: 700;
   color: #1e293b;
   line-height: 1.2;
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 body.dark-mode .pulse-weather-condition-line {
   color: #f1f5f9;
+}
+.pulse-weather-hero-lead-icon {
+  font-size: 0.72rem;
+  color: #64748b;
+  flex-shrink: 0;
+}
+body.dark-mode .pulse-weather-hero-lead-icon {
+  color: #cbd5e1;
 }
 .pulse-weather-expected-line {
   font-size: 0.71rem;
@@ -11608,18 +11619,6 @@ body.dark-mode .pulse-weather-condition-line {
   line-height: 1.2;
 }
 body.dark-mode .pulse-weather-expected-line {
-  color: #38bdf8;
-}
-.pulse-weather-rain-line {
-  font-size: 0.71rem;
-  font-weight: 600;
-  color: #0284c7;
-  line-height: 1.2;
-  display: flex;
-  align-items: center;
-  gap: 3px;
-}
-body.dark-mode .pulse-weather-rain-line {
   color: #38bdf8;
 }
 
@@ -11985,9 +11984,9 @@ body.dark-mode .pulse-weather-daily-rows {
   border-top-color: rgba(255, 255, 255, 0.08);
 }
 .pulse-weather-daily-row {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(70px, 1fr) 1px 64px 1px 46px 1px 36px;
   align-items: center;
-  justify-content: space-between;
   gap: 2px;
   font-size: 0.72rem;
   padding: 2.5px 4px;
@@ -12004,8 +12003,8 @@ body.dark-mode .pulse-weather-daily-row {
   flex-direction: column;
   line-height: 1.15;
   text-align: left;
-  flex: 0 0 72px;
-  min-width: 72px;
+  min-width: 0;
+  overflow: hidden;
 }
 body.dark-mode .pulse-weather-daily-name {
   color: #f8fafc;
@@ -12014,6 +12013,7 @@ body.dark-mode .pulse-weather-daily-name {
   font-size: 0.60rem;
   font-weight: normal;
   color: #64748b;
+  white-space: nowrap;
 }
 body.dark-mode .pulse-weather-daily-sub {
   color: #94a3b8;
@@ -12023,8 +12023,7 @@ body.dark-mode .pulse-weather-daily-sub {
   height: 13px;
   background: #cbd5e1;
   opacity: 0.5;
-  flex-shrink: 0;
-  margin: 0 1px;
+  justify-self: center;
 }
 body.dark-mode .pulse-weather-daily-divider {
   background: rgba(255, 255, 255, 0.12);
@@ -12035,7 +12034,7 @@ body.dark-mode .pulse-weather-daily-divider {
   color: #0f172a;
   white-space: nowrap;
   text-align: center;
-  flex: 0 0 auto;
+  justify-self: center;
   font-variant-numeric: tabular-nums;
 }
 body.dark-mode .pulse-weather-daily-temps {
@@ -12051,8 +12050,9 @@ body.dark-mode .pulse-weather-daily-min {
 .pulse-weather-daily-weather {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 3px;
-  flex: 0 0 auto;
+  justify-self: center;
   cursor: help;
 }
 .pulse-weather-daily-cond-icon {
@@ -12074,11 +12074,12 @@ body.dark-mode .pulse-weather-daily-precip {
 .pulse-weather-daily-wind {
   display: inline-flex;
   align-items: center;
+  justify-content: flex-end;
   gap: 2.5px;
   font-size: 0.69rem;
   font-weight: 700;
   color: #334155;
-  flex: 0 0 auto;
+  justify-self: end;
   font-variant-numeric: tabular-nums;
   cursor: help;
 }
@@ -13019,6 +13020,87 @@ body.dark-mode .pulse-conv-swap-btn {
 body.dark-mode .pulse-conv-swap-btn:hover {
   background: #1e293b;
   border-color: #38bdf8;
+}
+
+/* Швидкі кнопки сум для конвертера валют (баланс висоти 4-ї картки) */
+.pulse-conv-quick-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+  margin: 6px 0 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+.pulse-conv-quick-lbl {
+  font-size: 0.62rem;
+  font-weight: 600;
+  color: #64748b;
+  white-space: nowrap;
+}
+body.dark-mode .pulse-conv-quick-lbl {
+  color: #94a3b8;
+}
+.pulse-conv-quick-buttons {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+.pulse-conv-quick-btn {
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  color: #334155;
+  font-size: 0.63rem;
+  font-weight: 600;
+  padding: 1.5px 5px;
+  border-radius: 4px;
+  cursor: pointer;
+  line-height: 1.2;
+  transition: all 0.15s ease;
+  font-variant-numeric: tabular-nums;
+}
+.pulse-conv-quick-btn:hover {
+  background: #e0f2fe;
+  border-color: #38bdf8;
+  color: #0284c7;
+}
+body.dark-mode .pulse-conv-quick-btn {
+  background: #1e293b;
+  border-color: #334155;
+  color: #cbd5e1;
+}
+body.dark-mode .pulse-conv-quick-btn:hover {
+  background: rgba(56, 189, 248, 0.2);
+  border-color: #38bdf8;
+  color: #38bdf8;
+}
+
+/* Підвал картки Фінанси (узгоджено з картками 1, 2, 3) */
+.pulse-finance-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  width: 100%;
+  margin-top: 2px;
+  font-size: 0.65rem;
+  color: #64748b;
+  box-sizing: border-box;
+}
+body.dark-mode .pulse-finance-footer {
+  color: #94a3b8;
+}
+.pulse-finance-footer-note {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-weight: 500;
+}
+.pulse-finance-footer-date {
+  font-size: 0.62rem;
+  opacity: 0.85;
 }
 
 
