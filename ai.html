@@ -114,7 +114,7 @@
         padding: 0 !important; margin: 0 !important; cursor: pointer; z-index: 1050 !important; font-size: 0.95rem; line-height: 1; outline: none;
       }
       .notice-bell-btn {
-        position: absolute !important; left: 48px !important; right: auto !important; top: 50% !important;
+        position: absolute !important; right: 48px !important; left: auto !important; top: 50% !important;
         transform: translateY(-50%) !important; width: 30px !important; height: 30px !important; border-radius: 7px !important;
         background: rgba(255, 255, 255, 0.16) !important; border: 1px solid rgba(255, 255, 255, 0.3) !important;
         color: #ffffff !important; display: inline-flex !important; align-items: center !important; justify-content: center !important;
@@ -130,9 +130,15 @@
       }
       @media (min-width: 1280px) {
         .user-auth-btn { right: 12px !important; }
+        .notice-bell-btn { right: 48px !important; left: auto !important; }
       }
       @media (max-width: 1279.98px) {
-        .user-auth-btn { right: 56px !important; }
+        .user-auth-btn { right: 52px !important; }
+        .notice-bell-btn { right: 90px !important; left: auto !important; }
+      }
+      @media (max-width: 360px) {
+        .user-auth-btn { right: 46px !important; width: 28px !important; height: 28px !important; min-width: 28px !important; max-width: 28px !important; }
+        .notice-bell-btn { right: 80px !important; width: 28px !important; height: 28px !important; }
       }
       .user-auth-btn:hover {
         background: rgba(255, 255, 255, 0.28) !important;
@@ -177,9 +183,9 @@
             <li class="nav-item"><a class="nav-link" href="./programs.html">Soft</a></li>
           </ul>
         </div>
-        <button id="userAuthNavBtn" class="user-auth-btn" aria-label="Особистий кабінет" title="Особистий кабінет / Вхід"><i class="far fa-user-circle"></i></button>
         <button id="themeToggle" class="theme-toggle-btn" aria-label="Переключити тему" title="Переключити тему (світла/темна)"><i class="fas fa-moon"></i></button>
         <button id="noticeBellBtn" class="notice-bell-btn" aria-label="Оголошення" title="Оголошення"><i class="fas fa-bell"></i><span class="notice-bell-badge-dot"></span></button>
+        <button id="userAuthNavBtn" class="user-auth-btn" aria-label="Особистий кабінет" title="Особистий кабінет / Вхід"><i class="far fa-user-circle"></i></button>
       </nav>
     </div>
     <main class="container-fluid main" id="main-content" role="main">

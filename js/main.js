@@ -9305,10 +9305,10 @@ function renderPulseHolidaysUI() {
 window.renderPulseHolidaysUI = renderPulseHolidaysUI;
 
 function initPulseDayDrawer() {
-  // 1. Перевіряємо та гарантуємо наявність кнопки «Пульс дня» у верхньому меню зліва (після «Ніч/День» та «Дзвіночок»)
+  // 1. Перевіряємо та гарантуємо наявність кнопки «Пульс дня» у верхньому меню зліва (після «Ніч/День»)
   let pulseBtn = document.getElementById('pulseDayBtn');
   const navbar = document.querySelector('nav.navbar');
-  const noticeBell = document.getElementById('noticeBellBtn');
+  const themeToggle = document.getElementById('themeToggle');
 
   if (!pulseBtn) {
     if (navbar) {
@@ -9328,8 +9328,8 @@ function initPulseDayDrawer() {
           <span class="pulse-day-badge-sub">ДНЯ</span>
         </span>
       `;
-      if (noticeBell && noticeBell.nextSibling) {
-        navbar.insertBefore(pulseBtn, noticeBell.nextSibling);
+      if (themeToggle && themeToggle.nextSibling) {
+        navbar.insertBefore(pulseBtn, themeToggle.nextSibling);
       } else {
         navbar.appendChild(pulseBtn);
       }
@@ -9352,8 +9352,8 @@ function initPulseDayDrawer() {
     // Якщо кнопка опинилася всередині li.nav-item-pulse або collapse-меню, переміщуємо її нагору в nav.navbar
     if (navbar && pulseBtn.parentElement && pulseBtn.parentElement !== navbar) {
       const oldLi = pulseBtn.closest('.nav-item-pulse');
-      if (noticeBell && noticeBell.nextSibling) {
-        navbar.insertBefore(pulseBtn, noticeBell.nextSibling);
+      if (themeToggle && themeToggle.nextSibling) {
+        navbar.insertBefore(pulseBtn, themeToggle.nextSibling);
       } else {
         navbar.appendChild(pulseBtn);
       }

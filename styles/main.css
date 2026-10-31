@@ -3791,8 +3791,8 @@ body.dark-mode .maintenance-progress-bar {
 @media (min-width: 1280px) {
   .notice-bell-btn {
     position: absolute !important;
-    left: 48px !important;
-    right: auto !important;
+    right: 48px !important;
+    left: auto !important;
     top: 50% !important;
     transform: translateY(-50%) !important;
     z-index: 1050 !important;
@@ -3808,13 +3808,21 @@ body.dark-mode .maintenance-progress-bar {
     position: absolute !important;
     top: 50% !important;
     transform: translateY(-50%) !important;
-    left: 48px !important;
-    right: auto !important;
+    right: 90px !important;
+    left: auto !important;
     z-index: 1050 !important;
     margin: 0 !important;
     width: 30px !important;
     height: 30px !important;
     padding: 0 !important;
+  }
+}
+
+@media (max-width: 360px) {
+  .notice-bell-btn {
+    right: 80px !important;
+    width: 28px !important;
+    height: 28px !important;
   }
 }
 
@@ -6268,7 +6276,16 @@ body.dark-mode .ad-terms-link {
 }
 @media (max-width: 1279.98px) {
   .user-auth-btn {
-    right: 56px !important;
+    right: 52px !important;
+  }
+}
+@media (max-width: 360px) {
+  .user-auth-btn {
+    right: 46px !important;
+    width: 28px !important;
+    height: 28px !important;
+    min-width: 28px !important;
+    max-width: 28px !important;
   }
 }
 .user-auth-btn:hover {
@@ -10830,7 +10847,7 @@ body.dark-mode .guest-bm-modal-footer {
   white-space: nowrap;
   z-index: 1050;
   position: absolute !important;
-  left: 84px !important;
+  left: 48px !important;
   right: auto !important;
   top: 50% !important;
   transform: translateY(-50%) !important;
@@ -10929,7 +10946,7 @@ body.dark-mode .guest-bm-modal-footer {
     padding: 0 !important;
     justify-content: center !important;
     gap: 0 !important;
-    left: 80px !important;
+    left: 48px !important;
   }
   .pulse-day-btn .pulse-day-badge-wrap {
     display: none !important;
@@ -10940,9 +10957,9 @@ body.dark-mode .guest-bm-modal-footer {
   }
 }
 
-@media (max-width: 375px) {
+@media (max-width: 360px) {
   .pulse-day-btn {
-    left: 76px !important;
+    left: 42px !important;
     width: 28px !important;
     min-width: 28px !important;
     max-width: 28px !important;
