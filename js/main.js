@@ -9770,7 +9770,7 @@ async function loadPulseWeatherData(forceRefresh = false) {
   }
 
   try {
-    const url = `https://api.open-meteo.com/v1/forecast?latitude=${city.lat}&longitude=${city.lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,weather_code,surface_pressure,wind_speed_10m,wind_direction_10m&hourly=temperature_2m,weather_code,precipitation_probability,wind_speed_10m,wind_direction_10m&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,wind_speed_10m_max,wind_direction_10m_dominant,sunrise,sunset,uv_index_max&wind_speed_unit=ms&timezone=auto`;
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${city.lat}&longitude=${city.lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,weather_code,surface_pressure,wind_speed_10m,wind_direction_10m&hourly=temperature_2m,weather_code,precipitation_probability,wind_speed_10m,wind_direction_10m,surface_pressure&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,wind_speed_10m_max,wind_direction_10m_dominant,sunrise,sunset,uv_index_max&wind_speed_unit=ms&timezone=auto`;
     const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
     const timeoutId = controller ? setTimeout(() => controller.abort(), 8000) : null;
     const res = await fetch(url, controller ? { signal: controller.signal } : {});
@@ -9850,6 +9850,17 @@ function renderPulseWeatherUI(data, city, updatedTime = '') {
   const hourly = data.hourly || {};
   const daily = data.daily || {};
 
+  // Оновлюємо дані атмосферного тиску для модуля метеочутливості
+  if (curr.surface_pressure) {
+    window.currentWeatherPressure = Math.round(curr.surface_pressure * 0.750062);
+  }
+  if (hourly.surface_pressure && hourly.time) {
+    window.currentPressureForecast = buildPressure3DayForecast(hourly);
+    if (window.activeHealthTab === 'pressure' && typeof renderHealthForecastUI === 'function') {
+      renderHealthForecastUI('pressure');
+    }
+  }
+
   const isDay = curr.is_day !== 0 ? 1 : 0;
   const cond = getWeatherConditionInfo(curr.weather_code, isDay, 36);
   const temp = Math.round(curr.temperature_2m);
@@ -9869,13 +9880,20 @@ function renderPulseWeatherUI(data, city, updatedTime = '') {
   const sunriseStr = daily.sunrise && daily.sunrise[0] ? daily.sunrise[0].slice(11, 16) : '06:35';
   const sunsetStr = daily.sunset && daily.sunset[0] ? daily.sunset[0].slice(11, 16) : '16:38';
 
-  // 1. Погодинний прогноз (наступні 24 години)
+  // 1. Погодинний прогноз (наступні 24 години) - точний локальний час без зміщення UTC
   let hourlyHtml = '';
   let curPrecipProb = 0;
   if (hourly.time && hourly.time.length) {
-    const curHourIso = now.toISOString().slice(0, 13);
+    const locY = now.getFullYear();
+    const locM = String(now.getMonth() + 1).padStart(2, '0');
+    const locD = String(now.getDate()).padStart(2, '0');
+    const locH = String(now.getHours()).padStart(2, '0');
+    const curHourIso = `${locY}-${locM}-${locD}T${locH}`;
     let startIdx = hourly.time.findIndex(t => t.startsWith(curHourIso));
-    if (startIdx === -1) startIdx = 0;
+    if (startIdx === -1) {
+      startIdx = hourly.time.findIndex(t => t >= curHourIso);
+      if (startIdx === -1) startIdx = 0;
+    }
 
     curPrecipProb = (hourly.precipitation_probability && hourly.precipitation_probability[startIdx] !== undefined)
       ? hourly.precipitation_probability[startIdx]
@@ -10493,24 +10511,35 @@ function renderPulseDrawerLayout(container) {
         <!-- Лагідна роздільна лінія між Святами та Магнітними бурями -->
         <div class="pulse-card-divider"></div>
 
-        <!-- Прогноз геомагнітної активності (Магнітні бурі) на 3 дні у табличному вигляді -->
+        <!-- Модуль Метео & Тиск: Магнітні бурі та Атмосферний тиск (Таби) -->
         <div class="pulse-geomag-forecast-wrap" id="pulseGeomagWrap">
-          <div class="pulse-geomag-forecast-header">
-            <span><i class="fas fa-magnet text-primary me-1"></i> Магнітні бурі:</span>
+          <div class="pulse-health-header-row">
+            <span class="pulse-health-section-title"><i class="fas fa-heartbeat text-danger me-1" style="margin-right: 5px;"></i> <strong>Метео & Тиск:</strong></span>
             <span class="pulse-geomag-now-badge green" id="pulseGeomagNowBadge">🟢 Спокійно</span>
+          </div>
+
+          <div class="pulse-health-tabs-bar">
+            <div class="pulse-health-tab-group" id="pulseHealthTabGroup" role="tablist" aria-label="Перемикач параметрів">
+              <button type="button" class="pulse-rate-tab-btn active" id="pulseHealthTabGeomag" data-tab="geomag" title="Перемкнути на прогноз геомагнітних бурь (Kp-індекс)">
+                <i class="fas fa-magnet text-primary me-1"></i> Магнітні бурі
+              </button>
+              <button type="button" class="pulse-rate-tab-btn" id="pulseHealthTabPressure" data-tab="pressure" title="Перемкнути на графік атмосферного тиску (мм рт. ст.)">
+                <i class="fas fa-tachometer-alt text-danger me-1"></i> Атмосферний тиск
+              </button>
+            </div>
           </div>
           
           <div class="pulse-geomag-table-wrap" id="pulseGeomagTableWrap">
-            <!-- Заповнюється таблицею функцією renderGeomagForecastUI -->
+            <!-- Заповнюється таблицею функцією renderHealthForecastUI -->
             <div class="text-center py-2 text-muted small"><i class="fas fa-spinner fa-spin me-1"></i> Завантаження прогнозу...</div>
           </div>
 
           <div class="pulse-geomag-footer">
-            <div class="pulse-geomag-footer-legend">
+            <div class="pulse-geomag-footer-legend" id="pulseHealthFooterLegend">
               Шкала-Kp: 0-2 спокійно / 3-4 помірно / 5+ буря
             </div>
             <div class="pulse-geomag-footer-more">
-              <a href="https://solarmeteo.ukalendar.com/defs/kp-index" target="_blank" rel="noopener" title="Детальніше про Kp-індекс та шкалу геомагнітної активності">
+              <a href="https://solarmeteo.ukalendar.com/defs/kp-index" id="pulseHealthFooterLink" target="_blank" rel="noopener" title="Детальніше про Kp-індекс та шкалу геомагнітної активності">
                 Детальніше... <i class="fas fa-external-link-alt"></i>
               </a>
             </div>
@@ -10811,6 +10840,14 @@ function renderPulseDrawerLayout(container) {
           </div>
         </div>
 
+        <!-- Рядок офіційного орієнтиру / джерела (розміщено одразу після 2 рядків курсів) -->
+        <div class="pulse-finance-footer">
+          <span class="pulse-finance-footer-note" title="Офіційний курс НБУ та середньозважені міжбанківські котирування">
+            <i class="fas fa-university text-primary" style="margin-right: 3px;"></i>Курс НБУ / Міжбанк
+          </span>
+          <span class="pulse-finance-footer-date" id="pulseFinanceDateNote">Оновлення щодня</span>
+        </div>
+
         <!-- Роздільна лінія перед Конвертером Валют як просив користувач -->
         <div class="pulse-card-divider"></div>
 
@@ -10889,16 +10926,6 @@ function renderPulseDrawerLayout(container) {
             <button type="button" class="pulse-conv-quick-btn" data-amount="1000">1 000</button>
             <button type="button" class="pulse-conv-quick-btn" data-amount="5000">5 000</button>
           </div>
-        </div>
-
-        <div class="pulse-card-divider" style="margin: 6px 0 5px;"></div>
-
-        <!-- Рядок офіційного орієнтиру / джерела -->
-        <div class="pulse-finance-footer">
-          <span class="pulse-finance-footer-note" title="Офіційний курс НБУ та середньозважені міжбанківські котирування">
-            <i class="fas fa-university text-primary" style="margin-right: 3px;"></i>Курс НБУ / Міжбанк
-          </span>
-          <span class="pulse-finance-footer-date" id="pulseFinanceDateNote">Оновлення щодня</span>
         </div>
       </div>
     </div>
@@ -11053,7 +11080,19 @@ function renderPulseDrawerLayout(container) {
       }, 500);
     };
   }
-  renderPulseFuelTable(savedRegion);
+  // Перемикач вкладок Магнітні бурі / Атмосферний тиск (Метео & Тиск)
+  const tabHealthGeomag = container.querySelector('#pulseHealthTabGeomag');
+  const tabHealthPressure = container.querySelector('#pulseHealthTabPressure');
+  if (tabHealthGeomag && tabHealthPressure) {
+    tabHealthGeomag.onclick = () => {
+      window.activeHealthTab = 'geomag';
+      renderHealthForecastUI('geomag');
+    };
+    tabHealthPressure.onclick = () => {
+      window.activeHealthTab = 'pressure';
+      renderHealthForecastUI('pressure');
+    };
+  }
 
   // Перемикач вкладок Валюти / Крипта у сітці
   const tabBtnFiat = container.querySelector('#pulseTabBtnFiat');
@@ -11574,65 +11613,249 @@ function formatDateToYMD(d) {
   return `${y}-${m}-${day}`;
 }
 
-function renderGeomagForecastUI(daysForecast) {
-  const container = document.getElementById('pulseGeomagTableWrap') || document.getElementById('pulseGeomagDaysContainer');
-  if (!container || !Array.isArray(daysForecast)) return;
+// ==========================================================================
+// МОДУЛЬ МЕТЕОЧУТЛИВІСТЬ & ЗДОРОВ'Я (МАГНІТНІ БУРІ ТА АТМОСФЕРНИЙ ТИСК)
+// ==========================================================================
+window.activeHealthTab = 'geomag';
+window.currentGeomagForecast = null;
+window.currentPressureForecast = null;
+window.currentWeatherPressure = 754;
 
-  // Оцінюємо максимальний Kp на сьогодні для шапки
-  const todaySlots = daysForecast[0]?.slots || [];
-  const maxTodayKp = Math.max(...todaySlots.map(s => s.kp), 1.0);
+function buildPressure3DayForecast(hourly) {
+  const now = new Date();
+  const d1Obj = new Date(now.getTime() + 24 * 3600 * 1000);
+  const d2Obj = new Date(now.getTime() + 48 * 3600 * 1000);
 
-  const badgeEl = document.getElementById('pulseGeomagNowBadge');
-  if (badgeEl) {
-    if (maxTodayKp < 3.0) {
-      badgeEl.className = 'pulse-geomag-now-badge green';
-      badgeEl.innerHTML = `🟢 Спокійно (Kp ${formatDecimalsHtml(maxTodayKp, 1, false)})`;
-    } else if (maxTodayKp < 5.0) {
-      badgeEl.className = 'pulse-geomag-now-badge yellow';
-      badgeEl.innerHTML = `🟡 Помірно (Kp ${formatDecimalsHtml(maxTodayKp, 1, false)})`;
+  const dates = [
+    { ymd: formatDateToYMD(now), badge: getGeomagCompactDayBadge(now) },
+    { ymd: formatDateToYMD(d1Obj), badge: getGeomagCompactDayBadge(d1Obj) },
+    { ymd: formatDateToYMD(d2Obj), badge: getGeomagCompactDayBadge(d2Obj) }
+  ];
+
+  const timeSlots = ['00:00', '03:00', '06:00', '09:00', '12:00', '15:00', '18:00', '21:00'];
+
+  return dates.map((dayInfo, dayIdx) => {
+    const slots = timeSlots.map((timeStr, slotIdx) => {
+      const targetTime = `${dayInfo.ymd}T${timeStr}`;
+      let mmHg = 753;
+      if (hourly && Array.isArray(hourly.time) && Array.isArray(hourly.surface_pressure)) {
+        const idx = hourly.time.indexOf(targetTime);
+        if (idx !== -1 && hourly.surface_pressure[idx] !== undefined) {
+          mmHg = Math.round(hourly.surface_pressure[idx] * 0.750062);
+        } else {
+          const dayPrefix = `${dayInfo.ymd}T`;
+          const hourVal = parseInt(timeStr.slice(0, 2), 10);
+          const foundIdx = hourly.time.findIndex(t => t.startsWith(dayPrefix) && Math.abs(parseInt(t.slice(11, 13), 10) - hourVal) <= 1);
+          if (foundIdx !== -1 && hourly.surface_pressure[foundIdx] !== undefined) {
+            mmHg = Math.round(hourly.surface_pressure[foundIdx] * 0.750062);
+          }
+        }
+      } else {
+        const wave = Math.sin((dayIdx * 8 + slotIdx) / 3) * 2;
+        mmHg = Math.round(753 + wave);
+      }
+      return { time: timeStr, pressure: mmHg };
+    });
+    return { label: dayInfo.badge, badge: dayInfo.badge, date: dayInfo.ymd, slots };
+  });
+}
+
+function getPressureClassAndStatus(val, prevVal = null) {
+  let colorClass = 'green';
+  let note = 'Комфортний, безпечний тиск';
+  const jump = (prevVal !== null) ? Math.abs(val - prevVal) : 0;
+  if (jump >= 6) {
+    colorClass = 'red';
+    note = `Різкий стрибок тиску (зміна на ${jump} мм)`;
+  } else if (val < 742 || val > 766) {
+    colorClass = 'red';
+    note = val < 742 ? 'Глибокий циклон (значно знижений)' : 'Потужний антициклон (значно підвищений)';
+  } else if (val < 750 || val > 760 || jump >= 4) {
+    colorClass = 'yellow';
+    note = val < 750 ? 'Знижений тиск (можлива слабкість)' : (val > 760 ? 'Підвищений тиск (гіпертонія)' : `Коливання тиску (${jump} мм)`);
+  } else {
+    colorClass = 'green';
+    note = 'Комфортний, безпечний тиск';
+  }
+  return { colorClass, note };
+}
+
+function renderHealthForecastUI(activeTab) {
+  const container = document.getElementById('pulseGeomagTableWrap');
+  if (!container) return;
+
+  const tab = activeTab || window.activeHealthTab || 'geomag';
+  window.activeHealthTab = tab;
+
+  const tabGeomag = document.getElementById('pulseHealthTabGeomag');
+  const tabPressure = document.getElementById('pulseHealthTabPressure');
+  if (tabGeomag && tabPressure) {
+    if (tab === 'pressure') {
+      tabPressure.classList.add('active');
+      tabGeomag.classList.remove('active');
     } else {
-      badgeEl.className = 'pulse-geomag-now-badge red';
-      badgeEl.innerHTML = `🔴 Буря (Kp ${formatDecimalsHtml(maxTodayKp, 1, false)})`;
+      tabGeomag.classList.add('active');
+      tabPressure.classList.remove('active');
     }
   }
 
+  const badgeEl = document.getElementById('pulseGeomagNowBadge');
+  const legendEl = document.getElementById('pulseHealthFooterLegend');
+  const linkEl = document.getElementById('pulseHealthFooterLink');
   const timeHeaders = ['00:00', '03:00', '06:00', '09:00', '12:00', '15:00', '18:00', '21:00'];
 
-  const rowsHtml = daysForecast.map(day => {
-    let dayLabel = (day.badge || day.label || '').replace(/\s*•\s*/g, ' • ');
-    const m = dayLabel.match(/^(\d+)\s*•\s*([А-Яа-яЇїІіЄєҐґ]+)$/);
-    if (m) {
-      dayLabel = `${m[2]} • ${m[1]}`;
+  if (tab === 'pressure') {
+    // Вкладка: Атмосферний тиск
+    if (!window.currentPressureForecast) {
+      window.currentPressureForecast = buildPressure3DayForecast(null);
     }
-    const slotsHtml = (day.slots || []).map(slot => {
-      const val = typeof slot.kp === 'number' ? slot.kp : 1.5;
-      let colorClass = 'green';
-      if (val >= 5.0) colorClass = 'red';
-      else if (val >= 3.0) colorClass = 'yellow';
-      return `<td class="kp-cell ${colorClass}" title="${dayLabel} ${slot.time} - Kp ${val.toFixed(1)}">${formatDecimalsHtml(val, 1, false)}</td>`;
+    const days = window.currentPressureForecast;
+    const curP = window.currentWeatherPressure || (days[0]?.slots[0]?.pressure || 754);
+
+    const todaySlots = days[0]?.slots || [];
+    let maxJumpToday = 0;
+    for (let j = 1; j < todaySlots.length; j++) {
+      const diff = Math.abs(todaySlots[j].pressure - todaySlots[j - 1].pressure);
+      if (diff > maxJumpToday) maxJumpToday = diff;
+    }
+
+    if (badgeEl) {
+      if (maxJumpToday >= 6) {
+        badgeEl.className = 'pulse-geomag-now-badge red';
+        badgeEl.innerHTML = `⚠️ Стрибок (${curP})`;
+      } else if (curP < 742 || curP > 766) {
+        badgeEl.className = 'pulse-geomag-now-badge red';
+        badgeEl.innerHTML = `🔴 ${curP < 742 ? 'Знижений' : 'Підвищений'} (${curP})`;
+      } else if (curP < 750 || curP > 760) {
+        badgeEl.className = 'pulse-geomag-now-badge yellow';
+        badgeEl.innerHTML = `🟡 ${curP < 750 ? 'Знижений' : 'Підвищений'} (${curP})`;
+      } else {
+        badgeEl.className = 'pulse-geomag-now-badge green';
+        badgeEl.innerHTML = `🟢 Норма (${curP})`;
+      }
+    }
+
+    if (legendEl) {
+      legendEl.textContent = 'Норма: 750-760 мм рт. ст.';
+    }
+    if (linkEl) {
+      linkEl.href = 'https://meteo.gov.ua/';
+      linkEl.title = 'Дізнатися більше про вплив барометричного тиску на самопочуття';
+      linkEl.innerHTML = 'Детальніше... <i class="fas fa-external-link-alt"></i>';
+    }
+
+    let prevPressure = null;
+    const rowsHtml = days.map(day => {
+      let dayLabel = (day.badge || day.label || '').replace(/\s*•\s*/g, ' • ');
+      const m = dayLabel.match(/^(\d+)\s*•\s*([А-Яа-яЇїІіЄєҐґ]+)$/);
+      if (m) {
+        dayLabel = `${m[2]} • ${m[1]}`;
+      }
+      const slotsHtml = (day.slots || []).map(slot => {
+        const val = slot.pressure;
+        const status = getPressureClassAndStatus(val, prevPressure);
+        prevPressure = val;
+        return `<td class="kp-cell ${status.colorClass}" title="${dayLabel} ${slot.time} - ${val} мм рт. ст. (${status.note})">${val}</td>`;
+      }).join('');
+
+      return `
+        <tr>
+          <td class="kp-td-day">${dayLabel}</td>
+          ${slotsHtml}
+        </tr>
+      `;
     }).join('');
 
-    return `
-      <tr>
-        <td class="kp-td-day">${dayLabel}</td>
-        ${slotsHtml}
-      </tr>
+    container.innerHTML = `
+      <table class="pulse-kp-table">
+        <thead>
+          <tr>
+            <th class="kp-th-day">Час</th>
+            ${timeHeaders.map(t => `<th>${t}</th>`).join('')}
+          </tr>
+        </thead>
+        <tbody>
+          ${rowsHtml}
+        </tbody>
+      </table>
     `;
-  }).join('');
+  } else {
+    // Вкладка: Магнітні бурі
+    const daysForecast = window.currentGeomagForecast || [];
+    if (!daysForecast.length) {
+      container.innerHTML = '<div class="text-center py-2 text-muted small"><i class="fas fa-spinner fa-spin me-1"></i> Завантаження прогнозу...</div>';
+      return;
+    }
 
-  container.innerHTML = `
-    <table class="pulse-kp-table">
-      <thead>
+    const todaySlots = daysForecast[0]?.slots || [];
+    const maxTodayKp = Math.max(...todaySlots.map(s => s.kp), 1.0);
+
+    if (badgeEl) {
+      if (maxTodayKp < 3.0) {
+        badgeEl.className = 'pulse-geomag-now-badge green';
+        badgeEl.innerHTML = `🟢 Спокійно (Kp ${formatDecimalsHtml(maxTodayKp, 1, false)})`;
+      } else if (maxTodayKp < 5.0) {
+        badgeEl.className = 'pulse-geomag-now-badge yellow';
+        badgeEl.innerHTML = `🟡 Помірно (Kp ${formatDecimalsHtml(maxTodayKp, 1, false)})`;
+      } else {
+        badgeEl.className = 'pulse-geomag-now-badge red';
+        badgeEl.innerHTML = `🔴 Буря (Kp ${formatDecimalsHtml(maxTodayKp, 1, false)})`;
+      }
+    }
+
+    if (legendEl) {
+      legendEl.textContent = 'Шкала-Kp: 0-2 спокійно / 3-4 помірно / 5+ буря';
+    }
+    if (linkEl) {
+      linkEl.href = 'https://solarmeteo.ukalendar.com/defs/kp-index';
+      linkEl.title = 'Детальніше про Kp-індекс та шкалу геомагнітної активності';
+      linkEl.innerHTML = 'Детальніше... <i class="fas fa-external-link-alt"></i>';
+    }
+
+    const rowsHtml = daysForecast.map(day => {
+      let dayLabel = (day.badge || day.label || '').replace(/\s*•\s*/g, ' • ');
+      const m = dayLabel.match(/^(\d+)\s*•\s*([А-Яа-яЇїІіЄєҐґ]+)$/);
+      if (m) {
+        dayLabel = `${m[2]} • ${m[1]}`;
+      }
+      const slotsHtml = (day.slots || []).map(slot => {
+        const val = typeof slot.kp === 'number' ? slot.kp : 1.5;
+        let colorClass = 'green';
+        if (val >= 5.0) colorClass = 'red';
+        else if (val >= 3.0) colorClass = 'yellow';
+        return `<td class="kp-cell ${colorClass}" title="${dayLabel} ${slot.time} - Kp ${val.toFixed(1)}">${formatDecimalsHtml(val, 1, false)}</td>`;
+      }).join('');
+
+      return `
         <tr>
-          <th class="kp-th-day">Час</th>
-          ${timeHeaders.map(t => `<th>${t}</th>`).join('')}
+          <td class="kp-td-day">${dayLabel}</td>
+          ${slotsHtml}
         </tr>
-      </thead>
-      <tbody>
-        ${rowsHtml}
-      </tbody>
-    </table>
-  `;
+      `;
+    }).join('');
+
+    container.innerHTML = `
+      <table class="pulse-kp-table">
+        <thead>
+          <tr>
+            <th class="kp-th-day">Час</th>
+            ${timeHeaders.map(t => `<th>${t}</th>`).join('')}
+          </tr>
+        </thead>
+        <tbody>
+          ${rowsHtml}
+        </tbody>
+      </table>
+    `;
+  }
+}
+window.renderHealthForecastUI = renderHealthForecastUI;
+
+function renderGeomagForecastUI(daysForecast) {
+  if (Array.isArray(daysForecast)) {
+    window.currentGeomagForecast = daysForecast;
+  }
+  renderHealthForecastUI(window.activeHealthTab || 'geomag');
 }
 window.renderGeomagForecastUI = renderGeomagForecastUI;
 
