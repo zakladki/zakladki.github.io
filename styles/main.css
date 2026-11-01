@@ -953,7 +953,7 @@ footer.footer .btn-primary:active {
       position: absolute;
       top: 50%;                     
       transform: translateY(-50%); 
-      left: 48px;                  
+      left: 10px;                  
       z-index: 1050;                
       margin: 0;                    
       width: 30px !important;
@@ -966,7 +966,7 @@ footer.footer .btn-primary:active {
       position: absolute;
       top: 50%;                     
       transform: translateY(-50%) scale(0.7); 
-      right: 12px;                   
+      right: 10px;                   
       z-index: 1050;                
       transform-origin: right center;
       padding: 6px !important;      
@@ -3808,7 +3808,7 @@ body.dark-mode .maintenance-progress-bar {
     position: absolute !important;
     top: 50% !important;
     transform: translateY(-50%) !important;
-    right: 90px !important;
+    right: 96px !important;
     left: auto !important;
     z-index: 1050 !important;
     margin: 0 !important;
@@ -3820,7 +3820,7 @@ body.dark-mode .maintenance-progress-bar {
 
 @media (max-width: 360px) {
   .notice-bell-btn {
-    right: 80px !important;
+    right: 84px !important;
     width: 28px !important;
     height: 28px !important;
   }
@@ -6276,12 +6276,12 @@ body.dark-mode .ad-terms-link {
 }
 @media (max-width: 1279.98px) {
   .user-auth-btn {
-    right: 52px !important;
+    right: 56px !important;
   }
 }
 @media (max-width: 360px) {
   .user-auth-btn {
-    right: 46px !important;
+    right: 48px !important;
     width: 28px !important;
     height: 28px !important;
     min-width: 28px !important;
@@ -10946,7 +10946,7 @@ body.dark-mode .guest-bm-modal-footer {
     padding: 0 !important;
     justify-content: center !important;
     gap: 0 !important;
-    left: 48px !important;
+    left: 50px !important;
   }
   .pulse-day-btn .pulse-day-badge-wrap {
     display: none !important;
@@ -10959,7 +10959,7 @@ body.dark-mode .guest-bm-modal-footer {
 
 @media (max-width: 360px) {
   .pulse-day-btn {
-    left: 42px !important;
+    left: 44px !important;
     width: 28px !important;
     min-width: 28px !important;
     max-width: 28px !important;

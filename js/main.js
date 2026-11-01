@@ -9253,8 +9253,7 @@ function renderPulseHolidaysUI() {
   if (!container) return;
 
   const now = new Date();
-  const daysUk = ['неділя', 'понеділок', 'вівторок', 'середа', 'четвер', 'п\'ятниця', 'субота'];
-  const monthsUk = ['січня', 'лютого', 'березня', 'квітня', 'травня', 'червня', 'липня', 'серпня', 'вересня', 'жовтня', 'листопада', 'грудня'];
+  const daysShortUk = ['Нд', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
   const dayLabels = ['Сьогодні', 'Завтра', 'Післязавтра'];
 
   let html = '';
@@ -9262,9 +9261,10 @@ function renderPulseHolidaysUI() {
   for (let offset = 0; offset < 3; offset++) {
     const dayLabel = dayLabels[offset] || '';
     const targetDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + offset);
-    const rawDayOfWeek = daysUk[targetDate.getDay()];
-    const dayOfWeekCapitalized = rawDayOfWeek.charAt(0).toUpperCase() + rawDayOfWeek.slice(1);
-    const dateFormatted = `${targetDate.getDate()} ${monthsUk[targetDate.getMonth()]} • ${dayOfWeekCapitalized}`;
+    const dayNum = targetDate.getDate();
+    const shortDay = daysShortUk[targetDate.getDay()];
+    // Для СЬОГОДНІ напис прибрано, для ЗАВТРА та ПІСЛЯЗАВТРА: "2 • Пн", "3 • Вт"
+    const dateFormatted = offset === 0 ? '' : `${dayNum} • ${shortDay}`;
 
     const events = getEventsForDate(targetDate);
     // Обмеження: не більше 3 записів для сьогодні і не більше 2 для наступних днів (разом до 7 рядків)
@@ -9723,7 +9723,7 @@ function createFallbackWeatherData(city) {
       is_day: 1,
       precipitation: 0.1,
       weather_code: 3,
-      surface_pressure: 752,
+      surface_pressure: 1005.2,
       wind_speed_10m: 3.4,
       wind_direction_10m: 235
     },
@@ -9852,7 +9852,8 @@ function renderPulseWeatherUI(data, city, updatedTime = '') {
 
   // Оновлюємо дані атмосферного тиску для модуля метеочутливості
   if (curr.surface_pressure) {
-    window.currentWeatherPressure = Math.round(curr.surface_pressure * 0.750062);
+    const rawP = curr.surface_pressure;
+    window.currentWeatherPressure = rawP > 850 ? Math.round(rawP * 0.750062) : Math.round(rawP);
   }
   if (hourly.surface_pressure && hourly.time) {
     window.currentPressureForecast = buildPressure3DayForecast(hourly);
@@ -11080,6 +11081,7 @@ function renderPulseDrawerLayout(container) {
       }, 500);
     };
   }
+  renderPulseFuelTable(savedRegion);
   // Перемикач вкладок Магнітні бурі / Атмосферний тиск (Метео & Тиск)
   const tabHealthGeomag = container.querySelector('#pulseHealthTabGeomag');
   const tabHealthPressure = container.querySelector('#pulseHealthTabPressure');
@@ -11380,18 +11382,21 @@ async function loadPulseDrawerData(forceRefresh = false) {
 }
 
 async function fetchLiveFuelPrices() {
+  const curReg = localStorage.getItem('user_fuel_region') || 'ua';
   try {
     const res = await fetch('/api/fuel-prices');
-    if (!res.ok) return;
+    if (!res.ok) {
+      renderPulseFuelTable(curReg);
+      return;
+    }
     const data = await res.json();
     if (data && data.base && Array.isArray(data.base)) {
       window.LIVE_FUEL_NETWORKS = data.base;
       if (data.regionDeltas) window.LIVE_FUEL_DELTAS = data.regionDeltas;
-      const curReg = localStorage.getItem('user_fuel_region') || 'ua';
-      renderPulseFuelTable(curReg);
     }
+    renderPulseFuelTable(curReg);
   } catch (e) {
-    // тихо продовжуємо з базовими даними
+    renderPulseFuelTable(curReg);
   }
 }
 
@@ -11709,8 +11714,10 @@ function renderHealthForecastUI(activeTab) {
     if (!window.currentPressureForecast) {
       window.currentPressureForecast = buildPressure3DayForecast(null);
     }
-    const days = window.currentPressureForecast;
-    const curP = window.currentWeatherPressure || (days[0]?.slots[0]?.pressure || 754);
+    let curP = window.currentWeatherPressure || (days[0]?.slots[0]?.pressure || 754);
+    if (curP < 680 || curP > 820) {
+      curP = (days[0]?.slots[0]?.pressure || 754);
+    }
 
     const todaySlots = days[0]?.slots || [];
     let maxJumpToday = 0;
