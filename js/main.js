@@ -10498,7 +10498,7 @@ function renderPulseDrawerLayout(container) {
     </div>
 
     <div class="pulse-cards-grid">
-      <!-- 1. СВЯТА ТА ПОДІЇ ДНЯ + МАГНІТНІ БУРІ -->
+      <!-- 1. СВЯТА ТА ПОДІЇ ДНЯ + ЦІНИ НА ПАЛЬНЕ -->
       <div class="pulse-card" id="pulseCardHoliday">
         <div class="pulse-card-header">
           <span class="pulse-card-title"><i class="fas fa-calendar-day text-info"></i> Свята та події</span>
@@ -10509,151 +10509,7 @@ function renderPulseDrawerLayout(container) {
           <!-- Заповнюється динамічно функцією renderPulseHolidaysUI -->
         </div>
 
-        <!-- Лагідна роздільна лінія між Святами та Магнітними бурями -->
-        <div class="pulse-card-divider"></div>
-
-        <!-- Модуль Метео & Тиск: Магнітні бурі та Атмосферний тиск (Таби) -->
-        <div class="pulse-geomag-forecast-wrap" id="pulseGeomagWrap">
-          <div class="pulse-health-header-row">
-            <span class="pulse-health-section-title"><i class="fas fa-heartbeat text-danger me-1" style="margin-right: 5px;"></i> <strong>Метео & Тиск:</strong></span>
-            <span class="pulse-geomag-now-badge green" id="pulseGeomagNowBadge">🟢 Спокійно</span>
-          </div>
-
-          <div class="pulse-health-tabs-bar">
-            <div class="pulse-health-tab-group" id="pulseHealthTabGroup" role="tablist" aria-label="Перемикач параметрів">
-              <button type="button" class="pulse-rate-tab-btn active" id="pulseHealthTabGeomag" data-tab="geomag" title="Перемкнути на прогноз геомагнітних бурь (Kp-індекс)">
-                <i class="fas fa-magnet text-primary me-1"></i> Магнітні бурі
-              </button>
-              <button type="button" class="pulse-rate-tab-btn" id="pulseHealthTabPressure" data-tab="pressure" title="Перемкнути на графік атмосферного тиску (мм рт. ст.)">
-                <i class="fas fa-tachometer-alt text-danger me-1"></i> Атмосферний тиск
-              </button>
-            </div>
-          </div>
-          
-          <div class="pulse-geomag-table-wrap" id="pulseGeomagTableWrap">
-            <!-- Заповнюється таблицею функцією renderHealthForecastUI -->
-            <div class="text-center py-2 text-muted small"><i class="fas fa-spinner fa-spin me-1"></i> Завантаження прогнозу...</div>
-          </div>
-
-          <div class="pulse-geomag-footer">
-            <div class="pulse-geomag-footer-legend" id="pulseHealthFooterLegend">
-              Шкала-Kp: 0-2 спокійно / 3-4 помірно / 5+ буря
-            </div>
-            <div class="pulse-geomag-footer-more">
-              <a href="https://solarmeteo.ukalendar.com/defs/kp-index" id="pulseHealthFooterLink" target="_blank" rel="noopener" title="Детальніше про Kp-індекс та шкалу геомагнітної активності">
-                Детальніше... <i class="fas fa-external-link-alt"></i>
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 2. ПОГОДА (ВЛАСНИЙ ВІДЖЕТ OPEN-METEO) -->
-      <div class="pulse-card" id="pulseCardWeather">
-        <div class="pulse-card-header">
-          <span class="pulse-card-title"><i class="fas fa-cloud-sun text-warning"></i> Погода</span>
-          <div class="d-flex align-items-center" style="gap: 5px;">
-            <span class="pulse-card-badge badge-green" id="pulseWeatherLiveBadge">Наживо</span>
-            <button type="button" id="pulseWeatherRefreshBtn" class="pulse-weather-refresh-action-btn" title="Оновити погоду" aria-label="Оновити погоду">
-              <i class="fas fa-sync-alt" id="pulseWeatherRefreshIcon"></i>
-            </button>
-          </div>
-        </div>
-
-        <!-- Вибір місцевості (міста) з автоматичним збереженням -->
-        <div class="pulse-weather-city-bar">
-          <label for="pulseWeatherCitySelect" class="pulse-weather-city-label">
-            <i class="fas fa-map-marker-alt text-danger me-1"></i> Місто:
-          </label>
-          <select id="pulseWeatherCitySelect" class="pulse-weather-city-select" aria-label="Обрати місто для прогнозу погоди">
-            ${renderWeatherCityOptions()}
-          </select>
-          <button type="button" id="pulseWeatherGeoBtn" class="pulse-weather-tool-btn pulse-weather-geo-btn-inline" title="Визначити моє місто автоматично (GPS / IP)" aria-label="Автовизначення локації">
-            <i class="fas fa-crosshairs"></i>
-          </button>
-        </div>
-
-        <!-- Контейнер власного прогнозу погоди -->
-        <div id="pulseWeatherContainer" class="pulse-weather-container">
-          <div class="text-center py-4 text-muted small" style="font-size: 0.72rem;">
-            <i class="fas fa-spinner fa-spin me-2 text-info"></i>Завантаження прогнозу погоди...
-          </div>
-        </div>
-      </div>
-
-      <!-- 3. ЕКОЛОГІЯ ТА РАДІАЦІЯ + ЦІНИ НА ПАЛЬНЕ -->
-      <div class="pulse-card" id="pulseCardFuel">
-        <div class="pulse-card-header">
-          <span class="pulse-card-title"><i class="fas fa-leaf text-success"></i> Екологія та радіація</span>
-          <span class="pulse-card-badge badge-green" id="pulseEcoStatusBadge">🟢 Норма</span>
-        </div>
-
-        <!-- Вибір місцевості (міста) з автоматичним збереженням (уніфіковано з погодою) -->
-        <div class="pulse-weather-city-bar">
-          <label for="pulseEcoRegionSelect" class="pulse-weather-city-label">
-            <i class="fas fa-map-marker-alt text-success me-1"></i> Місто:
-          </label>
-          <select id="pulseEcoRegionSelect" class="pulse-weather-city-select" aria-label="Обрати місто для якості повітря та радіаційного фону">
-            ${UKRAINE_ECO_REGIONS.map(r => `<option value="${r.id}" ${r.id === getEffectiveEcoRegionId() ? 'selected' : ''}>${r.name}</option>`).join('')}
-          </select>
-          <button type="button" id="pulseEcoGeoBtn" class="pulse-weather-tool-btn pulse-weather-geo-btn-inline" title="Визначити найближче місто автоматично (GPS / IP)" aria-label="Автовизначення найближчого регіону">
-            <i class="fas fa-crosshairs"></i>
-          </button>
-        </div>
-
-        <!-- Лаконічний віджет із ключовими показниками (2-рядковий вигляд: заголовок + кольоровий бейдж зі значенням) -->
-        <div class="pulse-eco-metrics-row">
-          <!-- Радіаційний фон -->
-          <div class="pulse-eco-metric-box">
-            <div class="pulse-eco-metric-title">
-              <i class="fas fa-radiation text-warning"></i> Радіація
-            </div>
-            <div class="pulse-eco-metric-badge green" id="pulseEcoRadBadge" title="Норма: радіаційний фон у межах безпеки (до 0.30 мкЗв/год)">
-              <span class="pulse-eco-badge-dot">🟢</span> <span id="pulseEcoRadVal" class="pulse-eco-badge-val">0.11</span> <span class="pulse-eco-badge-unit">мкЗв/год</span>
-            </div>
-          </div>
-
-          <!-- Якість повітря (AQI) -->
-          <div class="pulse-eco-metric-box">
-            <div class="pulse-eco-metric-title">
-              <i class="fas fa-wind text-info"></i> Повітря (AQI)
-            </div>
-            <div class="pulse-eco-metric-badge green" id="pulseEcoAqiBadge" title="Чисте: безпечне для дихання (до 50 AQI)">
-              <span class="pulse-eco-badge-dot">🟢</span> <span id="pulseEcoAqiVal" class="pulse-eco-badge-val">AQI 28</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Деталізація показників датчиків (PM2.5, PM10, NO2, O3) -->
-        <div class="pulse-eco-details-box">
-          <div class="pulse-eco-detail-row">
-            <span class="pulse-eco-detail-label">Дрібний пил PM2.5:</span>
-            <span class="pulse-eco-detail-val" id="pulseEcoPm25">${formatEcoMetricHtml(7.2, 'мкг/м³')}</span>
-          </div>
-          <div class="pulse-eco-detail-row">
-            <span class="pulse-eco-detail-label">Зважений пил PM10:</span>
-            <span class="pulse-eco-detail-val" id="pulseEcoPm10">${formatEcoMetricHtml(14.5, 'мкг/м³')}</span>
-          </div>
-          <div class="pulse-eco-detail-row">
-            <span class="pulse-eco-detail-label">Діоксид азоту (NO₂):</span>
-            <span class="pulse-eco-detail-val" id="pulseEcoNo2">${formatEcoMetricHtml(11.8, 'мкг/м³')}</span>
-          </div>
-          <div class="pulse-eco-detail-row">
-            <span class="pulse-eco-detail-label">Приземний озон (O₃):</span>
-            <span class="pulse-eco-detail-val" id="pulseEcoO3">${formatEcoMetricHtml(46.2, 'мкг/м³')}</span>
-          </div>
-        </div>
-
-        <div class="pulse-eco-footer" style="margin-bottom: 2px;">
-          <span class="pulse-eco-footer-text" title="Дані з відкритих датчиків SaveEcoBot, EcoCity та супутників моніторингу">
-            <i class="fas fa-broadcast-tower text-success" style="margin-right: 1px;"></i>SaveEcoBot / EcoCity
-          </span>
-          <a href="https://www.saveecobot.com/" target="_blank" rel="noopener" class="pulse-eco-link" title="Відкрити мапу радіаційного фону та якості повітря на SaveEcoBot">
-            Мапа датчиків <i class="fas fa-external-link-alt ms-1"></i>
-          </a>
-        </div>
-
-        <!-- Роздільна лінія між Екологією та Пальним -->
+        <!-- Лагідна роздільна лінія між Святами та Пальним -->
         <div class="pulse-card-divider"></div>
 
         <!-- Секція 2: Ціни на пальне -->
@@ -10698,6 +10554,156 @@ function renderPulseDrawerLayout(container) {
           <a href="https://minfin.com.ua/ua/fuel/" target="_blank" rel="noopener" class="pulse-fuel-link" title="Моніторинг цін на пальне на Мінфін">
             Мінфін АЗС <i class="fas fa-external-link-alt ms-1"></i>
           </a>
+        </div>
+      </div>
+
+      <!-- 2. ПОГОДА (ВЛАСНИЙ ВІДЖЕТ OPEN-METEO) -->
+      <div class="pulse-card" id="pulseCardWeather">
+        <div class="pulse-card-header">
+          <span class="pulse-card-title"><i class="fas fa-cloud-sun text-warning"></i> Погода</span>
+          <div class="d-flex align-items-center" style="gap: 5px;">
+            <span class="pulse-card-badge badge-green" id="pulseWeatherLiveBadge">Наживо</span>
+            <button type="button" id="pulseWeatherRefreshBtn" class="pulse-weather-refresh-action-btn" title="Оновити погоду" aria-label="Оновити погоду">
+              <i class="fas fa-sync-alt" id="pulseWeatherRefreshIcon"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Вибір місцевості (міста) з автоматичним збереженням -->
+        <div class="pulse-weather-city-bar">
+          <label for="pulseWeatherCitySelect" class="pulse-weather-city-label">
+            <i class="fas fa-map-marker-alt text-danger me-1"></i> Місто:
+          </label>
+          <select id="pulseWeatherCitySelect" class="pulse-weather-city-select" aria-label="Обрати місто для прогнозу погоди">
+            ${renderWeatherCityOptions()}
+          </select>
+          <button type="button" id="pulseWeatherGeoBtn" class="pulse-weather-tool-btn pulse-weather-geo-btn-inline" title="Визначити моє місто автоматично (GPS / IP)" aria-label="Автовизначення локації">
+            <i class="fas fa-crosshairs"></i>
+          </button>
+        </div>
+
+        <!-- Контейнер власного прогнозу погоди -->
+        <div id="pulseWeatherContainer" class="pulse-weather-container">
+          <div class="text-center py-4 text-muted small" style="font-size: 0.72rem;">
+            <i class="fas fa-spinner fa-spin me-2 text-info"></i>Завантаження прогнозу погоди...
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. ЕКОЛОГІЯ ТА РАДІАЦІЯ + МЕТЕО & ТИСК -->
+      <div class="pulse-card" id="pulseCardEco">
+        <div class="pulse-card-header">
+          <span class="pulse-card-title"><i class="fas fa-leaf text-success"></i> Екологія та радіація</span>
+          <span class="pulse-card-badge badge-green" id="pulseEcoStatusBadge">🟢 Норма</span>
+        </div>
+
+        <!-- Вибір місцевості (міста) з автоматичним збереженням (уніфіковано з погодою) -->
+        <div class="pulse-weather-city-bar">
+          <label for="pulseEcoRegionSelect" class="pulse-weather-city-label">
+            <i class="fas fa-map-marker-alt text-success me-1"></i> Місто:
+          </label>
+          <select id="pulseEcoRegionSelect" class="pulse-weather-city-select" aria-label="Обрати місто для якості повітря та радіаційного фону">
+            ${UKRAINE_ECO_REGIONS.map(r => `<option value="${r.id}" ${r.id === getEffectiveEcoRegionId() ? 'selected' : ''}>${r.name}</option>`).join('')}
+          </select>
+          <button type="button" id="pulseEcoGeoBtn" class="pulse-weather-tool-btn pulse-weather-geo-btn-inline" title="Визначити найближче місто автоматично (GPS / IP)" aria-label="Автовизначення найближчого регіону">
+            <i class="fas fa-crosshairs"></i>
+          </button>
+        </div>
+
+        <!-- Лаконічний віджет із ключовими показниками (2-рядковий вигляд: заголовок + кольоровий бейдж зі значенням) -->
+        <div class="pulse-eco-metrics-row">
+          <!-- Радіаційний фон -->
+          <div class="pulse-eco-metric-box">
+            <div class="pulse-eco-metric-title">
+              <i class="fas fa-radiation text-warning"></i> Радіація
+            </div>
+            <div class="pulse-eco-metric-badge green" id="pulseEcoRadBadge" title="Норма: радіаційний фон у межах безпеки (до 0.30 мкЗв/год)">
+              <span class="pulse-eco-badge-dot">🟢</span> <span id="pulseEcoRadVal" class="pulse-eco-badge-val">0.11</span> <span class="pulse-eco-badge-unit">мкЗв/год</span>
+            </div>
+          </div>
+
+          <!-- Якість повітря (AQI) -->
+          <div class="pulse-eco-metric-box">
+            <div class="pulse-eco-metric-title">
+              <i class="fas fa-wind text-info"></i> Повітря (AQI)
+            </div>
+            <div class="pulse-eco-metric-badge green" id="pulseEcoAqiBadge" title="Чисте: безпечне для дихання (до 50 AQI)">
+              <span class="pulse-eco-badge-dot">🟢</span> <span id="pulseEcoAqiVal" class="pulse-eco-badge-val">AQI 28</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Кнопка-спойлер для детальних показників пилу та газів -->
+        <div class="pulse-eco-spoiler-toggle" id="pulseEcoSpoilerToggle" role="button" tabindex="0" title="Натисніть, щоб переглянути детальний склад повітря (PM2.5, PM10, NO₂, O₃)">
+          <span><i class="fas fa-sliders-h me-1 text-primary"></i> Детальні показники повітря</span>
+          <i class="fas fa-chevron-down pulse-eco-spoiler-chevron" id="pulseEcoSpoilerChevron"></i>
+        </div>
+
+        <!-- Деталізація показників датчиків (PM2.5, PM10, NO2, O3) (приховано під спойлер) -->
+        <div class="pulse-eco-details-box collapsed" id="pulseEcoDetailsBox">
+          <div class="pulse-eco-detail-row">
+            <span class="pulse-eco-detail-label">Дрібний пил PM2.5:</span>
+            <span class="pulse-eco-detail-val" id="pulseEcoPm25">${formatEcoMetricHtml(7.2, 'мкг/м³')}</span>
+          </div>
+          <div class="pulse-eco-detail-row">
+            <span class="pulse-eco-detail-label">Зважений пил PM10:</span>
+            <span class="pulse-eco-detail-val" id="pulseEcoPm10">${formatEcoMetricHtml(14.5, 'мкг/м³')}</span>
+          </div>
+          <div class="pulse-eco-detail-row">
+            <span class="pulse-eco-detail-label">Діоксид азоту (NO₂):</span>
+            <span class="pulse-eco-detail-val" id="pulseEcoNo2">${formatEcoMetricHtml(11.8, 'мкг/м³')}</span>
+          </div>
+          <div class="pulse-eco-detail-row">
+            <span class="pulse-eco-detail-label">Приземний озон (O₃):</span>
+            <span class="pulse-eco-detail-val" id="pulseEcoO3">${formatEcoMetricHtml(46.2, 'мкг/м³')}</span>
+          </div>
+        </div>
+
+        <div class="pulse-eco-footer" style="margin-bottom: 2px;">
+          <span class="pulse-eco-footer-text" title="Дані з відкритих датчиків SaveEcoBot, EcoCity та супутників моніторингу">
+            <i class="fas fa-broadcast-tower text-success" style="margin-right: 1px;"></i>SaveEcoBot / EcoCity
+          </span>
+          <a href="https://www.saveecobot.com/" target="_blank" rel="noopener" class="pulse-eco-link" title="Відкрити мапу радіаційного фону та якості повітря на SaveEcoBot">
+            Мапа датчиків <i class="fas fa-external-link-alt ms-1"></i>
+          </a>
+        </div>
+
+        <!-- Роздільна лінія між Екологією та Метео/Тиском -->
+        <div class="pulse-card-divider"></div>
+
+        <!-- Модуль Метео & Тиск: Магнітні бурі та Атмосферний тиск (Таби) -->
+        <div class="pulse-geomag-forecast-wrap" id="pulseGeomagWrap">
+          <div class="pulse-health-header-row">
+            <span class="pulse-health-section-title"><i class="fas fa-heartbeat text-danger me-1" style="margin-right: 5px;"></i> <strong>Метео & Тиск:</strong></span>
+            <span class="pulse-geomag-now-badge green" id="pulseGeomagNowBadge">🟢 Спокійно</span>
+          </div>
+
+          <div class="pulse-health-tabs-bar">
+            <div class="pulse-health-tab-group" id="pulseHealthTabGroup" role="tablist" aria-label="Перемикач параметрів">
+              <button type="button" class="pulse-rate-tab-btn active" id="pulseHealthTabGeomag" data-tab="geomag" title="Перемкнути на прогноз геомагнітних бурь (Kp-індекс)">
+                <i class="fas fa-magnet text-primary me-1"></i> Магнітні бурі
+              </button>
+              <button type="button" class="pulse-rate-tab-btn" id="pulseHealthTabPressure" data-tab="pressure" title="Перемкнути на графік атмосферного тиску (мм рт. ст.)">
+                <i class="fas fa-tachometer-alt text-danger me-1"></i> Атмосферний тиск
+              </button>
+            </div>
+          </div>
+          
+          <div class="pulse-geomag-table-wrap" id="pulseGeomagTableWrap">
+            <!-- Заповнюється таблицею функцією renderHealthForecastUI -->
+            <div class="text-center py-2 text-muted small"><i class="fas fa-spinner fa-spin me-1"></i> Завантаження прогнозу...</div>
+          </div>
+
+          <div class="pulse-geomag-footer">
+            <div class="pulse-geomag-footer-legend" id="pulseHealthFooterLegend">
+              Шкала-Kp: 0-2 спокійно / 3-4 помірно / 5+ буря
+            </div>
+            <div class="pulse-geomag-footer-more">
+              <a href="https://solarmeteo.ukalendar.com/defs/kp-index" id="pulseHealthFooterLink" target="_blank" rel="noopener" title="Детальніше про Kp-індекс та шкалу геомагнітної активності">
+                Детальніше... <i class="fas fa-external-link-alt"></i>
+              </a>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -11057,6 +11063,33 @@ function renderPulseDrawerLayout(container) {
       } else {
         showQuickToast('Геолокація не підтримується браузером', 'warning');
         ecoGeoBtn.innerHTML = '<i class="fas fa-crosshairs"></i>';
+      }
+    };
+  }
+
+  // Обробник спойлера для детальних показників якості повітря (PM2.5, PM10 тощо)
+  const ecoSpoilerToggle = container.querySelector('#pulseEcoSpoilerToggle');
+  const ecoDetailsBox = container.querySelector('#pulseEcoDetailsBox');
+  if (ecoSpoilerToggle && ecoDetailsBox) {
+    const isSavedOpen = localStorage.getItem('user_eco_spoiler_open') === 'true';
+    if (isSavedOpen) {
+      ecoDetailsBox.classList.remove('collapsed');
+      ecoSpoilerToggle.classList.add('is-open');
+    } else {
+      ecoDetailsBox.classList.add('collapsed');
+      ecoSpoilerToggle.classList.remove('is-open');
+    }
+
+    ecoSpoilerToggle.onclick = () => {
+      const isNowCollapsed = ecoDetailsBox.classList.contains('collapsed');
+      if (isNowCollapsed) {
+        ecoDetailsBox.classList.remove('collapsed');
+        ecoSpoilerToggle.classList.add('is-open');
+        localStorage.setItem('user_eco_spoiler_open', 'true');
+      } else {
+        ecoDetailsBox.classList.add('collapsed');
+        ecoSpoilerToggle.classList.remove('is-open');
+        localStorage.setItem('user_eco_spoiler_open', 'false');
       }
     };
   }
@@ -11714,6 +11747,7 @@ function renderHealthForecastUI(activeTab) {
     if (!window.currentPressureForecast) {
       window.currentPressureForecast = buildPressure3DayForecast(null);
     }
+    const days = window.currentPressureForecast || [];
     let curP = window.currentWeatherPressure || (days[0]?.slots[0]?.pressure || 754);
     if (curP < 680 || curP > 820) {
       curP = (days[0]?.slots[0]?.pressure || 754);
