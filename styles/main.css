@@ -11669,7 +11669,7 @@ body.dark-mode .pulse-weather-temp-val {
 }
 .pulse-weather-hero-precip {
   font-size: 0.74rem;
-  font-weight: 700;
+  font-weight: 500;
   color: #0284c7;
   line-height: 1;
   white-space: nowrap;
@@ -11799,7 +11799,7 @@ body.dark-mode .pulse-weather-hour-temp {
 }
 .pulse-weather-hour-precip-badge {
   font-size: 0.58rem;
-  font-weight: 700;
+  font-weight: 500;
   color: #0284c7;
   line-height: 1;
   white-space: nowrap;
@@ -11834,12 +11834,12 @@ body.dark-mode .pulse-weather-hour-wind {
   color: #cbd5e1;
 }
 .pulse-hour-wind-arrow {
-  color: #0284c7;
+  color: #475569;
   flex-shrink: 0;
   transition: transform 0.3s ease;
 }
 body.dark-mode .pulse-hour-wind-arrow {
-  color: #38bdf8;
+  color: #94a3b8;
 }
 .pulse-hour-wind-val {
   font-variant-numeric: tabular-nums;
@@ -11923,14 +11923,14 @@ body.dark-mode .pulse-weather-metric-unit {
   vertical-align: middle;
 }
 .pulse-metric-wind {
-  color: #0284c7;
+  color: #475569;
   display: inline-block;
   vertical-align: middle;
   flex-shrink: 0;
   transition: transform 0.3s ease;
 }
 body.dark-mode .pulse-metric-wind {
-  color: #38bdf8;
+  color: #94a3b8;
 }
 .pulse-metric-rain {
   color: #2563eb;
@@ -12177,7 +12177,7 @@ body.dark-mode .pulse-weather-daily-min {
 }
 .pulse-weather-daily-precip {
   font-size: 0.68rem;
-  font-weight: 700;
+  font-weight: 500;
   color: #0284c7;
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
@@ -12204,12 +12204,12 @@ body.dark-mode .pulse-weather-daily-wind {
   color: #cbd5e1;
 }
 .pulse-daily-wind-arrow {
-  color: #0284c7;
+  color: #475569;
   flex-shrink: 0;
   transition: transform 0.3s ease;
 }
 body.dark-mode .pulse-daily-wind-arrow {
-  color: #38bdf8;
+  color: #94a3b8;
 }
 .pulse-daily-wind-val {
   line-height: 1;

@@ -9835,11 +9835,11 @@ async function loadPulseWeatherData(forceRefresh = false) {
 window.loadPulseWeatherData = loadPulseWeatherData;
 
 function formatWindValHtml(speed) {
-  if (speed === undefined || speed === null || isNaN(speed)) return '0,<span class="pulse-decimal">0</span>';
+  if (speed === undefined || speed === null || isNaN(speed)) return '0.<span class="pulse-decimal">0</span>';
   const num = typeof speed === 'number' ? speed : parseFloat(speed);
   const rounded = num.toFixed(1);
   const parts = rounded.split('.');
-  return `${parts[0]},<span class="pulse-decimal">${parts[1]}</span>`;
+  return `${parts[0]}.<span class="pulse-decimal">${parts[1]}</span>`;
 }
 
 function renderPulseWeatherUI(data, city, updatedTime = '') {
@@ -9941,8 +9941,8 @@ function renderPulseWeatherUI(data, city, updatedTime = '') {
             </span>
           </div>
           <div class="pulse-weather-hour-wind" title="Вітер: ${hWindInfo.dirName} (${hWindInfo.code}, ${hWindInfo.deg}°), швидкість ${hWindSpeed.toFixed(1)} м/с">
-            <svg class="pulse-hour-wind-arrow" width="11" height="11" viewBox="0 0 24 24" fill="currentColor" stroke="none" style="transform: rotate(${hWindInfo.arrowDeg}deg); transform-origin: 50% 50%;">
-              <path d="M12 2L4.5 20.5l7.5-4 7.5 4L12 2z"></path>
+            <svg class="pulse-hour-wind-arrow" width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="none" style="transform: rotate(${hWindInfo.arrowDeg}deg); transform-origin: 50% 50%;">
+              <path d="M12 1.5L7 21.5l5-4.5 5 4.5L12 1.5z"></path>
             </svg>
             <span class="pulse-hour-wind-val">${hWindHtml}</span>
           </div>
@@ -10013,8 +10013,8 @@ function renderPulseWeatherUI(data, city, updatedTime = '') {
           </div>
           <div class="pulse-weather-daily-divider"></div>
           <div class="pulse-weather-daily-wind" title="Вітер: ${dWindInfo.dirName} (${dWindInfo.code}, ${dWindInfo.deg}°), швидкість ${dWindSpeedRaw.toFixed(1)} м/с">
-            <svg class="pulse-daily-wind-arrow" width="11" height="11" viewBox="0 0 24 24" fill="currentColor" stroke="none" style="transform: rotate(${dWindInfo.arrowDeg}deg); transform-origin: 50% 50%;">
-              <path d="M12 2L4.5 20.5l7.5-4 7.5 4L12 2z"></path>
+            <svg class="pulse-daily-wind-arrow" width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="none" style="transform: rotate(${dWindInfo.arrowDeg}deg); transform-origin: 50% 50%;">
+              <path d="M12 1.5L7 21.5l5-4.5 5 4.5L12 1.5z"></path>
             </svg>
             <span class="pulse-daily-wind-val">${dWindSpeedHtml}</span>
           </div>
@@ -10076,8 +10076,8 @@ function renderPulseWeatherUI(data, city, updatedTime = '') {
       <div class="pulse-weather-metric-item" title="Вітер: ${windInfo.dirName} (${windInfo.code}, ${windInfo.deg}°), швидкість ${windSpeedRaw.toFixed(1)} м/с">
         <span class="pulse-weather-metric-lbl">Вітер</span>
         <div class="pulse-weather-metric-data">
-          <svg class="pulse-metric-svg pulse-metric-wind" width="11" height="11" viewBox="0 0 24 24" fill="currentColor" stroke="none" style="transform: rotate(${windInfo.arrowDeg}deg); transform-origin: 50% 50%;">
-            <path d="M12 2L4.5 20.5l7.5-4 7.5 4L12 2z"></path>
+          <svg class="pulse-metric-svg pulse-metric-wind" width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="none" style="transform: rotate(${windInfo.arrowDeg}deg); transform-origin: 50% 50%;">
+            <path d="M12 1.5L7 21.5l5-4.5 5 4.5L12 1.5z"></path>
           </svg>
           <span class="pulse-weather-metric-val">${formatWindValHtml(windSpeedRaw)}</span>
         </div>
