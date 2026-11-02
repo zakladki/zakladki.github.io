@@ -11668,13 +11668,16 @@ body.dark-mode .pulse-weather-temp-val {
   justify-content: center;
 }
 .pulse-weather-hero-precip {
-  font-size: 0.76rem;
+  font-size: 0.74rem;
   font-weight: 700;
   color: #0284c7;
   line-height: 1;
   white-space: nowrap;
   align-self: center;
   margin-left: 2px;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
 }
 body.dark-mode .pulse-weather-hero-precip {
   color: #38bdf8;
@@ -11712,13 +11715,13 @@ body.dark-mode .pulse-weather-hero-lead-icon {
   color: #cbd5e1;
 }
 .pulse-weather-expected-line {
-  font-size: 0.71rem;
-  font-weight: 600;
-  color: #0284c7;
+  font-size: 0.69rem;
+  font-weight: 500;
+  color: #64748b;
   line-height: 1.2;
 }
 body.dark-mode .pulse-weather-expected-line {
-  color: #38bdf8;
+  color: #94a3b8;
 }
 
 /* Погодинний прогноз (горизонтальна стрічка) */
@@ -11800,8 +11803,20 @@ body.dark-mode .pulse-weather-hour-temp {
   color: #0284c7;
   line-height: 1;
   white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 1.5px;
 }
 body.dark-mode .pulse-weather-hour-precip-badge {
+  color: #38bdf8;
+}
+.pulse-hour-precip-drops {
+  color: #0284c7;
+  flex-shrink: 0;
+  display: inline-block;
+  vertical-align: middle;
+}
+body.dark-mode .pulse-hour-precip-drops {
   color: #38bdf8;
 }
 .pulse-weather-hour-wind {
@@ -12166,6 +12181,9 @@ body.dark-mode .pulse-weather-daily-min {
   color: #0284c7;
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
 }
 body.dark-mode .pulse-weather-daily-precip {
   color: #38bdf8;

@@ -9929,7 +9929,16 @@ function renderPulseWeatherUI(data, city, updatedTime = '') {
           <span class="pulse-weather-hour-temp">${hTemp > 0 ? '+' : ''}${hTemp}°</span>
           <div class="pulse-weather-hour-bottom">
             <span class="pulse-weather-hour-icon">${hCond.icon}</span>
-            <span class="pulse-weather-hour-precip-badge" title="Ймовірність опадів: ${hPrecipProb}%">${hPrecipProb}%</span>
+            <span class="pulse-weather-hour-precip-badge" title="Ймовірність опадів, %: ${hPrecipProb}%">
+              <span>${hPrecipProb}</span>
+              <svg class="pulse-hour-precip-drops" width="9" height="9" viewBox="0 0 12 12" fill="currentColor" aria-hidden="true">
+                <path d="M2.2 1.2c-.3.6-.5 1.3-.4 1.8.1.6.6.9 1.1.8.6-.1.9-.6.8-1.2-.1-.5-.5-1.1-.9-1.5a.3.3 0 0 0-.6.1z" opacity="0.75"/>
+                <path d="M6.2 0.8c-.3.6-.5 1.3-.4 1.8.1.6.6.9 1.1.8.6-.1.9-.6.8-1.2-.1-.5-.5-1.1-.9-1.5a.3.3 0 0 0-.6.1z"/>
+                <path d="M10.2 1.2c-.3.6-.5 1.3-.4 1.8.1.6.6.9 1.1.8.6-.1.9-.6.8-1.2-.1-.5-.5-1.1-.9-1.5a.3.3 0 0 0-.6.1z" opacity="0.75"/>
+                <path d="M4.2 6.2c-.3.6-.5 1.3-.4 1.8.1.6.6.9 1.1.8.6-.1.9-.6.8-1.2-.1-.5-.5-1.1-.9-1.5a.3.3 0 0 0-.6.1z" opacity="0.85"/>
+                <path d="M8.2 6.2c-.3.6-.5 1.3-.4 1.8.1.6.6.9 1.1.8.6-.1.9-.6.8-1.2-.1-.5-.5-1.1-.9-1.5a.3.3 0 0 0-.6.1z" opacity="0.85"/>
+              </svg>
+            </span>
           </div>
           <div class="pulse-weather-hour-wind" title="Вітер: ${hWindInfo.dirName} (${hWindInfo.code}, ${hWindInfo.deg}°), швидкість ${hWindSpeed.toFixed(1)} м/с">
             <svg class="pulse-hour-wind-arrow" width="11" height="11" viewBox="0 0 24 24" fill="currentColor" stroke="none" style="transform: rotate(${hWindInfo.arrowDeg}deg); transform-origin: 50% 50%;">
@@ -9989,9 +9998,18 @@ function renderPulseWeatherUI(data, city, updatedTime = '') {
             <span>${dMax > 0 ? '+' : ''}${dMax}°</span>
           </div>
           <div class="pulse-weather-daily-divider"></div>
-          <div class="pulse-weather-daily-weather" title="${dCondLabel} (ймовірність опадів ${dPrecipProb}%)">
+          <div class="pulse-weather-daily-weather" title="${dCondLabel} (ймовірність опадів, %: ${dPrecipProb}%)">
             <span class="pulse-weather-daily-cond-icon" title="${dCondLabel}">${dCond.icon}</span>
-            <span class="pulse-weather-daily-precip">${dPrecipProb}%</span>
+            <span class="pulse-weather-daily-precip" title="Ймовірність опадів, %: ${dPrecipProb}%">
+              <span>${dPrecipProb}</span>
+              <svg class="pulse-hour-precip-drops" width="9" height="9" viewBox="0 0 12 12" fill="currentColor" aria-hidden="true">
+                <path d="M2.2 1.2c-.3.6-.5 1.3-.4 1.8.1.6.6.9 1.1.8.6-.1.9-.6.8-1.2-.1-.5-.5-1.1-.9-1.5a.3.3 0 0 0-.6.1z" opacity="0.75"/>
+                <path d="M6.2 0.8c-.3.6-.5 1.3-.4 1.8.1.6.6.9 1.1.8.6-.1.9-.6.8-1.2-.1-.5-.5-1.1-.9-1.5a.3.3 0 0 0-.6.1z"/>
+                <path d="M10.2 1.2c-.3.6-.5 1.3-.4 1.8.1.6.6.9 1.1.8.6-.1.9-.6.8-1.2-.1-.5-.5-1.1-.9-1.5a.3.3 0 0 0-.6.1z" opacity="0.75"/>
+                <path d="M4.2 6.2c-.3.6-.5 1.3-.4 1.8.1.6.6.9 1.1.8.6-.1.9-.6.8-1.2-.1-.5-.5-1.1-.9-1.5a.3.3 0 0 0-.6.1z" opacity="0.85"/>
+                <path d="M8.2 6.2c-.3.6-.5 1.3-.4 1.8.1.6.6.9 1.1.8.6-.1.9-.6.8-1.2-.1-.5-.5-1.1-.9-1.5a.3.3 0 0 0-.6.1z" opacity="0.85"/>
+              </svg>
+            </span>
           </div>
           <div class="pulse-weather-daily-divider"></div>
           <div class="pulse-weather-daily-wind" title="Вітер: ${dWindInfo.dirName} (${dWindInfo.code}, ${dWindInfo.deg}°), швидкість ${dWindSpeedRaw.toFixed(1)} м/с">
@@ -10030,15 +10048,24 @@ function renderPulseWeatherUI(data, city, updatedTime = '') {
           <i class="fas ${leadIconClass} pulse-weather-hero-lead-icon" aria-hidden="true"></i>
           <span>${curCondLabel}</span>
         </div>
-        <div class="pulse-weather-expected-line" title="Очікуваний діапазон температури на добу">
-          ${todayRangeStr ? `Очікується: ${todayRangeStr}` : ''}
+        <div class="pulse-weather-expected-line" title="Діапазон температури на добу">
+          ${todayRangeStr ? `Мін/Макс: ${todayRangeStr}` : ''}
         </div>
       </div>
       <div class="pulse-weather-hero-right">
         <div class="pulse-weather-temp-main">
           <div class="pulse-weather-temp-val">${temp > 0 ? '+' : ''}${temp}°</div>
           <div class="pulse-weather-temp-icon" title="${cond.label}">${cond.icon}</div>
-          <span class="pulse-weather-hero-precip" title="Ймовірність опадів: ${curPrecipProb}%">${curPrecipProb}%</span>
+          <span class="pulse-weather-hero-precip" title="Ймовірність опадів, %: ${curPrecipProb}%">
+            <span>${curPrecipProb}</span>
+            <svg class="pulse-hour-precip-drops" width="10" height="10" viewBox="0 0 12 12" fill="currentColor" aria-hidden="true">
+              <path d="M2.2 1.2c-.3.6-.5 1.3-.4 1.8.1.6.6.9 1.1.8.6-.1.9-.6.8-1.2-.1-.5-.5-1.1-.9-1.5a.3.3 0 0 0-.6.1z" opacity="0.75"/>
+              <path d="M6.2 0.8c-.3.6-.5 1.3-.4 1.8.1.6.6.9 1.1.8.6-.1.9-.6.8-1.2-.1-.5-.5-1.1-.9-1.5a.3.3 0 0 0-.6.1z"/>
+              <path d="M10.2 1.2c-.3.6-.5 1.3-.4 1.8.1.6.6.9 1.1.8.6-.1.9-.6.8-1.2-.1-.5-.5-1.1-.9-1.5a.3.3 0 0 0-.6.1z" opacity="0.75"/>
+              <path d="M4.2 6.2c-.3.6-.5 1.3-.4 1.8.1.6.6.9 1.1.8.6-.1.9-.6.8-1.2-.1-.5-.5-1.1-.9-1.5a.3.3 0 0 0-.6.1z" opacity="0.85"/>
+              <path d="M8.2 6.2c-.3.6-.5 1.3-.4 1.8.1.6.6.9 1.1.8.6-.1.9-.6.8-1.2-.1-.5-.5-1.1-.9-1.5a.3.3 0 0 0-.6.1z" opacity="0.85"/>
+            </svg>
+          </span>
         </div>
         <div class="pulse-weather-feels-line">${feelsLineText}</div>
       </div>
