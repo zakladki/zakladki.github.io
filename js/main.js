@@ -10129,13 +10129,13 @@ function renderPulseWeatherUI(data, city, updatedTime = '') {
 
   const feelsLineText = `Відчувається як ${feels > 0 ? '+' : ''}${feels}°`;
 
-  container.innerHTML = `
-    <!-- Рядок джерела та синхронізації у самому верху картки -->
-    <div class="pulse-weather-meta-top">
-      <span>Open-Meteo • ${city.name || 'Новомиргород'}</span>
-      <span>${updatedTime ? `Оновлено: ${updatedTime}` : 'Наживо'}</span>
-    </div>
+  const liveBadge = document.getElementById('pulseWeatherLiveBadge');
+  if (liveBadge) {
+    liveBadge.textContent = updatedTime ? updatedTime : 'Наживо';
+    liveBadge.title = `Open-Meteo • ${city.name || 'Новомиргород'} (Оновлено: ${updatedTime || 'наживо'})`;
+  }
 
+  container.innerHTML = `
     <!-- Головна картка поточної погоди -->
     <div class="pulse-weather-hero">
       <div class="pulse-weather-hero-left">
@@ -10241,6 +10241,14 @@ function renderPulseWeatherUI(data, city, updatedTime = '') {
     <!-- Прогноз на наступні дні (Завтра та Післязавтра) -->
     <div class="pulse-weather-daily-rows">
       ${dailyHtml}
+    </div>
+
+    <!-- Підвал картки погоди: джерело даних та статус синхронізації -->
+    <div class="pulse-weather-footer-note">
+      <span title="Джерело метеоданих: високоточні супутникові моделі Open-Meteo">
+        <i class="fas fa-cloud-sun text-info me-1"></i> Open-Meteo
+      </span>
+      <span>${updatedTime ? `Оновлено: ${updatedTime}` : 'Наживо'}</span>
     </div>
   `;
 }
