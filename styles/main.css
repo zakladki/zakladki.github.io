@@ -11389,8 +11389,8 @@ body.dark-mode .pulse-holiday-day-group {
 .pulse-holiday-day-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 6px;
+  justify-content: flex-start;
+  gap: 5px;
   margin-bottom: 2px;
 }
 .pulse-holiday-day-badge {
@@ -11846,20 +11846,32 @@ body.dark-mode .pulse-hour-wind-arrow {
   line-height: 1;
 }
 
-/* Метеопоказники (єдиний суцільний горизонтальний блок із тонкими внутрішніми розділювачами) */
+/* Єдина таблиця: 5 метеопоказників + горизонтальний блок Схід/Захід через лінію */
+.pulse-weather-combined-table {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 7px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+}
+body.dark-mode .pulse-weather-combined-table {
+  background: rgba(30, 41, 59, 0.55);
+  border-color: rgba(255, 255, 255, 0.08);
+}
 .pulse-weather-metrics-grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   gap: 0;
   margin: 0;
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 7px;
-  overflow: hidden;
+  background: transparent;
+  border: none;
+  border-radius: 0;
 }
 body.dark-mode .pulse-weather-metrics-grid {
-  background: rgba(30, 41, 59, 0.55);
-  border-color: rgba(255, 255, 255, 0.08);
+  background: transparent;
+  border-color: transparent;
 }
 .pulse-weather-metric-item {
   background: transparent;
@@ -11957,25 +11969,27 @@ body.dark-mode .pulse-metric-uv {
   color: #fbbf24;
 }
 
-/* Рядок сходу та заходу сонця */
+/* Рядок сходу та заходу сонця (нижній рядок єдиної таблички із роздільною лінією) */
 .pulse-weather-sun-bar {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 12px;
+  justify-content: space-between;
+  gap: 6px;
   margin: 0;
-  padding: 2.5px 6px;
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 6px;
+  padding: 3px 8px 2.5px;
+  background: transparent;
+  border: none;
+  border-top: 1px solid #e2e8f0;
+  border-radius: 0;
   font-size: 0.65rem;
   font-weight: 600;
   color: #475569;
   line-height: 1;
 }
 body.dark-mode .pulse-weather-sun-bar {
-  background: rgba(30, 41, 59, 0.45);
-  border-color: rgba(255, 255, 255, 0.07);
+  background: transparent;
+  border-color: transparent;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
   color: #cbd5e1;
 }
 .pulse-weather-sun-item {
@@ -11984,7 +11998,7 @@ body.dark-mode .pulse-weather-sun-bar {
   gap: 4px;
 }
 .pulse-weather-sun-text {
-  font-size: 0.65rem;
+  font-size: 0.64rem;
   color: #475569;
   letter-spacing: 0.02em;
   white-space: nowrap;
@@ -12003,8 +12017,41 @@ body.dark-mode .pulse-weather-sun-text strong {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 6px;
   line-height: 1;
-  padding: 0 1px;
+  padding: 0;
+}
+.pulse-daylight-val {
+  font-size: 0.67rem;
+  font-weight: 500;
+  color: #0f172a;
+  font-variant-numeric: tabular-nums;
+  cursor: help;
+  line-height: 1;
+  white-space: nowrap;
+}
+body.dark-mode .pulse-daylight-val {
+  color: #f8fafc;
+}
+.pulse-moon-phase-wrap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  cursor: help;
+  flex-shrink: 0;
+}
+.pulse-moon-svg {
+  display: block;
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+.pulse-moon-phase-wrap:hover .pulse-moon-svg {
+  transform: scale(1.15);
+}
+body.dark-mode .pulse-moon-svg circle[fill="#334155"],
+body.dark-mode .pulse-moon-svg path[fill="#334155"] {
+  fill: #1e293b;
 }
 @keyframes pulseSunSpin {
   from {
@@ -12508,51 +12555,63 @@ body.dark-mode .pulse-kp-table td.kp-cell.red {
   color: #f87171;
 }
 
-/* Підвал блоку магнітних бур: вирівнювання по лівому краю за побажанням користувача */
+/* Підвал блоку магнітних бур: легенда ліворуч, компактний значок-посилання праворуч */
 .pulse-geomag-footer {
-  text-align: left;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
   max-width: 300px;
   width: 100%;
-  margin: 5px auto 0;
-  padding-left: 2px;
+  margin: 3px auto 0;
+  padding: 0 2px;
+  box-sizing: border-box;
   border-top: none;
 }
 body.dark-mode .pulse-geomag-footer {
   border-top: none;
 }
 .pulse-geomag-footer-legend {
-  font-size: 0.68rem;
-  line-height: 1.35;
+  font-size: 0.66rem;
+  line-height: 1.25;
   color: #64748b;
-  margin-bottom: 2px;
+  margin: 0;
   text-align: left;
+  flex: 1;
 }
 body.dark-mode .pulse-geomag-footer-legend {
   color: #94a3b8;
 }
 .pulse-geomag-footer-more {
-  text-align: left;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-shrink: 0;
 }
 .pulse-geomag-footer-more a {
-  font-size: 0.72rem;
-  font-weight: 600;
+  font-size: 0.74rem;
   color: #0284c7;
   text-decoration: none;
   display: inline-flex;
   align-items: center;
-  justify-content: flex-start;
-  gap: 4px;
-  transition: color 0.15s ease;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  line-height: 1;
+  transition: all 0.15s ease;
 }
 .pulse-geomag-footer-more a:hover {
-  text-decoration: underline;
   color: #0369a1;
+  background: rgba(2, 132, 199, 0.08);
+  transform: scale(1.15);
 }
 body.dark-mode .pulse-geomag-footer-more a {
   color: #38bdf8;
 }
 body.dark-mode .pulse-geomag-footer-more a:hover {
   color: #7dd3fc;
+  background: rgba(56, 189, 248, 0.15);
 }
 
 /* ==========================================================================

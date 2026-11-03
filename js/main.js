@@ -9263,8 +9263,8 @@ function renderPulseHolidaysUI() {
     const targetDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + offset);
     const dayNum = targetDate.getDate();
     const shortDay = daysShortUk[targetDate.getDay()];
-    // Для СЬОГОДНІ напис прибрано, для ЗАВТРА та ПІСЛЯЗАВТРА: "2 • Пн", "3 • Вт"
-    const dateFormatted = offset === 0 ? '' : `${dayNum} • ${shortDay}`;
+    // Для СЬОГОДНІ напис прибрано, для ЗАВТРА та ПІСЛЯЗАВТРА: "• 4 • Ср", "• 5 • Чт"
+    const dateFormatted = offset === 0 ? '' : `• ${dayNum} • ${shortDay}`;
 
     const events = getEventsForDate(targetDate);
     // Обмеження: не більше 3 записів для сьогодні і не більше 2 для наступних днів (разом до 7 рядків)
@@ -9714,7 +9714,13 @@ function createFallbackWeatherData(city) {
     winds.push(+(3.2 + (i % 3) * 0.4).toFixed(1));
     dirs.push(220 + (i * 10) % 90);
   }
-  const ymd = formatDateToYMD ? formatDateToYMD(now) : now.toISOString().slice(0, 10);
+  const pad = n => String(n).padStart(2, '0');
+  const d1 = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+  const d2 = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 2);
+  const ymd0 = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+  const ymd1 = `${d1.getFullYear()}-${pad(d1.getMonth() + 1)}-${pad(d1.getDate())}`;
+  const ymd2 = `${d2.getFullYear()}-${pad(d2.getMonth() + 1)}-${pad(d2.getDate())}`;
+  const ymd = formatDateToYMD ? formatDateToYMD(now) : ymd0;
   return {
     current: {
       temperature_2m: 8.5,
@@ -9736,6 +9742,7 @@ function createFallbackWeatherData(city) {
       wind_direction_10m: dirs
     },
     daily: {
+      time: [ymd0, ymd1, ymd2],
       sunrise: [`${ymd}T06:36`],
       sunset: [`${ymd}T16:38`],
       uv_index_max: [1.2],
@@ -9842,6 +9849,62 @@ function formatWindValHtml(speed) {
   return `${parts[0]}.<span class="pulse-decimal">${parts[1]}</span>`;
 }
 
+function getMoonPhaseInfo(date = new Date()) {
+  const refNewMoon = new Date(Date.UTC(2024, 0, 11, 11, 57, 0));
+  const diffDays = (date.getTime() - refNewMoon.getTime()) / 86400000;
+  const synodicMonth = 29.53058770576;
+  const age = ((diffDays % synodicMonth) + synodicMonth) % synodicMonth;
+  const fraction = age / synodicMonth;
+
+  let name = 'Молодик';
+  let phaseKey = 'new';
+  let svg = '';
+
+  const illumPercent = Math.round((1 - Math.cos(fraction * 2 * Math.PI)) / 2 * 100);
+
+  if (fraction < 0.035 || fraction >= 0.965) {
+    name = 'Молодик (Новий Місяць)';
+    phaseKey = 'new';
+    svg = '<svg class="pulse-moon-svg" width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="#334155" stroke="#94a3b8" stroke-width="1.3"/></svg>';
+  } else if (fraction < 0.215) {
+    name = 'Молодий місяць (Зростаючий серп)';
+    phaseKey = 'waxing_crescent';
+    svg = '<svg class="pulse-moon-svg" width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="#334155"/><path d="M12 3 A9 9 0 0 1 12 21 A5 9 0 0 0 12 3 Z" fill="#fef08a"/><circle cx="12" cy="12" r="9" fill="none" stroke="#94a3b8" stroke-width="1.3"/></svg>';
+  } else if (fraction < 0.285) {
+    name = 'Перша чверть';
+    phaseKey = 'first_quarter';
+    svg = '<svg class="pulse-moon-svg" width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="#334155"/><path d="M12 3 A9 9 0 0 1 12 21 Z" fill="#fef08a"/><circle cx="12" cy="12" r="9" fill="none" stroke="#94a3b8" stroke-width="1.3"/></svg>';
+  } else if (fraction < 0.465) {
+    name = 'Зростаючий місяць';
+    phaseKey = 'waxing_gibbous';
+    svg = '<svg class="pulse-moon-svg" width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="#fef08a"/><path d="M12 3 A9 9 0 0 0 12 21 A5 9 0 0 1 12 3 Z" fill="#334155"/><circle cx="12" cy="12" r="9" fill="none" stroke="#94a3b8" stroke-width="1.3"/></svg>';
+  } else if (fraction < 0.535) {
+    name = 'Повня (Повний Місяць)';
+    phaseKey = 'full';
+    svg = '<svg class="pulse-moon-svg" width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="#fef08a" stroke="#f59e0b" stroke-width="1.3"/><circle cx="9" cy="10" r="1.5" fill="#fde047" opacity="0.6"/><circle cx="15" cy="14" r="2" fill="#fde047" opacity="0.6"/></svg>';
+  } else if (fraction < 0.715) {
+    name = 'Спадаючий місяць';
+    phaseKey = 'waning_gibbous';
+    svg = '<svg class="pulse-moon-svg" width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="#fef08a"/><path d="M12 3 A9 9 0 0 1 12 21 A5 9 0 0 0 12 3 Z" fill="#334155"/><circle cx="12" cy="12" r="9" fill="none" stroke="#94a3b8" stroke-width="1.3"/></svg>';
+  } else if (fraction < 0.785) {
+    name = 'Остання чверть';
+    phaseKey = 'last_quarter';
+    svg = '<svg class="pulse-moon-svg" width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="#334155"/><path d="M12 3 A9 9 0 0 0 12 21 Z" fill="#fef08a"/><circle cx="12" cy="12" r="9" fill="none" stroke="#94a3b8" stroke-width="1.3"/></svg>';
+  } else {
+    name = 'Старий місяць (Спадний серп)';
+    phaseKey = 'waning_crescent';
+    svg = '<svg class="pulse-moon-svg" width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="#334155"/><path d="M12 3 A9 9 0 0 0 12 21 A5 9 0 0 1 12 3 Z" fill="#fef08a"/><circle cx="12" cy="12" r="9" fill="none" stroke="#94a3b8" stroke-width="1.3"/></svg>';
+  }
+
+  return {
+    name,
+    phaseKey,
+    svg,
+    illumPercent,
+    tooltip: `Фаза Місяця: ${name} (освітленість ~${illumPercent}%)`
+  };
+}
+
 function renderPulseWeatherUI(data, city, updatedTime = '') {
   const container = document.getElementById('pulseWeatherContainer');
   if (!container || !data || !data.current) return;
@@ -9880,6 +9943,27 @@ function renderPulseWeatherUI(data, city, updatedTime = '') {
   // Схід та захід сонця на сьогодні
   const sunriseStr = daily.sunrise && daily.sunrise[0] ? daily.sunrise[0].slice(11, 16) : '06:35';
   const sunsetStr = daily.sunset && daily.sunset[0] ? daily.sunset[0].slice(11, 16) : '16:38';
+
+  // Розрахунок тривалості світлового дня
+  let daylightStr = '10:03';
+  let daylightTooltip = 'Тривалість дня';
+  try {
+    const srParts = sunriseStr.split(':').map(Number);
+    const ssParts = sunsetStr.split(':').map(Number);
+    if (srParts.length === 2 && ssParts.length === 2 && !isNaN(srParts[0]) && !isNaN(ssParts[0])) {
+      const srMins = srParts[0] * 60 + srParts[1];
+      const ssMins = ssParts[0] * 60 + ssParts[1];
+      let diff = ssMins - srMins;
+      if (diff < 0) diff += 24 * 60;
+      const dHours = Math.floor(diff / 60);
+      const dMins = diff % 60;
+      daylightStr = `${dHours}:${String(dMins).padStart(2, '0')}`;
+      daylightTooltip = `Тривалість дня: ${dHours} год ${dMins} хв`;
+    }
+  } catch (e) {}
+
+  // Фаза місяця для поточної дати
+  const moonPhase = getMoonPhaseInfo(now);
 
   // 1. Погодинний прогноз (наступні 24 години) - точний локальний час без зміщення UTC
   let hourlyHtml = '';
@@ -9929,7 +10013,7 @@ function renderPulseWeatherUI(data, city, updatedTime = '') {
           <span class="pulse-weather-hour-temp">${hTemp > 0 ? '+' : ''}${hTemp}°</span>
           <div class="pulse-weather-hour-bottom">
             <span class="pulse-weather-hour-icon">${hCond.icon}</span>
-            <span class="pulse-weather-hour-precip-badge" title="Ймовірність опадів, %: ${hPrecipProb}%">
+            <span class="pulse-weather-hour-precip-badge" title="Ймовірність опадів, ${hPrecipProb}%">
               <span>${hPrecipProb}</span>
               <svg class="pulse-hour-precip-drops" width="9" height="9" viewBox="0 0 12 12" fill="currentColor" aria-hidden="true">
                 <path d="M2.2 1.2c-.3.6-.5 1.3-.4 1.8.1.6.6.9 1.1.8.6-.1.9-.6.8-1.2-.1-.5-.5-1.1-.9-1.5a.3.3 0 0 0-.6.1z" opacity="0.75"/>
@@ -9966,61 +10050,72 @@ function renderPulseWeatherUI(data, city, updatedTime = '') {
   const todayMin = (daily.temperature_2m_min && daily.temperature_2m_min[0] !== undefined) ? Math.round(daily.temperature_2m_min[0]) : null;
   const todayRangeStr = (todayMin !== null && todayMax !== null) ? `${todayMin > 0 ? '+' : ''}${todayMin}° / ${todayMax > 0 ? '+' : ''}${todayMax}°` : '';
 
-  // 3. Прогноз на наступні дні («Завтра» та «Післязавтра»)
+  // 3. Прогноз на наступні дні («Завтра» та «Післязавтра») - надійний парсинг дат та захист для старих браузерів
   let dailyHtml = '';
-  if (daily.time && daily.time.length >= 2) {
-    const dayLabels = { 1: 'Завтра', 2: 'Післязавтра' };
-    const maxDays = Math.min(daily.time.length - 1, 2);
-    for (let i = 1; i <= maxDays; i++) {
-      const dDate = new Date(daily.time[i] + 'T12:00:00');
-      const dDayName = dayLabels[i] || daysUk[dDate.getDay()];
-      const dShortDate = `${dDate.getDate()} ${monthsUk[dDate.getMonth()].toLowerCase()}`;
-      const dMax = Math.round(daily.temperature_2m_max[i]);
-      const dMin = Math.round(daily.temperature_2m_min[i]);
-      const dCode = daily.weather_code[i];
-      const dCond = getWeatherConditionInfo(dCode, 1, 16);
-      const dCondLabel = dCond.label ? (dCond.label.charAt(0).toUpperCase() + dCond.label.slice(1)) : 'Похмуро';
-      const dPrecipProb = (daily.precipitation_probability_max && daily.precipitation_probability_max[i] !== undefined) ? daily.precipitation_probability_max[i] : 0;
-      const dWindSpeedRaw = (daily.wind_speed_10m_max && daily.wind_speed_10m_max[i] !== undefined) ? daily.wind_speed_10m_max[i] : 0;
-      const dWindDir = (daily.wind_direction_10m_dominant && daily.wind_direction_10m_dominant[i] !== undefined) ? daily.wind_direction_10m_dominant[i] : 0;
-      const dWindInfo = getWindDirectionInfo(dWindDir);
-      const dWindSpeedHtml = formatWindValHtml(dWindSpeedRaw);
-
-      dailyHtml += `
-        <div class="pulse-weather-daily-row">
-          <div class="pulse-weather-daily-name">
-            <span>${dDayName}</span>
-            <span class="pulse-weather-daily-sub">${dShortDate}</span>
-          </div>
-          <div class="pulse-weather-daily-divider"></div>
-          <div class="pulse-weather-daily-temps" title="Температура: від ${dMin > 0 ? '+' : ''}${dMin}° до ${dMax > 0 ? '+' : ''}${dMax}°">
-            <span class="pulse-weather-daily-min">${dMin > 0 ? '+' : ''}${dMin}°</span> / 
-            <span>${dMax > 0 ? '+' : ''}${dMax}°</span>
-          </div>
-          <div class="pulse-weather-daily-divider"></div>
-          <div class="pulse-weather-daily-weather" title="${dCondLabel} (ймовірність опадів, %: ${dPrecipProb}%)">
-            <span class="pulse-weather-daily-cond-icon" title="${dCondLabel}">${dCond.icon}</span>
-            <span class="pulse-weather-daily-precip" title="Ймовірність опадів, %: ${dPrecipProb}%">
-              <span>${dPrecipProb}</span>
-              <svg class="pulse-hour-precip-drops" width="9" height="9" viewBox="0 0 12 12" fill="currentColor" aria-hidden="true">
-                <path d="M2.2 1.2c-.3.6-.5 1.3-.4 1.8.1.6.6.9 1.1.8.6-.1.9-.6.8-1.2-.1-.5-.5-1.1-.9-1.5a.3.3 0 0 0-.6.1z" opacity="0.75"/>
-                <path d="M6.2 0.8c-.3.6-.5 1.3-.4 1.8.1.6.6.9 1.1.8.6-.1.9-.6.8-1.2-.1-.5-.5-1.1-.9-1.5a.3.3 0 0 0-.6.1z"/>
-                <path d="M10.2 1.2c-.3.6-.5 1.3-.4 1.8.1.6.6.9 1.1.8.6-.1.9-.6.8-1.2-.1-.5-.5-1.1-.9-1.5a.3.3 0 0 0-.6.1z" opacity="0.75"/>
-                <path d="M4.2 6.2c-.3.6-.5 1.3-.4 1.8.1.6.6.9 1.1.8.6-.1.9-.6.8-1.2-.1-.5-.5-1.1-.9-1.5a.3.3 0 0 0-.6.1z" opacity="0.85"/>
-                <path d="M8.2 6.2c-.3.6-.5 1.3-.4 1.8.1.6.6.9 1.1.8.6-.1.9-.6.8-1.2-.1-.5-.5-1.1-.9-1.5a.3.3 0 0 0-.6.1z" opacity="0.85"/>
-              </svg>
-            </span>
-          </div>
-          <div class="pulse-weather-daily-divider"></div>
-          <div class="pulse-weather-daily-wind" title="Вітер: ${dWindInfo.dirName} (${dWindInfo.code}, ${dWindInfo.deg}°), швидкість ${dWindSpeedRaw.toFixed(1)} м/с">
-            <svg class="pulse-daily-wind-arrow" width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="none" style="transform: rotate(${dWindInfo.arrowDeg}deg); transform-origin: 50% 50%;">
-              <path d="M12 1.5L7 21.5l5-4.5 5 4.5L12 1.5z"></path>
-            </svg>
-            <span class="pulse-daily-wind-val">${dWindSpeedHtml}</span>
-          </div>
-        </div>
-      `;
+  const dayLabels = { 1: 'Завтра', 2: 'Післязавтра' };
+  for (let i = 1; i <= 2; i++) {
+    let dDate;
+    if (daily.time && daily.time[i]) {
+      const parts = String(daily.time[i]).split('T')[0].split('-').map(Number);
+      if (parts.length === 3 && !isNaN(parts[0]) && !isNaN(parts[1]) && !isNaN(parts[2])) {
+        dDate = new Date(parts[0], parts[1] - 1, parts[2], 12, 0, 0);
+      }
     }
+    if (!dDate || isNaN(dDate.getTime())) {
+      dDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + i);
+    }
+    const dDayName = dayLabels[i] || ((daysUk && daysUk[dDate.getDay()]) || '');
+    const mIdx = dDate.getMonth();
+    const monthStr = (monthsUk && monthsUk[mIdx]) ? monthsUk[mIdx].toLowerCase() : '';
+    const dShortDate = `${dDate.getDate()} ${monthStr}`.trim();
+
+    const maxRaw = (daily.temperature_2m_max && daily.temperature_2m_max[i] !== undefined) ? daily.temperature_2m_max[i] : (temp + (i === 1 ? 1 : -1));
+    const minRaw = (daily.temperature_2m_min && daily.temperature_2m_min[i] !== undefined) ? daily.temperature_2m_min[i] : (temp - 3);
+    const dMax = Math.round(maxRaw);
+    const dMin = Math.round(minRaw);
+    const dCode = (daily.weather_code && daily.weather_code[i] !== undefined) ? daily.weather_code[i] : (todayCode || 3);
+    const dCond = getWeatherConditionInfo(dCode, 1, 16);
+    const dCondLabel = dCond.label ? (dCond.label.charAt(0).toUpperCase() + dCond.label.slice(1)) : 'Похмуро';
+    const dPrecipProb = (daily.precipitation_probability_max && daily.precipitation_probability_max[i] !== undefined) ? daily.precipitation_probability_max[i] : 0;
+    const dWindSpeedRaw = (daily.wind_speed_10m_max && daily.wind_speed_10m_max[i] !== undefined) ? daily.wind_speed_10m_max[i] : windSpeedRaw;
+    const dWindDir = (daily.wind_direction_10m_dominant && daily.wind_direction_10m_dominant[i] !== undefined) ? daily.wind_direction_10m_dominant[i] : (curr.wind_direction_10m || 0);
+    const dWindInfo = getWindDirectionInfo(dWindDir);
+    const dWindSpeedHtml = formatWindValHtml(dWindSpeedRaw);
+
+    dailyHtml += `
+      <div class="pulse-weather-daily-row">
+        <div class="pulse-weather-daily-name">
+          <span>${dDayName}</span>
+          <span class="pulse-weather-daily-sub">${dShortDate}</span>
+        </div>
+        <div class="pulse-weather-daily-divider"></div>
+        <div class="pulse-weather-daily-temps" title="Температура: від ${dMin > 0 ? '+' : ''}${dMin}° до ${dMax > 0 ? '+' : ''}${dMax}°">
+          <span class="pulse-weather-daily-min">${dMin > 0 ? '+' : ''}${dMin}°</span> / 
+          <span>${dMax > 0 ? '+' : ''}${dMax}°</span>
+        </div>
+        <div class="pulse-weather-daily-divider"></div>
+        <div class="pulse-weather-daily-weather" title="${dCondLabel} (ймовірність опадів, ${dPrecipProb}%)">
+          <span class="pulse-weather-daily-cond-icon" title="${dCondLabel}">${dCond.icon}</span>
+          <span class="pulse-weather-daily-precip" title="Ймовірність опадів, ${dPrecipProb}%">
+            <span>${dPrecipProb}</span>
+            <svg class="pulse-hour-precip-drops" width="9" height="9" viewBox="0 0 12 12" fill="currentColor" aria-hidden="true">
+              <path d="M2.2 1.2c-.3.6-.5 1.3-.4 1.8.1.6.6.9 1.1.8.6-.1.9-.6.8-1.2-.1-.5-.5-1.1-.9-1.5a.3.3 0 0 0-.6.1z" opacity="0.75"/>
+              <path d="M6.2 0.8c-.3.6-.5 1.3-.4 1.8.1.6.6.9 1.1.8.6-.1.9-.6.8-1.2-.1-.5-.5-1.1-.9-1.5a.3.3 0 0 0-.6.1z"/>
+              <path d="M10.2 1.2c-.3.6-.5 1.3-.4 1.8.1.6.6.9 1.1.8.6-.1.9-.6.8-1.2-.1-.5-.5-1.1-.9-1.5a.3.3 0 0 0-.6.1z" opacity="0.75"/>
+              <path d="M4.2 6.2c-.3.6-.5 1.3-.4 1.8.1.6.6.9 1.1.8.6-.1.9-.6.8-1.2-.1-.5-.5-1.1-.9-1.5a.3.3 0 0 0-.6.1z" opacity="0.85"/>
+              <path d="M8.2 6.2c-.3.6-.5 1.3-.4 1.8.1.6.6.9 1.1.8.6-.1.9-.6.8-1.2-.1-.5-.5-1.1-.9-1.5a.3.3 0 0 0-.6.1z" opacity="0.85"/>
+            </svg>
+          </span>
+        </div>
+        <div class="pulse-weather-daily-divider"></div>
+        <div class="pulse-weather-daily-wind" title="Вітер: ${dWindInfo.dirName} (${dWindInfo.code}, ${dWindInfo.deg}°), швидкість ${dWindSpeedRaw.toFixed(1)} м/с">
+          <svg class="pulse-daily-wind-arrow" width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="none" style="transform: rotate(${dWindInfo.arrowDeg}deg); transform-origin: 50% 50%;">
+            <path d="M12 1.5L7 21.5l5-4.5 5 4.5L12 1.5z"></path>
+          </svg>
+          <span class="pulse-daily-wind-val">${dWindSpeedHtml}</span>
+        </div>
+      </div>
+    `;
   }
 
   // Капіталізація першої літери та вибір відповідної значкової піктограми
@@ -10056,7 +10151,7 @@ function renderPulseWeatherUI(data, city, updatedTime = '') {
         <div class="pulse-weather-temp-main">
           <div class="pulse-weather-temp-val">${temp > 0 ? '+' : ''}${temp}°</div>
           <div class="pulse-weather-temp-icon" title="${cond.label}">${cond.icon}</div>
-          <span class="pulse-weather-hero-precip" title="Ймовірність опадів, %: ${curPrecipProb}%">
+          <span class="pulse-weather-hero-precip" title="Ймовірність опадів, ${curPrecipProb}%">
             <span>${curPrecipProb}</span>
             <svg class="pulse-hour-precip-drops" width="10" height="10" viewBox="0 0 12 12" fill="currentColor" aria-hidden="true">
               <path d="M2.2 1.2c-.3.6-.5 1.3-.4 1.8.1.6.6.9 1.1.8.6-.1.9-.6.8-1.2-.1-.5-.5-1.1-.9-1.5a.3.3 0 0 0-.6.1z" opacity="0.75"/>
@@ -10071,62 +10166,68 @@ function renderPulseWeatherUI(data, city, updatedTime = '') {
       </div>
     </div>
 
-    <!-- Рядок 5 метеопоказників (компактний 2-рядковий вигляд із векторними SVG-піктограмами) -->
-    <div class="pulse-weather-metrics-grid">
-      <div class="pulse-weather-metric-item" title="Вітер: ${windInfo.dirName} (${windInfo.code}, ${windInfo.deg}°), швидкість ${windSpeedRaw.toFixed(1)} м/с">
-        <span class="pulse-weather-metric-lbl">Вітер</span>
-        <div class="pulse-weather-metric-data">
-          <svg class="pulse-metric-svg pulse-metric-wind" width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="none" style="transform: rotate(${windInfo.arrowDeg}deg); transform-origin: 50% 50%;">
-            <path d="M12 1.5L7 21.5l5-4.5 5 4.5L12 1.5z"></path>
-          </svg>
-          <span class="pulse-weather-metric-val">${formatWindValHtml(windSpeedRaw)}</span>
+    <!-- Єдина табличка: 5 метеопоказників + горизонтальний рядок Схід/Захід із роздільною лінією -->
+    <div class="pulse-weather-combined-table">
+      <div class="pulse-weather-metrics-grid">
+        <div class="pulse-weather-metric-item" title="Вітер: ${windInfo.dirName} (${windInfo.code}, ${windInfo.deg}°), швидкість ${windSpeedRaw.toFixed(1)} м/с">
+          <span class="pulse-weather-metric-lbl">Вітер</span>
+          <div class="pulse-weather-metric-data">
+            <svg class="pulse-metric-svg pulse-metric-wind" width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="none" style="transform: rotate(${windInfo.arrowDeg}deg); transform-origin: 50% 50%;">
+              <path d="M12 1.5L7 21.5l5-4.5 5 4.5L12 1.5z"></path>
+            </svg>
+            <span class="pulse-weather-metric-val">${formatWindValHtml(windSpeedRaw)}</span>
+          </div>
+        </div>
+        <div class="pulse-weather-metric-item" title="Кількість опадів: ${precipRaw} мм">
+          <span class="pulse-weather-metric-lbl">Опади</span>
+          <div class="pulse-weather-metric-data">
+            <svg class="pulse-metric-svg pulse-metric-rain" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 16.58A5 5 0 0 0 18 7h-1.26A8 8 0 1 0 4 15.25"></path><path d="M8 19v2m8-2v2m-4-1v2"></path></svg>
+            <span class="pulse-weather-metric-val">${precipRaw === 0 ? '0' : formatWindValHtml(precipRaw)}</span>
+          </div>
+        </div>
+        <div class="pulse-weather-metric-item" title="Відносна вологість повітря, %">
+          <span class="pulse-weather-metric-lbl">Вологість</span>
+          <div class="pulse-weather-metric-data">
+            <svg class="pulse-metric-svg pulse-metric-hum" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path></svg>
+            <span class="pulse-weather-metric-val">${humidityVal}</span>
+          </div>
+        </div>
+        <div class="pulse-weather-metric-item" title="Атмосферний тиск, мм рт.ст.">
+          <span class="pulse-weather-metric-lbl">Тиск</span>
+          <div class="pulse-weather-metric-data">
+            <svg class="pulse-metric-svg pulse-metric-press" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"></path></svg>
+            <span class="pulse-weather-metric-val">${pressureVal}</span>
+          </div>
+        </div>
+        <div class="pulse-weather-metric-item" title="УФ-індекс (ультрафіолет)">
+          <span class="pulse-weather-metric-lbl">УФ-індекс</span>
+          <div class="pulse-weather-metric-data">
+            <svg class="pulse-metric-svg pulse-metric-uv" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M6.34 17.66l-1.41 1.41m12.73-12.73l-1.41 1.41"></path></svg>
+            <span class="pulse-weather-metric-val">${uvVal}</span>
+          </div>
         </div>
       </div>
-      <div class="pulse-weather-metric-item" title="Кількість опадів: ${precipRaw} мм">
-        <span class="pulse-weather-metric-lbl">Опади</span>
-        <div class="pulse-weather-metric-data">
-          <svg class="pulse-metric-svg pulse-metric-rain" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 16.58A5 5 0 0 0 18 7h-1.26A8 8 0 1 0 4 15.25"></path><path d="M8 19v2m8-2v2m-4-1v2"></path></svg>
-          <span class="pulse-weather-metric-val">${precipRaw === 0 ? '0' : formatWindValHtml(precipRaw)}</span>
-        </div>
-      </div>
-      <div class="pulse-weather-metric-item" title="Відносна вологість повітря, %">
-        <span class="pulse-weather-metric-lbl">Вологість</span>
-        <div class="pulse-weather-metric-data">
-          <svg class="pulse-metric-svg pulse-metric-hum" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path></svg>
-          <span class="pulse-weather-metric-val">${humidityVal}</span>
-        </div>
-      </div>
-      <div class="pulse-weather-metric-item" title="Атмосферний тиск, мм рт.ст.">
-        <span class="pulse-weather-metric-lbl">Тиск</span>
-        <div class="pulse-weather-metric-data">
-          <svg class="pulse-metric-svg pulse-metric-press" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"></path></svg>
-          <span class="pulse-weather-metric-val">${pressureVal}</span>
-        </div>
-      </div>
-      <div class="pulse-weather-metric-item" title="УФ-індекс (ультрафіолет)">
-        <span class="pulse-weather-metric-lbl">УФ-індекс</span>
-        <div class="pulse-weather-metric-data">
-          <svg class="pulse-metric-svg pulse-metric-uv" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M6.34 17.66l-1.41 1.41m12.73-12.73l-1.41 1.41"></path></svg>
-          <span class="pulse-weather-metric-val">${uvVal}</span>
-        </div>
-      </div>
-    </div>
 
-    <!-- Рядок сходу та заходу сонця -->
-    <div class="pulse-weather-sun-bar" title="Схід та захід сонця на сьогодні">
-      <div class="pulse-weather-sun-item" title="Схід сонця о ${sunriseStr}">
-        <span class="pulse-weather-sun-text"><strong>${sunriseStr}</strong> СХІД</span>
-      </div>
-      <div class="pulse-weather-sun-center" title="Сонце (світловий день)">
-        <span class="pulse-sun-spinner">
-          <svg class="pulse-sun-icon-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="4.5" fill="#fef08a" stroke="#f59e0b"></circle>
-            <path d="M12 2v2.5M12 19.5V22M4.93 4.93l1.77 1.77M17.3 17.3l1.77 1.77M2 12h2.5M19.5 12H22M4.93 19.07l1.77-1.77M17.3 6.7l1.77-1.77"></path>
-          </svg>
-        </span>
-      </div>
-      <div class="pulse-weather-sun-item" title="Захід сонця о ${sunsetStr}">
-        <span class="pulse-weather-sun-text">ЗАХІД <strong>${sunsetStr}</strong></span>
+      <!-- Рядок сходу, тривалості дня, фази місяця та заходу сонця -->
+      <div class="pulse-weather-sun-bar" title="Світловий день та астрономічні дані на сьогодні">
+        <div class="pulse-weather-sun-item" title="Схід сонця о ${sunriseStr}">
+          <span class="pulse-weather-sun-text"><strong>${sunriseStr}</strong> СХІД</span>
+        </div>
+        <div class="pulse-weather-sun-center">
+          <span class="pulse-sun-spinner" title="Сонце (світловий день)">
+            <svg class="pulse-sun-icon-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="4.5" fill="#fef08a" stroke="#f59e0b"></circle>
+              <path d="M12 2v2.5M12 19.5V22M4.93 4.93l1.77 1.77M17.3 17.3l1.77 1.77M2 12h2.5M19.5 12H22M4.93 19.07l1.77-1.77M17.3 6.7l1.77-1.77"></path>
+            </svg>
+          </span>
+          <span class="pulse-daylight-val" title="${daylightTooltip}">${daylightStr}</span>
+          <span class="pulse-moon-phase-wrap" title="${moonPhase.tooltip}">
+            ${moonPhase.svg}
+          </span>
+        </div>
+        <div class="pulse-weather-sun-item" title="Захід сонця о ${sunsetStr}">
+          <span class="pulse-weather-sun-text">ЗАХІД <strong>${sunsetStr}</strong></span>
+        </div>
       </div>
     </div>
 
@@ -10726,8 +10827,8 @@ function renderPulseDrawerLayout(container) {
               Шкала-Kp: 0-2 спокійно / 3-4 помірно / 5+ буря
             </div>
             <div class="pulse-geomag-footer-more">
-              <a href="https://solarmeteo.ukalendar.com/defs/kp-index" id="pulseHealthFooterLink" target="_blank" rel="noopener" title="Детальніше про Kp-індекс та шкалу геомагнітної активності">
-                Детальніше... <i class="fas fa-external-link-alt"></i>
+              <a href="https://solarmeteo.ukalendar.com/defs/kp-index" id="pulseHealthFooterLink" target="_blank" rel="noopener" title="Детальніше про індекс Kp та шкалу геомагнітної активності" aria-label="Детальніше про індекс Kp та геомагнітну активність">
+                <i class="fas fa-external-link-alt"></i>
               </a>
             </div>
           </div>
@@ -11808,8 +11909,9 @@ function renderHealthForecastUI(activeTab) {
     }
     if (linkEl) {
       linkEl.href = 'https://meteo.gov.ua/';
-      linkEl.title = 'Дізнатися більше про вплив барометричного тиску на самопочуття';
-      linkEl.innerHTML = 'Детальніше... <i class="fas fa-external-link-alt"></i>';
+      linkEl.title = 'Детальніше про атмосферний тиск та вплив на самопочуття';
+      linkEl.setAttribute('aria-label', 'Детальніше про атмосферний тиск та вплив на самопочуття');
+      linkEl.innerHTML = '<i class="fas fa-external-link-alt"></i>';
     }
 
     let prevPressure = null;
@@ -11876,8 +11978,9 @@ function renderHealthForecastUI(activeTab) {
     }
     if (linkEl) {
       linkEl.href = 'https://solarmeteo.ukalendar.com/defs/kp-index';
-      linkEl.title = 'Детальніше про Kp-індекс та шкалу геомагнітної активності';
-      linkEl.innerHTML = 'Детальніше... <i class="fas fa-external-link-alt"></i>';
+      linkEl.title = 'Детальніше про індекс Kp та шкалу геомагнітної активності';
+      linkEl.setAttribute('aria-label', 'Детальніше про індекс Kp та шкалу геомагнітної активності');
+      linkEl.innerHTML = '<i class="fas fa-external-link-alt"></i>';
     }
 
     const rowsHtml = daysForecast.map(day => {
