@@ -9272,11 +9272,18 @@ function renderPulseHolidaysUI() {
     const displayEvents = events.slice(0, maxItems);
 
     let itemsHtml = '';
+    const formatHolidayBullet = (icon) => {
+      if (!icon) return '📌';
+      if (icon === '🇺🇦' || icon.includes('🇺🇦')) {
+        return `<svg class="pulse-holiday-flag-ua" width="13" height="9" viewBox="0 0 16 11" style="border-radius: 2px; vertical-align: -1px; display: inline-block; box-shadow: 0 0 1px rgba(0,0,0,0.4);" aria-label="Прапор України"><rect width="16" height="5.5" fill="#0057b7"/><rect y="5.5" width="16" height="5.5" fill="#ffd700"/></svg>`;
+      }
+      return icon;
+    };
     displayEvents.forEach((ev, idx) => {
       const isMain = offset === 0 && idx === 0;
       itemsHtml += `
         <li class="pulse-holiday-item ${isMain ? 'is-main' : ''}" title="${ev.title}">
-          <span class="pulse-holiday-bullet" aria-hidden="true">${ev.icon || '📌'}</span>
+          <span class="pulse-holiday-bullet" aria-hidden="true">${formatHolidayBullet(ev.icon)}</span>
           <span class="pulse-holiday-text">${ev.title}</span>
         </li>
       `;
@@ -10120,11 +10127,13 @@ function renderPulseWeatherUI(data, city, updatedTime = '') {
 
   // Капіталізація першої літери та вибір відповідної значкової піктограми
   const curCondLabel = cond.label ? (cond.label.charAt(0).toUpperCase() + cond.label.slice(1)) : 'Хмарно';
-  let leadIconClass = 'fa-cloud-sun';
+  let leadIconClass = 'fa-cloud';
   if (cond.type === 'rain' || cond.type === 'drizzle') leadIconClass = 'fa-umbrella';
   else if (cond.type === 'snow') leadIconClass = 'fa-snowflake';
   else if (cond.type === 'thunder') leadIconClass = 'fa-bolt';
   else if (cond.type === 'fog') leadIconClass = 'fa-smog';
+  else if (cond.type === 'cloudy' || cond.type === 'overcast') leadIconClass = 'fa-cloud';
+  else if (cond.type === 'partly') leadIconClass = isDay ? 'fa-cloud-sun' : 'fa-cloud-moon';
   else if (cond.type === 'clear') leadIconClass = isDay ? 'fa-sun' : 'fa-moon';
 
   const feelsLineText = `Відчувається як ${feels > 0 ? '+' : ''}${feels}°`;
@@ -10443,7 +10452,7 @@ function formatEcoMetricHtml(val, unit = 'мкг/м³') {
 
   if (splitIdx !== -1) {
     const intPart = s.slice(0, splitIdx);
-    const decPart = s.slice(splitIdx);
+    const decPart = '.' + s.slice(splitIdx + 1);
     return `<span class="pulse-eco-int">${intPart}</span><span class="pulse-eco-dec">${decPart}</span> <span class="pulse-eco-unit">${unit}</span>`;
   }
   return `<span class="pulse-eco-int">${s}</span> <span class="pulse-eco-unit">${unit}</span>`;
@@ -10563,19 +10572,19 @@ const BASE_FUEL_NETWORKS = [
   { brand: 'Укрнафта', a95: 88.90, a95p: 91.90, dp: 99.90, dpp: 101.90, lpg: 50.90 }
 ];
 
-function formatDecimalsHtml(val, decimals = 2, useComma = true) {
+function formatDecimalsHtml(val, decimals = 2, useComma = false) {
   if (val === undefined || val === null || isNaN(val)) return '';
   const num = typeof val === 'number' ? val : parseFloat(val);
   const formatted = num.toFixed(decimals);
   const sep = useComma ? ',' : '.';
-  const parts = formatted.replace('.', sep).split(sep);
+  const parts = formatted.replace(',', '.').split('.');
   if (parts.length < 2) return parts[0];
   return `${parts[0]}${sep}<span class="pulse-decimal">${parts[1]}</span>`;
 }
 
 function formatFuelPrice(val, delta = 0) {
   const adjusted = Math.max(10, val + delta);
-  return formatDecimalsHtml(adjusted, 2, true);
+  return formatDecimalsHtml(adjusted, 2, false);
 }
 
 function renderPulseFuelTable(selectedRegion = 'ua') {
@@ -10865,28 +10874,28 @@ function renderPulseDrawerLayout(container) {
               <span class="pulse-rate-code">USD</span>
               <span class="pulse-rate-diff up" id="pulseDiffUsd" title="+0.04">▲</span>
             </div>
-            <div class="pulse-rate-value" id="pulseRateUsd">41,<span class="pulse-decimal">50</span></div>
+            <div class="pulse-rate-value" id="pulseRateUsd">41.<span class="pulse-decimal">50</span></div>
           </div>
           <div class="pulse-rate-item" title="Євро (EUR)">
             <div class="pulse-rate-top-line">
               <span class="pulse-rate-code">EUR</span>
               <span class="pulse-rate-diff up" id="pulseDiffEur" title="+0.08">▲</span>
             </div>
-            <div class="pulse-rate-value" id="pulseRateEur">45,<span class="pulse-decimal">15</span></div>
+            <div class="pulse-rate-value" id="pulseRateEur">45.<span class="pulse-decimal">15</span></div>
           </div>
           <div class="pulse-rate-item" title="Польський злотий (PLN)">
             <div class="pulse-rate-top-line">
               <span class="pulse-rate-code">PLN</span>
               <span class="pulse-rate-diff down" id="pulseDiffPln" title="-0.02">▼</span>
             </div>
-            <div class="pulse-rate-value" id="pulseRatePln">10,<span class="pulse-decimal">55</span></div>
+            <div class="pulse-rate-value" id="pulseRatePln">10.<span class="pulse-decimal">55</span></div>
           </div>
           <div class="pulse-rate-item" title="Британський фунт (GBP)">
             <div class="pulse-rate-top-line">
               <span class="pulse-rate-code">GBP</span>
               <span class="pulse-rate-diff up" id="pulseDiffGbp" title="+0.12">▲</span>
             </div>
-            <div class="pulse-rate-value" id="pulseRateGbp">53,<span class="pulse-decimal">90</span></div>
+            <div class="pulse-rate-value" id="pulseRateGbp">53.<span class="pulse-decimal">90</span></div>
           </div>
 
           <!-- Нижня четвірка (Резервні та практичні додаткові валюти) -->
@@ -10895,28 +10904,28 @@ function renderPulseDrawerLayout(container) {
               <span class="pulse-rate-code">CZK</span>
               <span class="pulse-rate-diff up" id="pulseDiffCzk" title="+0.01">▲</span>
             </div>
-            <div class="pulse-rate-value" id="pulseRateCzk">1,<span class="pulse-decimal">78</span></div>
+            <div class="pulse-rate-value" id="pulseRateCzk">1.<span class="pulse-decimal">78</span></div>
           </div>
           <div class="pulse-rate-item" title="Швейцарський франк (CHF)">
             <div class="pulse-rate-top-line">
               <span class="pulse-rate-code">CHF</span>
               <span class="pulse-rate-diff up" id="pulseDiffChf" title="+0.05">▲</span>
             </div>
-            <div class="pulse-rate-value" id="pulseRateChf">47,<span class="pulse-decimal">80</span></div>
+            <div class="pulse-rate-value" id="pulseRateChf">47.<span class="pulse-decimal">80</span></div>
           </div>
           <div class="pulse-rate-item" title="Канадський долар (CAD)">
             <div class="pulse-rate-top-line">
               <span class="pulse-rate-code">CAD</span>
               <span class="pulse-rate-diff down" id="pulseDiffCad" title="-0.03">▼</span>
             </div>
-            <div class="pulse-rate-value" id="pulseRateCad">30,<span class="pulse-decimal">20</span></div>
+            <div class="pulse-rate-value" id="pulseRateCad">30.<span class="pulse-decimal">20</span></div>
           </div>
           <div class="pulse-rate-item" title="Китайський юань (CNY)">
             <div class="pulse-rate-top-line">
               <span class="pulse-rate-code">CNY</span>
               <span class="pulse-rate-diff up" id="pulseDiffCny" title="+0.01">▲</span>
             </div>
-            <div class="pulse-rate-value" id="pulseRateCny">5,<span class="pulse-decimal">75</span></div>
+            <div class="pulse-rate-value" id="pulseRateCny">5.<span class="pulse-decimal">75</span></div>
           </div>
         </div>
 
@@ -10942,7 +10951,7 @@ function renderPulseDrawerLayout(container) {
               <span class="pulse-rate-code">SOL</span>
               <span class="pulse-rate-diff up" id="pulseDiffSol" title="+3.5%">▲</span>
             </div>
-            <div class="pulse-rate-value" id="pulseRateSol">176,40$</div>
+            <div class="pulse-rate-value" id="pulseRateSol">176.40$</div>
           </div>
           <div class="pulse-rate-item" title="BNB Chain (BNB)">
             <div class="pulse-rate-top-line">
@@ -11099,6 +11108,20 @@ function renderPulseDrawerLayout(container) {
           weatherCity: chosen
         }, { merge: true }).catch(() => {});
       }
+      // Автосинхронізація з вибором регіону для Екології
+      if (ecoRegionSelect && chosen !== 'custom_geo') {
+        const matchingEco = UKRAINE_ECO_REGIONS.find(r => r.id === chosen);
+        if (matchingEco && ecoRegionSelect.value !== chosen) {
+          ecoRegionSelect.value = chosen;
+          localStorage.setItem('pulse_eco_region', chosen);
+          loadPulseEcoData(false);
+          if (currentUser && firebaseDb) {
+            firebaseDb.collection('users').doc(currentUser.uid).set({
+              ecoRegion: chosen
+            }, { merge: true }).catch(() => {});
+          }
+        }
+      }
     };
   }
 
@@ -11135,6 +11158,20 @@ function renderPulseDrawerLayout(container) {
         firebaseDb.collection('users').doc(currentUser.uid).set({
           ecoRegion: chosen
         }, { merge: true }).catch(() => {});
+      }
+      // Автосинхронізація з вибором міста для Погоди
+      if (weatherCitySelect) {
+        const matchingWeather = UKRAINE_WEATHER_CITIES.find(c => c.id === chosen);
+        if (matchingWeather && weatherCitySelect.value !== chosen) {
+          weatherCitySelect.value = chosen;
+          localStorage.setItem('pulse_weather_city', chosen);
+          loadPulseWeatherData(false);
+          if (currentUser && firebaseDb) {
+            firebaseDb.collection('users').doc(currentUser.uid).set({
+              weatherCity: chosen
+            }, { merge: true }).catch(() => {});
+          }
+        }
       }
     };
   }
@@ -11656,9 +11693,9 @@ function applyCryptoToUI(cryptoData) {
     if (price >= 1000) {
       return Math.round(price).toLocaleString('uk-UA').replace(/\s/g, ' ') + '$';
     } else if (price >= 1) {
-      return price.toFixed(2).replace('.', ',') + '$';
+      return price.toFixed(2) + '$';
     } else {
-      return price.toFixed(3).replace('.', ',') + '$';
+      return price.toFixed(3) + '$';
     }
   };
 
@@ -11696,7 +11733,7 @@ function applyRatesToUI(rates) {
   const updateItem = (code, val, diff) => {
     const elVal = document.getElementById(`pulseRate${code}`);
     const elDiff = document.getElementById(`pulseDiff${code}`);
-    if (elVal) elVal.innerHTML = formatDecimalsHtml(val, 2, true);
+    if (elVal) elVal.innerHTML = formatDecimalsHtml(val, 2, false);
     if (elDiff && diff) {
       const isUp = diff.startsWith('+') || diff.startsWith('▲');
       elDiff.className = `pulse-rate-diff ${isUp ? 'up' : 'down'}`;

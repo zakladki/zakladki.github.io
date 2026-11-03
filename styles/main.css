@@ -11733,16 +11733,24 @@ body.dark-mode .pulse-weather-expected-line {
   display: flex;
   gap: 5px;
   overflow-x: auto;
-  padding: 0 1px 2px;
+  padding: 0 1px 3px;
   scrollbar-width: thin;
+  scrollbar-color: rgba(148, 163, 184, 0.25) transparent;
   -webkit-overflow-scrolling: touch;
 }
 .pulse-weather-hourly-slider::-webkit-scrollbar {
-  height: 3px;
+  height: 2px;
+}
+.pulse-weather-hourly-slider::-webkit-scrollbar-track {
+  background: transparent;
 }
 .pulse-weather-hourly-slider::-webkit-scrollbar-thumb {
-  background: rgba(148, 163, 184, 0.4);
-  border-radius: 2px;
+  background: rgba(148, 163, 184, 0.25);
+  border-radius: 999px;
+  transition: background 0.2s ease;
+}
+.pulse-weather-hourly-slider:hover::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.55);
 }
 .pulse-weather-hour-item {
   flex: 0 0 auto;
