@@ -12208,11 +12208,11 @@ body.dark-mode .pulse-weather-daily-temps {
   color: #f8fafc;
 }
 .pulse-weather-daily-min {
-  color: #64748b;
-  font-weight: 600;
+  color: inherit;
+  font-weight: inherit;
 }
 body.dark-mode .pulse-weather-daily-min {
-  color: #94a3b8;
+  color: inherit;
 }
 .pulse-weather-daily-weather {
   display: inline-flex;
