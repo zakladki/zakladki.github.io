@@ -9280,8 +9280,8 @@ function renderPulseHolidaysUI() {
     const targetDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + offset);
     const dayNum = targetDate.getDate();
     const shortDay = daysShortUk[targetDate.getDay()];
-    // Для СЬОГОДНІ напис прибрано, для ЗАВТРА та ПІСЛЯЗАВТРА: "• 4 • Ср", "• 5 • Чт"
-    const dateFormatted = offset === 0 ? '' : `• ${dayNum} • ${shortDay}`;
+    // Формат для всіх днів: "• 4 • Ср", "• 5 • Чт", "• 6 • Пт"
+    const dateFormatted = `• ${dayNum} • ${shortDay}`;
 
     const events = getEventsForDate(targetDate);
     // Обмеження: не більше 3 записів для сьогодні і не більше 2 для наступних днів (разом до 7 рядків)
