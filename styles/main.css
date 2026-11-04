@@ -11717,11 +11717,42 @@ body.dark-mode .pulse-weather-hero-lead-icon {
 .pulse-weather-expected-line {
   font-size: 0.69rem;
   font-weight: 500;
-  color: #64748b;
+  color: #1e293b;
   line-height: 1.2;
 }
 body.dark-mode .pulse-weather-expected-line {
+  color: #f1f5f9;
+}
+.pulse-weather-advice-line {
+  font-size: 0.63rem;
+  font-weight: 500;
+  color: #475569;
+  line-height: 1.2;
+  margin-top: 2px;
+  display: flex;
+  align-items: center;
+  gap: 3.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+body.dark-mode .pulse-weather-advice-line {
   color: #94a3b8;
+}
+.pulse-weather-advice-icon {
+  font-size: 0.65rem;
+  color: #0284c7;
+  flex-shrink: 0;
+}
+body.dark-mode .pulse-weather-advice-icon {
+  color: #38bdf8;
+}
+.pulse-temp-subzero {
+  color: #0284c7 !important;
+  font-weight: 700;
+}
+body.dark-mode .pulse-temp-subzero {
+  color: #38bdf8 !important;
 }
 
 /* Погодинний прогноз (горизонтальна стрічка) */
@@ -12150,11 +12181,11 @@ body.dark-mode .pulse-wsvg-sun circle {
 }
 .pulse-weather-daily-row {
   display: grid;
-  grid-template-columns: minmax(70px, 1fr) 1px 64px 1px 46px 1px 36px;
+  grid-template-columns: minmax(78px, 1.1fr) 1px 68px 1px 48px 1px 38px;
   align-items: center;
-  gap: 2px;
+  gap: 3px;
   font-size: 0.72rem;
-  padding: 3px 6px;
+  padding: 3.5px 6px;
   border-radius: 6px;
   background: #ffffff;
   border: 1px solid #e2e8f0;
@@ -12187,13 +12218,13 @@ body.dark-mode .pulse-weather-daily-sub {
 }
 .pulse-weather-daily-divider {
   width: 1px;
-  height: 13px;
-  background: #cbd5e1;
-  opacity: 0.5;
+  height: 14px;
+  background: rgba(148, 163, 184, 0.4);
+  opacity: 1;
   justify-self: center;
 }
 body.dark-mode .pulse-weather-daily-divider {
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.16);
 }
 .pulse-weather-daily-temps {
   font-weight: 700;
@@ -12203,6 +12234,7 @@ body.dark-mode .pulse-weather-daily-divider {
   text-align: center;
   justify-self: center;
   font-variant-numeric: tabular-nums;
+  letter-spacing: -0.2px;
 }
 body.dark-mode .pulse-weather-daily-temps {
   color: #f8fafc;
@@ -13455,7 +13487,7 @@ body.dark-mode .pulse-conv-quick-btn:hover {
 .pulse-finance-footer {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   gap: 6px;
   width: 100%;
   margin-top: 2px;

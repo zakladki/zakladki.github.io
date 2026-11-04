@@ -8976,6 +8976,22 @@ const UKRAINE_EVENTS_DB = {
   '11-04': [
     { title: 'День залізничника України', icon: '💼', cat: 'pro' }
   ],
+  '11-05': [
+    { title: 'Всесвітній день поширення інформації про проблему цунамі (ООН)', icon: '🌍', cat: 'intl' },
+    { title: 'День цифрової грамотності та волонтерських ініціатив', icon: '💻', cat: 'pro' }
+  ],
+  '11-06': [
+    { title: 'Міжнародний день захисту довкілля під час війни (ООН)', icon: '🌍', cat: 'intl' },
+    { title: 'День визволення Києва від нацистських загарбників (1943 р.)', icon: '🎗️', cat: 'memo' }
+  ],
+  '11-07': [
+    { title: 'Міжнародний день боротьби з насильством і цькуванням у школі (ЮНЕСКО)', icon: '🌍', cat: 'intl' },
+    { title: 'День відповідального лідерства та підтримки громад', icon: '🤝', cat: 'pro' }
+  ],
+  '11-08': [
+    { title: 'Собор Архістратига Михаїла (Михайлів день)', icon: '🕊️', cat: 'biblical' },
+    { title: 'Всесвітній день містобудування (урбанізму)', icon: '🌍', cat: 'intl' }
+  ],
   '11-09': [
     { title: 'Всеукраїнський день працівників культури та майстрів народного мистецтва', icon: '💼', cat: 'pro' }
   ],
@@ -9211,8 +9227,9 @@ function getEventsForDate(date) {
   const combined = [...relative, ...fixed];
 
   if (combined.length === 0) {
+    const daysShort = ['Нд', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
     return [
-      { title: 'Пам\'ятний день: щоденна праця для захисту та Перемоги України', icon: '🇺🇦', cat: 'ua' }
+      { title: `День стійкості, щоденної праці та єдності України (${daysShort[date.getDay()]})`, icon: '🇺🇦', cat: 'ua' }
     ];
   }
 
@@ -9685,6 +9702,35 @@ function getWeatherConditionInfo(code, isDay = 1, size = 18) {
   };
 }
 
+function formatPulseTempHtml(t, showPlus = true) {
+  if (t === null || t === undefined || isNaN(t)) return '';
+  const sign = t > 0 ? (showPlus ? '+' : '') : '';
+  const cls = t < 0 ? ' class="pulse-temp-subzero"' : '';
+  return `<span${cls}>${sign}${t}°</span>`;
+}
+
+function getPulseWeatherAdvice(temp, cond, precipProb, windSpeed) {
+  if (temp <= 0 && (cond.type === 'rain' || cond.type === 'snow' || cond.type === 'drizzle')) {
+    return { icon: 'fa-snowflake', text: 'Ожеледиця: слизька дорога' };
+  }
+  if (cond.type === 'rain' || cond.type === 'drizzle' || precipProb >= 40) {
+    return { icon: 'fa-car-side', text: 'Мокра дорога: тримайте дистанцію' };
+  }
+  if (windSpeed >= 6.5) {
+    return { icon: 'fa-wind', text: `Поривчастий вітер (${windSpeed.toFixed(1)} м/с)` };
+  }
+  if (cond.type === 'fog') {
+    return { icon: 'fa-smog', text: 'Туман: обмежена видимість' };
+  }
+  if (temp <= 2 && temp >= -1) {
+    return { icon: 'fa-temperature-low', text: 'Увага: можлива паморозь на мостах' };
+  }
+  if (temp >= 28) {
+    return { icon: 'fa-sun', text: 'Спека: пийте більше води' };
+  }
+  return { icon: 'fa-road', text: 'Суха дорога: сприятливі умови' };
+}
+
 function getActiveWeatherCity() {
   const select = document.getElementById('pulseWeatherCitySelect');
   let chosenId = select ? select.value : (localStorage.getItem('pulse_weather_city') || 'novomyrhorod');
@@ -10017,7 +10063,7 @@ function renderPulseWeatherUI(data, city, updatedTime = '') {
       hourlyHtml += `
         <div class="pulse-weather-hour-item">
           <span class="pulse-weather-hour-time">${i === startIdx ? 'Зараз' : hTime}</span>
-          <span class="pulse-weather-hour-temp">${hTemp > 0 ? '+' : ''}${hTemp}°</span>
+          <span class="pulse-weather-hour-temp ${hTemp < 0 ? 'pulse-temp-subzero' : ''}">${hTemp > 0 ? '+' : ''}${hTemp}°</span>
           <div class="pulse-weather-hour-bottom">
             <span class="pulse-weather-hour-icon">${hCond.icon}</span>
             <span class="pulse-weather-hour-precip-badge" title="Ймовірність опадів, ${hPrecipProb}%">
@@ -10055,7 +10101,7 @@ function renderPulseWeatherUI(data, city, updatedTime = '') {
   const todayCond = getWeatherConditionInfo(todayCode, 1, 16);
   const todayMax = (daily.temperature_2m_max && daily.temperature_2m_max[0] !== undefined) ? Math.round(daily.temperature_2m_max[0]) : null;
   const todayMin = (daily.temperature_2m_min && daily.temperature_2m_min[0] !== undefined) ? Math.round(daily.temperature_2m_min[0]) : null;
-  const todayRangeStr = (todayMin !== null && todayMax !== null) ? `${todayMin > 0 ? '+' : ''}${todayMin}° / ${todayMax > 0 ? '+' : ''}${todayMax}°` : '';
+  const todayRangeStr = (todayMin !== null && todayMax !== null) ? `${formatPulseTempHtml(todayMin)} ... ${formatPulseTempHtml(todayMax)}` : '';
 
   // 3. Прогноз на наступні дні («Завтра» та «Післязавтра») - надійний парсинг дат та захист для старих браузерів
   let dailyHtml = '';
@@ -10097,8 +10143,7 @@ function renderPulseWeatherUI(data, city, updatedTime = '') {
         </div>
         <div class="pulse-weather-daily-divider"></div>
         <div class="pulse-weather-daily-temps" title="Температура: від ${dMin > 0 ? '+' : ''}${dMin}° до ${dMax > 0 ? '+' : ''}${dMax}°">
-          <span class="pulse-weather-daily-min">${dMin > 0 ? '+' : ''}${dMin}°</span> / 
-          <span>${dMax > 0 ? '+' : ''}${dMax}°</span>
+          <span>${formatPulseTempHtml(dMin)}...${formatPulseTempHtml(dMax)}</span>
         </div>
         <div class="pulse-weather-daily-divider"></div>
         <div class="pulse-weather-daily-weather" title="${dCondLabel} (ймовірність опадів, ${dPrecipProb}%)">
@@ -10137,6 +10182,7 @@ function renderPulseWeatherUI(data, city, updatedTime = '') {
   else if (cond.type === 'clear') leadIconClass = isDay ? 'fa-sun' : 'fa-moon';
 
   const feelsLineText = `Відчувається як ${feels > 0 ? '+' : ''}${feels}°`;
+  const weatherAdvice = getPulseWeatherAdvice(temp, cond, curPrecipProb, windSpeedRaw);
 
   const liveBadge = document.getElementById('pulseWeatherLiveBadge');
   if (liveBadge) {
@@ -10153,12 +10199,16 @@ function renderPulseWeatherUI(data, city, updatedTime = '') {
           <span>${curCondLabel}</span>
         </div>
         <div class="pulse-weather-expected-line" title="Діапазон температури на добу">
-          ${todayRangeStr ? `Мін/Макс: ${todayRangeStr}` : ''}
+          ${todayRangeStr ? `Температура: ${todayRangeStr}` : ''}
+        </div>
+        <div class="pulse-weather-advice-line" title="Порада водіям та пішоходам на основі поточної погоди">
+          <i class="fas ${weatherAdvice.icon} pulse-weather-advice-icon"></i>
+          <span>${weatherAdvice.text}</span>
         </div>
       </div>
       <div class="pulse-weather-hero-right">
         <div class="pulse-weather-temp-main">
-          <div class="pulse-weather-temp-val">${temp > 0 ? '+' : ''}${temp}°</div>
+          <div class="pulse-weather-temp-val ${temp < 0 ? 'pulse-temp-subzero' : ''}">${temp > 0 ? '+' : ''}${temp}°</div>
           <div class="pulse-weather-temp-icon" title="${cond.label}">${cond.icon}</div>
           <span class="pulse-weather-hero-precip" title="Ймовірність опадів, ${curPrecipProb}%">
             <span>${curPrecipProb}</span>
@@ -10382,6 +10432,8 @@ function getEffectiveEcoRegionId() {
 }
 
 async function loadPulseEcoData(forceRefresh = false) {
+  const refreshIcon = document.getElementById('pulseEcoRefreshIcon');
+  if (refreshIcon) refreshIcon.classList.add('fa-spin');
   const select = document.getElementById('pulseEcoRegionSelect');
   const chosenId = select ? select.value : getEffectiveEcoRegionId();
   const region = UKRAINE_ECO_REGIONS.find(r => r.id === chosenId) || UKRAINE_ECO_REGIONS[0];
@@ -10393,6 +10445,7 @@ async function loadPulseEcoData(forceRefresh = false) {
       const cached = JSON.parse(localStorage.getItem(cacheKey) || 'null');
       if (cached && (now - cached.timestamp < 45 * 60 * 1000)) {
         renderPulseEcoUI(cached.data, region);
+        if (refreshIcon) refreshIcon.classList.remove('fa-spin');
         return;
       }
     } catch (e) {}
@@ -10439,6 +10492,7 @@ async function loadPulseEcoData(forceRefresh = false) {
   } catch (e) {}
 
   renderPulseEcoUI(ecoData, region);
+  if (refreshIcon) refreshIcon.classList.remove('fa-spin');
 }
 
 function formatEcoMetricHtml(val, unit = 'мкг/м³') {
@@ -10524,6 +10578,14 @@ function renderPulseEcoUI(data, region) {
       statusBadge.style.color = '#dc2626';
       statusBadge.textContent = '🔴 Увага';
     }
+  }
+
+  const ecoLiveBadge = document.getElementById('pulseEcoLiveBadge');
+  if (ecoLiveBadge) {
+    const d = new Date();
+    const timeStr = `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+    ecoLiveBadge.textContent = timeStr;
+    ecoLiveBadge.title = `SaveEcoBot / EcoCity • ${region.name || 'Новомиргород'} (Оновлено: ${timeStr})`;
   }
 
   if (pm25El) pm25El.innerHTML = formatEcoMetricHtml(data.pm25, 'мкг/м³');
@@ -10658,9 +10720,8 @@ function renderPulseDrawerLayout(container) {
         <div class="pulse-card-divider"></div>
 
         <!-- Секція 2: Ціни на пальне -->
-        <div class="pulse-calc-heading" style="justify-content: space-between; margin-bottom: 6px;">
+        <div class="pulse-calc-heading" style="margin-bottom: 6px;">
           <span><i class="fas fa-gas-pump text-danger"></i> <strong>Ціни на пальне:</strong></span>
-          <span class="pulse-card-badge" id="pulseFuelRegionBadge" style="margin: 0;">АЗС України</span>
         </div>
 
         <!-- Вибір регіону / області (збереження в браузері та профілі) -->
@@ -10739,7 +10800,12 @@ function renderPulseDrawerLayout(container) {
       <div class="pulse-card" id="pulseCardEco">
         <div class="pulse-card-header">
           <span class="pulse-card-title"><i class="fas fa-leaf text-success"></i> Екологія та радіація</span>
-          <span class="pulse-card-badge badge-green" id="pulseEcoStatusBadge">🟢 Норма</span>
+          <div class="d-flex align-items-center" style="gap: 5px;">
+            <span class="pulse-card-badge badge-green" id="pulseEcoLiveBadge" title="Час останніх вимірів екологічних датчиків">Наживо</span>
+            <button type="button" id="pulseEcoRefreshBtn" class="pulse-weather-refresh-action-btn" title="Оновити дані екології" aria-label="Оновити дані екології">
+              <i class="fas fa-sync-alt" id="pulseEcoRefreshIcon"></i>
+            </button>
+          </div>
         </div>
 
         <!-- Вибір місцевості (міста) з автоматичним збереженням (уніфіковано з погодою) -->
@@ -10995,9 +11061,8 @@ function renderPulseDrawerLayout(container) {
         <!-- Рядок офіційного орієнтиру / джерела (розміщено одразу після 2 рядків курсів) -->
         <div class="pulse-finance-footer">
           <span class="pulse-finance-footer-note" title="Офіційний курс НБУ та середньозважені міжбанківські котирування">
-            <i class="fas fa-university text-primary" style="margin-right: 3px;"></i>Курс НБУ / Міжбанк
+            <i class="fas fa-university text-primary" style="margin-right: 3px;"></i>Курс НБУ / Міжбанк • <span id="pulseFinanceDateNote">Оновлення щодня</span>
           </span>
-          <span class="pulse-finance-footer-date" id="pulseFinanceDateNote">Оновлення щодня</span>
         </div>
 
         <!-- Роздільна лінія перед Конвертером Валют як просив користувач -->
@@ -11035,7 +11100,7 @@ function renderPulseDrawerLayout(container) {
               </select>
             </div>
             <div class="pulse-conv-input-row">
-              <input type="number" id="pulseConvAmountFrom" class="pulse-conv-input" value="10" min="0" step="any">
+              <input type="text" inputmode="decimal" id="pulseConvAmountFrom" class="pulse-conv-input" value="10">
             </div>
             <div class="pulse-conv-rate-ref" id="pulseConvRateFromRef">1 USD = 41.50 UAH</div>
           </div>
@@ -11062,7 +11127,7 @@ function renderPulseDrawerLayout(container) {
               </select>
             </div>
             <div class="pulse-conv-input-row">
-              <input type="number" id="pulseConvAmountTo" class="pulse-conv-input" value="415.00" min="0" step="any">
+              <input type="text" inputmode="decimal" id="pulseConvAmountTo" class="pulse-conv-input" value="415.00">
             </div>
             <div class="pulse-conv-rate-ref" id="pulseConvRateToRef">1 UAH = 0.0241 USD</div>
           </div>
@@ -11142,6 +11207,16 @@ function renderPulseDrawerLayout(container) {
       e.preventDefault();
       e.stopPropagation();
       loadPulseWeatherData(true);
+    };
+  }
+
+  // Кнопка примусового оновлення екології
+  const ecoRefreshBtn = container.querySelector('#pulseEcoRefreshBtn');
+  if (ecoRefreshBtn) {
+    ecoRefreshBtn.onclick = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      loadPulseEcoData(true);
     };
   }
 
@@ -11432,7 +11507,8 @@ function renderPulseDrawerLayout(container) {
 
   function convertFromTo() {
     if (!inpFrom || !inpTo || !selFrom || !selTo) return;
-    const amt = parseFloat(inpFrom.value) || 0;
+    const cleanStr = String(inpFrom.value).replace(',', '.');
+    const amt = parseFloat(cleanStr) || 0;
     const cFrom = selFrom.value;
     const cTo = selTo.value;
     const rFromUah = getCurrencyRateUah(cFrom);
@@ -11444,7 +11520,8 @@ function renderPulseDrawerLayout(container) {
 
   function convertToFrom() {
     if (!inpFrom || !inpTo || !selFrom || !selTo) return;
-    const amt = parseFloat(inpTo.value) || 0;
+    const cleanStr = String(inpTo.value).replace(',', '.');
+    const amt = parseFloat(cleanStr) || 0;
     const cFrom = selFrom.value;
     const cTo = selTo.value;
     const rFromUah = getCurrencyRateUah(cFrom);
