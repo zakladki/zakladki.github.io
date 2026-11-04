@@ -11217,6 +11217,12 @@ function renderPulseDrawerLayout(container) {
       e.preventDefault();
       e.stopPropagation();
       loadPulseEcoData(true);
+      // Оскільки «Метео & Тиск» розташовано в цій самій 3-й колонці, також освіжаємо його дані
+      if (typeof fetchLiveGeomag3DayForecast === 'function') {
+        fetchLiveGeomag3DayForecast().then(res => {
+          if (res) renderGeomagForecastUI(res);
+        }).catch(() => {});
+      }
     };
   }
 
