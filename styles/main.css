@@ -13509,6 +13509,627 @@ body.dark-mode .pulse-finance-footer {
   opacity: 0.85;
 }
 
+/* ==========================================================================
+   ПОГОДА (СІНОПТІК-ВКЛАДКИ ТА 7-КОЛОНКОВА ТАБЛИЦЯ)
+   ========================================================================== */
+.pulse-weather2-content,
+.pulse-weather-container {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+/* Об'єднаний верхній блок (вкладки Sinoptik + органічна астро-вставка без порожнього розриву) */
+.pulse-w2-top-panel {
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-subtle, rgba(241, 245, 249, 0.75));
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 9px;
+  overflow: hidden;
+  margin-bottom: 5px;
+}
+body.dark-mode .pulse-w2-top-panel {
+  background: rgba(15, 23, 42, 0.6);
+  border-color: #334155;
+}
+
+/* Вкладки у стилі Sinoptik (Сьогодні / Завтра / Післязавтра) */
+.pulse-w2-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+  background: transparent;
+  padding: 3px 3px 2px;
+  border: none;
+  border-radius: 0;
+}
+
+.pulse-w2-tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  padding: 4px 2px 5px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  color: var(--text-muted, #64748b);
+  font-family: inherit;
+  outline: none;
+}
+.pulse-w2-tab:hover {
+  background: rgba(255, 255, 255, 0.6);
+  color: var(--text-main, #0f172a);
+}
+body.dark-mode .pulse-w2-tab:hover {
+  background: rgba(30, 41, 59, 0.6);
+  color: #f1f5f9;
+}
+.pulse-w2-tab.active {
+  background: var(--card-bg, #ffffff);
+  border-color: rgba(14, 165, 233, 0.4);
+  color: var(--text-main, #0f172a);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(14, 165, 233, 0.2);
+}
+body.dark-mode .pulse-w2-tab.active {
+  background: #1e293b;
+  border-color: rgba(56, 189, 248, 0.5);
+  color: #f8fafc;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.pulse-w2-tab-title {
+  font-size: 0.73rem;
+  font-weight: 700;
+  line-height: 1.1;
+}
+.pulse-w2-tab.active .pulse-w2-tab-title {
+  color: #0284c7;
+}
+body.dark-mode .pulse-w2-tab.active .pulse-w2-tab-title {
+  color: #38bdf8;
+}
+
+.pulse-w2-tab-date {
+  font-size: 0.63rem;
+  color: var(--text-muted, #64748b);
+  line-height: 1.1;
+  white-space: nowrap;
+}
+body.dark-mode .pulse-w2-tab-date {
+  color: #94a3b8;
+}
+
+.pulse-w2-tab-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 24px;
+  margin: 1px 0;
+}
+
+.pulse-w2-tab-temps {
+  font-size: 0.68rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.pulse-w2-tab-range-sep {
+  color: #94a3b8;
+  font-weight: normal;
+  font-size: 0.62rem;
+}
+
+/* ==========================================================================
+   ПОГОДА 2 (ВКЛАДКИ SINOPTIK, ДЕННА АСТРО-СМУГА, ТАБЛИЦЯ ТА РЕКОРДИ)
+   ========================================================================== */
+.pulse-w2-sun-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: transparent;
+  border: none;
+  border-top: 1px dashed var(--border-color, #e2e8f0);
+  border-radius: 0;
+  padding: 3px 8px 4px;
+  margin: 0;
+  font-size: 0.67rem;
+  color: var(--text-muted, #64748b);
+  box-sizing: border-box;
+}
+body.dark-mode .pulse-w2-sun-bar {
+  background: transparent;
+  border-top-color: #334155;
+  color: #94a3b8;
+}
+.pulse-w2-sun-side {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.67rem;
+}
+.pulse-w2-sun-time {
+  font-weight: 700;
+  color: var(--text-main, #0f172a);
+  font-variant-numeric: tabular-nums;
+}
+body.dark-mode .pulse-w2-sun-time {
+  color: #f1f5f9;
+}
+.pulse-w2-sun-lbl {
+  font-size: 0.60rem;
+  font-weight: 600;
+  opacity: 0.85;
+  letter-spacing: 0.3px;
+}
+.pulse-w2-sun-mid {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0 4px;
+}
+.pulse-w2-daylight-val {
+  font-weight: 700;
+  font-size: 0.69rem;
+  color: #d97706;
+  font-variant-numeric: tabular-nums;
+}
+body.dark-mode .pulse-w2-daylight-val {
+  color: #fbbf24;
+}
+
+/* Рядок стану погоди та порада водіям/пішоходам */
+.pulse-w2-status-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  background: var(--bg-subtle, rgba(241, 245, 249, 0.75));
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 8px;
+  padding: 4px 8px;
+  margin-bottom: 5px;
+  font-size: 0.68rem;
+  box-sizing: border-box;
+}
+body.dark-mode .pulse-w2-status-banner {
+  background: rgba(15, 23, 42, 0.55);
+  border-color: #334155;
+}
+.pulse-w2-status-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.pulse-w2-status-icon {
+  font-size: 0.78rem;
+  flex-shrink: 0;
+}
+.pulse-w2-status-txt {
+  font-weight: 600;
+  color: var(--text-main, #0f172a);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+body.dark-mode .pulse-w2-status-txt {
+  color: #e2e8f0;
+}
+.pulse-w2-status-sep {
+  color: var(--text-muted, #94a3b8);
+  font-size: 0.65rem;
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+
+.pulse-w2-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 8px;
+  background: var(--card-bg, #ffffff);
+}
+body.dark-mode .pulse-w2-table-wrap {
+  border-color: #334155;
+  background: rgba(15, 23, 42, 0.4);
+}
+
+.pulse-w2-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.72rem;
+  line-height: 1.25;
+  font-variant-numeric: tabular-nums;
+}
+
+.pulse-w2-th-row th {
+  background: var(--bg-subtle, #f8fafc);
+  color: var(--text-muted, #64748b);
+  font-weight: 600;
+  font-size: 0.73rem;
+  text-align: center;
+  padding: 5px 2px;
+  border-bottom: 1px solid var(--border-color, #e2e8f0);
+  white-space: nowrap;
+  vertical-align: middle;
+}
+body.dark-mode .pulse-w2-th-row th {
+  background: #1e293b;
+  color: #94a3b8;
+  border-color: #334155;
+}
+.pulse-w2-th-row th i {
+  display: inline-block;
+  font-size: 0.80rem;
+  opacity: 0.9;
+}
+
+.pulse-w2-row {
+  border-bottom: 1px solid var(--border-subtle, rgba(226, 232, 240, 0.65));
+  transition: background 0.15s ease;
+}
+body.dark-mode .pulse-w2-row {
+  border-color: rgba(51, 65, 85, 0.45);
+}
+.pulse-w2-row:last-child {
+  border-bottom: none;
+}
+.pulse-w2-row:hover {
+  background: rgba(241, 245, 249, 0.6);
+}
+body.dark-mode .pulse-w2-row:hover {
+  background: rgba(30, 41, 59, 0.4);
+}
+
+/* Підсвічування актуального періоду для Сьогодні (без зсуву таблиці) */
+.pulse-w2-row.pulse-w2-row-current {
+  background: rgba(14, 165, 233, 0.12) !important;
+  font-weight: 600;
+}
+body.dark-mode .pulse-w2-row.pulse-w2-row-current {
+  background: rgba(56, 189, 248, 0.16) !important;
+}
+
+.pulse-w2-table td {
+  padding: 3.5px 2px;
+  text-align: center;
+  vertical-align: middle;
+}
+
+/* Час: фіксована стабільна ширина */
+.pulse-w2-th-time {
+  width: 32px;
+}
+.pulse-w2-col-time {
+  font-weight: 600;
+  color: var(--text-muted, #475569);
+  width: 32px;
+}
+body.dark-mode .pulse-w2-col-time {
+  color: #cbd5e1;
+}
+.pulse-w2-time-val {
+  font-size: 0.71rem;
+}
+
+/* Об'єднана колонка: стан погоди (хмаринки/сонце) + цифрове значення опадів з крапельками */
+.pulse-w2-th-weather {
+  width: 58px;
+}
+.pulse-w2-th-weather i {
+  font-size: 0.86rem;
+}
+.pulse-w2-col-weather {
+  width: 58px;
+  text-align: center;
+  padding: 2.5px 1px !important;
+  white-space: nowrap;
+}
+.pulse-w2-weather-cell {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3.5px;
+  line-height: 1;
+}
+.pulse-w2-weather-cell .pulse-w2-cell-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.pulse-w2-weather-cell .pulse-w2-cell-icon svg {
+  display: block;
+}
+.pulse-w2-cell-precip {
+  display: inline-flex;
+  align-items: center;
+  gap: 1.5px;
+  font-size: 0.69rem;
+  font-weight: 600;
+  color: #0284c7;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+body.dark-mode .pulse-w2-cell-precip {
+  color: #38bdf8;
+}
+.pulse-w2-cell-precip.high {
+  color: #0369a1;
+  font-weight: 700;
+}
+body.dark-mode .pulse-w2-cell-precip.high {
+  color: #7dd3fc;
+}
+.pulse-w2-cell-precip .pulse-hour-precip-drops {
+  opacity: 0.85;
+}
+
+/* Температура: формат "+1°/-3°" без пробілів */
+.pulse-w2-th-temp {
+  width: 54px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+}
+.pulse-w2-col-temp {
+  width: 54px;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  padding: 3.5px 1px !important;
+}
+.pulse-w2-temp-actual {
+  font-weight: 700;
+  font-size: 0.73rem;
+  color: var(--text-main, #0f172a);
+}
+body.dark-mode .pulse-w2-temp-actual {
+  color: #f8fafc;
+}
+.pulse-w2-temp-feels {
+  font-weight: 500;
+  font-size: 0.65rem;
+  color: #64748b;
+}
+body.dark-mode .pulse-w2-temp-feels {
+  color: #94a3b8;
+}
+
+/* Вітер: витягнута сірувата стрілка */
+.pulse-w2-th-wind {
+  width: 44px;
+}
+.pulse-w2-col-wind {
+  width: 44px;
+}
+.pulse-w2-wind-cell {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  white-space: nowrap;
+  color: var(--text-main, #0f172a);
+}
+body.dark-mode .pulse-w2-wind-cell {
+  color: #f1f5f9;
+}
+.pulse-w2-wind-cell .pulse-hour-wind-arrow {
+  color: #64748b;
+  flex-shrink: 0;
+  transition: transform 0.25s ease;
+}
+body.dark-mode .pulse-w2-wind-cell .pulse-hour-wind-arrow {
+  color: #94a3b8;
+}
+.pulse-w2-wind-num {
+  font-size: 0.71rem;
+}
+
+/* Вологість */
+.pulse-w2-th-hum {
+  width: 30px;
+}
+.pulse-w2-col-hum {
+  width: 30px;
+}
+.pulse-w2-hum-num {
+  font-size: 0.71rem;
+  color: #64748b;
+}
+body.dark-mode .pulse-w2-hum-num {
+  color: #94a3b8;
+}
+
+/* Тиск з кольоровим підсвіченням норми - звичайний нежирний шрифт */
+.pulse-w2-th-press {
+  width: 34px;
+}
+.pulse-w2-col-press {
+  width: 34px;
+  font-weight: 400 !important;
+}
+.pulse-w2-press-badge {
+  display: inline-block;
+  padding: 1px 3px;
+  border-radius: 4px;
+  font-size: 0.69rem;
+  font-weight: 400 !important; /* Звичайний (normal) нежирний шрифт */
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+.pulse-w2-row.pulse-w2-row-current .pulse-w2-press-badge {
+  font-weight: 400 !important;
+}
+.pulse-w2-press-badge.green {
+  background: rgba(34, 197, 94, 0.12);
+  color: #15803d;
+}
+body.dark-mode .pulse-w2-press-badge.green {
+  background: rgba(34, 197, 94, 0.2);
+  color: #4ade80;
+}
+.pulse-w2-press-badge.yellow {
+  background: rgba(234, 179, 8, 0.15);
+  color: #b45309;
+}
+body.dark-mode .pulse-w2-press-badge.yellow {
+  background: rgba(234, 179, 8, 0.24);
+  color: #fde047;
+}
+.pulse-w2-press-badge.red {
+  background: rgba(239, 68, 68, 0.15);
+  color: #b91c1c;
+}
+body.dark-mode .pulse-w2-press-badge.red {
+  background: rgba(239, 68, 68, 0.25);
+  color: #f87171;
+}
+
+/* Магнітні бурі (Kp індекс): звичайний нежирний шрифт */
+.pulse-w2-th-geomag {
+  width: 28px;
+}
+.pulse-w2-col-geomag {
+  width: 28px;
+  padding: 3.5px 1px !important;
+  font-weight: 400 !important;
+}
+.pulse-w2-kp-badge {
+  display: inline-block;
+  padding: 1px 3px;
+  border-radius: 4px;
+  font-size: 0.68rem;
+  font-weight: 400 !important; /* Звичайний (normal) нежирний шрифт */
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+.pulse-w2-row.pulse-w2-row-current .pulse-w2-kp-badge {
+  font-weight: 400 !important;
+}
+.pulse-w2-kp-badge.green {
+  background: rgba(34, 197, 94, 0.16);
+  color: #15803d;
+}
+body.dark-mode .pulse-w2-kp-badge.green {
+  background: rgba(34, 197, 94, 0.22);
+  color: #4ade80;
+}
+.pulse-w2-kp-badge.yellow {
+  background: rgba(234, 179, 8, 0.2);
+  color: #b45309;
+}
+body.dark-mode .pulse-w2-kp-badge.yellow {
+  background: rgba(234, 179, 8, 0.26);
+  color: #fde047;
+}
+.pulse-w2-kp-badge.red {
+  background: rgba(239, 68, 68, 0.2);
+  color: #b91c1c;
+}
+body.dark-mode .pulse-w2-kp-badge.red {
+  background: rgba(239, 68, 68, 0.28);
+  color: #f87171;
+}
+
+/* Історичні кліматичні рекорди (за останні 130 років) */
+.pulse-w2-history-box {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  background: var(--bg-subtle, rgba(241, 245, 249, 0.7));
+  border: 1px dashed var(--border-color, #e2e8f0);
+  border-radius: 7px;
+  padding: 3px 6px;
+  margin-top: 1px;
+  font-size: 0.64rem;
+}
+body.dark-mode .pulse-w2-history-box {
+  background: rgba(15, 23, 42, 0.45);
+  border-color: #334155;
+}
+.pulse-w2-history-header {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.63rem;
+  color: var(--text-muted, #64748b);
+  font-weight: 600;
+}
+body.dark-mode .pulse-w2-history-header {
+  color: #94a3b8;
+}
+.pulse-w2-history-records {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 6px;
+  font-size: 0.66rem;
+}
+.pulse-w2-hist-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+.pulse-w2-hist-item.max {
+  color: #b91c1c;
+}
+body.dark-mode .pulse-w2-hist-item.max {
+  color: #f87171;
+}
+.pulse-w2-hist-item.min {
+  color: #0284c7;
+}
+body.dark-mode .pulse-w2-hist-item.min {
+  color: #38bdf8;
+}
+.pulse-w2-hist-year {
+  color: var(--text-muted, #64748b);
+  font-size: 0.61rem;
+}
+body.dark-mode .pulse-w2-hist-year {
+  color: #94a3b8;
+}
+.pulse-w2-hist-sep {
+  color: #cbd5e1;
+  font-size: 0.60rem;
+}
+body.dark-mode .pulse-w2-hist-sep {
+  color: #475569;
+}
+
+/* Підвал */
+.pulse-w2-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 2px 0;
+  font-size: 0.67rem;
+  color: var(--text-muted, #64748b);
+  border-top: 1px dashed var(--border-color, #e2e8f0);
+}
+body.dark-mode .pulse-w2-footer {
+  border-color: #334155;
+  color: #94a3b8;
+}
+.pulse-w2-footer-city,
+.pulse-w2-footer-source {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+
 
 
 
