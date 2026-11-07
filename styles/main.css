@@ -12808,9 +12808,9 @@ body.dark-mode .pulse-eco-strip {
   white-space: nowrap;
 }
 .pulse-eco-strip-title {
-  font-size: 0.62rem;
-  font-weight: 700;
-  color: #64748b;
+  font-size: 0.63rem;
+  font-weight: 600;
+  color: #475569;
   line-height: 1;
   margin-bottom: 0;
   letter-spacing: 0.1px;
@@ -12853,23 +12853,23 @@ body.dark-mode .pulse-eco-strip-title {
   background-color: #ef4444;
 }
 .pulse-eco-strip-val {
-  font-size: 0.74rem;
-  font-weight: 700;
-  color: #0f172a;
+  font-size: 0.65rem;
+  font-weight: 500;
+  color: #334155;
   font-variant-numeric: tabular-nums;
   line-height: 1;
   display: inline-flex;
   align-items: baseline;
 }
 body.dark-mode .pulse-eco-strip-val {
-  color: #f1f5f9;
+  color: #cbd5e1;
 }
 .pulse-eco-strip-val .pulse-eco-int {
-  font-weight: 700;
+  font-weight: 500;
 }
 .pulse-eco-strip-val .pulse-eco-dec {
-  font-size: 0.62rem;
-  font-weight: 500;
+  font-size: 0.58rem;
+  font-weight: 400;
   color: #64748b;
   margin-left: 0.5px;
 }
@@ -12890,7 +12890,56 @@ body.dark-mode .pulse-eco-strip-sep {
    КОЛОНКА 4: СТРІЧКА ВАЖЛИВИХ НОВИН
    ========================================================================== */
 .pulse-news-tabs-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
   margin-bottom: 7px;
+}
+.pulse-news-important-filter-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 20px;
+  border-radius: 5px;
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  background: rgba(239, 68, 68, 0.06);
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+.pulse-news-important-filter-btn:hover {
+  background: rgba(239, 68, 68, 0.16);
+  border-color: #ef4444;
+  transform: scale(1.05);
+}
+.pulse-news-important-filter-btn.active {
+  background: rgba(239, 68, 68, 0.22);
+  border-color: #ef4444;
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.25);
+}
+.pulse-news-filter-red-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #ef4444;
+  display: block;
+  box-shadow: 0 0 4px rgba(239, 68, 68, 0.6);
+  transition: transform 0.15s ease;
+}
+.pulse-news-important-filter-btn:hover .pulse-news-filter-red-dot,
+.pulse-news-important-filter-btn.active .pulse-news-filter-red-dot {
+  transform: scale(1.2);
+}
+body.dark-mode .pulse-news-important-filter-btn {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.4);
+}
+body.dark-mode .pulse-news-important-filter-btn.active {
+  background: rgba(239, 68, 68, 0.3);
+  border-color: #ef4444;
 }
 .pulse-news-feed {
   display: flex;
@@ -12931,65 +12980,54 @@ body.dark-mode .pulse-news-item:hover {
   background: rgba(56, 189, 248, 0.1);
   border-color: #38bdf8;
 }
+.pulse-news-item.priority-high {
+  border-left: 2.5px solid #ef4444;
+  background: rgba(239, 68, 68, 0.02);
+}
+body.dark-mode .pulse-news-item.priority-high {
+  border-left-color: #ef4444;
+  background: rgba(239, 68, 68, 0.06);
+}
 .pulse-news-meta {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 4px;
+  gap: 6px;
 }
 .pulse-news-src-badge {
   font-size: 0.58rem;
-  font-weight: 700;
-  padding: 1px 4px;
+  font-weight: 600;
+  padding: 1px 5px;
   border-radius: 3px;
   text-transform: uppercase;
   letter-spacing: 0.2px;
-  background: rgba(2, 132, 199, 0.1);
-  color: #0284c7;
+  background: #f1f5f9;
+  color: #475569;
+  border: 1px solid #e2e8f0;
 }
 body.dark-mode .pulse-news-src-badge {
-  background: rgba(56, 189, 248, 0.18);
-  color: #38bdf8;
+  background: #1e293b;
+  color: #94a3b8;
+  border-color: #334155;
 }
-.pulse-news-src-badge.src-suspilne {
-  background: rgba(16, 185, 129, 0.12);
-  color: #059669;
-}
-body.dark-mode .pulse-news-src-badge.src-suspilne {
-  background: rgba(16, 185, 129, 0.22);
-  color: #34d399;
-}
-.pulse-news-src-badge.src-pravda {
-  background: rgba(239, 68, 68, 0.12);
-  color: #dc2626;
-}
-body.dark-mode .pulse-news-src-badge.src-pravda {
-  background: rgba(239, 68, 68, 0.22);
-  color: #f87171;
-}
-.pulse-news-src-badge.src-rbc {
-  background: rgba(245, 158, 11, 0.12);
-  color: #d97706;
-}
-body.dark-mode .pulse-news-src-badge.src-rbc {
-  background: rgba(245, 158, 11, 0.22);
-  color: #fbbf24;
-}
-.pulse-news-src-badge.src-ukrinform {
-  background: rgba(59, 130, 246, 0.12);
-  color: #2563eb;
-}
-body.dark-mode .pulse-news-src-badge.src-ukrinform {
-  background: rgba(59, 130, 246, 0.22);
-  color: #60a5fa;
-}
+/* Нейтральний вигляд для всіх джерел - без відволікаючої строкатості */
+.pulse-news-src-badge.src-suspilne,
+.pulse-news-src-badge.src-pravda,
+.pulse-news-src-badge.src-rbc,
+.pulse-news-src-badge.src-ukrinform,
 .pulse-news-src-badge.src-liga {
-  background: rgba(139, 92, 246, 0.12);
-  color: #7c3aed;
+  background: #f1f5f9;
+  color: #475569;
+  border-color: #e2e8f0;
 }
+body.dark-mode .pulse-news-src-badge.src-suspilne,
+body.dark-mode .pulse-news-src-badge.src-pravda,
+body.dark-mode .pulse-news-src-badge.src-rbc,
+body.dark-mode .pulse-news-src-badge.src-ukrinform,
 body.dark-mode .pulse-news-src-badge.src-liga {
-  background: rgba(139, 92, 246, 0.22);
-  color: #a78bfa;
+  background: #1e293b;
+  color: #94a3b8;
+  border-color: #334155;
 }
 .pulse-news-time {
   font-size: 0.60rem;
@@ -14540,13 +14578,12 @@ body.dark-mode .pulse-w2-hist-sep {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 4px 2px 0;
+  padding: 5px 2px 0;
   font-size: 0.67rem;
   color: var(--text-muted, #64748b);
-  border-top: 1px dashed var(--border-color, #e2e8f0);
+  border-top: none;
 }
 body.dark-mode .pulse-w2-footer {
-  border-color: #334155;
   color: #94a3b8;
 }
 .pulse-w2-footer-city,

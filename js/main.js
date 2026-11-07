@@ -10973,6 +10973,7 @@ const PULSE_NEWS_ITEMS = [
     source: 'Суспільне',
     sourceClass: 'src-suspilne',
     cat: 'war',
+    priority: 'high',
     minutesAgo: 8,
     url: 'https://suspilne.media/'
   },
@@ -10982,6 +10983,7 @@ const PULSE_NEWS_ITEMS = [
     source: 'Укрінформ',
     sourceClass: 'src-ukrinform',
     cat: 'main',
+    priority: 'normal',
     minutesAgo: 24,
     url: 'https://www.ukrinform.ua/'
   },
@@ -10991,6 +10993,7 @@ const PULSE_NEWS_ITEMS = [
     source: 'РБК-Україна',
     sourceClass: 'src-rbc',
     cat: 'econ',
+    priority: 'normal',
     minutesAgo: 45,
     url: 'https://www.rbc.ua/'
   },
@@ -11000,6 +11003,7 @@ const PULSE_NEWS_ITEMS = [
     source: 'УП',
     sourceClass: 'src-pravda',
     cat: 'war',
+    priority: 'high',
     minutesAgo: 65,
     url: 'https://www.pravda.com.ua/'
   },
@@ -11009,6 +11013,7 @@ const PULSE_NEWS_ITEMS = [
     source: 'Liga.net',
     sourceClass: 'src-liga',
     cat: 'econ',
+    priority: 'normal',
     minutesAgo: 95,
     url: 'https://www.liga.net/'
   },
@@ -11018,6 +11023,7 @@ const PULSE_NEWS_ITEMS = [
     source: 'Суспільне',
     sourceClass: 'src-suspilne',
     cat: 'main',
+    priority: 'normal',
     minutesAgo: 120,
     url: 'https://suspilne.media/'
   },
@@ -11027,6 +11033,7 @@ const PULSE_NEWS_ITEMS = [
     source: 'Укрінформ',
     sourceClass: 'src-ukrinform',
     cat: 'main',
+    priority: 'normal',
     minutesAgo: 150,
     url: 'https://www.ukrinform.ua/'
   },
@@ -11036,6 +11043,7 @@ const PULSE_NEWS_ITEMS = [
     source: 'РБК-Україна',
     sourceClass: 'src-rbc',
     cat: 'econ',
+    priority: 'normal',
     minutesAgo: 185,
     url: 'https://www.rbc.ua/'
   }
@@ -11044,14 +11052,17 @@ const PULSE_NEWS_ITEMS = [
 let currentPulseNewsTab = 'all';
 
 function formatNewsTime(minutesAgo) {
-  const d = new Date(Date.now() - minutesAgo * 60 * 1000);
+  const now = new Date();
+  const d = new Date(now.getTime() - minutesAgo * 60 * 1000);
   const hh = String(d.getHours()).padStart(2, '0');
   const mm = String(d.getMinutes()).padStart(2, '0');
+  const isYesterday = d.getDate() !== now.getDate();
+  const prefix = isYesterday ? 'вчора ' : '';
   if (minutesAgo < 60) {
-    return `${hh}:${mm} (${minutesAgo} хв тому)`;
+    return `${prefix}${hh}:${mm} (${minutesAgo} хв тому)`;
   }
   const hours = Math.floor(minutesAgo / 60);
-  return `${hh}:${mm} (${hours} год тому)`;
+  return `${prefix}${hh}:${mm} (${hours} год тому)`;
 }
 
 function renderPulseNewsFeed(filter = 'all') {
@@ -11059,16 +11070,24 @@ function renderPulseNewsFeed(filter = 'all') {
   const feedEl = document.getElementById('pulseNewsFeed');
   if (!feedEl) return;
 
-  const items = filter === 'all' ? PULSE_NEWS_ITEMS : PULSE_NEWS_ITEMS.filter(it => it.cat === filter);
+  let items;
+  if (filter === 'important') {
+    items = PULSE_NEWS_ITEMS.filter(it => it.priority === 'high');
+  } else if (filter === 'all') {
+    items = PULSE_NEWS_ITEMS;
+  } else {
+    items = PULSE_NEWS_ITEMS.filter(it => it.cat === filter);
+  }
+
   if (!items.length) {
-    feedEl.innerHTML = `<div class="text-center py-3 text-muted" style="font-size:0.7rem;">Новин у цій категорії наразі немає</div>`;
+    feedEl.innerHTML = `<div class="text-center py-3 text-muted" style="font-size:0.7rem;">${filter === 'important' ? 'Важливих новин наразі немає' : 'Новин у цій категорії наразі немає'}</div>`;
     return;
   }
 
   feedEl.innerHTML = items.map(item => `
-    <article class="pulse-news-item">
+    <article class="pulse-news-item ${item.priority === 'high' ? 'priority-high' : ''}">
       <div class="pulse-news-meta">
-        <span class="pulse-news-src-badge ${item.sourceClass}">${item.source}</span>
+        <span class="pulse-news-src-badge">${item.source}</span>
         <span class="pulse-news-time">${formatNewsTime(item.minutesAgo)}</span>
       </div>
       <a href="${item.url}" target="_blank" rel="noopener" class="pulse-news-title" title="${item.title}">
@@ -11521,7 +11540,7 @@ function renderPulseDrawerLayout(container) {
             </div>
           </div>
 
-          <!-- Вкладки категорій новин -->
+          <!-- Вкладки категорій новин та кнопка-індикатор важливих новин (червоний кружечок) -->
           <div class="pulse-news-tabs-wrap">
             <div class="pulse-rates-tab-group" id="pulseNewsTabGroup">
               <button type="button" class="pulse-rate-tab-btn active" data-tab="all">Всі</button>
@@ -11529,6 +11548,9 @@ function renderPulseDrawerLayout(container) {
               <button type="button" class="pulse-rate-tab-btn" data-tab="war">Фронт</button>
               <button type="button" class="pulse-rate-tab-btn" data-tab="econ">Економіка</button>
             </div>
+            <button type="button" class="pulse-news-important-filter-btn" id="pulseNewsImportantBtn" title="Показати лише важливі новини (з червоною лінією)" aria-label="Лише важливі новини">
+              <span class="pulse-news-filter-red-dot"></span>
+            </button>
           </div>
 
           <!-- Стрічка останніх новин -->
@@ -11969,18 +11991,43 @@ function renderPulseDrawerLayout(container) {
   // Рендеримо власний віджет «Свята та події» на 3 дні (Сьогодні, Завтра, Післязавтра)
   renderPulseHolidaysUI();
 
-  // Обробники вкладок категорій та оновлення стрічки новин (Колонка 4)
+  // Обробники вкладок категорій та червоного кружечка (важливі новини)
   const newsTabGroup = container.querySelector('#pulseNewsTabGroup');
+  const newsImportantBtn = container.querySelector('#pulseNewsImportantBtn');
+
   if (newsTabGroup) {
     const tabBtns = newsTabGroup.querySelectorAll('.pulse-rate-tab-btn');
     tabBtns.forEach(btn => {
       btn.onclick = () => {
         tabBtns.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
+        if (newsImportantBtn) newsImportantBtn.classList.remove('active');
         const tab = btn.getAttribute('data-tab') || 'all';
         renderPulseNewsFeed(tab);
       };
     });
+  }
+
+  if (newsImportantBtn) {
+    newsImportantBtn.onclick = () => {
+      const isCurrentlyActive = newsImportantBtn.classList.contains('active');
+      const tabBtns = newsTabGroup ? newsTabGroup.querySelectorAll('.pulse-rate-tab-btn') : [];
+
+      if (isCurrentlyActive) {
+        // Вимикаємо фільтр важливих: повертаємося до вкладки "Всі"
+        newsImportantBtn.classList.remove('active');
+        tabBtns.forEach(b => {
+          if (b.getAttribute('data-tab') === 'all') b.classList.add('active');
+          else b.classList.remove('active');
+        });
+        renderPulseNewsFeed('all');
+      } else {
+        // Вмикаємо фільтр лише важливих новин
+        newsImportantBtn.classList.add('active');
+        tabBtns.forEach(b => b.classList.remove('active'));
+        renderPulseNewsFeed('important');
+      }
+    };
   }
 
   const newsRefreshBtn = container.querySelector('#pulseNewsRefreshBtn');
