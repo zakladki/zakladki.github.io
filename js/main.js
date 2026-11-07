@@ -10074,11 +10074,32 @@ function renderPulseWeatherUI(data, city, updatedTime = '') {
     const minSign = minT > 0 ? '+' : '';
     const maxSign = maxT > 0 ? '+' : '';
 
+    // Розрахунок середньодобової ймовірності опадів для вкладки
+    let dayAvgPrecip = 0;
+    if (hourly.precipitation_probability && Array.isArray(hourly.precipitation_probability)) {
+      const daySlice = hourly.precipitation_probability.slice(d * 24, (d + 1) * 24).filter(v => typeof v === 'number' && !isNaN(v));
+      if (daySlice.length > 0) {
+        dayAvgPrecip = Math.round(daySlice.reduce((sum, v) => sum + v, 0) / daySlice.length);
+      }
+    }
+
     tabsHtml += `
       <button type="button" class="pulse-w2-tab ${d === activeTab ? 'active' : ''}" onclick="window.setPulseWeatherTab(${d})">
         <span class="pulse-w2-tab-title">${tabNames[d]}</span>
         <span class="pulse-w2-tab-date">${dayNum} ${monthLabel} • ${dowLabel}</span>
-        <span class="pulse-w2-tab-icon">${cond.icon}</span>
+        <div class="pulse-w2-tab-weather-row" title="${cond.label} • Середня ймовірність опадів: ${dayAvgPrecip}%">
+          <span class="pulse-w2-tab-icon">${cond.icon}</span>
+          <span class="pulse-w2-tab-precip ${dayAvgPrecip >= 50 ? 'high' : ''}" title="Середня ймовірність опадів за добу: ${dayAvgPrecip}%">
+            <span class="pulse-w2-tab-precip-val">${dayAvgPrecip}</span>
+            <svg class="pulse-hour-precip-drops" width="8" height="8" viewBox="0 0 12 12" fill="currentColor" aria-hidden="true">
+              <path d="M2.2 1.2c-.3.6-.5 1.3-.4 1.8.1.6.6.9 1.1.8.6-.1.9-.6.8-1.2-.1-.5-.5-1.1-.9-1.5a.3.3 0 0 0-.6.1z" opacity="0.75"/>
+              <path d="M6.2 0.8c-.3.6-.5 1.3-.4 1.8.1.6.6.9 1.1.8.6-.1.9-.6.8-1.2-.1-.5-.5-1.1-.9-1.5a.3.3 0 0 0-.6.1z"/>
+              <path d="M10.2 1.2c-.3.6-.5 1.3-.4 1.8.1.6.6.9 1.1.8.6-.1.9-.6.8-1.2-.1-.5-.5-1.1-.9-1.5a.3.3 0 0 0-.6.1z" opacity="0.75"/>
+              <path d="M4.2 6.2c-.3.6-.5 1.3-.4 1.8.1.6.6.9 1.1.8.6-.1.9-.6.8-1.2-.1-.5-.5-1.1-.9-1.5a.3.3 0 0 0-.6.1z" opacity="0.85"/>
+              <path d="M8.2 6.2c-.3.6-.5 1.3-.4 1.8.1.6.6.9 1.1.8.6-.1.9-.6.8-1.2-.1-.5-.5-1.1-.9-1.5a.3.3 0 0 0-.6.1z" opacity="0.85"/>
+            </svg>
+          </span>
+        </div>
         <div class="pulse-w2-tab-temps">
           <span class="${minClass}">${minSign}${minT}°</span>
           <span class="pulse-w2-tab-range-sep">...</span>
@@ -10287,7 +10308,7 @@ function renderPulseWeatherUI(data, city, updatedTime = '') {
         <td class="pulse-w2-col-weather" title="${cond.label} (ймовірність опадів: ${precipVal}%)">
           <div class="pulse-w2-weather-cell">
             <span class="pulse-w2-cell-icon">${cond.icon}</span>
-            <span class="pulse-w2-cell-precip ${precipVal >= 40 ? 'high' : ''}" title="Ймовірність опадів: ${precipVal}%">
+            <span class="pulse-w2-cell-precip ${precipVal >= 50 ? 'high' : ''}" title="Ймовірність опадів: ${precipVal}%">
               <span class="pulse-w2-cell-precip-val">${precipVal}</span>
               <svg class="pulse-hour-precip-drops" width="9" height="9" viewBox="0 0 12 12" fill="currentColor" aria-hidden="true">
                 <path d="M2.2 1.2c-.3.6-.5 1.3-.4 1.8.1.6.6.9 1.1.8.6-.1.9-.6.8-1.2-.1-.5-.5-1.1-.9-1.5a.3.3 0 0 0-.6.1z" opacity="0.75"/>
@@ -10307,7 +10328,7 @@ function renderPulseWeatherUI(data, city, updatedTime = '') {
             <svg class="pulse-hour-wind-arrow" width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="none" style="transform: rotate(${windInfo.arrowDeg}deg); transform-origin: 50% 50%;">
               <path d="M12 1.5L7 21.5l5-4.5 5 4.5L12 1.5z"></path>
             </svg>
-            <span class="pulse-w2-wind-num">${hWindHtml}</span>
+            <span class="pulse-w2-wind-num ${windSpeed >= 8 ? 'high' : ''}">${hWindHtml}</span>
           </div>
         </td>
         <td class="pulse-w2-col-hum" title="Вологість повітря: ${humVal}%">
@@ -10333,65 +10354,118 @@ function renderPulseWeatherUI(data, city, updatedTime = '') {
       histMonth = parseInt(parts[1], 10) - 1;
     }
   }
-  const histDateLabel = `${histDay} ${monthsUkShort[histMonth]}`;
+  const monthsUkGenitive = [
+    'січня', 'лютого', 'березня', 'квітня', 'травня', 'червня',
+    'липня', 'серпня', 'вересня', 'жовтня', 'листопада', 'грудня'
+  ];
+  const histDateLabelFull = `${histDay} ${monthsUkGenitive[histMonth]}`;
   const hist = getHistoricalClimateRecord(histMonth, histDay);
 
   container.innerHTML = `
-    <!-- Об'єднана верхня панель: перемикачі Sinoptik + органічна астрономічна смуга без порожнього розриву -->
+    <!-- 1. Верхня панель: перемикачі Sinoptik + компактний вертикальний ротатор інфо-рядка (Світловий день / Стан неба / Дорожня порада) -->
     <div class="pulse-w2-top-panel">
       <div class="pulse-w2-tabs">
         ${tabsHtml}
       </div>
-      ${sunBarHtml}
+      <div class="pulse-w2-rot-divider">
+        <div class="pulse-w2-rot-dots-center" id="pulseWeatherRotDots" title="Індикатор активного слайда (натисніть для переходу)">
+          <span class="pulse-w2-rot-dot active" data-idx="0" onclick="window.setPulseWeatherSlide(0); event.stopPropagation();" title="Світловий день (схід / захід)"></span>
+          <span class="pulse-w2-rot-dot" data-idx="1" onclick="window.setPulseWeatherSlide(1); event.stopPropagation();" title="Стан погоди на добу"></span>
+          <span class="pulse-w2-rot-dot" data-idx="2" onclick="window.setPulseWeatherSlide(2); event.stopPropagation();" title="Порада водіям та пішоходам"></span>
+        </div>
+      </div>
+      <div class="pulse-w2-rotator-bar" id="pulseWeatherRotatorBar" onclick="window.rotatePulseWeatherInfo(1)" title="Натисніть для перегортання (автоповорот кожні 7 секунд)">
+        <div class="pulse-w2-rot-viewport">
+          <div class="pulse-w2-rot-track" id="pulseWeatherRotTrack">
+            <!-- Слайд 1: Схід / Тривалість дня / Захід -->
+            <div class="pulse-w2-rot-slide pulse-w2-rot-sun" title="${daylightTooltip}">
+              <span class="pulse-w2-rot-sun-side" title="Схід сонця: ${sunriseStr}"><span class="pulse-w2-rot-time">${sunriseStr}</span> <span class="pulse-w2-rot-lbl">СХІД</span></span>
+              <span class="pulse-w2-rot-sun-mid" title="${daylightTooltip}"><span class="pulse-sun-spinner" style="display:inline-flex; vertical-align:middle; margin-right:2px;"><svg class="pulse-sun-icon-svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4.5" fill="#fef08a" stroke="#f59e0b"></circle><path d="M12 2v2.5M12 19.5V22M4.93 4.93l1.77 1.77M17.3 17.3l1.77 1.77M2 12h2.5M19.5 12H22M4.93 19.07l1.77-1.77M17.3 6.7l1.77-1.77"></path></svg></span> <strong class="pulse-w2-rot-daylight">${daylightStr}</strong> <span class="pulse-moon-phase-wrap" style="display:inline-flex; vertical-align:middle; margin-left:2px;" title="${moonPhase.tooltip}">${moonPhase.svg}</span></span>
+              <span class="pulse-w2-rot-sun-side" title="Захід сонця: ${sunsetStr}"><span class="pulse-w2-rot-lbl">ЗАХІД</span> <span class="pulse-w2-rot-time">${sunsetStr}</span></span>
+            </div>
+            <!-- Слайд 2: Стан погоди -->
+            <div class="pulse-w2-rot-slide pulse-w2-rot-cond" title="Стан погоди: ${skyConditionText}">
+              <i class="fas ${skyIconClass} ${skyIconColorClass} pulse-w2-rot-icon"></i>
+              <span class="pulse-w2-rot-text">${skyConditionText}</span>
+            </div>
+            <!-- Слайд 3: Порада водіям та пішоходам -->
+            <div class="pulse-w2-rot-slide pulse-w2-rot-advice" title="Порада водіям та пішоходам на основі погодних умов">
+              <i class="fas ${weatherAdvice.icon} text-primary pulse-w2-rot-icon"></i>
+              <span class="pulse-w2-rot-text">${weatherAdvice.text}</span>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <!-- Рядок стану погоди та порада водіям/пішоходам -->
-    <div class="pulse-w2-status-banner">
-      <div class="pulse-w2-status-item pulse-w2-status-cond" title="Стан погоди: ${skyConditionText}">
-        <i class="fas ${skyIconClass} ${skyIconColorClass} pulse-w2-status-icon"></i>
-        <span class="pulse-w2-status-txt">${skyConditionText}</span>
+    <!-- 2. Єдиний монолітний блок: Таблиця + Бігуча стрічка довідки + Історичні рекорди (згруповані разом) -->
+    <div class="pulse-w2-bottom-panel">
+      <!-- Таблиця 7 колонок із лаконічною шапкою тільки з піктограм -->
+      <div class="pulse-w2-table-wrap">
+        <table class="pulse-w2-table">
+          <thead>
+            <tr class="pulse-w2-th-row">
+              <th class="pulse-w2-th-time" title="Час доби"><i class="far fa-clock"></i></th>
+              <th class="pulse-w2-th-weather" title="Стан погоди та ймовірність опадів (%)"><i class="fas fa-cloud-rain"></i></th>
+              <th class="pulse-w2-th-temp" title="Температура повітря та відчувається (°C)">C°</th>
+              <th class="pulse-w2-th-wind" title="Швидкість вітру (м/с) та напрямок"><i class="fas fa-wind"></i></th>
+              <th class="pulse-w2-th-hum" title="Відносна вологість (%)"><i class="fas fa-tint"></i></th>
+              <th class="pulse-w2-th-press" title="Атмосферний тиск (мм рт. ст.)"><i class="fas fa-tachometer-alt"></i></th>
+              <th class="pulse-w2-th-geomag" title="Геомагнітна активність (магнітні бурі, індекс Kp)"><i class="fas fa-magnet"></i></th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rowsHtml}
+          </tbody>
+        </table>
       </div>
-      <div class="pulse-w2-status-sep">•</div>
-      <div class="pulse-w2-status-item pulse-w2-status-advice" title="Порада водіям та пішоходам на основі погодних умов">
-        <i class="fas ${weatherAdvice.icon} text-primary pulse-w2-status-icon"></i>
-        <span class="pulse-w2-status-txt">${weatherAdvice.text}</span>
-      </div>
-    </div>
 
-    <!-- Таблиця 7 колонок із лаконічною шапкою тільки з піктограм -->
-    <div class="pulse-w2-table-wrap">
-      <table class="pulse-w2-table">
-        <thead>
-          <tr class="pulse-w2-th-row">
-            <th class="pulse-w2-th-time" title="Час доби"><i class="far fa-clock"></i></th>
-            <th class="pulse-w2-th-weather" title="Стан погоди та ймовірність опадів (%)"><i class="fas fa-cloud-rain"></i></th>
-            <th class="pulse-w2-th-temp" title="Температура повітря та відчувається (°C)">C°</th>
-            <th class="pulse-w2-th-wind" title="Швидкість вітру (м/с) та напрямок"><i class="fas fa-wind"></i></th>
-            <th class="pulse-w2-th-hum" title="Відносна вологість (%)"><i class="fas fa-tint"></i></th>
-            <th class="pulse-w2-th-press" title="Атмосферний тиск (мм рт. ст.)"><i class="fas fa-tachometer-alt"></i></th>
-            <th class="pulse-w2-th-geomag" title="Геомагнітна активність (магнітні бурі, індекс Kp)"><i class="fas fa-magnet"></i></th>
-          </tr>
-        </thead>
-        <tbody>
-          ${rowsHtml}
-        </tbody>
-      </table>
-    </div>
-
-    <!-- Історичні кліматичні рекорди за 130 років спостережень -->
-    <div class="pulse-w2-history-box" title="Кліматичні температурні рекорди за останні 130 років спостережень (з 1881 р.) для обраної дати">
-      <div class="pulse-w2-history-header">
-        <i class="fas fa-temperature-half text-warning"></i>
-        <span>За останні 130 років (${histDateLabel}):</span>
+      <!-- Бігуча стрічка (Ticker): коротке роз'яснення показників таблиці -->
+      <div class="pulse-w2-ticker-wrap" title="Довідка за показниками таблиці (наведіть курсор для паузи)">
+        <div class="pulse-w2-ticker-badge">
+          <i class="fas fa-info-circle text-primary"></i>
+          <span>Довідка</span>
+        </div>
+        <div class="pulse-w2-ticker-viewport">
+          <div class="pulse-w2-ticker-track">
+            <div class="pulse-w2-ticker-content">
+              <span class="pulse-w2-ticker-item">🧭 <strong>Атмосферний тиск:</strong> норма 750-760 мм рт. ст. (нижче 748 - знижений, вище 762 - підвищений)</span>
+              <span class="pulse-w2-ticker-sep">•</span>
+              <span class="pulse-w2-ticker-item">🧲 <strong>Геомагнітні бурі (шкала-Kp):</strong> 0-2 спокійно, 3-4 помірні збурення, 5+ магнітна буря</span>
+              <span class="pulse-w2-ticker-sep">•</span>
+              <span class="pulse-w2-ticker-item">💨 <strong>Вітер (м/с):</strong> швидкість і напрямок (стрілка показує куди дме вітер, від 8 м/с - сильний)</span>
+              <span class="pulse-w2-ticker-sep">•</span>
+              <span class="pulse-w2-ticker-item">💧 <strong>Вологість (%):</strong> оптимальний комфортний рівень 40-60%</span>
+              <span class="pulse-w2-ticker-sep">•</span>
+              <span class="pulse-w2-ticker-item">🌡️ <strong>Температура (C°):</strong> фактична / відчувається (з урахуванням вітру та вологості)</span>
+              <span class="pulse-w2-ticker-sep">•</span>
+              <span class="pulse-w2-ticker-item">🌧️ <strong>Опади (%):</strong> розрахункова ймовірність дощу чи снігу на вказаний час</span>
+              <span class="pulse-w2-ticker-sep">•</span>
+            </div>
+            <div class="pulse-w2-ticker-content" aria-hidden="true">
+              <span class="pulse-w2-ticker-item">🧭 <strong>Атмосферний тиск:</strong> норма 750-760 мм рт. ст. (нижче 748 - знижений, вище 762 - підвищений)</span>
+              <span class="pulse-w2-ticker-sep">•</span>
+              <span class="pulse-w2-ticker-item">🧲 <strong>Геомагнітні бурі (шкала-Kp):</strong> 0-2 спокійно, 3-4 помірні збурення, 5+ магнітна буря</span>
+              <span class="pulse-w2-ticker-sep">•</span>
+              <span class="pulse-w2-ticker-item">💨 <strong>Вітер (м/с):</strong> швидкість і напрямок (стрілка показує куди дме вітер, від 8 м/с - сильний)</span>
+              <span class="pulse-w2-ticker-sep">•</span>
+              <span class="pulse-w2-ticker-item">💧 <strong>Вологість (%):</strong> оптимальний комфортний рівень 40-60%</span>
+              <span class="pulse-w2-ticker-sep">•</span>
+              <span class="pulse-w2-ticker-item">🌡️ <strong>Температура (C°):</strong> фактична / відчувається (з урахуванням вітру та вологості)</span>
+              <span class="pulse-w2-ticker-sep">•</span>
+              <span class="pulse-w2-ticker-item">🌧️ <strong>Опади (%):</strong> розрахункова ймовірність дощу чи снігу на вказаний час</span>
+              <span class="pulse-w2-ticker-sep">•</span>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="pulse-w2-history-records">
-        <span class="pulse-w2-hist-item max">
-          МАКС: <strong>${hist.maxT > 0 ? '+' : ''}${hist.maxT}°C</strong> <span class="pulse-w2-hist-year">(${hist.maxYear})</span>
-        </span>
+
+      <!-- Історичні кліматичні рекорди за 130 років спостережень (в один чистий рядок) -->
+      <div class="pulse-w2-history-box" title="Кліматичні температурні рекорди за останні 130 років спостережень (з 1881 р.) для обраної дати">
+        <span class="pulse-w2-hist-date">${histDateLabelFull}:</span>
+        <span class="pulse-w2-hist-item max">МАКС: <strong>${hist.maxT > 0 ? '+' : ''}${hist.maxT}°C</strong> <span class="pulse-w2-hist-year">(${hist.maxYear})</span></span>
         <span class="pulse-w2-hist-sep">•</span>
-        <span class="pulse-w2-hist-item min">
-          МІН: <strong>${hist.minT > 0 ? '+' : ''}${hist.minT}°C</strong> <span class="pulse-w2-hist-year">(${hist.minYear})</span>
-        </span>
+        <span class="pulse-w2-hist-item min">МІН: <strong>${hist.minT > 0 ? '+' : ''}${hist.minT}°C</strong> <span class="pulse-w2-hist-year">(${hist.minYear})</span></span>
       </div>
     </div>
 
@@ -10405,7 +10479,77 @@ function renderPulseWeatherUI(data, city, updatedTime = '') {
       </span>
     </div>
   `;
+
+  if (typeof window.initPulseWeatherRotator === 'function') {
+    window.initPulseWeatherRotator();
+  }
 }
+
+window.pulseWeatherRotatorIndex = window.pulseWeatherRotatorIndex || 0;
+window.rotatePulseWeatherInfo = function(step = 1) {
+  const track = document.getElementById('pulseWeatherRotTrack');
+  if (!track) return;
+  const totalSlides = 3;
+  window.pulseWeatherRotatorIndex = (window.pulseWeatherRotatorIndex + step + totalSlides) % totalSlides;
+  const idx = window.pulseWeatherRotatorIndex;
+  track.style.transform = `translateY(-${idx * 24}px)`;
+  const dots = document.querySelectorAll('#pulseWeatherRotDots .pulse-w2-rot-dot');
+  dots.forEach((dot, i) => {
+    dot.classList.toggle('active', i === idx);
+  });
+  if (window.pulseWeatherRotatorTimer) {
+    clearInterval(window.pulseWeatherRotatorTimer);
+  }
+  window.pulseWeatherRotatorTimer = setInterval(() => {
+    const b = document.getElementById('pulseWeatherRotatorBar');
+    if (b && !b.matches(':hover')) {
+      window.rotatePulseWeatherInfo(1);
+    }
+  }, 7500);
+};
+
+window.setPulseWeatherSlide = function(slideIdx) {
+  const track = document.getElementById('pulseWeatherRotTrack');
+  if (!track) return;
+  const totalSlides = 3;
+  window.pulseWeatherRotatorIndex = ((slideIdx % totalSlides) + totalSlides) % totalSlides;
+  const idx = window.pulseWeatherRotatorIndex;
+  track.style.transform = `translateY(-${idx * 24}px)`;
+  const dots = document.querySelectorAll('#pulseWeatherRotDots .pulse-w2-rot-dot');
+  dots.forEach((dot, i) => {
+    dot.classList.toggle('active', i === idx);
+  });
+  if (window.pulseWeatherRotatorTimer) {
+    clearInterval(window.pulseWeatherRotatorTimer);
+  }
+  window.pulseWeatherRotatorTimer = setInterval(() => {
+    const b = document.getElementById('pulseWeatherRotatorBar');
+    if (b && !b.matches(':hover')) {
+      window.rotatePulseWeatherInfo(1);
+    }
+  }, 7500);
+};
+
+window.initPulseWeatherRotator = function() {
+  const track = document.getElementById('pulseWeatherRotTrack');
+  const idx = window.pulseWeatherRotatorIndex || 0;
+  if (track) {
+    track.style.transform = `translateY(-${idx * 24}px)`;
+  }
+  const dots = document.querySelectorAll('#pulseWeatherRotDots .pulse-w2-rot-dot');
+  dots.forEach((dot, i) => {
+    dot.classList.toggle('active', i === idx);
+  });
+  if (window.pulseWeatherRotatorTimer) {
+    clearInterval(window.pulseWeatherRotatorTimer);
+  }
+  window.pulseWeatherRotatorTimer = setInterval(() => {
+    const b = document.getElementById('pulseWeatherRotatorBar');
+    if (b && !b.matches(':hover')) {
+      window.rotatePulseWeatherInfo(1);
+    }
+  }, 7500);
+};
 
 window.setPulseWeatherTab = function(dayIndex) {
   if (!window.pulseWeatherState) return;
@@ -10590,10 +10734,10 @@ async function loadPulseEcoData(forceRefresh = false) {
   if (!ecoData) {
     ecoData = {
       aqi: 28,
-      pm25: 7.2,
-      pm10: 14.5,
-      no2: 11.8,
-      o3: 46.2,
+      pm25: 2.3,
+      pm10: 3.0,
+      no2: 2.4,
+      o3: 50.0,
       radiation: region.baseRad
     };
   }
@@ -10606,11 +10750,12 @@ async function loadPulseEcoData(forceRefresh = false) {
   if (refreshIcon) refreshIcon.classList.remove('fa-spin');
 }
 
-function formatEcoMetricHtml(val, unit = 'мкг/м³') {
+function formatEcoDecimalNum(val) {
   if (val === undefined || val === null || isNaN(val)) {
-    return `<span class="pulse-eco-int">-</span> <span class="pulse-eco-unit">${unit}</span>`;
+    return `<span class="pulse-eco-int">-</span>`;
   }
-  const s = String(val);
+  const num = Number(val);
+  const s = Number.isInteger(num) ? String(num) : num.toFixed(1);
   const dotIdx = s.indexOf('.');
   const commaIdx = s.indexOf(',');
   const splitIdx = dotIdx !== -1 ? dotIdx : commaIdx;
@@ -10618,9 +10763,30 @@ function formatEcoMetricHtml(val, unit = 'мкг/м³') {
   if (splitIdx !== -1) {
     const intPart = s.slice(0, splitIdx);
     const decPart = '.' + s.slice(splitIdx + 1);
-    return `<span class="pulse-eco-int">${intPart}</span><span class="pulse-eco-dec">${decPart}</span> <span class="pulse-eco-unit">${unit}</span>`;
+    return `<span class="pulse-eco-int">${intPart}</span><span class="pulse-eco-dec">${decPart}</span>`;
   }
-  return `<span class="pulse-eco-int">${s}</span> <span class="pulse-eco-unit">${unit}</span>`;
+  return `<span class="pulse-eco-int">${s}</span>`;
+}
+
+function getEcoMetricStatusClass(type, val) {
+  if (val === undefined || val === null || isNaN(val)) return 'green';
+  const num = Number(val);
+  switch (type) {
+    case 'pm25':
+      return num <= 15 ? 'green' : (num <= 35 ? 'yellow' : 'red');
+    case 'pm10':
+      return num <= 45 ? 'green' : (num <= 75 ? 'yellow' : 'red');
+    case 'no2':
+      return num <= 40 ? 'green' : (num <= 80 ? 'yellow' : 'red');
+    case 'o3':
+      return num <= 60 ? 'green' : (num <= 100 ? 'yellow' : 'red');
+    default:
+      return 'green';
+  }
+}
+
+function formatEcoMetricHtml(val, unit = 'мкг/м³') {
+  return `${formatEcoDecimalNum(val)} <span class="pulse-eco-unit">${unit}</span>`;
 }
 
 function renderPulseEcoUI(data, region) {
@@ -10630,6 +10796,10 @@ function renderPulseEcoUI(data, region) {
   const pm10El = document.getElementById('pulseEcoPm10');
   const no2El = document.getElementById('pulseEcoNo2');
   const o3El = document.getElementById('pulseEcoO3');
+  const dotPm25 = document.getElementById('pulseEcoDotPm25');
+  const dotPm10 = document.getElementById('pulseEcoDotPm10');
+  const dotNo2 = document.getElementById('pulseEcoDotNo2');
+  const dotO3 = document.getElementById('pulseEcoDotO3');
   const statusBadge = document.getElementById('pulseEcoStatusBadge');
 
   if (radBadgeEl) {
@@ -10699,10 +10869,15 @@ function renderPulseEcoUI(data, region) {
     ecoLiveBadge.title = `SaveEcoBot / EcoCity • ${region.name || 'Новомиргород'} (Оновлено: ${timeStr})`;
   }
 
-  if (pm25El) pm25El.innerHTML = formatEcoMetricHtml(data.pm25, 'мкг/м³');
-  if (pm10El) pm10El.innerHTML = formatEcoMetricHtml(data.pm10, 'мкг/м³');
-  if (no2El) no2El.innerHTML = formatEcoMetricHtml(data.no2, 'мкг/м³');
-  if (o3El) o3El.innerHTML = formatEcoMetricHtml(data.o3, 'мкг/м³');
+  if (pm25El) pm25El.innerHTML = formatEcoDecimalNum(data.pm25);
+  if (pm10El) pm10El.innerHTML = formatEcoDecimalNum(data.pm10);
+  if (no2El) no2El.innerHTML = formatEcoDecimalNum(data.no2);
+  if (o3El) o3El.innerHTML = formatEcoDecimalNum(data.o3);
+
+  if (dotPm25) dotPm25.className = `pulse-eco-pulse-dot ${getEcoMetricStatusClass('pm25', data.pm25)}`;
+  if (dotPm10) dotPm10.className = `pulse-eco-pulse-dot ${getEcoMetricStatusClass('pm10', data.pm10)}`;
+  if (dotNo2) dotNo2.className = `pulse-eco-pulse-dot ${getEcoMetricStatusClass('no2', data.no2)}`;
+  if (dotO3) dotO3.className = `pulse-eco-pulse-dot ${getEcoMetricStatusClass('o3', data.o3)}`;
 }
 
 // ==========================================================================
@@ -10788,6 +10963,121 @@ function renderPulseFuelTable(selectedRegion = 'ua') {
   }
 }
 
+// ==========================================================================
+// ДАНІ ТА ЛОГІКА СТРІЧКИ ВАЖЛИВИХ НОВИН УКРАЇНИ (КОЛОНКА 4)
+// ==========================================================================
+const PULSE_NEWS_ITEMS = [
+  {
+    id: 1,
+    title: 'Повітряні сили знешкодили ворожі ударні дрони під час нічної атаки',
+    source: 'Суспільне',
+    sourceClass: 'src-suspilne',
+    cat: 'war',
+    minutesAgo: 8,
+    url: 'https://suspilne.media/'
+  },
+  {
+    id: 2,
+    title: 'ЄС узгодив новий пакет підтримки для відновлення енергетичної системи України',
+    source: 'Укрінформ',
+    sourceClass: 'src-ukrinform',
+    cat: 'main',
+    minutesAgo: 24,
+    url: 'https://www.ukrinform.ua/'
+  },
+  {
+    id: 3,
+    title: 'НБУ зберіг облікову ставку на рівні 13% та оновив макроекономічний прогноз',
+    source: 'РБК-Україна',
+    sourceClass: 'src-rbc',
+    cat: 'econ',
+    minutesAgo: 45,
+    url: 'https://www.rbc.ua/'
+  },
+  {
+    id: 4,
+    title: 'Генштаб ЗСУ: Сили оборони стримують штурми ворога на східних напрямках',
+    source: 'УП',
+    sourceClass: 'src-pravda',
+    cat: 'war',
+    minutesAgo: 65,
+    url: 'https://www.pravda.com.ua/'
+  },
+  {
+    id: 5,
+    title: 'Уряд розширив програми єОселя та доступних грантів для малого бізнесу',
+    source: 'Liga.net',
+    sourceClass: 'src-liga',
+    cat: 'econ',
+    minutesAgo: 95,
+    url: 'https://www.liga.net/'
+  },
+  {
+    id: 6,
+    title: 'Укренерго: енергосистема працює збалансовано, аварійних відключень не прогнозується',
+    source: 'Суспільне',
+    sourceClass: 'src-suspilne',
+    cat: 'main',
+    minutesAgo: 120,
+    url: 'https://suspilne.media/'
+  },
+  {
+    id: 7,
+    title: 'Україна та партнери відкривають новий залізничний логістичний коридор до Європи',
+    source: 'Укрінформ',
+    sourceClass: 'src-ukrinform',
+    cat: 'main',
+    minutesAgo: 150,
+    url: 'https://www.ukrinform.ua/'
+  },
+  {
+    id: 8,
+    title: 'Мінфін залучив понад 12 млрд грн від розміщення військових облігацій',
+    source: 'РБК-Україна',
+    sourceClass: 'src-rbc',
+    cat: 'econ',
+    minutesAgo: 185,
+    url: 'https://www.rbc.ua/'
+  }
+];
+
+let currentPulseNewsTab = 'all';
+
+function formatNewsTime(minutesAgo) {
+  const d = new Date(Date.now() - minutesAgo * 60 * 1000);
+  const hh = String(d.getHours()).padStart(2, '0');
+  const mm = String(d.getMinutes()).padStart(2, '0');
+  if (minutesAgo < 60) {
+    return `${hh}:${mm} (${minutesAgo} хв тому)`;
+  }
+  const hours = Math.floor(minutesAgo / 60);
+  return `${hh}:${mm} (${hours} год тому)`;
+}
+
+function renderPulseNewsFeed(filter = 'all') {
+  currentPulseNewsTab = filter;
+  const feedEl = document.getElementById('pulseNewsFeed');
+  if (!feedEl) return;
+
+  const items = filter === 'all' ? PULSE_NEWS_ITEMS : PULSE_NEWS_ITEMS.filter(it => it.cat === filter);
+  if (!items.length) {
+    feedEl.innerHTML = `<div class="text-center py-3 text-muted" style="font-size:0.7rem;">Новин у цій категорії наразі немає</div>`;
+    return;
+  }
+
+  feedEl.innerHTML = items.map(item => `
+    <article class="pulse-news-item">
+      <div class="pulse-news-meta">
+        <span class="pulse-news-src-badge ${item.sourceClass}">${item.source}</span>
+        <span class="pulse-news-time">${formatNewsTime(item.minutesAgo)}</span>
+      </div>
+      <a href="${item.url}" target="_blank" rel="noopener" class="pulse-news-title" title="${item.title}">
+        ${item.title}
+      </a>
+    </article>
+  `).join('');
+}
+
 function renderPulseDrawerLayout(container) {
   const holiday = getTodayHolidayInfo();
 
@@ -10816,443 +11106,443 @@ function renderPulseDrawerLayout(container) {
     </div>
 
     <div class="pulse-cards-grid">
-      <!-- 1. СВЯТА ТА ПОДІЇ ДНЯ + ЦІНИ НА ПАЛЬНЕ -->
-      <div class="pulse-card" id="pulseCardHoliday">
-        <div class="pulse-card-header">
-          <span class="pulse-card-title"><i class="fas fa-calendar-day text-info"></i> Свята та події</span>
-        </div>
-
-        <!-- Власний адаптивний інформер «Свята та події» на 3 дні (Сьогодні, Завтра, Післязавтра) -->
-        <div class="pulse-holidays-container" id="pulseHolidaysContainer">
-          <!-- Заповнюється динамічно функцією renderPulseHolidaysUI -->
-        </div>
-
-        <!-- Лагідна роздільна лінія між Святами та Пальним -->
-        <div class="pulse-card-divider"></div>
-
-        <!-- Секція 2: Ціни на пальне -->
-        <div class="pulse-calc-heading" style="margin-bottom: 6px;">
-          <span><i class="fas fa-gas-pump text-danger"></i> <strong>Ціни на пальне:</strong></span>
-        </div>
-
-        <!-- Вибір регіону / області (збереження в браузері та профілі) -->
-        <div class="pulse-fuel-region-bar">
-          <label for="pulseFuelRegionSelect" class="pulse-fuel-region-label">
-            <i class="fas fa-map-marker-alt text-danger"></i> Регіон:
-          </label>
-          <select id="pulseFuelRegionSelect" class="pulse-fuel-region-select" aria-label="Обрати область для перегляду цін на пальне">
-            ${UKRAINE_FUEL_REGIONS.map(r => `<option value="${r.id}">${r.name}</option>`).join('')}
-          </select>
-        </div>
-
-        <!-- Таблиця цін на пальне по провідних мережах АЗС (як у зведеннях RBC/Мінфін) -->
-        <div class="pulse-fuel-table-wrap">
-          <table class="pulse-fuel-table">
-            <thead>
-              <tr>
-                <th class="fuel-th-brand">АЗС</th>
-                <th>А-95</th>
-                <th>А-95+</th>
-                <th>ДП</th>
-                <th>ДП+</th>
-                <th>Газ</th>
-              </tr>
-            </thead>
-            <tbody id="pulseFuelTableBody">
-              <!-- Заповнюється динамічно функцією renderPulseFuelTable -->
-            </tbody>
-          </table>
-        </div>
-
-        <div class="pulse-fuel-bottom">
-          <span class="text-muted" style="font-size: 0.67rem;" title="Ціни оновлюються автоматично щодня о 08:10 за київським часом">
-            <i class="fas fa-clock text-info me-2"></i> Оновлення щодня о 08:10 • грн/л
-          </span>
-          <a href="https://minfin.com.ua/ua/fuel/" target="_blank" rel="noopener" class="pulse-fuel-link" title="Моніторинг цін на пальне на Мінфін">
-            Мінфін АЗС <i class="fas fa-external-link-alt ms-1"></i>
-          </a>
-        </div>
-      </div>
-
-      <!-- 2. ПОГОДА (ВЛАСНИЙ ВІДЖЕТ OPEN-METEO) -->
-      <div class="pulse-card" id="pulseCardWeather">
-        <div class="pulse-card-header">
-          <span class="pulse-card-title"><i class="fas fa-cloud-sun text-warning"></i> Погода</span>
-          <div class="d-flex align-items-center" style="gap: 5px;">
-            <span class="pulse-card-badge badge-green" id="pulseWeatherLiveBadge">Наживо</span>
-            <button type="button" id="pulseWeatherRefreshBtn" class="pulse-weather-refresh-action-btn" title="Оновити погоду" aria-label="Оновити погоду">
-              <i class="fas fa-sync-alt" id="pulseWeatherRefreshIcon"></i>
-            </button>
-          </div>
-        </div>
-
-        <!-- Вибір місцевості (міста) з автоматичним збереженням -->
-        <div class="pulse-weather-city-bar">
-          <label for="pulseWeatherCitySelect" class="pulse-weather-city-label">
-            <i class="fas fa-map-marker-alt text-danger me-1"></i> Місто:
-          </label>
-          <select id="pulseWeatherCitySelect" class="pulse-weather-city-select" aria-label="Обрати місто для прогнозу погоди">
-            ${renderWeatherCityOptions()}
-          </select>
-          <button type="button" id="pulseWeatherGeoBtn" class="pulse-weather-tool-btn pulse-weather-geo-btn-inline" title="Визначити моє місто автоматично (GPS / IP)" aria-label="Автовизначення локації">
-            <i class="fas fa-crosshairs"></i>
-          </button>
-        </div>
-
-        <!-- Контейнер власного прогнозу погоди -->
-        <div id="pulseWeatherContainer" class="pulse-weather-container pulse-weather2-content">
-          <div class="text-center py-4 text-muted small" style="font-size: 0.72rem;">
-            <i class="fas fa-spinner fa-spin me-2 text-info"></i>Завантаження прогнозу погоди...
-          </div>
-        </div>
-      </div>
-
-      <!-- 3. ЕКОЛОГІЯ ТА РАДІАЦІЯ + МЕТЕО & ТИСК -->
-      <div class="pulse-card" id="pulseCardEco">
-        <div class="pulse-card-header">
-          <span class="pulse-card-title"><i class="fas fa-leaf text-success"></i> Екологія та радіація</span>
-          <div class="d-flex align-items-center" style="gap: 5px;">
-            <span class="pulse-card-badge badge-green" id="pulseEcoLiveBadge" title="Час останніх вимірів екологічних датчиків">Наживо</span>
-            <button type="button" id="pulseEcoRefreshBtn" class="pulse-weather-refresh-action-btn" title="Оновити дані екології" aria-label="Оновити дані екології">
-              <i class="fas fa-sync-alt" id="pulseEcoRefreshIcon"></i>
-            </button>
-          </div>
-        </div>
-
-        <!-- Вибір місцевості (міста) з автоматичним збереженням (уніфіковано з погодою) -->
-        <div class="pulse-weather-city-bar">
-          <label for="pulseEcoRegionSelect" class="pulse-weather-city-label">
-            <i class="fas fa-map-marker-alt text-success me-1"></i> Місто:
-          </label>
-          <select id="pulseEcoRegionSelect" class="pulse-weather-city-select" aria-label="Обрати місто для якості повітря та радіаційного фону">
-            ${UKRAINE_ECO_REGIONS.map(r => `<option value="${r.id}" ${r.id === getEffectiveEcoRegionId() ? 'selected' : ''}>${r.name}</option>`).join('')}
-          </select>
-          <button type="button" id="pulseEcoGeoBtn" class="pulse-weather-tool-btn pulse-weather-geo-btn-inline" title="Визначити найближче місто автоматично (GPS / IP)" aria-label="Автовизначення найближчого регіону">
-            <i class="fas fa-crosshairs"></i>
-          </button>
-        </div>
-
-        <!-- Лаконічний віджет із ключовими показниками (2-рядковий вигляд: заголовок + кольоровий бейдж зі значенням) -->
-        <div class="pulse-eco-metrics-row">
-          <!-- Радіаційний фон -->
-          <div class="pulse-eco-metric-box">
-            <div class="pulse-eco-metric-title">
-              <i class="fas fa-radiation text-warning"></i> Радіація
-            </div>
-            <div class="pulse-eco-metric-badge green" id="pulseEcoRadBadge" title="Норма: радіаційний фон у межах безпеки (до 0.30 мкЗв/год)">
-              <span class="pulse-eco-badge-dot">🟢</span> <span id="pulseEcoRadVal" class="pulse-eco-badge-val">0.11</span> <span class="pulse-eco-badge-unit">мкЗв/год</span>
-            </div>
-          </div>
-
-          <!-- Якість повітря (AQI) -->
-          <div class="pulse-eco-metric-box">
-            <div class="pulse-eco-metric-title">
-              <i class="fas fa-wind text-info"></i> Повітря (AQI)
-            </div>
-            <div class="pulse-eco-metric-badge green" id="pulseEcoAqiBadge" title="Чисте: безпечне для дихання (до 50 AQI)">
-              <span class="pulse-eco-badge-dot">🟢</span> <span id="pulseEcoAqiVal" class="pulse-eco-badge-val">AQI 28</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Кнопка-спойлер для детальних показників пилу та газів -->
-        <div class="pulse-eco-spoiler-toggle" id="pulseEcoSpoilerToggle" role="button" tabindex="0" title="Натисніть, щоб переглянути детальний склад повітря (PM2.5, PM10, NO₂, O₃)">
-          <span><i class="fas fa-sliders-h me-1 text-primary"></i> Детальні показники повітря</span>
-          <i class="fas fa-chevron-down pulse-eco-spoiler-chevron" id="pulseEcoSpoilerChevron"></i>
-        </div>
-
-        <!-- Деталізація показників датчиків (PM2.5, PM10, NO2, O3) (приховано під спойлер) -->
-        <div class="pulse-eco-details-box collapsed" id="pulseEcoDetailsBox">
-          <div class="pulse-eco-detail-row">
-            <span class="pulse-eco-detail-label">Дрібний пил PM2.5:</span>
-            <span class="pulse-eco-detail-val" id="pulseEcoPm25">${formatEcoMetricHtml(7.2, 'мкг/м³')}</span>
-          </div>
-          <div class="pulse-eco-detail-row">
-            <span class="pulse-eco-detail-label">Зважений пил PM10:</span>
-            <span class="pulse-eco-detail-val" id="pulseEcoPm10">${formatEcoMetricHtml(14.5, 'мкг/м³')}</span>
-          </div>
-          <div class="pulse-eco-detail-row">
-            <span class="pulse-eco-detail-label">Діоксид азоту (NO₂):</span>
-            <span class="pulse-eco-detail-val" id="pulseEcoNo2">${formatEcoMetricHtml(11.8, 'мкг/м³')}</span>
-          </div>
-          <div class="pulse-eco-detail-row">
-            <span class="pulse-eco-detail-label">Приземний озон (O₃):</span>
-            <span class="pulse-eco-detail-val" id="pulseEcoO3">${formatEcoMetricHtml(46.2, 'мкг/м³')}</span>
-          </div>
-        </div>
-
-        <div class="pulse-eco-footer" style="margin-bottom: 2px;">
-          <span class="pulse-eco-footer-text" title="Дані з відкритих датчиків SaveEcoBot, EcoCity та супутників моніторингу">
-            <i class="fas fa-broadcast-tower text-success" style="margin-right: 1px;"></i>SaveEcoBot / EcoCity
-          </span>
-          <a href="https://www.saveecobot.com/" target="_blank" rel="noopener" class="pulse-eco-link" title="Відкрити мапу радіаційного фону та якості повітря на SaveEcoBot">
-            Мапа датчиків <i class="fas fa-external-link-alt ms-1"></i>
-          </a>
-        </div>
-
-        <!-- Роздільна лінія між Екологією та Метео/Тиском -->
-        <div class="pulse-card-divider"></div>
-
-        <!-- Модуль Метео & Тиск: Магнітні бурі та Атмосферний тиск (Таби) -->
-        <div class="pulse-geomag-forecast-wrap" id="pulseGeomagWrap">
-          <div class="pulse-health-header-row">
-            <span class="pulse-health-section-title"><i class="fas fa-heartbeat text-danger me-1" style="margin-right: 5px;"></i> <strong>Метео & Тиск:</strong></span>
-            <span class="pulse-geomag-now-badge green" id="pulseGeomagNowBadge">🟢 Спокійно</span>
-          </div>
-
-          <div class="pulse-health-tabs-bar">
-            <div class="pulse-health-tab-group" id="pulseHealthTabGroup" role="tablist" aria-label="Перемикач параметрів">
-              <button type="button" class="pulse-rate-tab-btn active" id="pulseHealthTabGeomag" data-tab="geomag" title="Перемкнути на прогноз геомагнітних бурь (Kp-індекс)">
-                <i class="fas fa-magnet text-primary me-1"></i> Магнітні бурі
-              </button>
-              <button type="button" class="pulse-rate-tab-btn" id="pulseHealthTabPressure" data-tab="pressure" title="Перемкнути на графік атмосферного тиску (мм рт. ст.)">
-                <i class="fas fa-tachometer-alt text-danger me-1"></i> Атмосферний тиск
+      <!-- КОЛОНКА 1: ПОГОДА -->
+      <div class="pulse-grid-col" id="pulseColWeather">
+        <div class="pulse-card" id="pulseCardWeather">
+          <div class="pulse-card-header">
+            <span class="pulse-card-title"><i class="fas fa-cloud-sun text-warning"></i> Погода</span>
+            <div class="d-flex align-items-center" style="gap: 5px;">
+              <span class="pulse-card-badge badge-green" id="pulseWeatherLiveBadge">Наживо</span>
+              <button type="button" id="pulseWeatherRefreshBtn" class="pulse-weather-refresh-action-btn" title="Оновити погоду" aria-label="Оновити погоду">
+                <i class="fas fa-sync-alt" id="pulseWeatherRefreshIcon"></i>
               </button>
             </div>
           </div>
-          
-          <div class="pulse-geomag-table-wrap" id="pulseGeomagTableWrap">
-            <!-- Заповнюється таблицею функцією renderHealthForecastUI -->
-            <div class="text-center py-2 text-muted small"><i class="fas fa-spinner fa-spin me-1"></i> Завантаження прогнозу...</div>
+
+          <!-- Вибір місцевості (міста) з автоматичним збереженням -->
+          <div class="pulse-weather-city-bar">
+            <label for="pulseWeatherCitySelect" class="pulse-weather-city-label">
+              <i class="fas fa-map-marker-alt text-danger me-1"></i> Місто:
+            </label>
+            <select id="pulseWeatherCitySelect" class="pulse-weather-city-select" aria-label="Обрати місто для прогнозу погоди">
+              ${renderWeatherCityOptions()}
+            </select>
+            <button type="button" id="pulseWeatherGeoBtn" class="pulse-weather-tool-btn pulse-weather-geo-btn-inline" title="Визначити моє місто автоматично (GPS / IP)" aria-label="Автовизначення локації">
+              <i class="fas fa-crosshairs"></i>
+            </button>
           </div>
 
-          <div class="pulse-geomag-footer">
-            <div class="pulse-geomag-footer-legend" id="pulseHealthFooterLegend">
-              Шкала-Kp: 0-2 спокійно / 3-4 помірно / 5+ буря
-            </div>
-            <div class="pulse-geomag-footer-more">
-              <a href="https://solarmeteo.ukalendar.com/defs/kp-index" id="pulseHealthFooterLink" target="_blank" rel="noopener" title="Детальніше про індекс Kp та шкалу геомагнітної активності" aria-label="Детальніше про індекс Kp та геомагнітну активність">
-                <i class="fas fa-external-link-alt"></i>
-              </a>
+          <!-- Контейнер власного прогнозу погоди -->
+          <div id="pulseWeatherContainer" class="pulse-weather-container pulse-weather2-content">
+            <div class="text-center py-4 text-muted small" style="font-size: 0.72rem;">
+              <i class="fas fa-spinner fa-spin me-2 text-info"></i>Завантаження прогнозу погоди...
             </div>
           </div>
         </div>
       </div>
 
-      <!-- 4. КУРС ВАЛЮТ ТА КРИПТОВАЛЮТИ (8 ВАЛЮТ / 8 МОНЕТ) + ДВОСТОРОННІЙ КОНВЕРТЕР -->
-      <div class="pulse-card" id="pulseCardCurrency">
-        <div class="pulse-card-header">
-          <span class="pulse-card-title"><i class="fas fa-coins text-warning"></i> Фінанси</span>
-          <div class="pulse-rates-tab-group" id="pulseRatesTabGroup">
-            <button type="button" class="pulse-rate-tab-btn active" id="pulseTabBtnFiat" data-tab="fiat">
-              <i class="fas fa-money-bill-wave"></i> Валюта
-            </button>
-            <button type="button" class="pulse-rate-tab-btn" id="pulseTabBtnCrypto" data-tab="crypto">
-              <i class="fab fa-bitcoin"></i> Крипта
-            </button>
-          </div>
-        </div>
-
-        <!-- 1. СІТКА 8 ФІАТНИХ ВАЛЮТ (без прапорців, формат: USD ▲ / 45,20) -->
-        <div class="pulse-rates-grid" id="pulseFiatGrid">
-          <!-- Верхня четвірка (Головні топ-валюти) -->
-          <div class="pulse-rate-item" title="Долар США (USD)">
-            <div class="pulse-rate-top-line">
-              <span class="pulse-rate-code">USD</span>
-              <span class="pulse-rate-diff up" id="pulseDiffUsd" title="+0.04">▲</span>
+      <!-- КОЛОНКА 2: ЕКОЛОГІЯ ТА РАДІАЦІЯ, А НИЖЧЕ ФІНАНСИ ТА КОНВЕРТЕР -->
+      <div class="pulse-grid-col" id="pulseColEcoFinance">
+        <!-- 1. Екологія та радіація -->
+        <div class="pulse-card" id="pulseCardEco">
+          <div class="pulse-card-header">
+            <span class="pulse-card-title"><i class="fas fa-leaf text-success"></i> Екологія та радіація</span>
+            <div class="d-flex align-items-center" style="gap: 5px;">
+              <span class="pulse-card-badge badge-green" id="pulseEcoLiveBadge" title="Час останніх вимірів екологічних датчиків">Наживо</span>
+              <button type="button" id="pulseEcoRefreshBtn" class="pulse-weather-refresh-action-btn" title="Оновити дані екології" aria-label="Оновити дані екології">
+                <i class="fas fa-sync-alt" id="pulseEcoRefreshIcon"></i>
+              </button>
             </div>
-            <div class="pulse-rate-value" id="pulseRateUsd">41.<span class="pulse-decimal">50</span></div>
-          </div>
-          <div class="pulse-rate-item" title="Євро (EUR)">
-            <div class="pulse-rate-top-line">
-              <span class="pulse-rate-code">EUR</span>
-              <span class="pulse-rate-diff up" id="pulseDiffEur" title="+0.08">▲</span>
-            </div>
-            <div class="pulse-rate-value" id="pulseRateEur">45.<span class="pulse-decimal">15</span></div>
-          </div>
-          <div class="pulse-rate-item" title="Польський злотий (PLN)">
-            <div class="pulse-rate-top-line">
-              <span class="pulse-rate-code">PLN</span>
-              <span class="pulse-rate-diff down" id="pulseDiffPln" title="-0.02">▼</span>
-            </div>
-            <div class="pulse-rate-value" id="pulseRatePln">10.<span class="pulse-decimal">55</span></div>
-          </div>
-          <div class="pulse-rate-item" title="Британський фунт (GBP)">
-            <div class="pulse-rate-top-line">
-              <span class="pulse-rate-code">GBP</span>
-              <span class="pulse-rate-diff up" id="pulseDiffGbp" title="+0.12">▲</span>
-            </div>
-            <div class="pulse-rate-value" id="pulseRateGbp">53.<span class="pulse-decimal">90</span></div>
           </div>
 
-          <!-- Нижня четвірка (Резервні та практичні додаткові валюти) -->
-          <div class="pulse-rate-item" title="Чеська крона (CZK)">
-            <div class="pulse-rate-top-line">
-              <span class="pulse-rate-code">CZK</span>
-              <span class="pulse-rate-diff up" id="pulseDiffCzk" title="+0.01">▲</span>
-            </div>
-            <div class="pulse-rate-value" id="pulseRateCzk">1.<span class="pulse-decimal">78</span></div>
-          </div>
-          <div class="pulse-rate-item" title="Швейцарський франк (CHF)">
-            <div class="pulse-rate-top-line">
-              <span class="pulse-rate-code">CHF</span>
-              <span class="pulse-rate-diff up" id="pulseDiffChf" title="+0.05">▲</span>
-            </div>
-            <div class="pulse-rate-value" id="pulseRateChf">47.<span class="pulse-decimal">80</span></div>
-          </div>
-          <div class="pulse-rate-item" title="Канадський долар (CAD)">
-            <div class="pulse-rate-top-line">
-              <span class="pulse-rate-code">CAD</span>
-              <span class="pulse-rate-diff down" id="pulseDiffCad" title="-0.03">▼</span>
-            </div>
-            <div class="pulse-rate-value" id="pulseRateCad">30.<span class="pulse-decimal">20</span></div>
-          </div>
-          <div class="pulse-rate-item" title="Китайський юань (CNY)">
-            <div class="pulse-rate-top-line">
-              <span class="pulse-rate-code">CNY</span>
-              <span class="pulse-rate-diff up" id="pulseDiffCny" title="+0.01">▲</span>
-            </div>
-            <div class="pulse-rate-value" id="pulseRateCny">5.<span class="pulse-decimal">75</span></div>
-          </div>
-        </div>
-
-        <!-- 2. СІТКА 8 КРИПТОВАЛЮТ (ТОП-4 ФЛАГМАНИ ТА 4 АКТИВНІ МОНЕТИ) -->
-        <div class="pulse-rates-grid" id="pulseCryptoGrid" style="display: none;">
-          <!-- Топ-4 флагмани -->
-          <div class="pulse-rate-item" title="Bitcoin (BTC)">
-            <div class="pulse-rate-top-line">
-              <span class="pulse-rate-code">BTC</span>
-              <span class="pulse-rate-diff up" id="pulseDiffBtc" title="+1.8%">▲</span>
-            </div>
-            <div class="pulse-rate-value" id="pulseRateBtc">68 450$</div>
-          </div>
-          <div class="pulse-rate-item" title="Ethereum (ETH)">
-            <div class="pulse-rate-top-line">
-              <span class="pulse-rate-code">ETH</span>
-              <span class="pulse-rate-diff up" id="pulseDiffEth" title="+2.1%">▲</span>
-            </div>
-            <div class="pulse-rate-value" id="pulseRateEth">2 520$</div>
-          </div>
-          <div class="pulse-rate-item" title="Solana (SOL)">
-            <div class="pulse-rate-top-line">
-              <span class="pulse-rate-code">SOL</span>
-              <span class="pulse-rate-diff up" id="pulseDiffSol" title="+3.5%">▲</span>
-            </div>
-            <div class="pulse-rate-value" id="pulseRateSol">176.40$</div>
-          </div>
-          <div class="pulse-rate-item" title="BNB Chain (BNB)">
-            <div class="pulse-rate-top-line">
-              <span class="pulse-rate-code">BNB</span>
-              <span class="pulse-rate-diff down" id="pulseDiffBnb" title="-0.8%">▼</span>
-            </div>
-            <div class="pulse-rate-value" id="pulseRateBnb">594,20$</div>
-          </div>
-
-          <!-- 4 активні монети -->
-          <div class="pulse-rate-item" title="Gram / TON Telegram ecosystem (GRAM)">
-            <div class="pulse-rate-top-line">
-              <span class="pulse-rate-code">GRAM</span>
-              <span class="pulse-rate-diff up" id="pulseDiffGram" title="+4.2%">▲</span>
-            </div>
-            <div class="pulse-rate-value" id="pulseRateGram">0,016$</div>
-          </div>
-          <div class="pulse-rate-item" title="Ripple (XRP)">
-            <div class="pulse-rate-top-line">
-              <span class="pulse-rate-code">XRP</span>
-              <span class="pulse-rate-diff up" id="pulseDiffXrp" title="+1.2%">▲</span>
-            </div>
-            <div class="pulse-rate-value" id="pulseRateXrp">0,535$</div>
-          </div>
-          <div class="pulse-rate-item" title="Litecoin (LTC)">
-            <div class="pulse-rate-top-line">
-              <span class="pulse-rate-code">LTC</span>
-              <span class="pulse-rate-diff down" id="pulseDiffLtc" title="-0.5%">▼</span>
-            </div>
-            <div class="pulse-rate-value" id="pulseRateLtc">71,80$</div>
-          </div>
-          <div class="pulse-rate-item" title="Dogecoin (DOGE)">
-            <div class="pulse-rate-top-line">
-              <span class="pulse-rate-code">DOGE</span>
-              <span class="pulse-rate-diff up" id="pulseDiffDoge" title="+2.8%">▲</span>
-            </div>
-            <div class="pulse-rate-value" id="pulseRateDoge">0,142$</div>
-          </div>
-        </div>
-
-        <!-- Рядок офіційного орієнтиру / джерела (розміщено одразу після 2 рядків курсів) -->
-        <div class="pulse-finance-footer">
-          <span class="pulse-finance-footer-note" title="Офіційний курс НБУ та середньозважені міжбанківські котирування">
-            <i class="fas fa-university text-primary" style="margin-right: 3px;"></i>Курс НБУ / Міжбанк • <span id="pulseFinanceDateNote">Оновлення щодня</span>
-          </span>
-        </div>
-
-        <!-- Роздільна лінія перед Конвертером Валют як просив користувач -->
-        <div class="pulse-card-divider"></div>
-
-        <!-- Заголовок конвертера з перемикачем режимів [ Валюта ] та [ Крипта ] -->
-        <div class="pulse-conv-header">
-          <div class="pulse-calc-heading">
-            <i class="fas fa-calculator text-primary"></i> <strong>Конвертер:</strong>
-          </div>
-          <div class="pulse-rates-tab-group" id="pulseConvTabGroup">
-            <button type="button" class="pulse-rate-tab-btn active" id="pulseConvTabFiat" data-tab="fiat">
-              <i class="fas fa-money-bill-wave"></i> Валюта
-            </button>
-            <button type="button" class="pulse-rate-tab-btn" id="pulseConvTabCrypto" data-tab="crypto">
-              <i class="fab fa-bitcoin"></i> Крипта
+          <!-- Вибір місцевості (міста) з автоматичним збереженням -->
+          <div class="pulse-weather-city-bar">
+            <label for="pulseEcoRegionSelect" class="pulse-weather-city-label">
+              <i class="fas fa-map-marker-alt text-success me-1"></i> Місто:
+            </label>
+            <select id="pulseEcoRegionSelect" class="pulse-weather-city-select" aria-label="Обрати місто для якості повітря та радіаційного фону">
+              ${UKRAINE_ECO_REGIONS.map(r => `<option value="${r.id}" ${r.id === getEffectiveEcoRegionId() ? 'selected' : ''}>${r.name}</option>`).join('')}
+            </select>
+            <button type="button" id="pulseEcoGeoBtn" class="pulse-weather-tool-btn pulse-weather-geo-btn-inline" title="Визначити найближче місто автоматично (GPS / IP)" aria-label="Автовизначення найближчого регіону">
+              <i class="fas fa-crosshairs"></i>
             </button>
           </div>
-        </div>
-        <div class="pulse-converter-dual-wrap">
-          <!-- Блок 1: Я маю -->
-          <div class="pulse-conv-box">
-            <div class="pulse-conv-top-row">
-              <span class="pulse-conv-label">Я маю</span>
-              <select id="pulseConvCurrencyFrom" class="pulse-conv-select">
-                <option value="USD" selected>USD</option>
-                <option value="EUR">EUR</option>
-                <option value="PLN">PLN</option>
-                <option value="GBP">GBP</option>
-                <option value="CZK">CZK</option>
-                <option value="CHF">CHF</option>
-                <option value="CAD">CAD</option>
-                <option value="CNY">CNY</option>
-                <option value="UAH">UAH</option>
-              </select>
+
+          <!-- Лаконічний віджет із ключовими показниками (Радіація + AQI) -->
+          <div class="pulse-eco-metrics-row">
+            <div class="pulse-eco-metric-box">
+              <div class="pulse-eco-metric-title">
+                <i class="fas fa-radiation text-warning"></i> Радіація
+              </div>
+              <div class="pulse-eco-metric-badge green" id="pulseEcoRadBadge" title="Норма: радіаційний фон у межах безпеки (до 0.30 мкЗв/год)">
+                <span class="pulse-eco-badge-dot">🟢</span> <span id="pulseEcoRadVal" class="pulse-eco-badge-val">0.11</span> <span class="pulse-eco-badge-unit">мкЗв/год</span>
+              </div>
             </div>
-            <div class="pulse-conv-input-row">
-              <input type="text" inputmode="decimal" id="pulseConvAmountFrom" class="pulse-conv-input" value="10">
+
+            <div class="pulse-eco-metric-box">
+              <div class="pulse-eco-metric-title">
+                <i class="fas fa-wind text-info"></i> Повітря (AQI)
+              </div>
+              <div class="pulse-eco-metric-badge green" id="pulseEcoAqiBadge" title="Чисте: безпечне для дихання (до 50 AQI)">
+                <span class="pulse-eco-badge-dot">🟢</span> <span id="pulseEcoAqiVal" class="pulse-eco-badge-val">AQI 28</span>
+              </div>
             </div>
-            <div class="pulse-conv-rate-ref" id="pulseConvRateFromRef">1 USD = 41.50 UAH</div>
           </div>
 
-          <!-- Кругла кнопка обміну валют (⇄) -->
-          <button type="button" class="pulse-conv-swap-btn" id="pulseConvSwapBtn" title="Поміняти місцями (⇄)">
-            <i class="fas fa-exchange-alt"></i>
-          </button>
+          <!-- 4-показникова стрічка повітря (PM2.5, PM10, NO₂, O₃) в один акуратний рядок із видимими роздільниками -->
+          <div class="pulse-eco-strip" id="pulseEcoStrip">
+            <div class="pulse-eco-strip-item" title="Дрібний пил PM2.5: норма до 15 мкг/м³">
+              <span class="pulse-eco-strip-title">PM2.5</span>
+              <span class="pulse-eco-pulse-dot green" id="pulseEcoDotPm25"></span>
+              <span class="pulse-eco-strip-val" id="pulseEcoPm25"><span class="pulse-eco-int">2</span><span class="pulse-eco-dec">.3</span></span>
+            </div>
+            <div class="pulse-eco-strip-sep"></div>
 
-          <!-- Блок 2: Я отримую -->
-          <div class="pulse-conv-box">
-            <div class="pulse-conv-top-row">
-              <span class="pulse-conv-label">Я отримую</span>
-              <select id="pulseConvCurrencyTo" class="pulse-conv-select">
-                <option value="UAH" selected>UAH</option>
-                <option value="USD">USD</option>
-                <option value="EUR">EUR</option>
-                <option value="PLN">PLN</option>
-                <option value="GBP">GBP</option>
-                <option value="CZK">CZK</option>
-                <option value="CHF">CHF</option>
-                <option value="CAD">CAD</option>
-                <option value="CNY">CNY</option>
-              </select>
+            <div class="pulse-eco-strip-item" title="Зважений пил PM10: норма до 45 мкг/м³">
+              <span class="pulse-eco-strip-title">PM10</span>
+              <span class="pulse-eco-pulse-dot green" id="pulseEcoDotPm10"></span>
+              <span class="pulse-eco-strip-val" id="pulseEcoPm10"><span class="pulse-eco-int">3</span></span>
             </div>
-            <div class="pulse-conv-input-row">
-              <input type="text" inputmode="decimal" id="pulseConvAmountTo" class="pulse-conv-input" value="415.00">
+            <div class="pulse-eco-strip-sep"></div>
+
+            <div class="pulse-eco-strip-item" title="Діоксид азоту NO₂: норма до 40 мкг/м³">
+              <span class="pulse-eco-strip-title">NO₂</span>
+              <span class="pulse-eco-pulse-dot green" id="pulseEcoDotNo2"></span>
+              <span class="pulse-eco-strip-val" id="pulseEcoNo2"><span class="pulse-eco-int">2</span><span class="pulse-eco-dec">.4</span></span>
             </div>
-            <div class="pulse-conv-rate-ref" id="pulseConvRateToRef">1 UAH = 0.0241 USD</div>
+            <div class="pulse-eco-strip-sep"></div>
+
+            <div class="pulse-eco-strip-item" title="Приземний озон O₃: норма до 60 мкг/м³">
+              <span class="pulse-eco-strip-title">O₃</span>
+              <span class="pulse-eco-pulse-dot green" id="pulseEcoDotO3"></span>
+              <span class="pulse-eco-strip-val" id="pulseEcoO3"><span class="pulse-eco-int">50</span></span>
+            </div>
+          </div>
+
+          <div class="pulse-eco-footer" style="margin-bottom: 2px;">
+            <span class="pulse-eco-footer-text" title="Дані з відкритих датчиків SaveEcoBot, EcoCity та супутників моніторингу">
+              <i class="fas fa-broadcast-tower text-success" style="margin-right: 1px;"></i>SaveEcoBot / EcoCity
+            </span>
+            <a href="https://www.saveecobot.com/" target="_blank" rel="noopener" class="pulse-eco-link" title="Відкрити мапу радіаційного фону та якості повітря на SaveEcoBot">
+              Мапа датчиків <i class="fas fa-external-link-alt ms-1"></i>
+            </a>
           </div>
         </div>
 
-        <!-- Швидкі суми для конвертера (баланс висоти картки) -->
-        <div class="pulse-conv-quick-row">
-          <span class="pulse-conv-quick-lbl">Швидкі суми:</span>
-          <div class="pulse-conv-quick-buttons">
-            <button type="button" class="pulse-conv-quick-btn" data-amount="50">50</button>
-            <button type="button" class="pulse-conv-quick-btn" data-amount="100">100</button>
-            <button type="button" class="pulse-conv-quick-btn" data-amount="500">500</button>
-            <button type="button" class="pulse-conv-quick-btn" data-amount="1000">1 000</button>
-            <button type="button" class="pulse-conv-quick-btn" data-amount="5000">5 000</button>
+        <!-- 2. Курс валют та криптовалюти -->
+        <div class="pulse-card" id="pulseCardCurrency">
+          <div class="pulse-card-header">
+            <span class="pulse-card-title"><i class="fas fa-coins text-warning"></i> Фінанси</span>
+            <div class="pulse-rates-tab-group" id="pulseRatesTabGroup">
+              <button type="button" class="pulse-rate-tab-btn active" id="pulseTabBtnFiat" data-tab="fiat">
+                <i class="fas fa-money-bill-wave"></i> Валюта
+              </button>
+              <button type="button" class="pulse-rate-tab-btn" id="pulseTabBtnCrypto" data-tab="crypto">
+                <i class="fab fa-bitcoin"></i> Крипта
+              </button>
+            </div>
+          </div>
+
+          <!-- 1. СІТКА 8 ФІАТНИХ ВАЛЮТ -->
+          <div class="pulse-rates-grid" id="pulseFiatGrid">
+            <div class="pulse-rate-item" title="Долар США (USD)">
+              <div class="pulse-rate-top-line">
+                <span class="pulse-rate-code">USD</span>
+                <span class="pulse-rate-diff up" id="pulseDiffUsd" title="+0.04">▲</span>
+              </div>
+              <div class="pulse-rate-value" id="pulseRateUsd">41.<span class="pulse-decimal">50</span></div>
+            </div>
+            <div class="pulse-rate-item" title="Євро (EUR)">
+              <div class="pulse-rate-top-line">
+                <span class="pulse-rate-code">EUR</span>
+                <span class="pulse-rate-diff up" id="pulseDiffEur" title="+0.08">▲</span>
+              </div>
+              <div class="pulse-rate-value" id="pulseRateEur">45.<span class="pulse-decimal">15</span></div>
+            </div>
+            <div class="pulse-rate-item" title="Польський злотий (PLN)">
+              <div class="pulse-rate-top-line">
+                <span class="pulse-rate-code">PLN</span>
+                <span class="pulse-rate-diff down" id="pulseDiffPln" title="-0.02">▼</span>
+              </div>
+              <div class="pulse-rate-value" id="pulseRatePln">10.<span class="pulse-decimal">55</span></div>
+            </div>
+            <div class="pulse-rate-item" title="Британський фунт (GBP)">
+              <div class="pulse-rate-top-line">
+                <span class="pulse-rate-code">GBP</span>
+                <span class="pulse-rate-diff up" id="pulseDiffGbp" title="+0.12">▲</span>
+              </div>
+              <div class="pulse-rate-value" id="pulseRateGbp">53.<span class="pulse-decimal">90</span></div>
+            </div>
+
+            <div class="pulse-rate-item" title="Чеська крона (CZK)">
+              <div class="pulse-rate-top-line">
+                <span class="pulse-rate-code">CZK</span>
+                <span class="pulse-rate-diff up" id="pulseDiffCzk" title="+0.01">▲</span>
+              </div>
+              <div class="pulse-rate-value" id="pulseRateCzk">1.<span class="pulse-decimal">78</span></div>
+            </div>
+            <div class="pulse-rate-item" title="Швейцарський франк (CHF)">
+              <div class="pulse-rate-top-line">
+                <span class="pulse-rate-code">CHF</span>
+                <span class="pulse-rate-diff up" id="pulseDiffChf" title="+0.05">▲</span>
+              </div>
+              <div class="pulse-rate-value" id="pulseRateChf">47.<span class="pulse-decimal">80</span></div>
+            </div>
+            <div class="pulse-rate-item" title="Канадський долар (CAD)">
+              <div class="pulse-rate-top-line">
+                <span class="pulse-rate-code">CAD</span>
+                <span class="pulse-rate-diff down" id="pulseDiffCad" title="-0.03">▼</span>
+              </div>
+              <div class="pulse-rate-value" id="pulseRateCad">30.<span class="pulse-decimal">20</span></div>
+            </div>
+            <div class="pulse-rate-item" title="Китайський юань (CNY)">
+              <div class="pulse-rate-top-line">
+                <span class="pulse-rate-code">CNY</span>
+                <span class="pulse-rate-diff up" id="pulseDiffCny" title="+0.01">▲</span>
+              </div>
+              <div class="pulse-rate-value" id="pulseRateCny">5.<span class="pulse-decimal">75</span></div>
+            </div>
+          </div>
+
+          <!-- 2. СІТКА 8 КРИПТОВАЛЮТ -->
+          <div class="pulse-rates-grid" id="pulseCryptoGrid" style="display: none;">
+            <div class="pulse-rate-item" title="Bitcoin (BTC)">
+              <div class="pulse-rate-top-line">
+                <span class="pulse-rate-code">BTC</span>
+                <span class="pulse-rate-diff up" id="pulseDiffBtc" title="+1.8%">▲</span>
+              </div>
+              <div class="pulse-rate-value" id="pulseRateBtc">68 450$</div>
+            </div>
+            <div class="pulse-rate-item" title="Ethereum (ETH)">
+              <div class="pulse-rate-top-line">
+                <span class="pulse-rate-code">ETH</span>
+                <span class="pulse-rate-diff up" id="pulseDiffEth" title="+2.1%">▲</span>
+              </div>
+              <div class="pulse-rate-value" id="pulseRateEth">2 520$</div>
+            </div>
+            <div class="pulse-rate-item" title="Solana (SOL)">
+              <div class="pulse-rate-top-line">
+                <span class="pulse-rate-code">SOL</span>
+                <span class="pulse-rate-diff up" id="pulseDiffSol" title="+3.5%">▲</span>
+              </div>
+              <div class="pulse-rate-value" id="pulseRateSol">176.40$</div>
+            </div>
+            <div class="pulse-rate-item" title="BNB Chain (BNB)">
+              <div class="pulse-rate-top-line">
+                <span class="pulse-rate-code">BNB</span>
+                <span class="pulse-rate-diff down" id="pulseDiffBnb" title="-0.8%">▼</span>
+              </div>
+              <div class="pulse-rate-value" id="pulseRateBnb">594,20$</div>
+            </div>
+
+            <div class="pulse-rate-item" title="Gram / TON Telegram ecosystem (GRAM)">
+              <div class="pulse-rate-top-line">
+                <span class="pulse-rate-code">GRAM</span>
+                <span class="pulse-rate-diff up" id="pulseDiffGram" title="+4.2%">▲</span>
+              </div>
+              <div class="pulse-rate-value" id="pulseRateGram">0,016$</div>
+            </div>
+            <div class="pulse-rate-item" title="Ripple (XRP)">
+              <div class="pulse-rate-top-line">
+                <span class="pulse-rate-code">XRP</span>
+                <span class="pulse-rate-diff up" id="pulseDiffXrp" title="+1.2%">▲</span>
+              </div>
+              <div class="pulse-rate-value" id="pulseRateXrp">0,535$</div>
+            </div>
+            <div class="pulse-rate-item" title="Litecoin (LTC)">
+              <div class="pulse-rate-top-line">
+                <span class="pulse-rate-code">LTC</span>
+                <span class="pulse-rate-diff down" id="pulseDiffLtc" title="-0.5%">▼</span>
+              </div>
+              <div class="pulse-rate-value" id="pulseRateLtc">71,80$</div>
+            </div>
+            <div class="pulse-rate-item" title="Dogecoin (DOGE)">
+              <div class="pulse-rate-top-line">
+                <span class="pulse-rate-code">DOGE</span>
+                <span class="pulse-rate-diff up" id="pulseDiffDoge" title="+2.8%">▲</span>
+              </div>
+              <div class="pulse-rate-value" id="pulseRateDoge">0,142$</div>
+            </div>
+          </div>
+
+          <div class="pulse-finance-footer">
+            <span class="pulse-finance-footer-note" title="Офіційний курс НБУ та середньозважені міжбанківські котирування">
+              <i class="fas fa-university text-primary" style="margin-right: 3px;"></i>Курс НБУ / Міжбанк • <span id="pulseFinanceDateNote">Оновлення щодня</span>
+            </span>
+          </div>
+        </div>
+
+        <!-- 3. Конвертер валют як окремий автономний блок -->
+        <div class="pulse-card" id="pulseCardConverter">
+          <div class="pulse-card-header">
+            <span class="pulse-card-title"><i class="fas fa-calculator text-primary"></i> Конвертер</span>
+            <div class="pulse-rates-tab-group" id="pulseConvTabGroup">
+              <button type="button" class="pulse-rate-tab-btn active" id="pulseConvTabFiat" data-tab="fiat">
+                <i class="fas fa-money-bill-wave"></i> Валюта
+              </button>
+              <button type="button" class="pulse-rate-tab-btn" id="pulseConvTabCrypto" data-tab="crypto">
+                <i class="fab fa-bitcoin"></i> Крипта
+              </button>
+            </div>
+          </div>
+          <div class="pulse-converter-dual-wrap">
+            <div class="pulse-conv-box">
+              <div class="pulse-conv-top-row">
+                <span class="pulse-conv-label">Я маю</span>
+                <select id="pulseConvCurrencyFrom" class="pulse-conv-select">
+                  <option value="USD" selected>USD</option>
+                  <option value="EUR">EUR</option>
+                  <option value="PLN">PLN</option>
+                  <option value="GBP">GBP</option>
+                  <option value="CZK">CZK</option>
+                  <option value="CHF">CHF</option>
+                  <option value="CAD">CAD</option>
+                  <option value="CNY">CNY</option>
+                  <option value="UAH">UAH</option>
+                </select>
+              </div>
+              <div class="pulse-conv-input-row">
+                <input type="text" inputmode="decimal" id="pulseConvAmountFrom" class="pulse-conv-input" value="10">
+              </div>
+              <div class="pulse-conv-rate-ref" id="pulseConvRateFromRef">1 USD = 41.50 UAH</div>
+            </div>
+
+            <button type="button" class="pulse-conv-swap-btn" id="pulseConvSwapBtn" title="Поміняти місцями (⇄)">
+              <i class="fas fa-exchange-alt"></i>
+            </button>
+
+            <div class="pulse-conv-box">
+              <div class="pulse-conv-top-row">
+                <span class="pulse-conv-label">Я отримую</span>
+                <select id="pulseConvCurrencyTo" class="pulse-conv-select">
+                  <option value="UAH" selected>UAH</option>
+                  <option value="USD">USD</option>
+                  <option value="EUR">EUR</option>
+                  <option value="PLN">PLN</option>
+                  <option value="GBP">GBP</option>
+                  <option value="CZK">CZK</option>
+                  <option value="CHF">CHF</option>
+                  <option value="CAD">CAD</option>
+                  <option value="CNY">CNY</option>
+                </select>
+              </div>
+              <div class="pulse-conv-input-row">
+                <input type="text" inputmode="decimal" id="pulseConvAmountTo" class="pulse-conv-input" value="415.00">
+              </div>
+              <div class="pulse-conv-rate-ref" id="pulseConvRateToRef">1 UAH = 0.0241 USD</div>
+            </div>
+          </div>
+
+          <div class="pulse-conv-quick-row">
+            <span class="pulse-conv-quick-lbl">Швидкі суми:</span>
+            <div class="pulse-conv-quick-buttons">
+              <button type="button" class="pulse-conv-quick-btn" data-amount="50">50</button>
+              <button type="button" class="pulse-conv-quick-btn" data-amount="100">100</button>
+              <button type="button" class="pulse-conv-quick-btn" data-amount="500">500</button>
+              <button type="button" class="pulse-conv-quick-btn" data-amount="1000">1 000</button>
+              <button type="button" class="pulse-conv-quick-btn" data-amount="5000">5 000</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- КОЛОНКА 3: ЦІНИ НА ПАЛЬНЕ ТА СВЯТА І ПОДІЇ -->
+      <div class="pulse-grid-col" id="pulseColFuelHoliday">
+        <!-- 1. Ціни на пальне -->
+        <div class="pulse-card" id="pulseCardFuel">
+          <div class="pulse-card-header">
+            <span class="pulse-card-title"><i class="fas fa-gas-pump text-danger"></i> Ціни на пальне</span>
+            <span class="pulse-card-badge badge-green" id="pulseFuelRegionBadge">АЗС України</span>
+          </div>
+
+          <!-- Вибір регіону / області (збереження в браузері та профілі) -->
+          <div class="pulse-fuel-region-bar">
+            <label for="pulseFuelRegionSelect" class="pulse-fuel-region-label">
+              <i class="fas fa-map-marker-alt text-danger"></i> Регіон:
+            </label>
+            <select id="pulseFuelRegionSelect" class="pulse-fuel-region-select" aria-label="Обрати область для перегляду цін на пальне">
+              ${UKRAINE_FUEL_REGIONS.map(r => `<option value="${r.id}">${r.name}</option>`).join('')}
+            </select>
+          </div>
+
+          <!-- Таблиця цін на пальне по провідних мережах АЗС -->
+          <div class="pulse-fuel-table-wrap">
+            <table class="pulse-fuel-table">
+              <thead>
+                <tr>
+                  <th class="fuel-th-brand">АЗС</th>
+                  <th>А-95</th>
+                  <th>А-95+</th>
+                  <th>ДП</th>
+                  <th>ДП+</th>
+                  <th>Газ</th>
+                </tr>
+              </thead>
+              <tbody id="pulseFuelTableBody">
+                <!-- Заповнюється динамічно функцією renderPulseFuelTable -->
+              </tbody>
+            </table>
+          </div>
+
+          <div class="pulse-fuel-bottom">
+            <span class="text-muted" style="font-size: 0.67rem;" title="Ціни оновлюються автоматично щодня о 08:10 за київським часом">
+              <i class="fas fa-clock text-info me-2"></i> Оновлення щодня о 08:10 • грн/л
+            </span>
+            <a href="https://minfin.com.ua/ua/fuel/" target="_blank" rel="noopener" class="pulse-fuel-link" title="Моніторинг цін на пальне на Мінфін">
+              Мінфін АЗС <i class="fas fa-external-link-alt ms-1"></i>
+            </a>
+          </div>
+        </div>
+
+        <!-- 2. Свята та події -->
+        <div class="pulse-card" id="pulseCardHoliday">
+          <div class="pulse-card-header">
+            <span class="pulse-card-title"><i class="fas fa-calendar-day text-info"></i> Свята та події</span>
+            <span class="pulse-card-badge" id="pulseHolidaysBadge">3 дні</span>
+          </div>
+
+          <!-- Власний адаптивний інформер «Свята та події» на 3 дні (Сьогодні, Завтра, Післязавтра) -->
+          <div class="pulse-holidays-container" id="pulseHolidaysContainer">
+            <!-- Заповнюється динамічно функцією renderPulseHolidaysUI -->
+          </div>
+        </div>
+      </div>
+
+      <!-- КОЛОНКА 4: СТРІЧКА ВАЖЛИВИХ НОВИН -->
+      <div class="pulse-grid-col" id="pulseColNews">
+        <div class="pulse-card" id="pulseCardNews">
+          <div class="pulse-card-header">
+            <span class="pulse-card-title"><i class="fas fa-newspaper text-danger"></i> Новини України</span>
+            <div class="d-flex align-items-center" style="gap: 5px;">
+              <span class="pulse-card-badge badge-green" id="pulseNewsLiveBadge" title="Оновлення стрічки наживо">Наживо</span>
+              <button type="button" id="pulseNewsRefreshBtn" class="pulse-weather-refresh-action-btn" title="Оновити стрічку новин" aria-label="Оновити новини">
+                <i class="fas fa-sync-alt" id="pulseNewsRefreshIcon"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Вкладки категорій новин -->
+          <div class="pulse-news-tabs-wrap">
+            <div class="pulse-rates-tab-group" id="pulseNewsTabGroup">
+              <button type="button" class="pulse-rate-tab-btn active" data-tab="all">Всі</button>
+              <button type="button" class="pulse-rate-tab-btn" data-tab="main">Головне</button>
+              <button type="button" class="pulse-rate-tab-btn" data-tab="war">Фронт</button>
+              <button type="button" class="pulse-rate-tab-btn" data-tab="econ">Економіка</button>
+            </div>
+          </div>
+
+          <!-- Стрічка останніх новин -->
+          <div class="pulse-news-feed" id="pulseNewsFeed">
+            <!-- Заповнюється динамічно функцією renderPulseNewsFeed -->
+          </div>
+
+          <div class="pulse-news-footer">
+            <span class="pulse-news-footer-source" title="Провідні інформаційні агенції України">
+              <i class="fas fa-rss text-danger me-1"></i>Суспільне • Укрінформ • УП • РБК
+            </span>
+            <a href="./news.html" class="pulse-fuel-link" title="Перейти до повного каталогу українських та світових новин">
+              Всі ЗМІ <i class="fas fa-arrow-right ms-1"></i>
+            </a>
           </div>
         </div>
       </div>
@@ -11483,19 +11773,6 @@ function renderPulseDrawerLayout(container) {
     };
   }
   renderPulseFuelTable(savedRegion);
-  // Перемикач вкладок Магнітні бурі / Атмосферний тиск (Метео & Тиск)
-  const tabHealthGeomag = container.querySelector('#pulseHealthTabGeomag');
-  const tabHealthPressure = container.querySelector('#pulseHealthTabPressure');
-  if (tabHealthGeomag && tabHealthPressure) {
-    tabHealthGeomag.onclick = () => {
-      window.activeHealthTab = 'geomag';
-      renderHealthForecastUI('geomag');
-    };
-    tabHealthPressure.onclick = () => {
-      window.activeHealthTab = 'pressure';
-      renderHealthForecastUI('pressure');
-    };
-  }
 
   // Перемикач вкладок Валюти / Крипта у сітці
   const tabBtnFiat = container.querySelector('#pulseTabBtnFiat');
@@ -11691,6 +11968,36 @@ function renderPulseDrawerLayout(container) {
 
   // Рендеримо власний віджет «Свята та події» на 3 дні (Сьогодні, Завтра, Післязавтра)
   renderPulseHolidaysUI();
+
+  // Обробники вкладок категорій та оновлення стрічки новин (Колонка 4)
+  const newsTabGroup = container.querySelector('#pulseNewsTabGroup');
+  if (newsTabGroup) {
+    const tabBtns = newsTabGroup.querySelectorAll('.pulse-rate-tab-btn');
+    tabBtns.forEach(btn => {
+      btn.onclick = () => {
+        tabBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const tab = btn.getAttribute('data-tab') || 'all';
+        renderPulseNewsFeed(tab);
+      };
+    });
+  }
+
+  const newsRefreshBtn = container.querySelector('#pulseNewsRefreshBtn');
+  if (newsRefreshBtn) {
+    newsRefreshBtn.onclick = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const spin = container.querySelector('#pulseNewsRefreshIcon');
+      if (spin) spin.classList.add('fa-spin');
+      setTimeout(() => {
+        renderPulseNewsFeed(currentPulseNewsTab);
+        if (spin) spin.classList.remove('fa-spin');
+        showQuickToast('Стрічку новин оновлено', 'info');
+      }, 350);
+    };
+  }
+  renderPulseNewsFeed('all');
 }
 
 async function loadPulseDrawerData(forceRefresh = false) {
