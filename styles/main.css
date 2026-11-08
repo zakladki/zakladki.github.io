@@ -13763,14 +13763,12 @@ body.dark-mode .pulse-w2-top-panel {
 
 .pulse-w2-tab {
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 2px;
   background: transparent;
   border: 1px solid transparent;
   border-radius: 7px;
-  padding: 4px 2px 5px;
+  padding: 3px 2px 4px;
   cursor: pointer;
   transition: all 0.15s ease;
   color: var(--text-muted, #64748b);
@@ -13796,6 +13794,133 @@ body.dark-mode .pulse-w2-tab.active {
   border-color: rgba(56, 189, 248, 0.5);
   color: #f8fafc;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* Внутрішній горизонтальний розподіл: зліва колба опадів, праворуч інформація (щільні відступи) */
+.pulse-w2-tab-inner {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  gap: 2px; /* Зменшено відступ від колби до тексту праворуч */
+}
+.pulse-w2-tab-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px; /* Акуратний мінімальний відступ між рядками тексту */
+  flex: 1;
+  min-width: 0;
+}
+
+/* Вертикальна колба опадів (опадомір) ліворуч майже по всій висоті (трішки товстіша і довша) */
+.pulse-w2-flask-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 48px; /* Подовжено до 48px */
+  width: 7.5px; /* Збільшено ширину */
+  flex-shrink: 0;
+  cursor: help;
+  position: relative;
+  margin: 0;
+}
+.pulse-w2-flask-glass {
+  width: 6.5px; /* Трішки товстіша колба (6.5px замість 5px) */
+  height: 46px; /* Подовжена колба (46px замість 42px) */
+  border-radius: 3.25px;
+  background: rgba(148, 163, 184, 0.22);
+  border: 1px solid rgba(148, 163, 184, 0.48);
+  position: relative;
+  overflow: hidden;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+body.dark-mode .pulse-w2-flask-glass {
+  background: rgba(51, 65, 85, 0.45);
+  border-color: rgba(100, 116, 139, 0.55);
+}
+.pulse-w2-flask-fill {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: linear-gradient(180deg, #38bdf8 0%, #0284c7 100%);
+  border-radius: 0 0 2.5px 2.5px;
+  transition: height 0.4s ease;
+}
+.pulse-w2-flask-fill.has-rain {
+  background: linear-gradient(180deg, #60a5fa 0%, #0284c7 100%);
+  box-shadow: 0 0 3px rgba(56, 189, 248, 0.85);
+}
+/* Поділки на скляній колбі за принципом 25% / 50% / 75% шкали (3 позначки) */
+.pulse-w2-flask-marks {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+.pulse-w2-flask-tick {
+  position: absolute;
+  right: 0;
+  height: 1px;
+  background: rgba(100, 116, 139, 0.6);
+  pointer-events: none;
+}
+body.dark-mode .pulse-w2-flask-tick {
+  background: rgba(148, 163, 184, 0.65);
+}
+.pulse-w2-flask-tick.t25 {
+  bottom: 25%;
+  width: 2.2px;
+}
+.pulse-w2-flask-tick.t50 {
+  bottom: 50%;
+  width: 3.5px; /* Середня поділка 50% виразніша та довша */
+  background: rgba(71, 85, 105, 0.75);
+}
+body.dark-mode .pulse-w2-flask-tick.t50 {
+  background: rgba(203, 213, 225, 0.8);
+}
+.pulse-w2-flask-tick.t75 {
+  bottom: 75%;
+  width: 2.2px;
+}
+
+/* Міні-колбочка опадів для кожної строчки таблиці на межі між часом та хмаринками */
+.pulse-w2-row-flask {
+  width: 3.5px;
+  height: 17px;
+  border-radius: 1.75px;
+  background: rgba(148, 163, 184, 0.22);
+  border: 1px solid rgba(148, 163, 184, 0.45);
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+  margin-right: 2px;
+  cursor: help;
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
+}
+body.dark-mode .pulse-w2-row-flask {
+  background: rgba(51, 65, 85, 0.45);
+  border-color: rgba(100, 116, 139, 0.5);
+}
+.pulse-w2-row-flask-fill {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: linear-gradient(180deg, #38bdf8 0%, #0284c7 100%);
+  border-radius: 0 0 1px 1px;
+  transition: height 0.3s ease;
+}
+.pulse-w2-row-flask-fill.has-rain {
+  background: linear-gradient(180deg, #60a5fa 0%, #0284c7 100%);
+  box-shadow: 0 0 2px rgba(56, 189, 248, 0.85);
 }
 
 .pulse-w2-tab-title {
@@ -14148,16 +14273,16 @@ body.dark-mode .pulse-w2-col-time {
   font-size: 0.86rem;
 }
 .pulse-w2-col-weather {
-  width: 58px;
+  width: 60px;
   text-align: left !important;
-  padding: 2.5px 2px 2.5px 6px !important;
+  padding: 2.5px 2px 2.5px 3px !important;
   white-space: nowrap;
 }
 .pulse-w2-weather-cell {
   display: inline-flex;
   align-items: center;
   justify-content: flex-start;
-  gap: 3.5px;
+  gap: 2.5px;
   line-height: 1;
   width: 100%;
 }
@@ -14430,7 +14555,7 @@ body.dark-mode .pulse-w2-ticker-badge {
   display: flex;
   width: max-content;
   will-change: transform;
-  animation: pulseWeatherMarquee 48s linear infinite; /* Зменшено швидкість на 25% (48с замість 36с) */
+  animation: pulseWeatherMarquee 62s linear infinite; /* Зменшено швидкість ще на 25% (62с замість 48с) */
 }
 
 .pulse-w2-ticker-wrap:hover .pulse-w2-ticker-track {

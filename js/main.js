@@ -9801,6 +9801,7 @@ function createFallbackWeatherData(city) {
       surface_pressure: pressures,
       weather_code: codes,
       precipitation_probability: precips,
+      precipitation: Array(72).fill(0).map((_, i) => (precips[i] > 40 ? Math.round((precips[i] / 30) * 10) / 10 : 0)),
       wind_speed_10m: winds,
       wind_direction_10m: dirs
     },
@@ -9813,6 +9814,7 @@ function createFallbackWeatherData(city) {
       temperature_2m_max: [10.2, 9.4, 9.0],
       temperature_2m_min: [6.8, 6.5, 6.0],
       precipitation_probability_max: [25, 75, 10],
+      precipitation_sum: [0.2, 4.8, 0.0],
       wind_speed_10m_max: [4.2, 4.8, 3.9],
       wind_direction_10m_dominant: [230, 240, 220]
     }
@@ -9825,13 +9827,13 @@ async function loadPulseWeatherData(forceRefresh = false) {
   const refreshIcon = document.getElementById('pulseWeatherRefreshIcon');
   if (refreshIcon) refreshIcon.classList.add('fa-spin');
 
-  const cacheKey = `pulse_weather_${city.id}`;
+  const cacheKey = `pulse_weather_v4_${city.id}`;
   const now = Date.now();
 
   if (!forceRefresh) {
     try {
       const cached = JSON.parse(localStorage.getItem(cacheKey) || 'null');
-      if (cached && (now - cached.timestamp < 30 * 60 * 1000) && cached.data) {
+      if (cached && (now - cached.timestamp < 30 * 60 * 1000) && cached.data && cached.data.daily && Array.isArray(cached.data.daily.precipitation_sum)) {
         renderPulseWeatherUI(cached.data, city, cached.updatedText);
         if (refreshIcon) refreshIcon.classList.remove('fa-spin');
         return;
@@ -9840,7 +9842,7 @@ async function loadPulseWeatherData(forceRefresh = false) {
   }
 
   try {
-    const url = `https://api.open-meteo.com/v1/forecast?latitude=${city.lat}&longitude=${city.lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,weather_code,surface_pressure,wind_speed_10m,wind_direction_10m&hourly=temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,precipitation_probability,wind_speed_10m,wind_direction_10m,surface_pressure&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,wind_speed_10m_max,wind_direction_10m_dominant,sunrise,sunset,uv_index_max&wind_speed_unit=ms&timezone=auto`;
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${city.lat}&longitude=${city.lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,weather_code,surface_pressure,wind_speed_10m,wind_direction_10m&hourly=temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,precipitation_probability,precipitation,wind_speed_10m,wind_direction_10m,surface_pressure&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,precipitation_sum,wind_speed_10m_max,wind_direction_10m_dominant,sunrise,sunset,uv_index_max&wind_speed_unit=ms&timezone=auto`;
     const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
     const timeoutId = controller ? setTimeout(() => controller.abort(), 8000) : null;
     const res = await fetch(url, controller ? { signal: controller.signal } : {});
@@ -10074,7 +10076,7 @@ function renderPulseWeatherUI(data, city, updatedTime = '') {
     const minSign = minT > 0 ? '+' : '';
     const maxSign = maxT > 0 ? '+' : '';
 
-    // Розрахунок середньодобової ймовірності опадів для вкладки
+    // Розрахунок середньодобової ймовірності опадів (%) та суми опадів (мм) для вкладки
     let dayAvgPrecip = 0;
     if (hourly.precipitation_probability && Array.isArray(hourly.precipitation_probability)) {
       const daySlice = hourly.precipitation_probability.slice(d * 24, (d + 1) * 24).filter(v => typeof v === 'number' && !isNaN(v));
@@ -10083,27 +10085,61 @@ function renderPulseWeatherUI(data, city, updatedTime = '') {
       }
     }
 
+    let precipMm = 0;
+    if (daily.precipitation_sum && typeof daily.precipitation_sum[d] === 'number') {
+      precipMm = Math.round(daily.precipitation_sum[d] * 10) / 10;
+    }
+    // Додатково перевіряємо добову суму 24 годин цього дня
+    if (hourly.precipitation && Array.isArray(hourly.precipitation)) {
+      const dayPrecipSlice = hourly.precipitation.slice(d * 24, (d + 1) * 24).filter(v => typeof v === 'number' && !isNaN(v));
+      if (dayPrecipSlice.length > 0) {
+        const hSum = Math.round(dayPrecipSlice.reduce((sum, v) => sum + v, 0) * 10) / 10;
+        if (hSum > precipMm) {
+          precipMm = hSum;
+        }
+      }
+    }
+
+    // Заповнення колби-опадоміра (шкала від 0 до 15 мм = 100%)
+    const flaskFillPercent = precipMm > 0 ? Math.min(100, Math.max(10, Math.round((precipMm / 15) * 100))) : 0;
+    const precipMmText = precipMm > 0 ? `${precipMm} мм` : '0 мм (без опадів)';
+    const flaskTooltip = `Добові опади (${tabNames[d]}): ${precipMmText}&#10;Середня ймовірність: ${dayAvgPrecip}%`;
+
     tabsHtml += `
       <button type="button" class="pulse-w2-tab ${d === activeTab ? 'active' : ''}" onclick="window.setPulseWeatherTab(${d})">
-        <span class="pulse-w2-tab-title">${tabNames[d]}</span>
-        <span class="pulse-w2-tab-date">${dayNum} ${monthLabel} • ${dowLabel}</span>
-        <div class="pulse-w2-tab-weather-row" title="${cond.label} • Середня ймовірність опадів: ${dayAvgPrecip}%">
-          <span class="pulse-w2-tab-icon">${cond.icon}</span>
-          <span class="pulse-w2-tab-precip ${dayAvgPrecip >= 50 ? 'high' : ''}" title="Середня ймовірність опадів за добу: ${dayAvgPrecip}%">
-            <span class="pulse-w2-tab-precip-val">${dayAvgPrecip}</span>
-            <svg class="pulse-hour-precip-drops" width="8" height="8" viewBox="0 0 12 12" fill="currentColor" aria-hidden="true">
-              <path d="M2.2 1.2c-.3.6-.5 1.3-.4 1.8.1.6.6.9 1.1.8.6-.1.9-.6.8-1.2-.1-.5-.5-1.1-.9-1.5a.3.3 0 0 0-.6.1z" opacity="0.75"/>
-              <path d="M6.2 0.8c-.3.6-.5 1.3-.4 1.8.1.6.6.9 1.1.8.6-.1.9-.6.8-1.2-.1-.5-.5-1.1-.9-1.5a.3.3 0 0 0-.6.1z"/>
-              <path d="M10.2 1.2c-.3.6-.5 1.3-.4 1.8.1.6.6.9 1.1.8.6-.1.9-.6.8-1.2-.1-.5-.5-1.1-.9-1.5a.3.3 0 0 0-.6.1z" opacity="0.75"/>
-              <path d="M4.2 6.2c-.3.6-.5 1.3-.4 1.8.1.6.6.9 1.1.8.6-.1.9-.6.8-1.2-.1-.5-.5-1.1-.9-1.5a.3.3 0 0 0-.6.1z" opacity="0.85"/>
-              <path d="M8.2 6.2c-.3.6-.5 1.3-.4 1.8.1.6.6.9 1.1.8.6-.1.9-.6.8-1.2-.1-.5-.5-1.1-.9-1.5a.3.3 0 0 0-.6.1z" opacity="0.85"/>
-            </svg>
-          </span>
-        </div>
-        <div class="pulse-w2-tab-temps">
-          <span class="${minClass}">${minSign}${minT}°</span>
-          <span class="pulse-w2-tab-range-sep">...</span>
-          <span class="${maxClass}">${maxSign}${maxT}°</span>
+        <div class="pulse-w2-tab-inner">
+          <div class="pulse-w2-flask-wrap" title="${flaskTooltip}">
+            <div class="pulse-w2-flask-glass">
+              <div class="pulse-w2-flask-fill ${precipMm > 0 ? 'has-rain' : ''}" style="height: ${flaskFillPercent}%;"></div>
+              <div class="pulse-w2-flask-marks">
+                <span class="pulse-w2-flask-tick t25" title="25%"></span>
+                <span class="pulse-w2-flask-tick t50" title="50%"></span>
+                <span class="pulse-w2-flask-tick t75" title="75%"></span>
+              </div>
+            </div>
+          </div>
+          <div class="pulse-w2-tab-content">
+            <span class="pulse-w2-tab-title">${tabNames[d]}</span>
+            <span class="pulse-w2-tab-date">${dayNum} ${monthLabel} • ${dowLabel}</span>
+            <div class="pulse-w2-tab-weather-row" title="${cond.label} • Опади: ${precipMmText} (ймовірність ${dayAvgPrecip}%)">
+              <span class="pulse-w2-tab-icon">${cond.icon}</span>
+              <span class="pulse-w2-tab-precip ${dayAvgPrecip >= 50 ? 'high' : ''}" title="Середня ймовірність опадів за добу: ${dayAvgPrecip}%, очікується: ${precipMmText}">
+                <span class="pulse-w2-tab-precip-val">${dayAvgPrecip}</span>
+                <svg class="pulse-hour-precip-drops" width="8" height="8" viewBox="0 0 12 12" fill="currentColor" aria-hidden="true">
+                  <path d="M2.2 1.2c-.3.6-.5 1.3-.4 1.8.1.6.6.9 1.1.8.6-.1.9-.6.8-1.2-.1-.5-.5-1.1-.9-1.5a.3.3 0 0 0-.6.1z" opacity="0.75"/>
+                  <path d="M6.2 0.8c-.3.6-.5 1.3-.4 1.8.1.6.6.9 1.1.8.6-.1.9-.6.8-1.2-.1-.5-.5-1.1-.9-1.5a.3.3 0 0 0-.6.1z"/>
+                  <path d="M10.2 1.2c-.3.6-.5 1.3-.4 1.8.1.6.6.9 1.1.8.6-.1.9-.6.8-1.2-.1-.5-.5-1.1-.9-1.5a.3.3 0 0 0-.6.1z" opacity="0.75"/>
+                  <path d="M4.2 6.2c-.3.6-.5 1.3-.4 1.8.1.6.6.9 1.1.8.6-.1.9-.6.8-1.2-.1-.5-.5-1.1-.9-1.5a.3.3 0 0 0-.6.1z" opacity="0.85"/>
+                  <path d="M8.2 6.2c-.3.6-.5 1.3-.4 1.8.1.6.6.9 1.1.8.6-.1.9-.6.8-1.2-.1-.5-.5-1.1-.9-1.5a.3.3 0 0 0-.6.1z" opacity="0.85"/>
+                </svg>
+              </span>
+            </div>
+            <div class="pulse-w2-tab-temps">
+              <span class="${minClass}">${minSign}${minT}°</span>
+              <span class="pulse-w2-tab-range-sep">...</span>
+              <span class="${maxClass}">${maxSign}${maxT}°</span>
+            </div>
+          </div>
         </div>
       </button>
     `;
@@ -10243,6 +10279,9 @@ function renderPulseWeatherUI(data, city, updatedTime = '') {
     const precipVal = (hourly.precipitation_probability && hourly.precipitation_probability[idx] !== undefined)
       ? hourly.precipitation_probability[idx]
       : 0;
+    const hourlyPrecipMm = (hourly.precipitation && hourly.precipitation[idx] !== undefined)
+      ? Math.round(hourly.precipitation[idx] * 10) / 10
+      : 0;
     const humVal = (hourly.relative_humidity_2m && hourly.relative_humidity_2m[idx] !== undefined)
       ? Math.round(hourly.relative_humidity_2m[idx])
       : 65;
@@ -10300,15 +10339,43 @@ function renderPulseWeatherUI(data, city, updatedTime = '') {
     const kpParts = kpFixed.split('.');
     const kpHtml = `${kpParts[0]}.<span class="pulse-decimal">${kpParts[1]}</span>`;
 
+    const hourPrecipTooltip = `Ймовірність опадів: ${precipVal}%${hourlyPrecipMm > 0 ? ` • Очікується: ${hourlyPrecipMm} мм` : ''}`;
+
+    // Сума опадів за 3-годинний слот для міні-колбочки в рядку таблиці
+    let slotPrecipMm = 0;
+    if (hourly.precipitation && Array.isArray(hourly.precipitation)) {
+      for (let offset = 0; offset < 3; offset++) {
+        const pVal = hourly.precipitation[idx + offset];
+        if (typeof pVal === 'number' && !isNaN(pVal)) {
+          slotPrecipMm += pVal;
+        }
+      }
+      slotPrecipMm = Math.round(slotPrecipMm * 10) / 10;
+    } else if (hourlyPrecipMm > 0) {
+      slotPrecipMm = hourlyPrecipMm;
+    }
+
+    // Заповнення міні-колбочки (шкала від 0 до 2.5 мм за 3 год)
+    let rowFlaskFillPercent = 0;
+    if (slotPrecipMm > 0) {
+      rowFlaskFillPercent = Math.min(100, Math.max(15, Math.round((slotPrecipMm / 2.5) * 100)));
+    } else if (precipVal >= 40) {
+      rowFlaskFillPercent = Math.round(precipVal * 0.25);
+    }
+    const rowFlaskTooltip = `Опади (${hStr}): ${slotPrecipMm > 0 ? slotPrecipMm + ' мм' : 'без опадів'} • ймовірність: ${precipVal}%`;
+
     rowsHtml += `
       <tr class="pulse-w2-row ${isCurrent ? 'pulse-w2-row-current' : ''}">
         <td class="pulse-w2-col-time">
           <span class="pulse-w2-time-val">${hStr}</span>
         </td>
-        <td class="pulse-w2-col-weather" title="${cond.label} (ймовірність опадів: ${precipVal}%)">
+        <td class="pulse-w2-col-weather" title="${cond.label} (${hourPrecipTooltip})">
           <div class="pulse-w2-weather-cell">
+            <div class="pulse-w2-row-flask" title="${rowFlaskTooltip}">
+              <div class="pulse-w2-row-flask-fill ${rowFlaskFillPercent > 0 ? 'has-rain' : ''}" style="height: ${rowFlaskFillPercent}%;"></div>
+            </div>
             <span class="pulse-w2-cell-icon">${cond.icon}</span>
-            <span class="pulse-w2-cell-precip ${precipVal >= 50 ? 'high' : ''}" title="Ймовірність опадів: ${precipVal}%">
+            <span class="pulse-w2-cell-precip ${precipVal >= 50 ? 'high' : ''}" title="${hourPrecipTooltip}">
               <span class="pulse-w2-cell-precip-val">${precipVal}</span>
               <svg class="pulse-hour-precip-drops" width="9" height="9" viewBox="0 0 12 12" fill="currentColor" aria-hidden="true">
                 <path d="M2.2 1.2c-.3.6-.5 1.3-.4 1.8.1.6.6.9 1.1.8.6-.1.9-.6.8-1.2-.1-.5-.5-1.1-.9-1.5a.3.3 0 0 0-.6.1z" opacity="0.75"/>
