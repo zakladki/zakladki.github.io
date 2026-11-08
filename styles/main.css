@@ -12893,8 +12893,22 @@ body.dark-mode .pulse-eco-strip-sep {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 6px;
+  gap: 5px;
   margin-bottom: 7px;
+}
+.pulse-news-tabs-wrap .pulse-rates-tab-group {
+  flex: 1;
+  justify-content: space-between;
+  min-width: 0;
+  gap: 1px;
+}
+.pulse-news-tabs-wrap .pulse-rate-tab-btn {
+  padding: 1px 4px;
+  font-size: 0.63rem;
+  font-weight: 600;
+  white-space: nowrap;
+  flex: 1;
+  text-align: center;
 }
 .pulse-news-important-filter-btn {
   display: inline-flex;

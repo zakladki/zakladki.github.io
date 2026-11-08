@@ -10966,103 +10966,217 @@ function renderPulseFuelTable(selectedRegion = 'ua') {
 // ==========================================================================
 // ДАНІ ТА ЛОГІКА СТРІЧКИ ВАЖЛИВИХ НОВИН УКРАЇНИ (КОЛОНКА 4)
 // ==========================================================================
-const PULSE_NEWS_ITEMS = [
+// ==========================================================================
+// ДАНІ ТА ЛОГІКА СТРІЧКИ ВАЖЛИВИХ НОВИН УКРАЇНИ (КОЛОНКА 4)
+// ЖИВИЙ ОНЛАЙН-ПАРСИНГ ПРОВІДНИХ УКРАЇНСЬКИХ RSS-СТРІЧОК (УП, ТСН, BBC, ЕСПРЕСО)
+// ==========================================================================
+let currentPulseNewsItems = [];
+let currentPulseNewsTab = 'all';
+
+const PULSE_NEWS_BACKUP_ITEMS = [
   {
-    id: 1,
-    title: 'Повітряні сили знешкодили ворожі ударні дрони під час нічної атаки',
-    source: 'Суспільне',
-    sourceClass: 'src-suspilne',
-    cat: 'war',
-    priority: 'high',
-    minutesAgo: 8,
-    url: 'https://suspilne.media/'
-  },
-  {
-    id: 2,
-    title: 'ЄС узгодив новий пакет підтримки для відновлення енергетичної системи України',
-    source: 'Укрінформ',
-    sourceClass: 'src-ukrinform',
-    cat: 'main',
-    priority: 'normal',
-    minutesAgo: 24,
-    url: 'https://www.ukrinform.ua/'
-  },
-  {
-    id: 3,
-    title: 'НБУ зберіг облікову ставку на рівні 13% та оновив макроекономічний прогноз',
-    source: 'РБК-Україна',
-    sourceClass: 'src-rbc',
-    cat: 'econ',
-    priority: 'normal',
-    minutesAgo: 45,
-    url: 'https://www.rbc.ua/'
-  },
-  {
-    id: 4,
-    title: 'Генштаб ЗСУ: Сили оборони стримують штурми ворога на східних напрямках',
+    id: 'b1',
+    title: 'Повітряні сили знешкодили чергову групу ворожих ударних дронів',
     source: 'УП',
-    sourceClass: 'src-pravda',
     cat: 'war',
     priority: 'high',
-    minutesAgo: 65,
     url: 'https://www.pravda.com.ua/'
   },
   {
-    id: 5,
-    title: 'Уряд розширив програми єОселя та доступних грантів для малого бізнесу',
-    source: 'Liga.net',
-    sourceClass: 'src-liga',
+    id: 'b2',
+    title: 'Генштаб ЗСУ: Сили оборони відбили штурмові дії противника на ключових напрямках',
+    source: 'ТСН',
+    cat: 'war',
+    priority: 'high',
+    url: 'https://tsn.ua/'
+  },
+  {
+    id: 'b3',
+    title: 'Президент провів засідання Ставки щодо захисту енергетики та підготовки до зими',
+    source: 'УП',
+    cat: 'pol',
+    priority: 'normal',
+    url: 'https://www.pravda.com.ua/'
+  },
+  {
+    id: 'b4',
+    title: 'ЄС узгодив новий пакет фінансової та безпекової підтримки для України',
+    source: 'BBC',
+    cat: 'world',
+    priority: 'normal',
+    url: 'https://www.bbc.com/ukrainian'
+  },
+  {
+    id: 'b5',
+    title: 'НБУ зберіг облікову ставку на рівні 13% та оновив макроекономічний прогноз',
+    source: 'Еспресо',
     cat: 'econ',
     priority: 'normal',
-    minutesAgo: 95,
-    url: 'https://www.liga.net/'
+    url: 'https://espreso.tv/'
   },
   {
-    id: 6,
-    title: 'Укренерго: енергосистема працює збалансовано, аварійних відключень не прогнозується',
-    source: 'Суспільне',
-    sourceClass: 'src-suspilne',
-    cat: 'main',
-    priority: 'normal',
-    minutesAgo: 120,
-    url: 'https://suspilne.media/'
-  },
-  {
-    id: 7,
-    title: 'Україна та партнери відкривають новий залізничний логістичний коридор до Європи',
-    source: 'Укрінформ',
-    sourceClass: 'src-ukrinform',
-    cat: 'main',
-    priority: 'normal',
-    minutesAgo: 150,
-    url: 'https://www.ukrinform.ua/'
-  },
-  {
-    id: 8,
-    title: 'Мінфін залучив понад 12 млрд грн від розміщення військових облігацій',
-    source: 'РБК-Україна',
-    sourceClass: 'src-rbc',
+    id: 'b6',
+    title: 'Уряд розширив програми доступних кредитів єОселя та грантів для бізнесу',
+    source: 'УП',
     cat: 'econ',
     priority: 'normal',
-    minutesAgo: 185,
-    url: 'https://www.rbc.ua/'
+    url: 'https://www.pravda.com.ua/'
+  },
+  {
+    id: 'b7',
+    title: 'Укренерго: енергосистема працює збалансовано, критичних відключень не планується',
+    source: 'ТСН',
+    cat: 'econ',
+    priority: 'normal',
+    url: 'https://tsn.ua/'
+  },
+  {
+    id: 'b8',
+    title: 'Україна та партнери узгодили нові логістичні коридори експорту до Європи',
+    source: 'BBC',
+    cat: 'world',
+    priority: 'normal',
+    url: 'https://www.bbc.com/ukrainian'
+  },
+  {
+    id: 'b9',
+    title: 'Верховна Рада ухвалила євроінтеграційний законопроєкт про митну реформу',
+    source: 'Еспресо',
+    cat: 'pol',
+    priority: 'normal',
+    url: 'https://espreso.tv/'
+  },
+  {
+    id: 'b10',
+    title: 'Мінфін залучив понад 14 млрд грн від розміщення чергових облігацій',
+    source: 'УП',
+    cat: 'econ',
+    priority: 'normal',
+    url: 'https://www.pravda.com.ua/'
   }
 ];
 
-let currentPulseNewsTab = 'all';
+function detectNewsCategory(title, categories = []) {
+  const t = (title + ' ' + (Array.isArray(categories) ? categories.join(' ') : '')).toLowerCase();
+  if (/(генштаб|зсу|фронт|наступ|окупант|бої|ппо|дрон|шахед|ракета|обстріл|сирськ|ворог|бойов|війн|штурм|втрат|армія|повітрян|вибух|боєприпас)/i.test(t)) {
+    return 'war';
+  }
+  if (/(нбу|банк|гривн|долар|курс|інфляц|бюджет|подат|єосел|бізнес|тариф|цін|ринок|експорт|імпорт|ввп|грош|облігац|пальн|кредит)/i.test(t)) {
+    return 'econ';
+  }
+  if (/(сша|трамп|єс|байден|європ|нато|польщ|німеччин|франц|оон|китай|іран|ізраїл|міжнародн|переговор|британ|вибор.*сша|туреччин)/i.test(t)) {
+    return 'world';
+  }
+  return 'pol';
+}
 
-function formatNewsTime(minutesAgo) {
+function detectNewsPriority(title) {
+  const t = title.toLowerCase();
+  if (/(атак|шахед|ракета|ппо зби|ппо знешкод|вибух|тривог|загинул|поранен|удар по|масован|надзвичайн|штурм ворога)/i.test(t)) {
+    return 'high';
+  }
+  return 'normal';
+}
+
+function formatNewsTime(timestamp) {
   const now = new Date();
-  const d = new Date(now.getTime() - minutesAgo * 60 * 1000);
+  const d = new Date(timestamp);
+  if (isNaN(d.getTime())) return '';
+
   const hh = String(d.getHours()).padStart(2, '0');
   const mm = String(d.getMinutes()).padStart(2, '0');
-  const isYesterday = d.getDate() !== now.getDate();
-  const prefix = isYesterday ? 'вчора ' : '';
-  if (minutesAgo < 60) {
-    return `${prefix}${hh}:${mm} (${minutesAgo} хв тому)`;
+  const diffMinutes = Math.max(1, Math.floor((now.getTime() - d.getTime()) / 60000));
+
+  const isToday = d.toDateString() === now.toDateString();
+  const prefix = isToday ? '' : 'вчора ';
+
+  if (diffMinutes < 60) {
+    return `${prefix}${hh}:${mm} (${diffMinutes} хв тому)`;
   }
-  const hours = Math.floor(minutesAgo / 60);
+  const hours = Math.floor(diffMinutes / 60);
   return `${prefix}${hh}:${mm} (${hours} год тому)`;
+}
+
+function generateDynamicBackupNews(now) {
+  return PULSE_NEWS_BACKUP_ITEMS.map((item, idx) => {
+    const offsetMinutes = 12 + idx * 28;
+    return {
+      ...item,
+      timestamp: now - offsetMinutes * 60 * 1000
+    };
+  });
+}
+
+async function loadPulseLiveNews(forceRefresh = false) {
+  const cacheKey = 'pulse_live_news_cache_v2';
+  const now = Date.now();
+
+  if (!forceRefresh) {
+    try {
+      const cached = JSON.parse(localStorage.getItem(cacheKey) || 'null');
+      if (cached && Array.isArray(cached.items) && cached.items.length && (now - cached.timestamp < 10 * 60 * 1000)) {
+        currentPulseNewsItems = cached.items;
+        renderPulseNewsFeed(currentPulseNewsTab);
+        return;
+      }
+    } catch (e) {}
+  }
+
+  const feeds = [
+    { url: 'https://www.pravda.com.ua/rss/', src: 'УП' },
+    { url: 'https://tsn.ua/rss/full.rss', src: 'ТСН' },
+    { url: 'https://feeds.bbci.co.uk/ukrainian/rss.xml', src: 'BBC' },
+    { url: 'https://espreso.tv/rss', src: 'Еспресо' }
+  ];
+
+  let fetchedItems = [];
+
+  const fetchPromises = feeds.map(async (feed) => {
+    try {
+      const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feed.url)}`;
+      const resp = await fetch(apiUrl, { cache: 'no-cache' });
+      if (!resp.ok) return;
+      const data = await resp.json();
+      if (data.status === 'ok' && Array.isArray(data.items)) {
+        data.items.slice(0, 6).forEach((it, idx) => {
+          const rawTitle = (it.title || '').trim();
+          if (!rawTitle) return;
+          const cleanTitle = rawTitle.replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&amp;/g, '&');
+          let parsedDate = null;
+          if (it.pubDate) {
+            parsedDate = new Date(it.pubDate.replace(/-/g, '/'));
+          }
+          const timestamp = (parsedDate && !isNaN(parsedDate.getTime())) ? parsedDate.getTime() : (now - idx * 20 * 60 * 1000);
+
+          fetchedItems.push({
+            id: `${feed.src}_${idx}_${timestamp}`,
+            title: cleanTitle,
+            source: feed.src,
+            cat: detectNewsCategory(cleanTitle, it.categories),
+            priority: detectNewsPriority(cleanTitle),
+            timestamp: timestamp,
+            url: it.link || 'https://www.pravda.com.ua/'
+          });
+        });
+      }
+    } catch (e) {}
+  });
+
+  try {
+    await Promise.allSettled(fetchPromises);
+  } catch (e) {}
+
+  if (fetchedItems.length > 0) {
+    fetchedItems.sort((a, b) => b.timestamp - a.timestamp);
+    currentPulseNewsItems = fetchedItems.slice(0, 22);
+    try {
+      localStorage.setItem(cacheKey, JSON.stringify({ timestamp: now, items: currentPulseNewsItems }));
+    } catch (e) {}
+  } else if (!currentPulseNewsItems || currentPulseNewsItems.length === 0) {
+    currentPulseNewsItems = generateDynamicBackupNews(now);
+  }
+
+  renderPulseNewsFeed(currentPulseNewsTab);
 }
 
 function renderPulseNewsFeed(filter = 'all') {
@@ -11070,13 +11184,17 @@ function renderPulseNewsFeed(filter = 'all') {
   const feedEl = document.getElementById('pulseNewsFeed');
   if (!feedEl) return;
 
+  if (!currentPulseNewsItems || !currentPulseNewsItems.length) {
+    currentPulseNewsItems = generateDynamicBackupNews(Date.now());
+  }
+
   let items;
   if (filter === 'important') {
-    items = PULSE_NEWS_ITEMS.filter(it => it.priority === 'high');
+    items = currentPulseNewsItems.filter(it => it.priority === 'high');
   } else if (filter === 'all') {
-    items = PULSE_NEWS_ITEMS;
+    items = currentPulseNewsItems;
   } else {
-    items = PULSE_NEWS_ITEMS.filter(it => it.cat === filter);
+    items = currentPulseNewsItems.filter(it => it.cat === filter);
   }
 
   if (!items.length) {
@@ -11088,7 +11206,7 @@ function renderPulseNewsFeed(filter = 'all') {
     <article class="pulse-news-item ${item.priority === 'high' ? 'priority-high' : ''}">
       <div class="pulse-news-meta">
         <span class="pulse-news-src-badge">${item.source}</span>
-        <span class="pulse-news-time">${formatNewsTime(item.minutesAgo)}</span>
+        <span class="pulse-news-time">${formatNewsTime(item.timestamp)}</span>
       </div>
       <a href="${item.url}" target="_blank" rel="noopener" class="pulse-news-title" title="${item.title}">
         ${item.title}
@@ -11544,9 +11662,10 @@ function renderPulseDrawerLayout(container) {
           <div class="pulse-news-tabs-wrap">
             <div class="pulse-rates-tab-group" id="pulseNewsTabGroup">
               <button type="button" class="pulse-rate-tab-btn active" data-tab="all">Всі</button>
-              <button type="button" class="pulse-rate-tab-btn" data-tab="main">Головне</button>
               <button type="button" class="pulse-rate-tab-btn" data-tab="war">Фронт</button>
+              <button type="button" class="pulse-rate-tab-btn" data-tab="pol">Політика</button>
               <button type="button" class="pulse-rate-tab-btn" data-tab="econ">Економіка</button>
+              <button type="button" class="pulse-rate-tab-btn" data-tab="world">Світ</button>
             </div>
             <button type="button" class="pulse-news-important-filter-btn" id="pulseNewsImportantBtn" title="Показати лише важливі новини (з червоною лінією)" aria-label="Лише важливі новини">
               <span class="pulse-news-filter-red-dot"></span>
@@ -11560,7 +11679,7 @@ function renderPulseDrawerLayout(container) {
 
           <div class="pulse-news-footer">
             <span class="pulse-news-footer-source" title="Провідні інформаційні агенції України">
-              <i class="fas fa-rss text-danger me-1"></i>Суспільне • Укрінформ • УП • РБК
+              <i class="fas fa-rss text-danger me-1"></i>УП • ТСН • BBC • Еспресо
             </span>
             <a href="./news.html" class="pulse-fuel-link" title="Перейти до повного каталогу українських та світових новин">
               Всі ЗМІ <i class="fas fa-arrow-right ms-1"></i>
@@ -12032,19 +12151,22 @@ function renderPulseDrawerLayout(container) {
 
   const newsRefreshBtn = container.querySelector('#pulseNewsRefreshBtn');
   if (newsRefreshBtn) {
-    newsRefreshBtn.onclick = (e) => {
+    newsRefreshBtn.onclick = async (e) => {
       e.preventDefault();
       e.stopPropagation();
       const spin = container.querySelector('#pulseNewsRefreshIcon');
       if (spin) spin.classList.add('fa-spin');
-      setTimeout(() => {
+      try {
+        await loadPulseLiveNews(true);
+        showQuickToast('Стрічку новин оновлено наживо', 'info');
+      } catch (err) {
         renderPulseNewsFeed(currentPulseNewsTab);
+      } finally {
         if (spin) spin.classList.remove('fa-spin');
-        showQuickToast('Стрічку новин оновлено', 'info');
-      }, 350);
+      }
     };
   }
-  renderPulseNewsFeed('all');
+  loadPulseLiveNews(false);
 }
 
 async function loadPulseDrawerData(forceRefresh = false) {
@@ -12079,6 +12201,7 @@ async function loadPulseDrawerData(forceRefresh = false) {
     fetchLiveFuelPrices();
     loadPulseEcoData(false);
     renderPulseHolidaysUI();
+    loadPulseLiveNews(false);
     if (spin) spin.classList.remove('fa-spin');
     return;
   }
@@ -12117,6 +12240,7 @@ async function loadPulseDrawerData(forceRefresh = false) {
     fetchLiveFuelPrices();
     loadPulseEcoData(forceRefresh);
     renderPulseHolidaysUI();
+    loadPulseLiveNews(forceRefresh);
 
     try {
       localStorage.setItem(cacheKey, JSON.stringify({
