@@ -10069,7 +10069,7 @@ function renderPulseWeatherUI(data, city, updatedTime = '') {
       ? Math.round(daily.temperature_2m_max[d])
       : 0;
     const wCode = (daily.weather_code && daily.weather_code[d] !== undefined) ? daily.weather_code[d] : 3;
-    const cond = getWeatherConditionInfo(wCode, 1, 24);
+    const cond = getWeatherConditionInfo(wCode, 1, 26);
 
     const minClass = minT < 0 ? 'pulse-temp-subzero' : '';
     const maxClass = maxT < 0 ? 'pulse-temp-subzero' : '';
@@ -10100,46 +10100,44 @@ function renderPulseWeatherUI(data, city, updatedTime = '') {
       }
     }
 
-    // Заповнення колби-опадоміра (шкала від 0 до 15 мм = 100%)
-    const flaskFillPercent = precipMm > 0 ? Math.min(100, Math.max(10, Math.round((precipMm / 15) * 100))) : 0;
+    // Заповнення колби-опадоміра (калібрована шкала 10 мм = 100%, де поділки: 2.5 мм = 25%, 5 мм = 50%, 7.5 мм = 75%)
+    const flaskFillPercent = precipMm > 0 ? Math.min(100, Math.max(8, Math.round((precipMm / 10) * 100))) : 0;
     const precipMmText = precipMm > 0 ? `${precipMm} мм` : '0 мм (без опадів)';
-    const flaskTooltip = `Добові опади (${tabNames[d]}): ${precipMmText}&#10;Середня ймовірність: ${dayAvgPrecip}%`;
+    const flaskTooltip = `Добові опади (${tabNames[d]}): ${precipMmText}&#10;Середня ймовірність: ${dayAvgPrecip}%&#10;Шкала: 2.5 | 5.0 | 7.5 | 10 мм`;
 
     tabsHtml += `
       <button type="button" class="pulse-w2-tab ${d === activeTab ? 'active' : ''}" onclick="window.setPulseWeatherTab(${d})">
-        <div class="pulse-w2-tab-inner">
-          <div class="pulse-w2-flask-wrap" title="${flaskTooltip}">
-            <div class="pulse-w2-flask-glass">
-              <div class="pulse-w2-flask-fill ${precipMm > 0 ? 'has-rain' : ''}" style="height: ${flaskFillPercent}%;"></div>
-              <div class="pulse-w2-flask-marks">
-                <span class="pulse-w2-flask-tick t25" title="25%"></span>
-                <span class="pulse-w2-flask-tick t50" title="50%"></span>
-                <span class="pulse-w2-flask-tick t75" title="75%"></span>
-              </div>
+        <div class="pulse-w2-flask-wrap" title="${flaskTooltip}">
+          <div class="pulse-w2-flask-glass">
+            <div class="pulse-w2-flask-fill ${precipMm > 0 ? 'has-rain' : ''}" style="height: ${flaskFillPercent}%;"></div>
+            <div class="pulse-w2-flask-marks">
+              <span class="pulse-w2-flask-tick t25" title="25% (2.5 мм)"></span>
+              <span class="pulse-w2-flask-tick t50" title="50% (5.0 мм)"></span>
+              <span class="pulse-w2-flask-tick t75" title="75% (7.5 мм)"></span>
             </div>
           </div>
-          <div class="pulse-w2-tab-content">
-            <span class="pulse-w2-tab-title">${tabNames[d]}</span>
-            <span class="pulse-w2-tab-date">${dayNum} ${monthLabel} • ${dowLabel}</span>
-            <div class="pulse-w2-tab-weather-row" title="${cond.label} • Опади: ${precipMmText} (ймовірність ${dayAvgPrecip}%)">
-              <span class="pulse-w2-tab-icon">${cond.icon}</span>
-              <span class="pulse-w2-tab-precip ${dayAvgPrecip >= 50 ? 'high' : ''}" title="Середня ймовірність опадів за добу: ${dayAvgPrecip}%, очікується: ${precipMmText}">
-                <span class="pulse-w2-tab-precip-val">${dayAvgPrecip}</span>
-                <svg class="pulse-hour-precip-drops" width="8" height="8" viewBox="0 0 12 12" fill="currentColor" aria-hidden="true">
-                  <path d="M2.2 1.2c-.3.6-.5 1.3-.4 1.8.1.6.6.9 1.1.8.6-.1.9-.6.8-1.2-.1-.5-.5-1.1-.9-1.5a.3.3 0 0 0-.6.1z" opacity="0.75"/>
-                  <path d="M6.2 0.8c-.3.6-.5 1.3-.4 1.8.1.6.6.9 1.1.8.6-.1.9-.6.8-1.2-.1-.5-.5-1.1-.9-1.5a.3.3 0 0 0-.6.1z"/>
-                  <path d="M10.2 1.2c-.3.6-.5 1.3-.4 1.8.1.6.6.9 1.1.8.6-.1.9-.6.8-1.2-.1-.5-.5-1.1-.9-1.5a.3.3 0 0 0-.6.1z" opacity="0.75"/>
-                  <path d="M4.2 6.2c-.3.6-.5 1.3-.4 1.8.1.6.6.9 1.1.8.6-.1.9-.6.8-1.2-.1-.5-.5-1.1-.9-1.5a.3.3 0 0 0-.6.1z" opacity="0.85"/>
-                  <path d="M8.2 6.2c-.3.6-.5 1.3-.4 1.8.1.6.6.9 1.1.8.6-.1.9-.6.8-1.2-.1-.5-.5-1.1-.9-1.5a.3.3 0 0 0-.6.1z" opacity="0.85"/>
-                </svg>
-              </span>
-            </div>
-            <div class="pulse-w2-tab-temps">
-              <span class="${minClass}">${minSign}${minT}°</span>
-              <span class="pulse-w2-tab-range-sep">...</span>
-              <span class="${maxClass}">${maxSign}${maxT}°</span>
-            </div>
-          </div>
+        </div>
+        <div class="pulse-w2-tab-header">
+          <span class="pulse-w2-tab-title">${tabNames[d]}</span>
+          <span class="pulse-w2-tab-date">${dayNum} ${monthLabel} • ${dowLabel}</span>
+        </div>
+        <div class="pulse-w2-tab-weather-row" title="${cond.label} • Добові опади: ${precipMmText} (ймовірність ${dayAvgPrecip}%)">
+          <span class="pulse-w2-tab-icon">${cond.icon}</span>
+          <span class="pulse-w2-tab-precip ${dayAvgPrecip >= 50 ? 'high' : ''}" title="Середня ймовірність опадів за добу: ${dayAvgPrecip}%, очікується: ${precipMmText}">
+            <span class="pulse-w2-tab-precip-val">${dayAvgPrecip}</span>
+            <svg class="pulse-hour-precip-drops" width="8" height="8" viewBox="0 0 12 12" fill="currentColor" aria-hidden="true">
+              <path d="M2.2 1.2c-.3.6-.5 1.3-.4 1.8.1.6.6.9 1.1.8.6-.1.9-.6.8-1.2-.1-.5-.5-1.1-.9-1.5a.3.3 0 0 0-.6.1z" opacity="0.75"/>
+              <path d="M6.2 0.8c-.3.6-.5 1.3-.4 1.8.1.6.6.9 1.1.8.6-.1.9-.6.8-1.2-.1-.5-.5-1.1-.9-1.5a.3.3 0 0 0-.6.1z"/>
+              <path d="M10.2 1.2c-.3.6-.5 1.3-.4 1.8.1.6.6.9 1.1.8.6-.1.9-.6.8-1.2-.1-.5-.5-1.1-.9-1.5a.3.3 0 0 0-.6.1z" opacity="0.75"/>
+              <path d="M4.2 6.2c-.3.6-.5 1.3-.4 1.8.1.6.6.9 1.1.8.6-.1.9-.6.8-1.2-.1-.5-.5-1.1-.9-1.5a.3.3 0 0 0-.6.1z" opacity="0.85"/>
+              <path d="M8.2 6.2c-.3.6-.5 1.3-.4 1.8.1.6.6.9 1.1.8.6-.1.9-.6.8-1.2-.1-.5-.5-1.1-.9-1.5a.3.3 0 0 0-.6.1z" opacity="0.85"/>
+            </svg>
+          </span>
+        </div>
+        <div class="pulse-w2-tab-temps">
+          <span class="${minClass}">${minSign}${minT}°</span>
+          <span class="pulse-w2-tab-range-sep">...</span>
+          <span class="${maxClass}">${maxSign}${maxT}°</span>
         </div>
       </button>
     `;

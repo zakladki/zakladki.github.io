@@ -13762,18 +13762,23 @@ body.dark-mode .pulse-w2-top-panel {
 }
 
 .pulse-w2-tab {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  position: relative !important;
   background: transparent;
   border: 1px solid transparent;
   border-radius: 7px;
-  padding: 3px 2px 4px;
+  padding: 4px 2px 4px !important;
   cursor: pointer;
   transition: all 0.15s ease;
   color: var(--text-muted, #64748b);
   font-family: inherit;
   outline: none;
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 .pulse-w2-tab:hover {
   background: rgba(255, 255, 255, 0.6);
@@ -13796,42 +13801,39 @@ body.dark-mode .pulse-w2-tab.active {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
-/* Внутрішній горизонтальний розподіл: зліва колба опадів, праворуч інформація (щільні відступи) */
-.pulse-w2-tab-inner {
+/* 1. Верхня шапочка вкладки (назви «Сьогодні / Завтра / Післязавтра» та дата) — строго центровані по всій ширині вкладки */
+.pulse-w2-tab-header {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   width: 100%;
-  gap: 2px; /* Зменшено відступ від колби до тексту праворуч */
-}
-.pulse-w2-tab-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 1px; /* Акуратний мінімальний відступ між рядками тексту */
-  flex: 1;
-  min-width: 0;
+  text-align: center;
+  gap: 1px;
+  margin-bottom: 2px;
 }
 
-/* Вертикальна колба опадів (опадомір) ліворуч майже по всій висоті (трішки товстіша і довша) */
+/* 2. Вертикальна колба опадів (опадомір) ліворуч картки — абсолютно позиціонована, не впливає на центри */
 .pulse-w2-flask-wrap {
+  position: absolute;
+  left: 3px;
+  top: 50%;
+  transform: translateY(-50%);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 48px; /* Подовжено до 48px */
-  width: 7.5px; /* Збільшено ширину */
+  height: 42px;
+  width: 6.5px;
   flex-shrink: 0;
   cursor: help;
-  position: relative;
+  z-index: 2;
   margin: 0;
 }
 .pulse-w2-flask-glass {
-  width: 6.5px; /* Трішки товстіша колба (6.5px замість 5px) */
-  height: 46px; /* Подовжена колба (46px замість 42px) */
-  border-radius: 3.25px;
+  width: 5.5px;
+  height: 40px;
+  border-radius: 2.75px;
   background: rgba(148, 163, 184, 0.22);
   border: 1px solid rgba(148, 163, 184, 0.48);
   position: relative;
@@ -13949,14 +13951,23 @@ body.dark-mode .pulse-w2-tab-date {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 3px;
+  gap: 3.5px;
   height: 24px;
   margin: 1px 0;
+  overflow: visible;
 }
 .pulse-w2-tab-icon {
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
+}
+.pulse-w2-tab-icon svg {
+  width: 26px;
+  height: 26px;
+  transform: scale(1.22);
+  transform-origin: center center;
+  display: block;
 }
 .pulse-w2-tab-precip {
   display: inline-flex;
