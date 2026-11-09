@@ -12662,29 +12662,48 @@ body.dark-mode .pulse-geomag-footer-more a:hover {
 /* ==========================================================================
    КАРТКА 3: ЯКІСТЬ ПОВІТРЯ (AQI) ТА РАДІАЦІЙНИЙ ФОН (SAVEECOBOT / ECOCITY)
    ========================================================================== */
+/* Єдиний об'єднаний блок екології та радіації з тонкими внутрішніми роздільними лініями */
+.pulse-eco-unified-panel {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+  margin-bottom: 4px;
+}
+body.dark-mode .pulse-eco-unified-panel {
+  background: #1e293b;
+  border-color: #334155;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
 .pulse-eco-metrics-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 5px;
-  margin: 0 0 3px;
+  margin: 0;
   width: 100%;
   box-sizing: border-box;
+  border-bottom: 2px solid #e2e8f0; /* Трішки товстіша, м'яка нейтрально-сіра лінія без різкого контрасту */
+}
+body.dark-mode .pulse-eco-metrics-row {
+  border-bottom: 2px solid #334155;
 }
 .pulse-eco-metric-box {
-  padding: 4.5px 6px;
-  border-radius: 7px;
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
+  padding: 5px 8px;
+  background: transparent;
+  border: none;
+  border-radius: 0;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
   justify-content: center;
   gap: 3px;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
-body.dark-mode .pulse-eco-metric-box {
-  background: #1e293b;
-  border-color: #334155;
+.pulse-eco-metric-box:first-child {
+  border-right: 1px solid #cbd5e1;
+}
+body.dark-mode .pulse-eco-metric-box:first-child {
+  border-right-color: #475569;
 }
 .pulse-eco-metric-title {
   font-size: 0.67rem;
@@ -12780,20 +12799,20 @@ body.dark-mode .pulse-eco-ref-hint {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 6px;
+  background: transparent;
+  border: none;
+  border-radius: 0;
   padding: 3px 6px;
-  margin: 1px 0 3px;
+  margin: 0;
   width: 100%;
-  height: 24px;
+  height: 25px;
   box-sizing: border-box;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+  box-shadow: none;
 }
 body.dark-mode .pulse-eco-strip {
-  background: #1e293b;
-  border-color: #334155;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+  background: transparent;
+  border: none;
+  box-shadow: none;
 }
 .pulse-eco-strip-item {
   flex: 1;
@@ -12801,15 +12820,15 @@ body.dark-mode .pulse-eco-strip {
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  gap: 3.5px;
+  gap: 3px;
   padding: 0 2px;
   min-width: 0;
   cursor: help;
   white-space: nowrap;
 }
 .pulse-eco-strip-title {
-  font-size: 0.63rem;
-  font-weight: 600;
+  font-size: 0.67rem; /* Золота середина між 0.63rem та 0.74rem */
+  font-weight: 500;
   color: #475569;
   line-height: 1;
   margin-bottom: 0;
@@ -12820,41 +12839,44 @@ body.dark-mode .pulse-eco-strip-title {
 }
 .pulse-eco-pulse-dot {
   position: relative;
-  width: 4px;
-  height: 4px;
+  width: 5px;
+  height: 5px;
   border-radius: 50%;
   flex-shrink: 0;
-  margin: 0 0.5px;
+  margin: 0 1px;
 }
 .pulse-eco-pulse-dot::before {
   content: '';
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  top: -1px;
+  left: -1px;
+  width: calc(100% + 2px);
+  height: calc(100% + 2px);
   border-radius: 50%;
   background: inherit;
-  animation: ecoPulsePing 2.2s cubic-bezier(0, 0, 0.2, 1) infinite;
-  opacity: 0.75;
+  animation: ecoPulsePing 1.9s cubic-bezier(0, 0, 0.2, 1) infinite;
+  opacity: 0.85;
 }
 @keyframes ecoPulsePing {
-  0% { transform: scale(1); opacity: 0.75; }
-  60% { transform: scale(1.9); opacity: 0; }
-  100% { transform: scale(1.9); opacity: 0; }
+  0% { transform: scale(1); opacity: 0.85; }
+  65% { transform: scale(2.4); opacity: 0; }
+  100% { transform: scale(2.4); opacity: 0; }
 }
 .pulse-eco-pulse-dot.green {
   background-color: #10b981;
+  box-shadow: 0 0 3px rgba(16, 185, 129, 0.65);
 }
 .pulse-eco-pulse-dot.yellow {
   background-color: #f59e0b;
+  box-shadow: 0 0 3px rgba(245, 158, 11, 0.65);
 }
 .pulse-eco-pulse-dot.red {
   background-color: #ef4444;
+  box-shadow: 0 0 3px rgba(239, 68, 68, 0.7);
 }
 .pulse-eco-strip-val {
-  font-size: 0.65rem;
-  font-weight: 500;
+  font-size: 0.67rem;
+  font-weight: 400 !important;
   color: #334155;
   font-variant-numeric: tabular-nums;
   line-height: 1;
@@ -12865,11 +12887,13 @@ body.dark-mode .pulse-eco-strip-val {
   color: #cbd5e1;
 }
 .pulse-eco-strip-val .pulse-eco-int {
-  font-weight: 500;
+  font-size: 0.67rem;
+  font-weight: 400 !important;
+  color: inherit;
 }
 .pulse-eco-strip-val .pulse-eco-dec {
-  font-size: 0.58rem;
-  font-weight: 400;
+  font-size: 0.52rem;
+  font-weight: 400 !important;
   color: #64748b;
   margin-left: 0.5px;
 }
@@ -13778,7 +13802,7 @@ body.dark-mode .pulse-w2-top-panel {
   outline: none;
   width: 100%;
   box-sizing: border-box;
-  overflow: hidden;
+  overflow: visible;
 }
 .pulse-w2-tab:hover {
   background: rgba(255, 255, 255, 0.6);
@@ -13816,23 +13840,80 @@ body.dark-mode .pulse-w2-tab.active {
 /* 2. Вертикальна колба опадів (опадомір) ліворуч картки — абсолютно позиціонована, не впливає на центри */
 .pulse-w2-flask-wrap {
   position: absolute;
-  left: 3px;
-  top: 50%;
-  transform: translateY(-50%);
+  left: 3.5px;
+  bottom: 5.5px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 42px;
+  height: 44px;
   width: 6.5px;
   flex-shrink: 0;
   cursor: help;
-  z-index: 2;
+  z-index: 5;
   margin: 0;
+  pointer-events: auto;
+}
+/* Спливаюча витончена підказка при наведенні на колбу з ЖИРНИМ верхнім рядком */
+.pulse-w2-flask-popover {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #ffffff;
+  color: #1e293b;
+  border: 1px solid #cbd5e1;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.16), 0 1px 3px rgba(0, 0, 0, 0.08);
+  border-radius: 6px;
+  padding: 5px 8px;
+  font-size: 0.68rem;
+  line-height: 1.35;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.12s ease, visibility 0.12s ease;
+  z-index: 9999;
+  text-align: left;
+}
+body.dark-mode .pulse-w2-flask-popover {
+  background: #0f172a;
+  color: #f8fafc;
+  border-color: #334155;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45);
+}
+.pulse-w2-flask-wrap:hover .pulse-w2-flask-popover {
+  opacity: 1;
+  visibility: visible;
+}
+.pulse-w2-pop-title {
+  font-weight: 700 !important; /* Верхній рядок підказки жирним шрифтом */
+  color: #0f172a;
+  font-size: 0.70rem;
+  margin-bottom: 2px;
+}
+body.dark-mode .pulse-w2-pop-title {
+  color: #38bdf8;
+}
+.pulse-w2-pop-row {
+  font-size: 0.66rem;
+  color: #475569;
+  font-weight: 400;
+}
+body.dark-mode .pulse-w2-pop-row {
+  color: #cbd5e1;
+}
+.pulse-w2-pop-marks {
+  color: #64748b;
+  font-size: 0.62rem;
+  margin-top: 1.5px;
+}
+body.dark-mode .pulse-w2-pop-marks {
+  color: #94a3b8;
 }
 .pulse-w2-flask-glass {
   width: 5.5px;
-  height: 40px;
+  height: 42px;
   border-radius: 2.75px;
   background: rgba(148, 163, 184, 0.22);
   border: 1px solid rgba(148, 163, 184, 0.48);
@@ -13893,23 +13974,23 @@ body.dark-mode .pulse-w2-flask-tick.t50 {
   width: 2.2px;
 }
 
-/* Міні-колбочка опадів для кожної строчки таблиці на межі між часом та хмаринками */
+/* Міні-колбочка опадів для кожної строчки таблиці на межі між часом та хмаринками (ширша для кращої видимості) */
 .pulse-w2-row-flask {
-  width: 3.5px;
-  height: 17px;
-  border-radius: 1.75px;
+  width: 4.8px;
+  height: 18px;
+  border-radius: 2.4px;
   background: rgba(148, 163, 184, 0.22);
-  border: 1px solid rgba(148, 163, 184, 0.45);
+  border: 1px solid rgba(148, 163, 184, 0.5);
   position: relative;
   overflow: hidden;
   flex-shrink: 0;
-  margin-right: 2px;
+  margin-right: 2.5px;
   cursor: help;
-  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
+  box-shadow: inset 0 1px 1.5px rgba(0, 0, 0, 0.08);
 }
 body.dark-mode .pulse-w2-row-flask {
   background: rgba(51, 65, 85, 0.45);
-  border-color: rgba(100, 116, 139, 0.5);
+  border-color: rgba(100, 116, 139, 0.55);
 }
 .pulse-w2-row-flask-fill {
   position: absolute;
@@ -13917,12 +13998,12 @@ body.dark-mode .pulse-w2-row-flask {
   left: 0;
   width: 100%;
   background: linear-gradient(180deg, #38bdf8 0%, #0284c7 100%);
-  border-radius: 0 0 1px 1px;
+  border-radius: 0 0 1.8px 1.8px;
   transition: height 0.3s ease;
 }
 .pulse-w2-row-flask-fill.has-rain {
-  background: linear-gradient(180deg, #60a5fa 0%, #0284c7 100%);
-  box-shadow: 0 0 2px rgba(56, 189, 248, 0.85);
+  background: linear-gradient(180deg, #38bdf8 0%, #0284c7 100%);
+  box-shadow: 0 0 3px rgba(14, 165, 233, 0.95);
 }
 
 .pulse-w2-tab-title {
@@ -13998,6 +14079,8 @@ body.dark-mode .pulse-w2-tab-precip.high {
   font-weight: 700;
   display: flex;
   align-items: center;
+  justify-content: center;
+  width: 100%;
   gap: 2px;
   white-space: nowrap;
   font-variant-numeric: tabular-nums;

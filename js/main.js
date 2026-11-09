@@ -10107,14 +10107,19 @@ function renderPulseWeatherUI(data, city, updatedTime = '') {
 
     tabsHtml += `
       <button type="button" class="pulse-w2-tab ${d === activeTab ? 'active' : ''}" onclick="window.setPulseWeatherTab(${d})">
-        <div class="pulse-w2-flask-wrap" title="${flaskTooltip}">
+        <div class="pulse-w2-flask-wrap" aria-label="${flaskTooltip}">
           <div class="pulse-w2-flask-glass">
             <div class="pulse-w2-flask-fill ${precipMm > 0 ? 'has-rain' : ''}" style="height: ${flaskFillPercent}%;"></div>
             <div class="pulse-w2-flask-marks">
-              <span class="pulse-w2-flask-tick t25" title="25% (2.5 мм)"></span>
-              <span class="pulse-w2-flask-tick t50" title="50% (5.0 мм)"></span>
-              <span class="pulse-w2-flask-tick t75" title="75% (7.5 мм)"></span>
+              <span class="pulse-w2-flask-tick t25"></span>
+              <span class="pulse-w2-flask-tick t50"></span>
+              <span class="pulse-w2-flask-tick t75"></span>
             </div>
+          </div>
+          <div class="pulse-w2-flask-popover">
+            <div class="pulse-w2-pop-title">Добові опади (${tabNames[d]}): ${precipMmText}</div>
+            <div class="pulse-w2-pop-row">Середня ймовірність: ${dayAvgPrecip}%</div>
+            <div class="pulse-w2-pop-row pulse-w2-pop-marks">Шкала: 2.5 | 5.0 | 7.5 | 10 мм</div>
           </div>
         </div>
         <div class="pulse-w2-tab-header">
@@ -11135,6 +11140,18 @@ function detectNewsCategory(title, categories = []) {
   return 'pol';
 }
 
+function isSignificantPulseNews(title) {
+  if (!title || typeof title !== 'string') return false;
+  const t = title.toLowerCase();
+
+  const trivialPattern = /(шоубіз|зірк[аиі]|гороскоп|зодіак|модн|макіяж|манікюр|шкір[аи]|волос|зморшк|дієт|схудн|рецепт|страв[аи]|кулінар|кухн|пиріг|салат|грядк|город|садівниц|бур.ян|дача|побаченн|весілл|розлученн|блогер|співачк|співак|акторк|вбив.*(?:пес|собак|кіт|кошен|твари)|задушив|побив товариш|пиятик|застілл|астролог|таро|віщун|передбаченн|екстрасенс|секс|інтим|коханк|зрадив дружин|ясн[аи]|стоматолог|перукар|уявні друз|тривожність.*рак|психолог.*порад|погода.*(?:листопад|грудн|січн|лют)|дощ.*мороз.*погода|шви між плитк|копійчан)/i;
+  if (trivialPattern.test(t)) return false;
+
+  const significancePattern = /(зсу|генштаб|фронт|сил[иа] оборон|ппо|дрон|шахед|ракет|обстріл|бої|наступ|штурм|ворогом|ворог|війн|сирськ|зеленськ|президент|уряд|кабмін|верховн.*рад|рада|ради|раду|радо|парламент|нардеп|законопроєкт|сбу|гур|набу|сап|дбр|прокуратур|суд|правоохорон|затриман|підозр|викрил|енергет|укренерго|електроенерг|відключенн|світл|пальн|нбу|банк|гривн|курс|інфляц|бюджет|податк|експорт|відбудов|сша|єс|євросоюз|нато|трамп|байден|санкці|переговор|оон|британі|польщ|німеччин|франці|дснс|надзвичайн|безпек|евакуац|міністер|політик|економік|міжнародн|кремль|путін|рф|росі|атак|руйнуван|загибл|поранен|дипломат|допомог|втрат|вибух|удар|мобілізац|військов|збро|впк|завод|нпз|порт|інфраструктур)/i;
+
+  return significancePattern.test(t);
+}
+
 function detectNewsPriority(title) {
   const t = title.toLowerCase();
   if (/(атак|шахед|ракета|ппо зби|ппо знешкод|вибух|тривог|загинул|поранен|удар по|масован|надзвичайн|штурм ворога)/i.test(t)) {
@@ -11172,8 +11189,38 @@ function generateDynamicBackupNews(now) {
   });
 }
 
+function interleaveNewsBySource(items, maxConsecutive = 2) {
+  if (!items || items.length <= 2) return items;
+  const pool = [...items];
+  const result = [];
+  let lastSource = null;
+  let consecutiveCount = 0;
+
+  while (pool.length > 0) {
+    let pickIndex = 0;
+    if (lastSource && consecutiveCount >= maxConsecutive) {
+      const diffIndex = pool.findIndex(it => it.source !== lastSource);
+      if (diffIndex !== -1) {
+        pickIndex = diffIndex;
+      }
+    }
+
+    const [picked] = pool.splice(pickIndex, 1);
+    result.push(picked);
+
+    if (picked.source === lastSource) {
+      consecutiveCount++;
+    } else {
+      lastSource = picked.source;
+      consecutiveCount = 1;
+    }
+  }
+
+  return result;
+}
+
 async function loadPulseLiveNews(forceRefresh = false) {
-  const cacheKey = 'pulse_live_news_cache_v2';
+  const cacheKey = 'pulse_live_news_cache_v4';
   const now = Date.now();
 
   if (!forceRefresh) {
@@ -11189,51 +11236,78 @@ async function loadPulseLiveNews(forceRefresh = false) {
 
   const feeds = [
     { url: 'https://www.pravda.com.ua/rss/', src: 'УП' },
-    { url: 'https://tsn.ua/rss/full.rss', src: 'ТСН' },
+    { url: 'https://tsn.ua/rss/ukrayina', src: 'ТСН' },
     { url: 'https://feeds.bbci.co.uk/ukrainian/rss.xml', src: 'BBC' },
-    { url: 'https://espreso.tv/rss', src: 'Еспресо' }
+    { url: 'https://espreso.tv/rss', src: 'Еспресо' },
+    { url: 'https://suspilne.media/rss/news.xml', src: 'Суспільне' }
   ];
 
   let fetchedItems = [];
 
-  const fetchPromises = feeds.map(async (feed) => {
-    try {
-      const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feed.url)}`;
-      const resp = await fetch(apiUrl, { cache: 'no-cache' });
-      if (!resp.ok) return;
-      const data = await resp.json();
-      if (data.status === 'ok' && Array.isArray(data.items)) {
-        data.items.slice(0, 6).forEach((it, idx) => {
-          const rawTitle = (it.title || '').trim();
-          if (!rawTitle) return;
-          const cleanTitle = rawTitle.replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&amp;/g, '&');
-          let parsedDate = null;
-          if (it.pubDate) {
-            parsedDate = new Date(it.pubDate.replace(/-/g, '/'));
-          }
-          const timestamp = (parsedDate && !isNaN(parsedDate.getTime())) ? parsedDate.getTime() : (now - idx * 20 * 60 * 1000);
-
-          fetchedItems.push({
-            id: `${feed.src}_${idx}_${timestamp}`,
-            title: cleanTitle,
-            source: feed.src,
-            cat: detectNewsCategory(cleanTitle, it.categories),
-            priority: detectNewsPriority(cleanTitle),
-            timestamp: timestamp,
-            url: it.link || 'https://www.pravda.com.ua/'
-          });
-        });
-      }
-    } catch (e) {}
-  });
-
+  // 1. Пріоритет: прямий виклик нашого локального проксі-роута /api/news (справжні свіжі RSS без затримок шлюзу)
   try {
-    await Promise.allSettled(fetchPromises);
-  } catch (e) {}
+    const apiResp = await fetch(`/api/news${forceRefresh ? '?force=1' : ''}`, { cache: 'no-cache' });
+    if (apiResp.ok) {
+      const apiData = await apiResp.json();
+      if (apiData.status === 'ok' && Array.isArray(apiData.items) && apiData.items.length > 0) {
+        fetchedItems = apiData.items.map(it => ({
+          ...it,
+          cat: detectNewsCategory(it.title),
+          priority: detectNewsPriority(it.title)
+        }));
+      }
+    }
+  } catch (err) {}
+
+  // 2. Резервний шлях: якщо /api/news недоступний (наприклад, при суто статичному хостингу)
+  if (fetchedItems.length === 0) {
+    const timeSlice = Math.floor(now / (5 * 60 * 1000));
+    const fetchPromises = feeds.map(async (feed) => {
+      try {
+        const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feed.url)}&_t=${timeSlice}`;
+        const resp = await fetch(apiUrl, { cache: 'no-cache' });
+        if (!resp.ok) return;
+        const data = await resp.json();
+        if (data.status === 'ok' && Array.isArray(data.items)) {
+          data.items.slice(0, 15).forEach((it, idx) => {
+            const rawTitle = (it.title || '').trim();
+            if (!rawTitle) return;
+            const cleanTitle = rawTitle.replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&amp;/g, '&');
+            if (!isSignificantPulseNews(cleanTitle)) return;
+            let parsedDate = null;
+            if (it.pubDate) {
+              const pStr = String(it.pubDate).trim();
+              if (/^\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2}$/.test(pStr)) {
+                parsedDate = new Date(pStr.replace(' ', 'T') + 'Z');
+              } else {
+                parsedDate = new Date(pStr);
+              }
+            }
+            const timestamp = (parsedDate && !isNaN(parsedDate.getTime())) ? parsedDate.getTime() : (now - idx * 20 * 60 * 1000);
+
+            fetchedItems.push({
+              id: `${feed.src}_${idx}_${timestamp}`,
+              title: cleanTitle,
+              source: feed.src,
+              cat: detectNewsCategory(cleanTitle, it.categories),
+              priority: detectNewsPriority(cleanTitle),
+              timestamp: timestamp,
+              url: it.link || 'https://www.pravda.com.ua/'
+            });
+          });
+        }
+      } catch (e) {}
+    });
+
+    try {
+      await Promise.allSettled(fetchPromises);
+    } catch (e) {}
+  }
 
   if (fetchedItems.length > 0) {
     fetchedItems.sort((a, b) => b.timestamp - a.timestamp);
-    currentPulseNewsItems = fetchedItems.slice(0, 22);
+    const diverseItems = interleaveNewsBySource(fetchedItems, 2);
+    currentPulseNewsItems = diverseItems.slice(0, 50);
     try {
       localStorage.setItem(cacheKey, JSON.stringify({ timestamp: now, items: currentPulseNewsItems }));
     } catch (e) {}
@@ -11370,54 +11444,56 @@ function renderPulseDrawerLayout(container) {
             </button>
           </div>
 
-          <!-- Лаконічний віджет із ключовими показниками (Радіація + AQI) -->
-          <div class="pulse-eco-metrics-row">
-            <div class="pulse-eco-metric-box">
-              <div class="pulse-eco-metric-title">
-                <i class="fas fa-radiation text-warning"></i> Радіація
+          <!-- Єдиний об'єднаний блок екології та радіації з тонкими внутрішніми роздільними лініями -->
+          <div class="pulse-eco-unified-panel">
+            <div class="pulse-eco-metrics-row">
+              <div class="pulse-eco-metric-box">
+                <div class="pulse-eco-metric-title">
+                  <i class="fas fa-radiation text-warning"></i> Радіація
+                </div>
+                <div class="pulse-eco-metric-badge green" id="pulseEcoRadBadge" title="Норма: радіаційний фон у межах безпеки (до 0.30 мкЗв/год)">
+                  <span class="pulse-eco-badge-dot">🟢</span> <span id="pulseEcoRadVal" class="pulse-eco-badge-val">0.11</span> <span class="pulse-eco-badge-unit">мкЗв/год</span>
+                </div>
               </div>
-              <div class="pulse-eco-metric-badge green" id="pulseEcoRadBadge" title="Норма: радіаційний фон у межах безпеки (до 0.30 мкЗв/год)">
-                <span class="pulse-eco-badge-dot">🟢</span> <span id="pulseEcoRadVal" class="pulse-eco-badge-val">0.11</span> <span class="pulse-eco-badge-unit">мкЗв/год</span>
+
+              <div class="pulse-eco-metric-box">
+                <div class="pulse-eco-metric-title">
+                  <i class="fas fa-wind text-info"></i> Повітря (AQI)
+                </div>
+                <div class="pulse-eco-metric-badge green" id="pulseEcoAqiBadge" title="Чисте: безпечне для дихання (до 50 AQI)">
+                  <span class="pulse-eco-badge-dot">🟢</span> <span id="pulseEcoAqiVal" class="pulse-eco-badge-val">AQI 28</span>
+                </div>
               </div>
             </div>
 
-            <div class="pulse-eco-metric-box">
-              <div class="pulse-eco-metric-title">
-                <i class="fas fa-wind text-info"></i> Повітря (AQI)
+            <!-- 4-показникова стрічка повітря (PM2.5, PM10, NO₂, O₃) в один акуратний рядок із видимими роздільниками -->
+            <div class="pulse-eco-strip" id="pulseEcoStrip">
+              <div class="pulse-eco-strip-item" title="Дрібний пил PM2.5: норма до 15 мкг/м³">
+                <span class="pulse-eco-strip-title">PM2.5</span>
+                <span class="pulse-eco-pulse-dot green" id="pulseEcoDotPm25"></span>
+                <span class="pulse-eco-strip-val" id="pulseEcoPm25"><span class="pulse-eco-int">2</span><span class="pulse-eco-dec">.3</span></span>
               </div>
-              <div class="pulse-eco-metric-badge green" id="pulseEcoAqiBadge" title="Чисте: безпечне для дихання (до 50 AQI)">
-                <span class="pulse-eco-badge-dot">🟢</span> <span id="pulseEcoAqiVal" class="pulse-eco-badge-val">AQI 28</span>
+              <div class="pulse-eco-strip-sep"></div>
+
+              <div class="pulse-eco-strip-item" title="Зважений пил PM10: норма до 45 мкг/м³">
+                <span class="pulse-eco-strip-title">PM10</span>
+                <span class="pulse-eco-pulse-dot green" id="pulseEcoDotPm10"></span>
+                <span class="pulse-eco-strip-val" id="pulseEcoPm10"><span class="pulse-eco-int">3</span></span>
               </div>
-            </div>
-          </div>
+              <div class="pulse-eco-strip-sep"></div>
 
-          <!-- 4-показникова стрічка повітря (PM2.5, PM10, NO₂, O₃) в один акуратний рядок із видимими роздільниками -->
-          <div class="pulse-eco-strip" id="pulseEcoStrip">
-            <div class="pulse-eco-strip-item" title="Дрібний пил PM2.5: норма до 15 мкг/м³">
-              <span class="pulse-eco-strip-title">PM2.5</span>
-              <span class="pulse-eco-pulse-dot green" id="pulseEcoDotPm25"></span>
-              <span class="pulse-eco-strip-val" id="pulseEcoPm25"><span class="pulse-eco-int">2</span><span class="pulse-eco-dec">.3</span></span>
-            </div>
-            <div class="pulse-eco-strip-sep"></div>
+              <div class="pulse-eco-strip-item" title="Діоксид азоту NO₂: норма до 40 мкг/м³">
+                <span class="pulse-eco-strip-title">NO₂</span>
+                <span class="pulse-eco-pulse-dot green" id="pulseEcoDotNo2"></span>
+                <span class="pulse-eco-strip-val" id="pulseEcoNo2"><span class="pulse-eco-int">2</span><span class="pulse-eco-dec">.4</span></span>
+              </div>
+              <div class="pulse-eco-strip-sep"></div>
 
-            <div class="pulse-eco-strip-item" title="Зважений пил PM10: норма до 45 мкг/м³">
-              <span class="pulse-eco-strip-title">PM10</span>
-              <span class="pulse-eco-pulse-dot green" id="pulseEcoDotPm10"></span>
-              <span class="pulse-eco-strip-val" id="pulseEcoPm10"><span class="pulse-eco-int">3</span></span>
-            </div>
-            <div class="pulse-eco-strip-sep"></div>
-
-            <div class="pulse-eco-strip-item" title="Діоксид азоту NO₂: норма до 40 мкг/м³">
-              <span class="pulse-eco-strip-title">NO₂</span>
-              <span class="pulse-eco-pulse-dot green" id="pulseEcoDotNo2"></span>
-              <span class="pulse-eco-strip-val" id="pulseEcoNo2"><span class="pulse-eco-int">2</span><span class="pulse-eco-dec">.4</span></span>
-            </div>
-            <div class="pulse-eco-strip-sep"></div>
-
-            <div class="pulse-eco-strip-item" title="Приземний озон O₃: норма до 60 мкг/м³">
-              <span class="pulse-eco-strip-title">O₃</span>
-              <span class="pulse-eco-pulse-dot green" id="pulseEcoDotO3"></span>
-              <span class="pulse-eco-strip-val" id="pulseEcoO3"><span class="pulse-eco-int">50</span></span>
+              <div class="pulse-eco-strip-item" title="Приземний озон O₃: норма до 60 мкг/м³">
+                <span class="pulse-eco-strip-title">O₃</span>
+                <span class="pulse-eco-pulse-dot green" id="pulseEcoDotO3"></span>
+                <span class="pulse-eco-strip-val" id="pulseEcoO3"><span class="pulse-eco-int">50</span></span>
+              </div>
             </div>
           </div>
 
@@ -11744,7 +11820,7 @@ function renderPulseDrawerLayout(container) {
 
           <div class="pulse-news-footer">
             <span class="pulse-news-footer-source" title="Провідні інформаційні агенції України">
-              <i class="fas fa-rss text-danger me-1"></i>УП • ТСН • BBC • Еспресо
+              <i class="fas fa-rss text-danger me-1"></i>УП • ТСН • BBC • Еспресо • Суспільне
             </span>
             <a href="./news.html" class="pulse-fuel-link" title="Перейти до повного каталогу українських та світових новин">
               Всі ЗМІ <i class="fas fa-arrow-right ms-1"></i>

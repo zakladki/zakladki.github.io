@@ -43,6 +43,114 @@ app.post('/api/orders', (req, res) => {
   }
 });
 
+// Live Ukrainian News RSS aggregator API (direct server fetch with 2-minute in-memory cache)
+let newsCache = {
+  timestamp: 0,
+  items: []
+};
+
+// Filter to narrow down news to medium and high importance events (war, politics, economy, energy, diplomacy, security)
+function isSignificantNews(title) {
+  if (!title || typeof title !== 'string') return false;
+  const t = title.toLowerCase();
+
+  // Filter out yellow journalism, tabloid gossip, fluff, horoscopes, domestic minor disputes, lifestyle, fashion, cooking
+  const trivialPattern = /(шоубіз|зірк[аиі]|гороскоп|зодіак|модн|макіяж|манікюр|шкір[аи]|волос|зморшк|дієт|схудн|рецепт|страв[аи]|кулінар|кухн|пиріг|салат|грядк|город|садівниц|бур.ян|дача|побаченн|весілл|розлученн|блогер|співачк|співак|акторк|вбив.*(?:пес|собак|кіт|кошен|твари)|задушив|побив товариш|пиятик|застілл|астролог|таро|віщун|передбаченн|екстрасенс|секс|інтим|коханк|зрадив дружин|ясн[аи]|стоматолог|перукар|уявні друз|тривожність.*рак|психолог.*порад|погода.*(?:листопад|грудн|січн|лют)|дощ.*мороз.*погода|шви між плитк|копійчан)/i;
+  if (trivialPattern.test(t)) return false;
+
+  // Filter in events of medium and high importance
+  const significancePattern = /(зсу|генштаб|фронт|сил[иа] оборон|ппо|дрон|шахед|ракет|обстріл|бої|наступ|штурм|ворогом|ворог|війн|сирськ|зеленськ|президент|уряд|кабмін|верховн.*рад|рада|ради|раду|радо|парламент|нардеп|законопроєкт|сбу|гур|набу|сап|дбр|прокуратур|суд|правоохорон|затриман|підозр|викрил|енергет|укренерго|електроенерг|відключенн|світл|пальн|нбу|банк|гривн|курс|інфляц|бюджет|податк|експорт|відбудов|сша|єс|євросоюз|нато|трамп|байден|санкці|переговор|оон|британі|польщ|німеччин|франці|дснс|надзвичайн|безпек|евакуац|міністер|політик|економік|міжнародн|кремль|путін|рф|росі|атак|руйнуван|загибл|поранен|дипломат|допомог|втрат|вибух|удар|мобілізац|військов|збро|впк|завод|нпз|порт|інфраструктур)/i;
+
+  return significancePattern.test(t);
+}
+
+function parseRssXml(xml, src) {
+  const items = [];
+  const itemRegex = /<item>([\s\S]*?)<\/item>/gi;
+  let match;
+  while ((match = itemRegex.exec(xml)) !== null) {
+    const itemBlock = match[1];
+    const titleMatch = itemBlock.match(/<title><!\[CDATA\[([\s\S]*?)\]\]><\/title>/i) || itemBlock.match(/<title>([\s\S]*?)<\/title>/i);
+    const linkMatch = itemBlock.match(/<link><!\[CDATA\[([\s\S]*?)\]\]><\/link>/i) || itemBlock.match(/<link>([\s\S]*?)<\/link>/i);
+    const pubDateMatch = itemBlock.match(/<pubDate>([\s\S]*?)<\/pubDate>/i);
+
+    const title = (titleMatch ? titleMatch[1].trim() : '').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&amp;/g, '&');
+    const link = linkMatch ? linkMatch[1].trim() : '';
+    const pubDate = pubDateMatch ? pubDateMatch[1].trim() : '';
+
+    if (title) {
+      items.push({ title, link, pubDate, src });
+    }
+  }
+  return items;
+}
+
+app.get('/api/news', async (req, res) => {
+  const now = Date.now();
+  const force = req.query.force === '1' || req.query.force === 'true';
+
+  if (!force && newsCache.items.length > 0 && (now - newsCache.timestamp < 2 * 60 * 1000)) {
+    return res.json({ status: 'ok', items: newsCache.items, cached: true });
+  }
+
+  const feeds = [
+    { url: 'https://www.pravda.com.ua/rss/', src: 'УП' },
+    { url: 'https://tsn.ua/rss/ukrayina', src: 'ТСН' },
+    { url: 'https://feeds.bbci.co.uk/ukrainian/rss.xml', src: 'BBC' },
+    { url: 'https://espreso.tv/rss', src: 'Еспресо' }
+  ];
+
+  const fetched = [];
+  await Promise.allSettled(feeds.map(async (f) => {
+    try {
+      const resp = await fetch(f.url, {
+        headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' },
+        signal: AbortSignal.timeout(4000)
+      });
+      if (resp.ok) {
+        const text = await resp.text();
+        const parsed = parseRssXml(text, f.src);
+        fetched.push(...parsed.slice(0, 25));
+      }
+    } catch (e) {}
+  }));
+
+  if (fetched.length > 0) {
+    // Narrow down to medium & high importance events, filtering out yellow press/trivia
+    const significantOnly = fetched.filter(it => isSignificantNews(it.title));
+    const finalSourceItems = significantOnly.length >= 8 ? significantOnly : fetched;
+
+    const processed = finalSourceItems.map((it, idx) => {
+      let ts = 0;
+      if (it.pubDate) {
+        const d = new Date(it.pubDate);
+        if (!isNaN(d.getTime())) ts = d.getTime();
+      }
+      if (!ts) ts = now - (idx * 15 * 60 * 1000);
+      return {
+        id: `${it.src}_${ts}_${idx}`,
+        title: it.title,
+        source: it.src,
+        url: it.link,
+        timestamp: ts
+      };
+    });
+
+    processed.sort((a, b) => b.timestamp - a.timestamp);
+    newsCache = {
+      timestamp: now,
+      items: processed
+    };
+    return res.json({ status: 'ok', items: processed, cached: false });
+  }
+
+  if (newsCache.items.length > 0) {
+    return res.json({ status: 'ok', items: newsCache.items, cached: true });
+  }
+
+  return res.status(502).json({ status: 'error', message: 'Unable to fetch feeds' });
+});
+
 // Regional fuel prices API (updated: October 2026, UAH/l)
 const REGIONAL_FUEL_DATA = {
   updatedAt: '2026-10-24',
