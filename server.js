@@ -73,13 +73,34 @@ function parseRssXml(xml, src) {
     const titleMatch = itemBlock.match(/<title><!\[CDATA\[([\s\S]*?)\]\]><\/title>/i) || itemBlock.match(/<title>([\s\S]*?)<\/title>/i);
     const linkMatch = itemBlock.match(/<link><!\[CDATA\[([\s\S]*?)\]\]><\/link>/i) || itemBlock.match(/<link>([\s\S]*?)<\/link>/i);
     const pubDateMatch = itemBlock.match(/<pubDate>([\s\S]*?)<\/pubDate>/i);
+    const descMatch = itemBlock.match(/<description><!\[CDATA\[([\s\S]*?)\]\]><\/description>/i)
+                   || itemBlock.match(/<description>([\s\S]*?)<\/description>/i)
+                   || itemBlock.match(/<content:encoded><!\[CDATA\[([\s\S]*?)\]\]><\/content:encoded>/i);
 
     const title = (titleMatch ? titleMatch[1].trim() : '').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&amp;/g, '&');
     const link = linkMatch ? linkMatch[1].trim() : '';
     const pubDate = pubDateMatch ? pubDateMatch[1].trim() : '';
 
+    let desc = '';
+    if (descMatch) {
+      desc = descMatch[1]
+        .replace(/<[^>]+>/g, '') // remove HTML tags
+        .replace(/&quot;/g, '"')
+        .replace(/&#39;/g, "'")
+        .replace(/&amp;/g, '&')
+        .replace(/&nbsp;/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+      if (desc.startsWith(title)) {
+        desc = desc.substring(title.length).trim();
+      }
+      if (desc.length > 280) {
+        desc = desc.substring(0, 277).trim() + '...';
+      }
+    }
+
     if (title) {
-      items.push({ title, link, pubDate, src });
+      items.push({ title, link, pubDate, desc, src });
     }
   }
   return items;
@@ -132,6 +153,7 @@ app.get('/api/news', async (req, res) => {
         title: it.title,
         source: it.src,
         url: it.link,
+        desc: it.desc || '',
         timestamp: ts
       };
     });

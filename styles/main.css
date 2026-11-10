@@ -10971,7 +10971,7 @@ body.dark-mode .guest-bm-modal-footer {
 .pulse-drawer-backdrop {
   position: fixed;
   inset: 0;
-  top: 42px;
+  top: 39px; /* Перекриває можливий мікрозазор 1-2px під навом */
   background: rgba(0, 0, 0, 0.52);
   backdrop-filter: blur(3px);
   -webkit-backdrop-filter: blur(3px);
@@ -10988,12 +10988,12 @@ body.dark-mode .guest-bm-modal-footer {
 /* Головний контейнер шторки «Пульс дня» */
 .pulse-day-drawer {
   position: fixed;
-  top: 42px;
+  top: 39px; /* Заходить під нижній край навігаційної панелі без мікрозазору */
   left: 0;
   right: 0;
   width: 100%;
-  max-height: calc(100vh - 54px);
-  max-height: calc(100dvh - 54px);
+  max-height: calc(100vh - 42px);
+  max-height: calc(100dvh - 42px);
   overflow-y: auto;
   z-index: 998;
   transform: translateY(-115%);
@@ -12796,13 +12796,13 @@ body.dark-mode .pulse-eco-ref-hint {
    ЕКОЛОГІЯ: 4-ПОКАЗНИКОВА СТРІЧКА З ТОЧКОВОЮ ПУЛЬСАЦІЄЮ (PM2.5, PM10, NO₂, O₃) В ОДИН РЯДОК
    ========================================================================== */
 .pulse-eco-strip {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr); /* 4 абсолютно рівні колонки: 2-а колонка закінчується рівно на 50% */
   align-items: center;
-  justify-content: space-between;
   background: transparent;
   border: none;
   border-radius: 0;
-  padding: 3px 6px;
+  padding: 0; /* Без зайвих бокових полів для ідеального збігу з верхнім рядом */
   margin: 0;
   width: 100%;
   height: 25px;
@@ -12815,19 +12815,27 @@ body.dark-mode .pulse-eco-strip {
   box-shadow: none;
 }
 .pulse-eco-strip-item {
-  flex: 1;
   display: inline-flex;
   flex-direction: row;
   align-items: center;
   justify-content: center;
   gap: 3px;
-  padding: 0 2px;
+  padding: 0 4px;
+  height: 100%;
   min-width: 0;
   cursor: help;
   white-space: nowrap;
+  border-right: 1px solid #cbd5e1; /* Роздільні лінії між колонками (2-а лінія точно збігається з лінією верхнього ряду на 50%) */
+  box-sizing: border-box;
+}
+.pulse-eco-strip-item:last-child {
+  border-right: none;
+}
+body.dark-mode .pulse-eco-strip-item {
+  border-right-color: #475569;
 }
 .pulse-eco-strip-title {
-  font-size: 0.67rem; /* Золота середина між 0.63rem та 0.74rem */
+  font-size: 0.67rem;
   font-weight: 500;
   color: #475569;
   line-height: 1;
@@ -12876,38 +12884,32 @@ body.dark-mode .pulse-eco-strip-title {
 }
 .pulse-eco-strip-val {
   font-size: 0.67rem;
-  font-weight: 400 !important;
-  color: #334155;
+  font-weight: 600;
+  color: #0f172a;
   font-variant-numeric: tabular-nums;
   line-height: 1;
   display: inline-flex;
   align-items: baseline;
 }
 body.dark-mode .pulse-eco-strip-val {
-  color: #cbd5e1;
+  color: #f1f5f9;
 }
 .pulse-eco-strip-val .pulse-eco-int {
   font-size: 0.67rem;
-  font-weight: 400 !important;
+  font-weight: 600;
   color: inherit;
 }
 .pulse-eco-strip-val .pulse-eco-dec {
-  font-size: 0.52rem;
-  font-weight: 400 !important;
-  color: #64748b;
-  margin-left: 0.5px;
+  font-size: 0.67rem; /* Чіткий читабельний кегль як у цінах на пальне (без мікроточок і мікроцифр) */
+  font-weight: 600;
+  color: inherit;
+  margin-left: 0;
 }
 body.dark-mode .pulse-eco-strip-val .pulse-eco-dec {
-  color: #94a3b8;
+  color: inherit;
 }
 .pulse-eco-strip-sep {
-  width: 1px;
-  height: 14px;
-  background: #cbd5e1;
-  flex-shrink: 0;
-}
-body.dark-mode .pulse-eco-strip-sep {
-  background: #475569;
+  display: none !important;
 }
 
 /* ==========================================================================
@@ -12922,39 +12924,98 @@ body.dark-mode .pulse-eco-strip-sep {
 }
 .pulse-news-tabs-wrap .pulse-rates-tab-group {
   flex: 1;
+  display: flex;
+  align-items: center;
   justify-content: space-between;
   min-width: 0;
-  gap: 1px;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 2px;
+  gap: 3px; /* Чіткий візуальний проміжок між окремими розділами */
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+body.dark-mode .pulse-news-tabs-wrap .pulse-rates-tab-group {
+  background: #0f172a;
+  border-color: #334155;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.25);
 }
 .pulse-news-tabs-wrap .pulse-rate-tab-btn {
-  padding: 1px 4px;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2.5px 3px;
   font-size: 0.63rem;
   font-weight: 600;
   white-space: nowrap;
-  flex: 1;
-  text-align: center;
+  border-radius: 4px;
+  background: #ffffff;
+  border: 1px solid #cbd5e1; /* Окремі чіткі кнопки розділів замість монолітної плити */
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.03);
+}
+body.dark-mode .pulse-news-tabs-wrap .pulse-rate-tab-btn {
+  background: #1e293b;
+  border-color: #334155;
+  color: #94a3b8;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+.pulse-news-tabs-wrap .pulse-rate-tab-btn:hover {
+  background: #f8fafc;
+  color: #0284c7;
+  border-color: #94a3b8;
+}
+body.dark-mode .pulse-news-tabs-wrap .pulse-rate-tab-btn:hover {
+  background: #243247;
+  color: #38bdf8;
+  border-color: #475569;
+}
+.pulse-news-tabs-wrap .pulse-rate-tab-btn.active {
+  background: #ffffff;
+  color: #0284c7;
+  font-weight: 700;
+  border-color: #0284c7;
+  box-shadow: 0 1px 3px rgba(2, 132, 199, 0.2), inset 0 0 0 1px #0284c7;
+}
+body.dark-mode .pulse-news-tabs-wrap .pulse-rate-tab-btn.active {
+  background: #1e293b;
+  color: #38bdf8;
+  font-weight: 700;
+  border-color: #38bdf8;
+  box-shadow: 0 1px 3px rgba(56, 189, 248, 0.25), inset 0 0 0 1px #38bdf8;
+}
+/* Напис «ВСІ» виділено жирним шрифтом */
+.pulse-news-tabs-wrap .pulse-rate-tab-btn[data-tab="all"] {
+  font-weight: 800 !important;
+  letter-spacing: 0.2px;
 }
 .pulse-news-important-filter-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 22px;
-  height: 20px;
-  border-radius: 5px;
-  border: 1px solid rgba(239, 68, 68, 0.25);
-  background: rgba(239, 68, 68, 0.06);
+  width: 24px;
+  height: 23px;
+  border-radius: 6px;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  background: rgba(239, 68, 68, 0.08);
   cursor: pointer;
   padding: 0;
   transition: all 0.15s ease;
   flex-shrink: 0;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
 }
 .pulse-news-important-filter-btn:hover {
-  background: rgba(239, 68, 68, 0.16);
+  background: rgba(239, 68, 68, 0.18);
   border-color: #ef4444;
   transform: scale(1.05);
 }
 .pulse-news-important-filter-btn.active {
-  background: rgba(239, 68, 68, 0.22);
+  background: rgba(239, 68, 68, 0.24);
   border-color: #ef4444;
   box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.25);
 }
@@ -12972,11 +13033,11 @@ body.dark-mode .pulse-eco-strip-sep {
   transform: scale(1.2);
 }
 body.dark-mode .pulse-news-important-filter-btn {
-  background: rgba(239, 68, 68, 0.12);
-  border-color: rgba(239, 68, 68, 0.4);
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.45);
 }
 body.dark-mode .pulse-news-important-filter-btn.active {
-  background: rgba(239, 68, 68, 0.3);
+  background: rgba(239, 68, 68, 0.35);
   border-color: #ef4444;
 }
 .pulse-news-feed {
@@ -13026,11 +13087,101 @@ body.dark-mode .pulse-news-item.priority-high {
   border-left-color: #ef4444;
   background: rgba(239, 68, 68, 0.06);
 }
-.pulse-news-meta {
+.pulse-news-header-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 6px;
+  cursor: pointer;
+  user-select: none;
+}
+.pulse-news-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.pulse-news-expand-btn {
+  background: transparent;
+  border: none;
+  padding: 0 4px;
+  color: #94a3b8;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.62rem;
+  transition: all 0.2s ease;
+  line-height: 1;
+  outline: none !important;
+}
+.pulse-news-expand-btn:hover {
+  color: #0284c7;
+  transform: scale(1.15);
+}
+body.dark-mode .pulse-news-expand-btn {
+  color: #64748b;
+}
+body.dark-mode .pulse-news-expand-btn:hover {
+  color: #38bdf8;
+}
+.pulse-news-item.is-expanded .pulse-news-expand-btn i {
+  transform: rotate(180deg);
+  color: #0284c7;
+}
+body.dark-mode .pulse-news-item.is-expanded .pulse-news-expand-btn i {
+  color: #38bdf8;
+}
+.pulse-news-body-collapse {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: max-height 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease, padding 0.2s ease;
+  box-sizing: border-box;
+}
+.pulse-news-item.is-expanded .pulse-news-body-collapse {
+  max-height: 250px;
+  opacity: 1;
+  padding-top: 5px;
+  border-top: 1px dashed #e2e8f0;
+  margin-top: 3px;
+}
+body.dark-mode .pulse-news-item.is-expanded .pulse-news-body-collapse {
+  border-top-color: #334155;
+}
+.pulse-news-summary {
+  font-size: 0.65rem;
+  line-height: 1.35;
+  color: #475569;
+  margin: 0 0 4px 0;
+  word-break: break-word;
+}
+body.dark-mode .pulse-news-summary {
+  color: #cbd5e1;
+}
+.pulse-news-expand-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+.pulse-news-direct-link {
+  font-size: 0.62rem;
+  font-weight: 600;
+  color: #0284c7;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  transition: color 0.15s ease;
+}
+.pulse-news-direct-link:hover {
+  color: #0369a1;
+  text-decoration: underline;
+}
+body.dark-mode .pulse-news-direct-link {
+  color: #38bdf8;
+}
+body.dark-mode .pulse-news-direct-link:hover {
+  color: #7dd3fc;
 }
 .pulse-news-src-badge {
   font-size: 0.58rem;
@@ -13803,20 +13954,35 @@ body.dark-mode .pulse-w2-top-panel {
   width: 100%;
   box-sizing: border-box;
   overflow: visible;
+  z-index: 1;
 }
-.pulse-w2-tab:hover {
+.pulse-w2-tab:hover,
+.pulse-w2-tab.is-hovered,
+.pulse-w2-tab:focus-within,
+.pulse-w2-tab:has(.pulse-w2-flask-wrap:hover) {
   background: rgba(255, 255, 255, 0.6);
   color: var(--text-main, #0f172a);
+  z-index: 50 !important; /* Підносить картку над сусідніми вкладками, щоб підказка колби ніколи не перекривалася */
 }
-body.dark-mode .pulse-w2-tab:hover {
+body.dark-mode .pulse-w2-tab:hover,
+body.dark-mode .pulse-w2-tab.is-hovered,
+body.dark-mode .pulse-w2-tab:focus-within,
+body.dark-mode .pulse-w2-tab:has(.pulse-w2-flask-wrap:hover) {
   background: rgba(30, 41, 59, 0.6);
   color: #f1f5f9;
+  z-index: 50 !important;
 }
 .pulse-w2-tab.active {
   background: var(--card-bg, #ffffff);
   border-color: rgba(14, 165, 233, 0.4);
   color: var(--text-main, #0f172a);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(14, 165, 233, 0.2);
+  z-index: 2;
+}
+.pulse-w2-tab.active:hover,
+.pulse-w2-tab.active.is-hovered,
+.pulse-w2-tab.active:has(.pulse-w2-flask-wrap:hover) {
+  z-index: 50 !important;
 }
 body.dark-mode .pulse-w2-tab.active {
   background: #1e293b;
@@ -13837,33 +14003,36 @@ body.dark-mode .pulse-w2-tab.active {
   margin-bottom: 2px;
 }
 
-/* 2. Вертикальна колба опадів (опадомір) ліворуч картки — абсолютно позиціонована, не впливає на центри */
+/* 2. Вертикальна колба опадів (опадомір) ліворуч картки — абсолютно позиціонована */
 .pulse-w2-flask-wrap {
   position: absolute;
-  left: 3.5px;
+  left: 3px;
   bottom: 5.5px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   height: 44px;
-  width: 6.5px;
+  width: 8px;
   flex-shrink: 0;
   cursor: help;
-  z-index: 5;
+  z-index: 10;
   margin: 0;
   pointer-events: auto;
+}
+.pulse-w2-flask-wrap:hover {
+  z-index: 100 !important;
 }
 /* Спливаюча витончена підказка при наведенні на колбу з ЖИРНИМ верхнім рядком */
 .pulse-w2-flask-popover {
   position: absolute;
-  left: 12px;
+  left: 14px;
   top: 50%;
   transform: translateY(-50%);
   background: #ffffff;
   color: #1e293b;
   border: 1px solid #cbd5e1;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.16), 0 1px 3px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.22), 0 1px 3px rgba(0, 0, 0, 0.08);
   border-radius: 6px;
   padding: 5px 8px;
   font-size: 0.68rem;
@@ -13873,14 +14042,14 @@ body.dark-mode .pulse-w2-tab.active {
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.12s ease, visibility 0.12s ease;
-  z-index: 9999;
+  z-index: 99999 !important; /* Завжди поверх усього вмісту */
   text-align: left;
 }
 body.dark-mode .pulse-w2-flask-popover {
   background: #0f172a;
   color: #f8fafc;
   border-color: #334155;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45);
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.55);
 }
 .pulse-w2-flask-wrap:hover .pulse-w2-flask-popover {
   opacity: 1;
@@ -13912,31 +14081,35 @@ body.dark-mode .pulse-w2-pop-marks {
   color: #94a3b8;
 }
 .pulse-w2-flask-glass {
-  width: 5.5px;
+  width: 6.5px;
   height: 42px;
-  border-radius: 2.75px;
-  background: rgba(148, 163, 184, 0.22);
-  border: 1px solid rgba(148, 163, 184, 0.48);
+  border-radius: 3.25px;
+  background: rgba(148, 163, 184, 0.20);
+  border: 1px solid rgba(148, 163, 184, 0.45);
   position: relative;
   overflow: hidden;
+  box-sizing: border-box;
   box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.08);
 }
 body.dark-mode .pulse-w2-flask-glass {
   background: rgba(51, 65, 85, 0.45);
   border-color: rgba(100, 116, 139, 0.55);
 }
+/* Рідина заповнює колбу на всю товщину без зазору, не створюючи враження звуження */
 .pulse-w2-flask-fill {
   position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
+  bottom: -1px;
+  left: -1px;
+  right: -1px;
+  width: calc(100% + 2px);
   background: linear-gradient(180deg, #38bdf8 0%, #0284c7 100%);
-  border-radius: 0 0 2.5px 2.5px;
+  border-radius: 2px 2px 3.25px 3.25px;
   transition: height 0.4s ease;
+  box-sizing: border-box;
 }
 .pulse-w2-flask-fill.has-rain {
-  background: linear-gradient(180deg, #60a5fa 0%, #0284c7 100%);
-  box-shadow: 0 0 3px rgba(56, 189, 248, 0.85);
+  background: linear-gradient(180deg, #38bdf8 0%, #0284c7 100%);
+  box-shadow: inset 0 0 1px rgba(255, 255, 255, 0.6);
 }
 /* Поділки на скляній колбі за принципом 25% / 50% / 75% шкали (3 позначки) */
 .pulse-w2-flask-marks {
@@ -13946,6 +14119,7 @@ body.dark-mode .pulse-w2-flask-glass {
   width: 100%;
   height: 100%;
   pointer-events: none;
+  z-index: 3;
 }
 .pulse-w2-flask-tick {
   position: absolute;
@@ -13974,15 +14148,16 @@ body.dark-mode .pulse-w2-flask-tick.t50 {
   width: 2.2px;
 }
 
-/* Міні-колбочка опадів для кожної строчки таблиці на межі між часом та хмаринками (ширша для кращої видимості) */
+/* Міні-колбочка опадів для кожної строчки таблиці на межі між часом та хмаринками */
 .pulse-w2-row-flask {
-  width: 4.8px;
+  width: 5.2px;
   height: 18px;
-  border-radius: 2.4px;
+  border-radius: 2.6px;
   background: rgba(148, 163, 184, 0.22);
   border: 1px solid rgba(148, 163, 184, 0.5);
   position: relative;
   overflow: hidden;
+  box-sizing: border-box;
   flex-shrink: 0;
   margin-right: 2.5px;
   cursor: help;
@@ -13994,16 +14169,157 @@ body.dark-mode .pulse-w2-row-flask {
 }
 .pulse-w2-row-flask-fill {
   position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
+  bottom: -1px;
+  left: -1px;
+  right: -1px;
+  width: calc(100% + 2px);
   background: linear-gradient(180deg, #38bdf8 0%, #0284c7 100%);
-  border-radius: 0 0 1.8px 1.8px;
+  border-radius: 1.5px 1.5px 2.6px 2.6px;
   transition: height 0.3s ease;
+  box-sizing: border-box;
 }
 .pulse-w2-row-flask-fill.has-rain {
   background: linear-gradient(180deg, #38bdf8 0%, #0284c7 100%);
-  box-shadow: 0 0 3px rgba(14, 165, 233, 0.95);
+  box-shadow: 0 0 2px rgba(14, 165, 233, 0.8);
+}
+
+/* 3. Кольорове маркування вітру та плавне чергування поривів кожні 5 секунд */
+.pulse-w2-wind-cell {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+}
+.pulse-hour-wind-arrow {
+  flex-shrink: 0;
+  transition: color 0.2s ease;
+}
+.pulse-hour-wind-arrow.wind-calm {
+  color: #64748b;
+}
+body.dark-mode .pulse-hour-wind-arrow.wind-calm {
+  color: #94a3b8;
+}
+.pulse-hour-wind-arrow.wind-moderate {
+  color: #d97706; /* Помірний вітер 5.5-10.9 м/с */
+}
+body.dark-mode .pulse-hour-wind-arrow.wind-moderate {
+  color: #facc15;
+}
+.pulse-hour-wind-arrow.wind-strong {
+  color: #ea580c; /* Сильний вітер 11.0-16.9 м/с */
+}
+body.dark-mode .pulse-hour-wind-arrow.wind-strong {
+  color: #fb923c;
+}
+.pulse-hour-wind-arrow.wind-storm {
+  color: #dc2626; /* Штормовий вітер 17+ м/с */
+}
+body.dark-mode .pulse-hour-wind-arrow.wind-storm {
+  color: #f87171;
+}
+
+.pulse-wind-val-box {
+  display: inline-flex;
+  height: 16px;
+  line-height: 16px;
+  overflow: hidden;
+  vertical-align: middle;
+}
+.pulse-wind-cycler {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  animation: pulseWindCycle 6s infinite ease-in-out;
+}
+@keyframes pulseWindCycle {
+  0%, 46% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  48%, 51% {
+    opacity: 0;
+  }
+  53%, 96% {
+    transform: translateY(-16px);
+    opacity: 1;
+  }
+  98%, 100% {
+    opacity: 0;
+    transform: translateY(0);
+  }
+}
+.pulse-wind-line {
+  height: 16px;
+  line-height: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  text-align: left;
+  white-space: nowrap;
+}
+.pulse-wind-line.gust-line {
+  font-weight: 400; /* Не жирний, однаковий зі звичайною швидкістю вітру */
+  color: #ea580c;
+  font-size: 0.71rem;
+}
+body.dark-mode .pulse-wind-line.gust-line {
+  color: #fb923c;
+}
+.pulse-wind-line.gust-storm {
+  color: #dc2626 !important;
+  font-weight: 400;
+}
+body.dark-mode .pulse-wind-line.gust-storm {
+  color: #f87171 !important;
+}
+
+/* Пульсуюча кольорова цятка на межі між колонкою вітру та відносною вологістю (золота середина: 3.5px, виразна, але делікатна) */
+.pulse-wind-gust-dot {
+  position: absolute;
+  right: 0px;
+  top: 50%;
+  transform: translate(50%, -50%);
+  width: 3.5px;
+  height: 3.5px;
+  border-radius: 50%;
+  background: rgba(245, 158, 11, 0.9);
+  box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.65);
+  animation: pulseWindDotGlow 2.4s infinite ease-in-out;
+  pointer-events: auto;
+  cursor: help;
+  z-index: 5;
+  opacity: 0.88;
+}
+.pulse-wind-gust-dot.storm {
+  background: rgba(239, 68, 68, 0.92);
+  box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.75);
+}
+body.dark-mode .pulse-wind-gust-dot {
+  background: rgba(251, 191, 36, 0.9);
+  box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.65);
+}
+body.dark-mode .pulse-wind-gust-dot.storm {
+  background: rgba(248, 113, 113, 0.92);
+  box-shadow: 0 0 0 0 rgba(248, 113, 113, 0.75);
+}
+@keyframes pulseWindDotGlow {
+  0% {
+    transform: translate(50%, -50%) scale(0.95);
+    box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.65);
+    opacity: 0.78;
+  }
+  50% {
+    transform: translate(50%, -50%) scale(1.15);
+    box-shadow: 0 0 0 2.5px rgba(245, 158, 11, 0);
+    opacity: 0.95;
+  }
+  100% {
+    transform: translate(50%, -50%) scale(0.95);
+    box-shadow: 0 0 0 0 rgba(245, 158, 11, 0);
+    opacity: 0.78;
+  }
 }
 
 .pulse-w2-tab-title {
@@ -14098,7 +14414,7 @@ body.dark-mode .pulse-w2-tab-precip.high {
   position: relative;
   height: 0;
   width: 100%;
-  border-top: 1px dashed var(--border-color, #e2e8f0);
+  border-top: 1px solid var(--border-color, #e2e8f0); /* Суцільна лінія у відповідність до нижньої */
   z-index: 3;
 }
 body.dark-mode .pulse-w2-rot-divider {
@@ -14156,7 +14472,7 @@ body.dark-mode .pulse-w2-rot-dots-center .pulse-w2-rot-dot.active {
   height: 25px;
   overflow: hidden;
   background: rgba(2, 132, 199, 0.05);
-  border-top: 1px dashed var(--border-color, #e2e8f0);
+  border-top: 1px solid var(--border-color, #e2e8f0); /* Суцільна лінія */
   border-bottom: 1px solid var(--border-color, #e2e8f0);
   padding: 0 8px;
   display: flex;
@@ -14449,6 +14765,7 @@ body.dark-mode .pulse-w2-temp-feels {
 }
 .pulse-w2-col-wind {
   width: 44px;
+  position: relative;
 }
 .pulse-w2-wind-cell {
   display: inline-flex;

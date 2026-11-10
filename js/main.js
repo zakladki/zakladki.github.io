@@ -9827,7 +9827,7 @@ async function loadPulseWeatherData(forceRefresh = false) {
   const refreshIcon = document.getElementById('pulseWeatherRefreshIcon');
   if (refreshIcon) refreshIcon.classList.add('fa-spin');
 
-  const cacheKey = `pulse_weather_v4_${city.id}`;
+  const cacheKey = `pulse_weather_v5_${city.id}`;
   const now = Date.now();
 
   if (!forceRefresh) {
@@ -9842,7 +9842,7 @@ async function loadPulseWeatherData(forceRefresh = false) {
   }
 
   try {
-    const url = `https://api.open-meteo.com/v1/forecast?latitude=${city.lat}&longitude=${city.lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,weather_code,surface_pressure,wind_speed_10m,wind_direction_10m&hourly=temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,precipitation_probability,precipitation,wind_speed_10m,wind_direction_10m,surface_pressure&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,precipitation_sum,wind_speed_10m_max,wind_direction_10m_dominant,sunrise,sunset,uv_index_max&wind_speed_unit=ms&timezone=auto`;
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${city.lat}&longitude=${city.lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,weather_code,surface_pressure,wind_speed_10m,wind_direction_10m&hourly=temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,precipitation_probability,precipitation,wind_speed_10m,wind_gusts_10m,wind_direction_10m,surface_pressure&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,precipitation_sum,wind_speed_10m_max,wind_gusts_10m_max,wind_direction_10m_dominant,sunrise,sunset,uv_index_max&wind_speed_unit=ms&timezone=auto`;
     const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
     const timeoutId = controller ? setTimeout(() => controller.abort(), 8000) : null;
     const res = await fetch(url, controller ? { signal: controller.signal } : {});
@@ -10106,7 +10106,7 @@ function renderPulseWeatherUI(data, city, updatedTime = '') {
     const flaskTooltip = `Добові опади (${tabNames[d]}): ${precipMmText}&#10;Середня ймовірність: ${dayAvgPrecip}%&#10;Шкала: 2.5 | 5.0 | 7.5 | 10 мм`;
 
     tabsHtml += `
-      <button type="button" class="pulse-w2-tab ${d === activeTab ? 'active' : ''}" onclick="window.setPulseWeatherTab(${d})">
+      <button type="button" class="pulse-w2-tab ${d === activeTab ? 'active' : ''}" onclick="window.setPulseWeatherTab(${d})" onmouseenter="this.classList.add('is-hovered')" onmouseleave="this.classList.remove('is-hovered')">
         <div class="pulse-w2-flask-wrap" aria-label="${flaskTooltip}">
           <div class="pulse-w2-flask-glass">
             <div class="pulse-w2-flask-fill ${precipMm > 0 ? 'has-rain' : ''}" style="height: ${flaskFillPercent}%;"></div>
@@ -10291,6 +10291,9 @@ function renderPulseWeatherUI(data, city, updatedTime = '') {
     const windSpeed = (hourly.wind_speed_10m && hourly.wind_speed_10m[idx] !== undefined)
       ? hourly.wind_speed_10m[idx]
       : 0;
+    const windGust = (hourly.wind_gusts_10m && hourly.wind_gusts_10m[idx] !== undefined)
+      ? hourly.wind_gusts_10m[idx]
+      : windSpeed;
     const windDir = (hourly.wind_direction_10m && hourly.wind_direction_10m[idx] !== undefined)
       ? hourly.wind_direction_10m[idx]
       : 0;
@@ -10309,8 +10312,37 @@ function renderPulseWeatherUI(data, city, updatedTime = '') {
     const tSign = tVal > 0 ? '+' : '';
     const feelsSign = feelsVal > 0 ? '+' : '';
 
-    // Вітер: витягнута сірувата стрілка + десяткова частина менша (.pulse-decimal)
-    const hWindHtml = formatWindValHtml(windSpeed);
+    // Вітер: класифікація сили за шкалою ДСНС / Бофорта та стрілка
+    let windArrowClass = 'wind-calm';
+    if (windSpeed >= 17 || windGust >= 22) {
+      windArrowClass = 'wind-storm';
+    } else if (windSpeed >= 11 || windGust >= 15) {
+      windArrowClass = 'wind-strong';
+    } else if (windSpeed >= 5.5 || windGust >= 9) {
+      windArrowClass = 'wind-moderate';
+    }
+
+    // Пориви вітру (поперемінний показ кожні 5 сек, якщо порив суттєвий: gust >= 8.5 та на 2+ м/с більше за середню швидкість)
+    const hasGusts = (windGust >= 8.5 && (windGust - windSpeed >= 2.0));
+    const gustStorm = windGust >= 17;
+    let windValHtml = '';
+    if (hasGusts) {
+      windValHtml = `
+        <div class="pulse-wind-val-box" title="Середня швидкість: ${windSpeed.toFixed(1)} м/с • пориви: ${windGust.toFixed(1)} м/с (поперемінно кожні 3 сек)">
+          <div class="pulse-wind-cycler">
+            <div class="pulse-wind-line">
+              <span class="pulse-w2-wind-num ${windSpeed >= 8 ? 'high' : ''}">${formatWindValHtml(windSpeed)}</span>
+            </div>
+            <div class="pulse-wind-line gust-line ${gustStorm ? 'gust-storm' : ''}">
+              <span class="pulse-w2-wind-num">${formatWindValHtml(windGust)}</span>
+            </div>
+          </div>
+        </div>
+      `;
+    } else {
+      windValHtml = `<span class="pulse-w2-wind-num ${windSpeed >= 8 ? 'high' : ''}">${formatWindValHtml(windSpeed)}</span>`;
+    }
+    const windCellTooltip = `Вітер: ${windInfo.dirName} (${windInfo.code}, ${windInfo.deg}°), середня швидкість ${windSpeed.toFixed(1)} м/с${hasGusts ? ` • пориви до ${windGust.toFixed(1)} м/с` : ''}`;
 
     // Тиск: кольорове підсвічування норми чи відхилення (звичайний нежирний шрифт)
     const pressInfo = getPressureClassAndStatus(pressVal);
@@ -10393,13 +10425,14 @@ function renderPulseWeatherUI(data, city, updatedTime = '') {
         <td class="pulse-w2-col-temp" title="Температура: ${tSign}${tVal}°, відчувається: ${feelsSign}${feelsVal}°">
           <span class="pulse-w2-temp-actual ${tClass}">${tSign}${tVal}°</span>/<span class="pulse-w2-temp-feels ${feelsClass}">${feelsSign}${feelsVal}°</span>
         </td>
-        <td class="pulse-w2-col-wind" title="Вітер: ${windInfo.dirName} (${windInfo.code}, ${windInfo.deg}°), ${windSpeed.toFixed(1)} м/с">
+        <td class="pulse-w2-col-wind ${hasGusts ? 'has-gusts' : ''}" title="${windCellTooltip}">
           <div class="pulse-w2-wind-cell">
-            <svg class="pulse-hour-wind-arrow" width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="none" style="transform: rotate(${windInfo.arrowDeg}deg); transform-origin: 50% 50%;">
+            <svg class="pulse-hour-wind-arrow ${windArrowClass}" width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="none" style="transform: rotate(${windInfo.arrowDeg}deg); transform-origin: 50% 50%;">
               <path d="M12 1.5L7 21.5l5-4.5 5 4.5L12 1.5z"></path>
             </svg>
-            <span class="pulse-w2-wind-num ${windSpeed >= 8 ? 'high' : ''}">${hWindHtml}</span>
+            ${windValHtml}
           </div>
+          ${hasGusts ? `<span class="pulse-wind-gust-dot ${gustStorm ? 'storm' : ''}" title="Очікуються пориви вітру до ${windGust.toFixed(1)} м/с"></span>` : ''}
         </td>
         <td class="pulse-w2-col-hum" title="Вологість повітря: ${humVal}%">
           <span class="pulse-w2-hum-num">${humVal}</span>
@@ -11047,6 +11080,7 @@ const PULSE_NEWS_BACKUP_ITEMS = [
   {
     id: 'b1',
     title: 'Повітряні сили знешкодили чергову групу ворожих ударних дронів',
+    desc: 'Уночі протиповітряна оборона відбила атаку дронів типу Shahed у кількох областях. Зафіксовано збиття переважної більшості повітряних цілей.',
     source: 'УП',
     cat: 'war',
     priority: 'high',
@@ -11055,6 +11089,7 @@ const PULSE_NEWS_BACKUP_ITEMS = [
   {
     id: 'b2',
     title: 'Генштаб ЗСУ: Сили оборони відбили штурмові дії противника на ключових напрямках',
+    desc: 'Українські захисники утримують рубежі оборони, завдаючи окупантам відчутних втрат у живій силі та техніці вздовж лінії зіткнення.',
     source: 'ТСН',
     cat: 'war',
     priority: 'high',
@@ -11063,6 +11098,7 @@ const PULSE_NEWS_BACKUP_ITEMS = [
   {
     id: 'b3',
     title: 'Президент провів засідання Ставки щодо захисту енергетики та підготовки до зими',
+    desc: 'Обговорено графіки відновлення енергомереж, посилення фізичного захисту підстанцій та координацію з міжнародними партнерами.',
     source: 'УП',
     cat: 'pol',
     priority: 'normal',
@@ -11071,6 +11107,7 @@ const PULSE_NEWS_BACKUP_ITEMS = [
   {
     id: 'b4',
     title: 'ЄС узгодив новий пакет фінансової та безпекової підтримки для України',
+    desc: 'Кошти будуть спрямовані на макрофінансову стабільність, відновлення зруйнованої інфраструктури та закупівлю оборонного обладнання.',
     source: 'BBC',
     cat: 'world',
     priority: 'normal',
@@ -11079,6 +11116,7 @@ const PULSE_NEWS_BACKUP_ITEMS = [
   {
     id: 'b5',
     title: 'НБУ зберіг облікову ставку на рівні 13% та оновив макроекономічний прогноз',
+    desc: 'Рішення сприятиме підтримці курсової стійкості гривні та поступовому сповільненню інфляції в середньостроковій перспективі.',
     source: 'Еспресо',
     cat: 'econ',
     priority: 'normal',
@@ -11087,6 +11125,7 @@ const PULSE_NEWS_BACKUP_ITEMS = [
   {
     id: 'b6',
     title: 'Уряд розширив програми доступних кредитів єОселя та грантів для бізнесу',
+    desc: 'Кабмін спростив умови участі для молодих сімей та внутрішньо переміщених осіб, а також розширив ліміти пільгового фінансування.',
     source: 'УП',
     cat: 'econ',
     priority: 'normal',
@@ -11095,6 +11134,7 @@ const PULSE_NEWS_BACKUP_ITEMS = [
   {
     id: 'b7',
     title: 'Укренерго: енергосистема працює збалансовано, критичних відключень не планується',
+    desc: 'Енергетики закликають ощадливо споживати електрику у вечірні пікові години для полегшення балансування об’єднаної енергосистеми.',
     source: 'ТСН',
     cat: 'econ',
     priority: 'normal',
@@ -11103,6 +11143,7 @@ const PULSE_NEWS_BACKUP_ITEMS = [
   {
     id: 'b8',
     title: 'Україна та партнери узгодили нові логістичні коридори експорту до Європи',
+    desc: 'Домовленості передбачають розширення пропускної спроможності залізничних пунктів пропуску та оптимізацію митних процедур.',
     source: 'BBC',
     cat: 'world',
     priority: 'normal',
@@ -11111,6 +11152,7 @@ const PULSE_NEWS_BACKUP_ITEMS = [
   {
     id: 'b9',
     title: 'Верховна Рада ухвалила євроінтеграційний законопроєкт про митну реформу',
+    desc: 'Документ впроваджує європейські стандарти декларування товарів і передбачає цифровізацію митного контролю.',
     source: 'Еспресо',
     cat: 'pol',
     priority: 'normal',
@@ -11119,6 +11161,7 @@ const PULSE_NEWS_BACKUP_ITEMS = [
   {
     id: 'b10',
     title: 'Мінфін залучив понад 14 млрд грн від розміщення чергових облігацій',
+    desc: 'Найбільший попит зафіксовано на гривневі військові облігації терміном обігу півтора року з фіксованою прибутковістю.',
     source: 'УП',
     cat: 'econ',
     priority: 'normal',
@@ -11220,7 +11263,7 @@ function interleaveNewsBySource(items, maxConsecutive = 2) {
 }
 
 async function loadPulseLiveNews(forceRefresh = false) {
-  const cacheKey = 'pulse_live_news_cache_v4';
+  const cacheKey = 'pulse_live_news_cache_v5';
   const now = Date.now();
 
   if (!forceRefresh) {
@@ -11285,9 +11328,13 @@ async function loadPulseLiveNews(forceRefresh = false) {
             }
             const timestamp = (parsedDate && !isNaN(parsedDate.getTime())) ? parsedDate.getTime() : (now - idx * 20 * 60 * 1000);
 
+            const rawDesc = (it.description || it.content || '').trim();
+            const cleanDesc = rawDesc ? rawDesc.replace(/<[^>]+>/g, '').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&amp;/g, '&').replace(/\s+/g, ' ').trim().slice(0, 280) : '';
+
             fetchedItems.push({
               id: `${feed.src}_${idx}_${timestamp}`,
               title: cleanTitle,
+              desc: cleanDesc,
               source: feed.src,
               cat: detectNewsCategory(cleanTitle, it.categories),
               priority: detectNewsPriority(cleanTitle),
@@ -11341,18 +11388,56 @@ function renderPulseNewsFeed(filter = 'all') {
     return;
   }
 
-  feedEl.innerHTML = items.map(item => `
-    <article class="pulse-news-item ${item.priority === 'high' ? 'priority-high' : ''}">
-      <div class="pulse-news-meta">
-        <span class="pulse-news-src-badge">${item.source}</span>
-        <span class="pulse-news-time">${formatNewsTime(item.timestamp)}</span>
-      </div>
-      <a href="${item.url}" target="_blank" rel="noopener" class="pulse-news-title" title="${item.title}">
-        ${item.title}
-      </a>
-    </article>
-  `).join('');
+  feedEl.innerHTML = items.map(item => {
+    const hasDesc = !!(item.desc && item.desc.trim().length > 10);
+    return `
+      <article class="pulse-news-item ${item.priority === 'high' ? 'priority-high' : ''}" data-news-id="${item.id}">
+        <div class="pulse-news-header-row" ${hasDesc ? 'title="Натисніть, щоб розгорнути/згорнути короткий зміст"' : ''}>
+          <div class="pulse-news-meta">
+            <span class="pulse-news-src-badge">${item.source}</span>
+            <span class="pulse-news-time">${formatNewsTime(item.timestamp)}</span>
+          </div>
+          ${hasDesc ? `
+            <button type="button" class="pulse-news-expand-btn" aria-label="Розгорнути деталі" title="Розгорнути короткий зміст">
+              <i class="fas fa-chevron-down"></i>
+            </button>
+          ` : ''}
+        </div>
+        <div class="pulse-news-title-wrap">
+          <a href="${item.url}" target="_blank" rel="noopener" class="pulse-news-title" title="${item.title}">
+            ${item.title}
+          </a>
+        </div>
+        ${hasDesc ? `
+          <div class="pulse-news-body-collapse">
+            <p class="pulse-news-summary">${item.desc}</p>
+            <div class="pulse-news-expand-actions">
+              <a href="${item.url}" target="_blank" rel="noopener" class="pulse-news-direct-link">
+                Читати на джерелі <i class="fas fa-external-link-alt ms-1"></i>
+              </a>
+            </div>
+          </div>
+        ` : ''}
+      </article>
+    `;
+  }).join('');
+
+  if (!feedEl._pulseAccordionBound) {
+    feedEl._pulseAccordionBound = true;
+    feedEl.addEventListener('click', (e) => {
+      const btn = e.target.closest('.pulse-news-expand-btn');
+      const headerRow = e.target.closest('.pulse-news-header-row');
+      // If clicked the expand button or the header row (excluding direct links)
+      if (btn || (headerRow && !e.target.closest('a'))) {
+        const article = e.target.closest('.pulse-news-item');
+        if (article && article.querySelector('.pulse-news-body-collapse')) {
+          article.classList.toggle('is-expanded');
+        }
+      }
+    });
+  }
 }
+
 
 function renderPulseDrawerLayout(container) {
   const holiday = getTodayHolidayInfo();
@@ -11473,21 +11558,18 @@ function renderPulseDrawerLayout(container) {
                 <span class="pulse-eco-pulse-dot green" id="pulseEcoDotPm25"></span>
                 <span class="pulse-eco-strip-val" id="pulseEcoPm25"><span class="pulse-eco-int">2</span><span class="pulse-eco-dec">.3</span></span>
               </div>
-              <div class="pulse-eco-strip-sep"></div>
 
               <div class="pulse-eco-strip-item" title="Зважений пил PM10: норма до 45 мкг/м³">
                 <span class="pulse-eco-strip-title">PM10</span>
                 <span class="pulse-eco-pulse-dot green" id="pulseEcoDotPm10"></span>
                 <span class="pulse-eco-strip-val" id="pulseEcoPm10"><span class="pulse-eco-int">3</span></span>
               </div>
-              <div class="pulse-eco-strip-sep"></div>
 
               <div class="pulse-eco-strip-item" title="Діоксид азоту NO₂: норма до 40 мкг/м³">
                 <span class="pulse-eco-strip-title">NO₂</span>
                 <span class="pulse-eco-pulse-dot green" id="pulseEcoDotNo2"></span>
                 <span class="pulse-eco-strip-val" id="pulseEcoNo2"><span class="pulse-eco-int">2</span><span class="pulse-eco-dec">.4</span></span>
               </div>
-              <div class="pulse-eco-strip-sep"></div>
 
               <div class="pulse-eco-strip-item" title="Приземний озон O₃: норма до 60 мкг/м³">
                 <span class="pulse-eco-strip-title">O₃</span>
