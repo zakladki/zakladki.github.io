@@ -12883,8 +12883,8 @@ body.dark-mode .pulse-eco-strip-title {
   box-shadow: 0 0 3px rgba(239, 68, 68, 0.7);
 }
 .pulse-eco-strip-val {
-  font-size: 0.67rem;
-  font-weight: 600;
+  font-size: 0.68rem;
+  font-weight: 500;
   color: #0f172a;
   font-variant-numeric: tabular-nums;
   line-height: 1;
@@ -12895,18 +12895,21 @@ body.dark-mode .pulse-eco-strip-val {
   color: #f1f5f9;
 }
 .pulse-eco-strip-val .pulse-eco-int {
-  font-size: 0.67rem;
-  font-weight: 600;
+  font-size: 0.68rem;
+  font-weight: 500;
   color: inherit;
 }
 .pulse-eco-strip-val .pulse-eco-dec {
-  font-size: 0.67rem; /* Чіткий читабельний кегль як у цінах на пальне (без мікроточок і мікроцифр) */
-  font-weight: 600;
+  font-size: 0.58rem; /* Дещо менша цифра після крапки за зразком цін на пальне (.pulse-decimal) */
+  font-weight: 500;
   color: inherit;
-  margin-left: 0;
+  opacity: 0.88;
+  margin-left: 0.5px;
+  vertical-align: baseline;
 }
 body.dark-mode .pulse-eco-strip-val .pulse-eco-dec {
   color: inherit;
+  opacity: 0.90;
 }
 .pulse-eco-strip-sep {
   display: none !important;
@@ -13139,7 +13142,7 @@ body.dark-mode .pulse-news-item.is-expanded .pulse-news-expand-btn i {
   box-sizing: border-box;
 }
 .pulse-news-item.is-expanded .pulse-news-body-collapse {
-  max-height: 250px;
+  max-height: 600px;
   opacity: 1;
   padding-top: 5px;
   border-top: 1px dashed #e2e8f0;
@@ -13149,10 +13152,10 @@ body.dark-mode .pulse-news-item.is-expanded .pulse-news-body-collapse {
   border-top-color: #334155;
 }
 .pulse-news-summary {
-  font-size: 0.65rem;
-  line-height: 1.35;
-  color: #475569;
-  margin: 0 0 4px 0;
+  font-size: 0.72rem;
+  line-height: 1.45;
+  color: #334155;
+  margin: 0 0 5px 0;
   word-break: break-word;
 }
 body.dark-mode .pulse-news-summary {
@@ -14275,12 +14278,12 @@ body.dark-mode .pulse-wind-line.gust-storm {
   color: #f87171 !important;
 }
 
-/* Пульсуюча кольорова цятка на межі між колонкою вітру та відносною вологістю (золота середина: 3.5px, виразна, але делікатна) */
+/* Пульсуюча кольорова цятка на межі між колонками температури та сили вітру */
 .pulse-wind-gust-dot {
   position: absolute;
-  right: 0px;
+  left: 0px;
   top: 50%;
-  transform: translate(50%, -50%);
+  transform: translate(-50%, -50%);
   width: 3.5px;
   height: 3.5px;
   border-radius: 50%;
@@ -14306,17 +14309,17 @@ body.dark-mode .pulse-wind-gust-dot.storm {
 }
 @keyframes pulseWindDotGlow {
   0% {
-    transform: translate(50%, -50%) scale(0.95);
+    transform: translate(-50%, -50%) scale(0.95);
     box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.65);
     opacity: 0.78;
   }
   50% {
-    transform: translate(50%, -50%) scale(1.15);
+    transform: translate(-50%, -50%) scale(1.15);
     box-shadow: 0 0 0 2.5px rgba(245, 158, 11, 0);
     opacity: 0.95;
   }
   100% {
-    transform: translate(50%, -50%) scale(0.95);
+    transform: translate(-50%, -50%) scale(0.95);
     box-shadow: 0 0 0 0 rgba(245, 158, 11, 0);
     opacity: 0.78;
   }
@@ -14472,7 +14475,7 @@ body.dark-mode .pulse-w2-rot-dots-center .pulse-w2-rot-dot.active {
   height: 25px;
   overflow: hidden;
   background: rgba(2, 132, 199, 0.05);
-  border-top: 1px solid var(--border-color, #e2e8f0); /* Суцільна лінія */
+  border-top: none;
   border-bottom: 1px solid var(--border-color, #e2e8f0);
   padding: 0 8px;
   display: flex;
@@ -14485,7 +14488,6 @@ body.dark-mode .pulse-w2-rot-dots-center .pulse-w2-rot-dot.active {
 }
 body.dark-mode .pulse-w2-rotator-bar {
   background: rgba(14, 165, 233, 0.08);
-  border-top-color: #334155;
   border-bottom-color: #334155;
 }
 .pulse-w2-rotator-bar:hover {
@@ -14729,18 +14731,21 @@ body.dark-mode .pulse-w2-cell-precip.high {
   opacity: 0.85;
 }
 
-/* Температура: формат "+1°/-3°" без пробілів (нежирне акуратне накреслення) */
+/* Температура: формат "+1°/-3°" без пробілів (вирівнювання ліворуч) */
 .pulse-w2-th-temp {
   width: 54px;
   font-size: 0.72rem;
   font-weight: 600;
   letter-spacing: 0.2px;
+  text-align: left !important;
+  padding-left: 5px !important;
 }
 .pulse-w2-col-temp {
   width: 54px;
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
-  padding: 3.5px 1px !important;
+  padding: 3.5px 2px 3.5px 5px !important;
+  text-align: left !important;
 }
 .pulse-w2-temp-actual {
   font-weight: 500;
@@ -14759,18 +14764,22 @@ body.dark-mode .pulse-w2-temp-feels {
   color: #94a3b8;
 }
 
-/* Вітер: витягнута сірувата стрілка */
+/* Вітер: витягнута сірувата стрілка з вирівнюванням ліворуч */
 .pulse-w2-th-wind {
   width: 44px;
+  text-align: left !important;
+  padding-left: 6px !important;
 }
 .pulse-w2-col-wind {
   width: 44px;
   position: relative;
+  text-align: left !important;
+  padding: 3.5px 2px 3.5px 6px !important;
 }
 .pulse-w2-wind-cell {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 3px;
   white-space: nowrap;
   color: var(--text-main, #0f172a);

@@ -94,8 +94,8 @@ function parseRssXml(xml, src) {
       if (desc.startsWith(title)) {
         desc = desc.substring(title.length).trim();
       }
-      if (desc.length > 280) {
-        desc = desc.substring(0, 277).trim() + '...';
+      if (desc.length > 650) {
+        desc = desc.substring(0, 647).trim() + '...';
       }
     }
 

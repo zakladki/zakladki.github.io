@@ -11329,7 +11329,7 @@ async function loadPulseLiveNews(forceRefresh = false) {
             const timestamp = (parsedDate && !isNaN(parsedDate.getTime())) ? parsedDate.getTime() : (now - idx * 20 * 60 * 1000);
 
             const rawDesc = (it.description || it.content || '').trim();
-            const cleanDesc = rawDesc ? rawDesc.replace(/<[^>]+>/g, '').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&amp;/g, '&').replace(/\s+/g, ' ').trim().slice(0, 280) : '';
+            const cleanDesc = rawDesc ? rawDesc.replace(/<[^>]+>/g, '').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&amp;/g, '&').replace(/\s+/g, ' ').trim().slice(0, 650) : '';
 
             fetchedItems.push({
               id: `${feed.src}_${idx}_${timestamp}`,
