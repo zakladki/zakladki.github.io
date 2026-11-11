@@ -14222,18 +14222,41 @@ body.dark-mode .pulse-hour-wind-arrow.wind-storm {
   color: #f87171;
 }
 
+/* ==========================================================================
+   ВАРІАНТ 3: ТЕХНІЧНИЙ ПУНКТИР (DASHED DATA LINE) З ЦЕНТРУВАННЯМ КОЛОНКИ
+   ========================================================================== */
 .pulse-wind-val-box {
   display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 0;
+  width: 23px;
+  min-width: 23px;
   height: 16px;
-  line-height: 16px;
-  overflow: hidden;
+  box-sizing: content-box;
   vertical-align: middle;
+  overflow: hidden;
+  border-bottom: 1.5px dashed transparent;
 }
+.pulse-w2-col-wind.has-gusts .pulse-wind-val-box {
+  border-bottom: 1.5px dashed rgba(245, 158, 11, 0.95);
+}
+body.dark-mode .pulse-w2-col-wind.has-gusts .pulse-wind-val-box {
+  border-bottom-color: rgba(251, 191, 36, 0.95);
+}
+.pulse-w2-col-wind.has-gusts.storm .pulse-wind-val-box {
+  border-bottom-color: rgba(239, 68, 68, 0.95);
+}
+
 .pulse-wind-cycler {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
   justify-content: flex-start;
+  width: 100%;
+  margin: 0;
+  padding: 0;
   animation: pulseWindCycle 6s infinite ease-in-out;
 }
 @keyframes pulseWindCycle {
@@ -14255,74 +14278,57 @@ body.dark-mode .pulse-hour-wind-arrow.wind-storm {
 }
 .pulse-wind-line {
   height: 16px;
+  min-height: 16px;
+  max-height: 16px;
   line-height: 16px;
-  display: inline-flex;
+  flex-shrink: 0;
+  display: flex;
   align-items: center;
-  justify-content: flex-start;
-  text-align: left;
+  justify-content: center;
+  text-align: center;
   white-space: nowrap;
+  width: 100%;
+  font-size: 0.70rem;
+  font-weight: 400 !important;
+  color: var(--text-main, #0f172a);
+}
+body.dark-mode .pulse-wind-line {
+  color: #f1f5f9;
 }
 .pulse-wind-line.gust-line {
-  font-weight: 400; /* Не жирний, однаковий зі звичайною швидкістю вітру */
-  color: #ea580c;
-  font-size: 0.71rem;
+  font-weight: 500 !important;
+  color: #ea580c; /* Теплий помаранчевий колір для пориву */
+  font-size: 0.70rem;
 }
 body.dark-mode .pulse-wind-line.gust-line {
   color: #fb923c;
 }
 .pulse-wind-line.gust-storm {
   color: #dc2626 !important;
-  font-weight: 400;
+  font-weight: 500 !important;
 }
 body.dark-mode .pulse-wind-line.gust-storm {
   color: #f87171 !important;
 }
 
-/* Пульсуюча кольорова цятка на межі між колонками температури та сили вітру */
+.pulse-w2-wind-num {
+  font-size: 0.70rem;
+  font-weight: 400 !important;
+  font-variant-numeric: tabular-nums;
+  line-height: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  width: 23px;
+  min-width: 23px;
+  border-bottom: 1.5px dashed transparent;
+  box-sizing: content-box;
+  color: inherit;
+}
+
 .pulse-wind-gust-dot {
-  position: absolute;
-  left: 0px;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  width: 3.5px;
-  height: 3.5px;
-  border-radius: 50%;
-  background: rgba(245, 158, 11, 0.9);
-  box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.65);
-  animation: pulseWindDotGlow 2.4s infinite ease-in-out;
-  pointer-events: auto;
-  cursor: help;
-  z-index: 5;
-  opacity: 0.88;
-}
-.pulse-wind-gust-dot.storm {
-  background: rgba(239, 68, 68, 0.92);
-  box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.75);
-}
-body.dark-mode .pulse-wind-gust-dot {
-  background: rgba(251, 191, 36, 0.9);
-  box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.65);
-}
-body.dark-mode .pulse-wind-gust-dot.storm {
-  background: rgba(248, 113, 113, 0.92);
-  box-shadow: 0 0 0 0 rgba(248, 113, 113, 0.75);
-}
-@keyframes pulseWindDotGlow {
-  0% {
-    transform: translate(-50%, -50%) scale(0.95);
-    box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.65);
-    opacity: 0.78;
-  }
-  50% {
-    transform: translate(-50%, -50%) scale(1.15);
-    box-shadow: 0 0 0 2.5px rgba(245, 158, 11, 0);
-    opacity: 0.95;
-  }
-  100% {
-    transform: translate(-50%, -50%) scale(0.95);
-    box-shadow: 0 0 0 0 rgba(245, 158, 11, 0);
-    opacity: 0.78;
-  }
+  display: none !important;
 }
 
 .pulse-w2-tab-title {
@@ -14432,26 +14438,27 @@ body.dark-mode .pulse-w2-rot-divider {
   align-items: center;
   justify-content: center;
   gap: 4px;
-  height: 12px;
-  padding: 0 6px;
+  height: 8px;
+  padding: 0 4px;
   background: var(--bg-card, #ffffff);
-  border-radius: 9999px;
-  border: 1px solid var(--border-color, #e2e8f0);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  border: none;
+  box-shadow: none;
+  border-radius: 0;
   z-index: 4;
   cursor: pointer;
   box-sizing: border-box;
 }
 body.dark-mode .pulse-w2-rot-dots-center {
   background: #1e293b;
-  border-color: #334155;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+  border: none;
+  box-shadow: none;
 }
 .pulse-w2-rot-dots-center .pulse-w2-rot-dot {
-  width: 3.5px;
-  height: 3.5px;
+  width: 3px;
+  height: 3px;
   border-radius: 50%;
-  background: #cbd5e1;
+  background: #94a3b8;
+  opacity: 0.55;
   transition: all 0.2s ease;
   cursor: pointer;
   flex-shrink: 0;
@@ -14460,14 +14467,17 @@ body.dark-mode .pulse-w2-rot-dots-center {
   padding: 0;
 }
 body.dark-mode .pulse-w2-rot-dots-center .pulse-w2-rot-dot {
-  background: #475569;
+  background: #64748b;
+  opacity: 0.65;
 }
 .pulse-w2-rot-dots-center .pulse-w2-rot-dot.active {
   background: #0284c7;
-  transform: scale(1.25);
+  opacity: 1;
+  transform: scale(1.3);
 }
 body.dark-mode .pulse-w2-rot-dots-center .pulse-w2-rot-dot.active {
   background: #38bdf8;
+  opacity: 1;
 }
 
 .pulse-w2-rotator-bar {
@@ -14610,16 +14620,21 @@ body.dark-mode .pulse-w2-table-wrap {
   color: var(--text-muted, #64748b);
   font-weight: 600;
   font-size: 0.73rem;
-  text-align: center;
+  text-align: center !important;
   padding: 5px 2px;
   border-bottom: 1px solid var(--border-color, #e2e8f0);
+  border-right: 1px solid var(--border-color, #e2e8f0);
   white-space: nowrap;
   vertical-align: middle;
+}
+.pulse-w2-th-row th:last-child {
+  border-right: none;
 }
 body.dark-mode .pulse-w2-th-row th {
   background: #1e293b;
   color: #94a3b8;
   border-color: #334155;
+  border-right-color: #334155;
 }
 .pulse-w2-th-row th i {
   display: inline-block;
@@ -14662,6 +14677,8 @@ body.dark-mode .pulse-w2-row.pulse-w2-row-current {
 /* Час: фіксована стабільна ширина */
 .pulse-w2-th-time {
   width: 32px;
+  text-align: center !important;
+  padding: 5px 2px !important;
 }
 .pulse-w2-col-time {
   font-weight: 600;
@@ -14679,7 +14696,7 @@ body.dark-mode .pulse-w2-col-time {
 .pulse-w2-th-weather {
   width: 58px;
   text-align: center !important;
-  padding: 3.5px 2px !important;
+  padding: 5px 2px !important;
 }
 .pulse-w2-th-weather i {
   font-size: 0.86rem;
@@ -14731,17 +14748,17 @@ body.dark-mode .pulse-w2-cell-precip.high {
   opacity: 0.85;
 }
 
-/* Температура: формат "+1°/-3°" без пробілів (вирівнювання ліворуч) */
+/* Температура: формат "+1°/-3°" без пробілів (шапка по центру, значення ліворуч) */
 .pulse-w2-th-temp {
-  width: 54px;
+  width: 56px;
   font-size: 0.72rem;
   font-weight: 600;
   letter-spacing: 0.2px;
-  text-align: left !important;
-  padding-left: 5px !important;
+  text-align: center !important;
+  padding: 5px 2px !important;
 }
 .pulse-w2-col-temp {
-  width: 54px;
+  width: 56px;
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
   padding: 3.5px 2px 3.5px 5px !important;
@@ -14764,22 +14781,22 @@ body.dark-mode .pulse-w2-temp-feels {
   color: #94a3b8;
 }
 
-/* Вітер: витягнута сірувата стрілка з вирівнюванням ліворуч */
+/* Вітер: горизонтальне центрування всієї колонки та чітка стрілка 13.5px */
 .pulse-w2-th-wind {
   width: 44px;
-  text-align: left !important;
-  padding-left: 6px !important;
+  text-align: center !important;
+  padding: 5px 2px !important;
 }
 .pulse-w2-col-wind {
   width: 44px;
   position: relative;
-  text-align: left !important;
-  padding: 3.5px 2px 3.5px 6px !important;
+  text-align: center !important;
+  padding: 3.5px 2px !important;
 }
 .pulse-w2-wind-cell {
   display: inline-flex;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: center;
   gap: 3px;
   white-space: nowrap;
   color: var(--text-main, #0f172a);
@@ -14789,6 +14806,8 @@ body.dark-mode .pulse-w2-wind-cell {
 }
 .pulse-w2-wind-cell .pulse-hour-wind-arrow {
   color: #64748b;
+  width: 13.5px;
+  height: 13.5px;
   flex-shrink: 0;
   transition: transform 0.25s ease;
 }
@@ -14804,25 +14823,31 @@ body.dark-mode .pulse-w2-wind-cell .pulse-hour-wind-arrow {
   color: #dc2626;
 }
 
-/* Вологість */
+/* Вологість: шапка по центру, значення синюватим кольором (як ймовірність опадів) */
 .pulse-w2-th-hum {
   width: 30px;
+  text-align: center !important;
+  padding: 5px 2px !important;
 }
 .pulse-w2-col-hum {
   width: 30px;
+  text-align: center !important;
 }
 .pulse-w2-hum-num {
   font-size: 0.71rem;
   font-weight: 400;
-  color: #64748b;
+  color: #0284c7;
+  font-variant-numeric: tabular-nums;
 }
 body.dark-mode .pulse-w2-hum-num {
-  color: #94a3b8;
+  color: #38bdf8;
 }
 
 /* Тиск з кольоровим підсвіченням норми - звичайний нежирний шрифт */
 .pulse-w2-th-press {
   width: 34px;
+  text-align: center !important;
+  padding: 5px 2px !important;
 }
 .pulse-w2-col-press {
   width: 34px;
@@ -14868,6 +14893,8 @@ body.dark-mode .pulse-w2-press-badge.red {
 /* Магнітні бурі (Kp індекс): звичайний нежирний шрифт */
 .pulse-w2-th-geomag {
   width: 28px;
+  text-align: center !important;
+  padding: 5px 1px !important;
 }
 .pulse-w2-col-geomag {
   width: 28px;

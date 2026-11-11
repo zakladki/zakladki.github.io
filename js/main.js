@@ -10425,14 +10425,13 @@ function renderPulseWeatherUI(data, city, updatedTime = '') {
         <td class="pulse-w2-col-temp" title="Температура: ${tSign}${tVal}°, відчувається: ${feelsSign}${feelsVal}°">
           <span class="pulse-w2-temp-actual ${tClass}">${tSign}${tVal}°</span>/<span class="pulse-w2-temp-feels ${feelsClass}">${feelsSign}${feelsVal}°</span>
         </td>
-        <td class="pulse-w2-col-wind ${hasGusts ? 'has-gusts' : ''}" title="${windCellTooltip}">
+        <td class="pulse-w2-col-wind ${hasGusts ? 'has-gusts' : ''} ${gustStorm ? 'storm' : ''}" title="${windCellTooltip}">
           <div class="pulse-w2-wind-cell">
-            <svg class="pulse-hour-wind-arrow ${windArrowClass}" width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="none" style="transform: rotate(${windInfo.arrowDeg}deg); transform-origin: 50% 50%;">
+            <svg class="pulse-hour-wind-arrow ${windArrowClass}" width="13.5" height="13.5" viewBox="0 0 24 24" fill="currentColor" stroke="none" style="transform: rotate(${windInfo.arrowDeg}deg); transform-origin: 50% 50%;">
               <path d="M12 1.5L7 21.5l5-4.5 5 4.5L12 1.5z"></path>
             </svg>
             ${windValHtml}
           </div>
-          ${hasGusts ? `<span class="pulse-wind-gust-dot ${gustStorm ? 'storm' : ''}" title="Очікуються пориви вітру до ${windGust.toFixed(1)} м/с"></span>` : ''}
         </td>
         <td class="pulse-w2-col-hum" title="Вологість повітря: ${humVal}%">
           <span class="pulse-w2-hum-num">${humVal}</span>
