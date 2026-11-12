@@ -13932,11 +13932,12 @@ body.dark-mode .pulse-w2-top-panel {
 .pulse-w2-tabs {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 4px;
+  gap: 0;
   background: transparent;
-  padding: 3px 3px 2px;
+  padding: 0;
   border: none;
   border-radius: 0;
+  position: relative;
 }
 
 .pulse-w2-tab {
@@ -13946,11 +13947,15 @@ body.dark-mode .pulse-w2-top-panel {
   justify-content: center !important;
   position: relative !important;
   background: transparent;
-  border: 1px solid transparent;
-  border-radius: 7px;
-  padding: 4px 2px 4px !important;
+  border: none !important;
+  border-top: none !important;
+  border-bottom: none !important;
+  border-left: 1px solid transparent !important;
+  border-right: 1px solid transparent !important;
+  border-radius: 0 !important;
+  padding: 5px 2px 4px !important;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: background 0.15s ease, color 0.15s ease;
   color: var(--text-muted, #64748b);
   font-family: inherit;
   outline: none;
@@ -13959,11 +13964,17 @@ body.dark-mode .pulse-w2-top-panel {
   overflow: visible;
   z-index: 1;
 }
+.pulse-w2-tab:first-child {
+  border-top-left-radius: 8px !important;
+}
+.pulse-w2-tab:last-child {
+  border-top-right-radius: 8px !important;
+}
 .pulse-w2-tab:hover,
 .pulse-w2-tab.is-hovered,
 .pulse-w2-tab:focus-within,
 .pulse-w2-tab:has(.pulse-w2-flask-wrap:hover) {
-  background: rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.5);
   color: var(--text-main, #0f172a);
   z-index: 50 !important; /* Підносить картку над сусідніми вкладками, щоб підказка колби ніколи не перекривалася */
 }
@@ -13971,16 +13982,30 @@ body.dark-mode .pulse-w2-tab:hover,
 body.dark-mode .pulse-w2-tab.is-hovered,
 body.dark-mode .pulse-w2-tab:focus-within,
 body.dark-mode .pulse-w2-tab:has(.pulse-w2-flask-wrap:hover) {
-  background: rgba(30, 41, 59, 0.6);
+  background: rgba(30, 41, 59, 0.45);
   color: #f1f5f9;
   z-index: 50 !important;
 }
+
+/* Активна вкладка: без верхньої та нижньої границь, виключно бічні роздільні напрямні */
 .pulse-w2-tab.active {
   background: var(--card-bg, #ffffff);
-  border-color: rgba(14, 165, 233, 0.4);
+  border-top: none !important;
+  border-bottom: none !important;
+  border-left: 1px solid rgba(14, 165, 233, 0.45) !important;
+  border-right: 1px solid rgba(14, 165, 233, 0.45) !important;
+  border-radius: 0 !important;
   color: var(--text-main, #0f172a);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(14, 165, 233, 0.2);
+  box-shadow: none !important;
   z-index: 2;
+}
+.pulse-w2-tab:first-child.active {
+  border-left: none !important;
+  border-top-left-radius: 8px !important;
+}
+.pulse-w2-tab:last-child.active {
+  border-right: none !important;
+  border-top-right-radius: 8px !important;
 }
 .pulse-w2-tab.active:hover,
 .pulse-w2-tab.active.is-hovered,
@@ -13989,9 +14014,12 @@ body.dark-mode .pulse-w2-tab:has(.pulse-w2-flask-wrap:hover) {
 }
 body.dark-mode .pulse-w2-tab.active {
   background: #1e293b;
-  border-color: rgba(56, 189, 248, 0.5);
+  border-top: none !important;
+  border-bottom: none !important;
+  border-left-color: rgba(56, 189, 248, 0.45) !important;
+  border-right-color: rgba(56, 189, 248, 0.45) !important;
   color: #f8fafc;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  box-shadow: none !important;
 }
 
 /* 1. Верхня шапочка вкладки (назви «Сьогодні / Завтра / Післязавтра» та дата) — строго центровані по всій ширині вкладки */
@@ -14198,28 +14226,28 @@ body.dark-mode .pulse-w2-row-flask {
   transition: color 0.2s ease;
 }
 .pulse-hour-wind-arrow.wind-calm {
-  color: #64748b;
+  color: #64748b !important;
 }
 body.dark-mode .pulse-hour-wind-arrow.wind-calm {
-  color: #94a3b8;
+  color: #94a3b8 !important;
 }
 .pulse-hour-wind-arrow.wind-moderate {
-  color: #d97706; /* Помірний вітер 5.5-10.9 м/с */
+  color: #d97706 !important; /* Помірний вітер (швидкість від 5.5 м/с або пориви від 9 м/с) */
 }
 body.dark-mode .pulse-hour-wind-arrow.wind-moderate {
-  color: #facc15;
+  color: #facc15 !important;
 }
 .pulse-hour-wind-arrow.wind-strong {
-  color: #ea580c; /* Сильний вітер 11.0-16.9 м/с */
+  color: #ea580c !important; /* Сильний вітер (швидкість від 11 м/с або пориви від 15 м/с) */
 }
 body.dark-mode .pulse-hour-wind-arrow.wind-strong {
-  color: #fb923c;
+  color: #fb923c !important;
 }
 .pulse-hour-wind-arrow.wind-storm {
-  color: #dc2626; /* Штормовий вітер 17+ м/с */
+  color: #dc2626 !important; /* Штормовий вітер (швидкість від 17 м/с або пориви від 22 м/с) */
 }
 body.dark-mode .pulse-hour-wind-arrow.wind-storm {
-  color: #f87171;
+  color: #f87171 !important;
 }
 
 /* ==========================================================================
@@ -14421,63 +14449,23 @@ body.dark-mode .pulse-w2-tab-precip.high {
    ========================================================================== */
 .pulse-w2-rot-divider {
   position: relative;
-  height: 0;
-  width: 100%;
-  border-top: 1px solid var(--border-color, #e2e8f0); /* Суцільна лінія у відповідність до нижньої */
-  z-index: 3;
-}
-body.dark-mode .pulse-w2-rot-divider {
-  border-top-color: #334155;
-}
-.pulse-w2-rot-dots-center {
-  position: absolute;
-  top: 0;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: center;
-  gap: 4px;
-  height: 8px;
-  padding: 0 4px;
-  background: var(--bg-card, #ffffff);
-  border: none;
-  box-shadow: none;
-  border-radius: 0;
+  width: 100%;
+  height: 0;
+  border-top: none !important;
   z-index: 4;
-  cursor: pointer;
-  box-sizing: border-box;
 }
-body.dark-mode .pulse-w2-rot-dots-center {
-  background: #1e293b;
-  border: none;
-  box-shadow: none;
+.pulse-w2-rot-divider::before,
+.pulse-w2-rot-divider::after {
+  content: '';
+  flex: 1;
+  border-top: 1px solid var(--border-color, #e2e8f0);
 }
-.pulse-w2-rot-dots-center .pulse-w2-rot-dot {
-  width: 3px;
-  height: 3px;
-  border-radius: 50%;
-  background: #94a3b8;
-  opacity: 0.55;
-  transition: all 0.2s ease;
-  cursor: pointer;
-  flex-shrink: 0;
-  display: block;
-  margin: 0;
-  padding: 0;
-}
-body.dark-mode .pulse-w2-rot-dots-center .pulse-w2-rot-dot {
-  background: #64748b;
-  opacity: 0.65;
-}
-.pulse-w2-rot-dots-center .pulse-w2-rot-dot.active {
-  background: #0284c7;
-  opacity: 1;
-  transform: scale(1.3);
-}
-body.dark-mode .pulse-w2-rot-dots-center .pulse-w2-rot-dot.active {
-  background: #38bdf8;
-  opacity: 1;
+body.dark-mode .pulse-w2-rot-divider::before,
+body.dark-mode .pulse-w2-rot-divider::after {
+  border-top-color: #334155;
 }
 
 .pulse-w2-rotator-bar {
@@ -14505,6 +14493,73 @@ body.dark-mode .pulse-w2-rotator-bar {
 }
 body.dark-mode .pulse-w2-rotator-bar:hover {
   background: rgba(56, 189, 248, 0.14);
+}
+
+/* ==========================================================================
+   ВАРІАНТ Г: ПУНКТИРНІ КОРОТКІ ЛІНІЇ (ШТРИХИ) В РОЗРИВІ ЦЕНТРАЛЬНОЇ ЛІНІЇ
+   ========================================================================== */
+.pulse-w2-rot-dots-center {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3.5px;
+  padding: 0 5px;
+  height: 0;
+  overflow: visible;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  z-index: 5;
+  cursor: pointer;
+  user-select: none;
+}
+
+.pulse-w2-rot-dots-center .pulse-w2-rot-dot {
+  position: relative;
+  width: 8px;
+  height: 2px;
+  border-radius: 1px;
+  background: #94a3b8;
+  opacity: 0.6;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  flex-shrink: 0;
+  display: block;
+  margin: 0;
+  padding: 0;
+}
+.pulse-w2-rot-dots-center .pulse-w2-rot-dot::before {
+  content: '';
+  position: absolute;
+  top: -8px;
+  bottom: -8px;
+  left: -3px;
+  right: -3px;
+}
+body.dark-mode .pulse-w2-rot-dots-center .pulse-w2-rot-dot {
+  background: #64748b;
+  opacity: 0.65;
+}
+
+.pulse-w2-rot-dots-center .pulse-w2-rot-dot:hover {
+  opacity: 0.95;
+  background: #64748b;
+}
+body.dark-mode .pulse-w2-rot-dots-center .pulse-w2-rot-dot:hover {
+  background: #94a3b8;
+}
+
+.pulse-w2-rot-dots-center .pulse-w2-rot-dot.active {
+  background: #0284c7;
+  opacity: 1;
+  width: 14px;
+  border-radius: 1px;
+  box-shadow: 0 0 4px rgba(2, 132, 199, 0.35);
+}
+body.dark-mode .pulse-w2-rot-dots-center .pulse-w2-rot-dot.active {
+  background: #38bdf8;
+  opacity: 1;
+  box-shadow: 0 0 5px rgba(56, 189, 248, 0.45);
 }
 
 .pulse-w2-rot-viewport {
