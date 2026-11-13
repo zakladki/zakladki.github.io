@@ -9626,37 +9626,37 @@ const WMO_WEATHER_MAP = {
 function createWeatherSvg(type, isDay = 1, size = 18) {
   if (type === 'clear') {
     if (isDay) {
-      return `<svg class="pulse-weather-svg pulse-wsvg-sun" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4" fill="#fef08a"></circle><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M6.34 17.66l-1.41 1.41m12.73-12.73l-1.41 1.41"></path></svg>`;
+      return `<svg class="pulse-weather-svg pulse-wsvg-sun" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4.2" fill="#fef08a"></circle><path d="M12 2.2v2m0 15.6v2M5.07 5.07l1.41 1.41m11.04 11.04l1.41 1.41M2.2 12h2m15.6 0h2M6.48 17.52l-1.41 1.41m12.45-12.45l-1.41 1.41"></path></svg>`;
     } else {
-      return `<svg class="pulse-weather-svg pulse-wsvg-moon" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" fill="#f1f5f9"></path></svg>`;
+      return `<svg class="pulse-weather-svg pulse-wsvg-moon" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" fill="#f1f5f9"></path></svg>`;
     }
   }
   if (type === 'partly') {
     if (isDay) {
-      return `<svg class="pulse-weather-svg pulse-wsvg-partly-day" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v2M4.93 4.93l1.41 1.41M2 12h2" stroke="#f59e0b"></path><circle cx="12" cy="10" r="3.5" fill="#fef08a" stroke="#f59e0b"></circle><path d="M19 14.5a3.5 3.5 0 0 0-3.5-3.5 3.8 3.8 0 0 0-1.1.16A4.5 4.5 0 0 0 6 15a3.5 3.5 0 0 0 3.5 3.5h9.5a3.5 3.5 0 0 0 0-7z" fill="#e2e8f0" stroke="#64748b"></path></svg>`;
+      return `<svg class="pulse-weather-svg pulse-wsvg-partly-day" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.2v1.8M5.07 5.07l1.3 1.3M2.2 12h1.8" stroke="#f59e0b" stroke-width="1.35"></path><circle cx="12" cy="10" r="3.5" fill="#fef08a" stroke="#f59e0b" stroke-width="1.3"></circle><path d="M19 14.5a3.5 3.5 0 0 0-3.5-3.5 3.8 3.8 0 0 0-1.1.16A4.5 4.5 0 0 0 6 15a3.5 3.5 0 0 0 3.5 3.5h9.5a3.5 3.5 0 0 0 0-7z" fill="#f1f5f9" stroke="#94a3b8"></path></svg>`;
     } else {
-      return `<svg class="pulse-weather-svg pulse-wsvg-partly-night" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 5a5 5 0 0 1 4 4" stroke="#94a3b8"></path><path d="M19 14.5a3.5 3.5 0 0 0-3.5-3.5 3.8 3.8 0 0 0-1.1.16A4.5 4.5 0 0 0 6 15a3.5 3.5 0 0 0 3.5 3.5h9.5a3.5 3.5 0 0 0 0-7z" fill="#e2e8f0" stroke="#64748b"></path></svg>`;
+      return `<svg class="pulse-weather-svg pulse-wsvg-partly-night" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 5a5 5 0 0 1 4 4" stroke="#94a3b8"></path><path d="M19 14.5a3.5 3.5 0 0 0-3.5-3.5 3.8 3.8 0 0 0-1.1.16A4.5 4.5 0 0 0 6 15a3.5 3.5 0 0 0 3.5 3.5h9.5a3.5 3.5 0 0 0 0-7z" fill="#f1f5f9" stroke="#94a3b8"></path></svg>`;
     }
   }
   if (type === 'cloudy') {
-    return `<svg class="pulse-weather-svg pulse-wsvg-cloud" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14.5a3.5 3.5 0 0 0-3.5-3.5 3.8 3.8 0 0 0-1.1.16A4.5 4.5 0 0 0 6 15a3.5 3.5 0 0 0 3.5 3.5h9.5a3.5 3.5 0 0 0 0-7z" fill="#e2e8f0" stroke="#64748b"></path></svg>`;
+    return `<svg class="pulse-weather-svg pulse-wsvg-cloud" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14.5a3.5 3.5 0 0 0-3.5-3.5 3.8 3.8 0 0 0-1.1.16A4.5 4.5 0 0 0 6 15a3.5 3.5 0 0 0 3.5 3.5h9.5a3.5 3.5 0 0 0 0-7z" fill="#f1f5f9" stroke="#94a3b8"></path></svg>`;
   }
   if (type === 'fog') {
-    return `<svg class="pulse-weather-svg pulse-wsvg-fog" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14h16M6 18h12M4 10h16M6 6h12"></path></svg>`;
+    return `<svg class="pulse-weather-svg pulse-wsvg-fog" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14h16M6 18h12M4 10h16M6 6h12"></path></svg>`;
   }
   if (type === 'drizzle') {
-    return `<svg class="pulse-weather-svg pulse-wsvg-drizzle" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 13.5a3.5 3.5 0 0 0-3.5-3.5 3.8 3.8 0 0 0-1.1.16A4.5 4.5 0 0 0 6 14a3.5 3.5 0 0 0 3.5 3.5h9.5a3.5 3.5 0 0 0 0-7z" fill="#e2e8f0"></path><path d="M9 19.5v2m6-2v2" stroke="#0284c7" stroke-width="2"></path></svg>`;
+    return `<svg class="pulse-weather-svg pulse-wsvg-drizzle" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 13.5a3.5 3.5 0 0 0-3.5-3.5 3.8 3.8 0 0 0-1.1.16A4.5 4.5 0 0 0 6 14a3.5 3.5 0 0 0 3.5 3.5h9.5a3.5 3.5 0 0 0 0-7z" fill="#f1f5f9"></path><path d="M9 19.5v2m6-2v2" stroke="#0284c7" stroke-width="1.45"></path></svg>`;
   }
   if (type === 'rain') {
-    return `<svg class="pulse-weather-svg pulse-wsvg-rain" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 13.5a3.5 3.5 0 0 0-3.5-3.5 3.8 3.8 0 0 0-1.1.16A4.5 4.5 0 0 0 6 14a3.5 3.5 0 0 0 3.5 3.5h9.5a3.5 3.5 0 0 0 0-7z" fill="#e2e8f0"></path><path d="M8 19l-1 2.5m5-2.5l-1 2.5m5-2.5l-1 2.5" stroke="#0284c7" stroke-width="2"></path></svg>`;
+    return `<svg class="pulse-weather-svg pulse-wsvg-rain" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 13.5a3.5 3.5 0 0 0-3.5-3.5 3.8 3.8 0 0 0-1.1.16A4.5 4.5 0 0 0 6 14a3.5 3.5 0 0 0 3.5 3.5h9.5a3.5 3.5 0 0 0 0-7z" fill="#f1f5f9"></path><path d="M8 19l-1 2.5m5-2.5l-1 2.5m5-2.5l-1 2.5" stroke="#0284c7" stroke-width="1.45"></path></svg>`;
   }
   if (type === 'snow') {
-    return `<svg class="pulse-weather-svg pulse-wsvg-snow" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 13.5a3.5 3.5 0 0 0-3.5-3.5 3.8 3.8 0 0 0-1.1.16A4.5 4.5 0 0 0 6 14a3.5 3.5 0 0 0 3.5 3.5h9.5a3.5 3.5 0 0 0 0-7z" fill="#e2e8f0"></path><path d="M8 19v2m-1-1h2m5-1v2m-1-1h2" stroke="#38bdf8" stroke-width="1.8"></path></svg>`;
+    return `<svg class="pulse-weather-svg pulse-wsvg-snow" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 13.5a3.5 3.5 0 0 0-3.5-3.5 3.8 3.8 0 0 0-1.1.16A4.5 4.5 0 0 0 6 14a3.5 3.5 0 0 0 3.5 3.5h9.5a3.5 3.5 0 0 0 0-7z" fill="#f1f5f9"></path><path d="M8 19v2m-1-1h2m5-1v2m-1-1h2" stroke="#38bdf8" stroke-width="1.35"></path></svg>`;
   }
   if (type === 'thunder') {
-    return `<svg class="pulse-weather-svg pulse-wsvg-thunder" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 13a3.5 3.5 0 0 0-3.5-3.5 3.8 3.8 0 0 0-1.1.16A4.5 4.5 0 0 0 6 13.5a3.5 3.5 0 0 0 3.5 3.5h9.5a3.5 3.5 0 0 0 0-7z" fill="#cbd5e1"></path><path d="M13 14l-2.5 3.5h2.5l-1 3" stroke="#eab308" stroke-width="2" fill="#fef08a"></path></svg>`;
+    return `<svg class="pulse-weather-svg pulse-wsvg-thunder" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 13a3.5 3.5 0 0 0-3.5-3.5 3.8 3.8 0 0 0-1.1.16A4.5 4.5 0 0 0 6 13.5a3.5 3.5 0 0 0 3.5 3.5h9.5a3.5 3.5 0 0 0 0-7z" fill="#e2e8f0"></path><path d="M13 14l-2.5 3.5h2.5l-1 3" stroke="#eab308" stroke-width="1.35" fill="#fef08a"></path></svg>`;
   }
-  return `<svg class="pulse-weather-svg pulse-wsvg-cloud" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14.5a3.5 3.5 0 0 0-3.5-3.5 3.8 3.8 0 0 0-1.1.16A4.5 4.5 0 0 0 6 15a3.5 3.5 0 0 0 3.5 3.5h9.5a3.5 3.5 0 0 0 0-7z" fill="#e2e8f0" stroke="#64748b"></path></svg>`;
+  return `<svg class="pulse-weather-svg pulse-wsvg-cloud" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14.5a3.5 3.5 0 0 0-3.5-3.5 3.8 3.8 0 0 0-1.1.16A4.5 4.5 0 0 0 6 15a3.5 3.5 0 0 0 3.5 3.5h9.5a3.5 3.5 0 0 0 0-7z" fill="#f1f5f9" stroke="#94a3b8"></path></svg>`;
 }
 
 function getWindDirectionInfo(degrees) {
@@ -9971,25 +9971,313 @@ function getMoonPhaseInfo(date = new Date()) {
 }
 
 // ==========================================================================
-// БАЗА КЛІМАТИЧНИХ РЕКОРДІВ УКРАЇНИ ЗА ОСТАННІ 130 РОКІВ (З 1881 РОКУ)
+// БАЗА КЛІМАТИЧНИХ РЕКОРДІВ OPEN-METEO ERA5 (1940 - ПОТОЧНИЙ РІК)
 // ==========================================================================
-function getHistoricalClimateRecord(month, day) {
+const PULSE_WEATHER_HIST_TTL_MS = 30 * 24 * 60 * 60 * 1000; // 30 днів
+const pulseWeatherHistMemory = new Map();
+const pulseWeatherHistInFlight = new Map();
+const pulseWeatherHistCooldownUntil = new Map();
+
+function getWeatherHistCoordKey(city) {
+  const lat = city && typeof city.lat === 'number' ? city.lat : 48.8025;
+  const lon = city && typeof city.lon === 'number' ? city.lon : 31.6447;
+  return `${(Math.round(lat * 10000) / 10000).toFixed(4)}_${(Math.round(lon * 10000) / 10000).toFixed(4)}`;
+}
+
+function getFallbackHistoricalClimateRecord(month, day) {
   const dayOfYear = month * 30 + day;
   const seed = (month * 31 + day * 7) % 100;
-
-  // Сезонна синусоїда абсолютних температурних рекордів в Україні
   const seasonalMax = 23 + Math.sin((dayOfYear - 105) * 2 * Math.PI / 365) * 16;
   const seasonalMin = -8 + Math.sin((dayOfYear - 105) * 2 * Math.PI / 365) * 19;
-
   const maxYearList = [2010, 2019, 1926, 2013, 2002, 1996, 2020, 2024, 1968];
   const minYearList = [1956, 1979, 1988, 1965, 1999, 1912, 1947, 1987, 2006];
+  return {
+    maxT: Math.round(seasonalMax + (seed % 5) - 2),
+    maxYear: maxYearList[(dayOfYear + seed) % maxYearList.length],
+    minT: Math.round(seasonalMin - (seed % 6) + 1),
+    minYear: minYearList[(dayOfYear * 3 + seed) % minYearList.length],
+    isEstimate: true
+  };
+}
 
-  const maxT = Math.round(seasonalMax + (seed % 5) - 2);
-  const minT = Math.round(seasonalMin - (seed % 6) + 1);
-  const maxYear = maxYearList[(dayOfYear + seed) % maxYearList.length];
-  const minYear = minYearList[(dayOfYear * 3 + seed) % minYearList.length];
+function getCachedHistoricalClimateDataset(city) {
+  const key = getWeatherHistCoordKey(city);
+  const mem = pulseWeatherHistMemory.get(key);
+  if (mem && mem.days && (Date.now() - (mem.updatedAt || 0) < PULSE_WEATHER_HIST_TTL_MS)) {
+    return mem;
+  }
+  try {
+    const raw = localStorage.getItem(`pulse_weather_hist_v1_${key}`);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (parsed && parsed.days && (Date.now() - (parsed.updatedAt || 0) < PULSE_WEATHER_HIST_TTL_MS)) {
+        pulseWeatherHistMemory.set(key, parsed);
+        return parsed;
+      }
+    }
+  } catch (e) {}
+  return null;
+}
 
-  return { maxT, maxYear, minT, minYear };
+function saveHistoricalClimateDataset(city, dataset) {
+  const key = getWeatherHistCoordKey(city);
+  pulseWeatherHistMemory.set(key, dataset);
+  try {
+    localStorage.setItem(`pulse_weather_hist_v1_${key}`, JSON.stringify(dataset));
+  } catch (e) {}
+}
+
+function getHistoricalClimateRecord(month, day, city) {
+  const mm = String(month + 1).padStart(2, '0');
+  const dd = String(day).padStart(2, '0');
+  const mmdd = `${mm}-${dd}`;
+  const dataset = getCachedHistoricalClimateDataset(city);
+
+  if (dataset && dataset.days && Array.isArray(dataset.days[mmdd])) {
+    const [rawMax, maxYear, rawMin, minYear] = dataset.days[mmdd];
+    if (typeof rawMax === 'number' && typeof rawMin === 'number') {
+      return {
+        maxT: Math.round(rawMax),
+        maxRaw: rawMax,
+        maxYear,
+        minT: Math.round(rawMin),
+        minRaw: rawMin,
+        minYear,
+        startYear: dataset.startYear || 1940,
+        endYear: dataset.endYear || new Date().getFullYear(),
+        isRealArchive: true
+      };
+    }
+  }
+
+  return null;
+}
+
+async function fetchOpenMeteoArchiveDirect(city) {
+  const lat = Math.round((city && typeof city.lat === 'number' ? city.lat : 48.8025) * 10000) / 10000;
+  const lon = Math.round((city && typeof city.lon === 'number' ? city.lon : 31.6447) * 10000) / 10000;
+  const endDate = new Date(Date.now() - 6 * 86400000).toISOString().slice(0, 10);
+  const endYear = parseInt(endDate.slice(0, 4), 10) || new Date().getFullYear();
+  const ranges = [
+    ['1940-01-01', '1962-12-31'],
+    ['1963-01-01', '1984-12-31'],
+    ['1985-01-01', '2006-12-31'],
+    ['2007-01-01', endDate]
+  ];
+
+  const responses = await Promise.all(
+    ranges.map(async ([start, end]) => {
+      const url = `https://archive-api.open-meteo.com/v1/archive?latitude=${lat}&longitude=${lon}&start_date=${start}&end_date=${end}&daily=temperature_2m_max,temperature_2m_min&timezone=auto`;
+      const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+      const timer = controller ? setTimeout(() => controller.abort(), 16000) : null;
+      try {
+        const resp = await fetch(url, controller ? { signal: controller.signal } : {});
+        const json = await resp.json();
+        if (resp.status === 429 || (json && json.error && /limit/i.test(json.reason || ''))) {
+          const err = new Error(json.reason || 'Rate limit exceeded');
+          err.isRateLimit = true;
+          throw err;
+        }
+        if (!resp.ok || !json || json.error || !json.daily || !Array.isArray(json.daily.time)) {
+          throw new Error((json && json.reason) || `HTTP ${resp.status}`);
+        }
+        return json.daily;
+      } finally {
+        if (timer) clearTimeout(timer);
+      }
+    })
+  );
+
+  const days = {};
+  for (const daily of responses) {
+    const times = daily.time;
+    const maxArr = daily.temperature_2m_max || [];
+    const minArr = daily.temperature_2m_min || [];
+    for (let i = 0; i < times.length; i++) {
+      const dateStr = times[i];
+      if (!dateStr || dateStr.length < 10) continue;
+      const year = parseInt(dateStr.slice(0, 4), 10);
+      const mmdd = dateStr.slice(5, 10);
+      const mx = maxArr[i];
+      const mn = minArr[i];
+      let entry = days[mmdd];
+      if (!entry) {
+        entry = [null, null, null, null];
+        days[mmdd] = entry;
+      }
+      if (typeof mx === 'number' && !Number.isNaN(mx)) {
+        if (entry[0] === null || mx > entry[0]) {
+          entry[0] = Math.round(mx * 10) / 10;
+          entry[1] = year;
+        }
+      }
+      if (typeof mn === 'number' && !Number.isNaN(mn)) {
+        if (entry[2] === null || mn < entry[2]) {
+          entry[2] = Math.round(mn * 10) / 10;
+          entry[3] = year;
+        }
+      }
+    }
+  }
+
+  return {
+    updatedAt: Date.now(),
+    startYear: 1940,
+    endYear,
+    source: 'Open-Meteo ERA5',
+    days
+  };
+}
+
+function buildPulseWeatherHistoryView(city, histMonth, histDay, histDateLabelFull) {
+  const hist = getHistoricalClimateRecord(histMonth, histDay, city);
+  const cityName = (city && city.name) ? city.name : 'обраного міста';
+
+  if (hist && hist.isRealArchive) {
+    const yearsSpan = Math.max(1, (hist.endYear || new Date().getFullYear()) - (hist.startYear || 1940));
+    const maxRawFmt = `${hist.maxRaw > 0 ? '+' : ''}${String(hist.maxRaw).replace('.', ',')}°C`;
+    const minRawFmt = `${hist.minRaw > 0 ? '+' : ''}${String(hist.minRaw).replace('.', ',')}°C`;
+    const title = `Реальні кліматичні рекорди Open-Meteo ERA5 (1940-${hist.endYear} рр., ${yearsSpan} років) для ${cityName} на ${histDateLabelFull}: макс. ${maxRawFmt} (${hist.maxYear}), мін. ${minRawFmt} (${hist.minYear})`;
+    const html = `
+      <span class="pulse-w2-hist-date">${histDateLabelFull}:</span>
+      <span class="pulse-w2-hist-item max">МАКС: <strong>${hist.maxT > 0 ? '+' : ''}${hist.maxT}°C</strong> <span class="pulse-w2-hist-year">(${hist.maxYear})</span></span>
+      <span class="pulse-w2-hist-sep">•</span>
+      <span class="pulse-w2-hist-item min">МІН: <strong>${hist.minT > 0 ? '+' : ''}${hist.minT}°C</strong> <span class="pulse-w2-hist-year">(${hist.minYear})</span></span>
+    `;
+    return { title, html, needsFetch: false };
+  }
+
+  const key = getWeatherHistCoordKey(city);
+  const cooldownUntil = pulseWeatherHistCooldownUntil.get(key) || 0;
+  if (Date.now() < cooldownUntil) {
+    const est = getFallbackHistoricalClimateRecord(histMonth, histDay);
+    return {
+      title: `Орієнтовна кліматична оцінка для ${cityName} (архів Open-Meteo тимчасово обмежено за частотою запитів, автооновлення за хвилину)`,
+      html: `
+        <span class="pulse-w2-hist-date">${histDateLabelFull}:</span>
+        <span class="pulse-w2-hist-item max">МАКС: <strong>${est.maxT > 0 ? '+' : ''}${est.maxT}°C</strong> <span class="pulse-w2-hist-year">(~)</span></span>
+        <span class="pulse-w2-hist-sep">•</span>
+        <span class="pulse-w2-hist-item min">МІН: <strong>${est.minT > 0 ? '+' : ''}${est.minT}°C</strong> <span class="pulse-w2-hist-year">(~)</span></span>
+      `,
+      needsFetch: false
+    };
+  }
+
+  return {
+    title: `Завантаження реальних кліматичних рекордів Open-Meteo (ERA5, з 1940 р.) для ${cityName}...`,
+    html: `
+      <span class="pulse-w2-hist-date">${histDateLabelFull}:</span>
+      <span class="pulse-w2-hist-loading"><i class="fas fa-spinner fa-spin"></i> архів спостережень з 1940 р....</span>
+    `,
+    needsFetch: true
+  };
+}
+
+function updatePulseWeatherHistoryDom() {
+  const box = document.getElementById('pulseWeatherHistoryBox');
+  if (!box || !window.pulseWeatherState) return;
+  const city = window.pulseWeatherState.city;
+  const data = window.pulseWeatherState.data;
+  const activeTab = (typeof window.pulseWeatherState.activeTab === 'number') ? window.pulseWeatherState.activeTab : 0;
+  const daily = (data && data.daily) ? data.daily : {};
+
+  const now = new Date();
+  let histDay = now.getDate();
+  let histMonth = now.getMonth();
+  if (daily.time && daily.time[activeTab]) {
+    const parts = daily.time[activeTab].split('-');
+    if (parts.length === 3) {
+      histDay = parseInt(parts[2], 10);
+      histMonth = parseInt(parts[1], 10) - 1;
+    }
+  }
+  const monthsUkGenitive = [
+    'січня', 'лютого', 'березня', 'квітня', 'травня', 'червня',
+    'липня', 'серпня', 'вересня', 'жовтня', 'листопада', 'грудня'
+  ];
+  const histDateLabelFull = `${histDay} ${monthsUkGenitive[histMonth]}`;
+  const view = buildPulseWeatherHistoryView(city, histMonth, histDay, histDateLabelFull);
+  box.title = view.title;
+  box.innerHTML = view.html;
+}
+
+async function ensurePulseWeatherHistory(city) {
+  if (!city) return;
+  if (getCachedHistoricalClimateDataset(city)) return;
+
+  const key = getWeatherHistCoordKey(city);
+  const cooldownUntil = pulseWeatherHistCooldownUntil.get(key) || 0;
+  if (Date.now() < cooldownUntil) return;
+
+  if (pulseWeatherHistInFlight.has(key)) {
+    return pulseWeatherHistInFlight.get(key);
+  }
+
+  const task = (async () => {
+    let dataset = null;
+    let rateLimited = false;
+
+    // 1. Спочатку пробуємо серверний кеш-проксі /api/weather-history (2 мс, без повторних запитів до API)
+    try {
+      const apiUrl = `/api/weather-history?lat=${encodeURIComponent(city.lat)}&lon=${encodeURIComponent(city.lon)}`;
+      const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+      const timer = controller ? setTimeout(() => controller.abort(), 16000) : null;
+      const resp = await fetch(apiUrl, controller ? { signal: controller.signal } : {});
+      if (timer) clearTimeout(timer);
+      if (resp.ok) {
+        const json = await resp.json();
+        if (json && json.days) {
+          dataset = {
+            updatedAt: json.updatedAt || Date.now(),
+            startYear: json.startYear || 1940,
+            endYear: json.endYear || new Date().getFullYear(),
+            source: json.source || 'Open-Meteo ERA5',
+            days: json.days
+          };
+        }
+      } else if (resp.status === 429) {
+        rateLimited = true;
+      }
+    } catch (e) {
+      // /api/weather-history недоступний на статичному хостингу — переходимо до прямого запиту
+    }
+
+    // 2. Прямий запит у браузері до Open-Meteo Archive API (якщо серверний роут недоступний)
+    if (!dataset && !rateLimited) {
+      try {
+        dataset = await fetchOpenMeteoArchiveDirect(city);
+      } catch (err) {
+        if (err && err.isRateLimit) {
+          rateLimited = true;
+        }
+      }
+    }
+
+    if (dataset && dataset.days) {
+      saveHistoricalClimateDataset(city, dataset);
+      pulseWeatherHistCooldownUntil.delete(key);
+    } else if (rateLimited) {
+      pulseWeatherHistCooldownUntil.set(key, Date.now() + 62000);
+      setTimeout(() => {
+        const activeCity = window.pulseWeatherState && window.pulseWeatherState.city;
+        if (activeCity && getWeatherHistCoordKey(activeCity) === key && !getCachedHistoricalClimateDataset(activeCity)) {
+          ensurePulseWeatherHistory(activeCity);
+        }
+      }, 63000);
+    } else {
+      pulseWeatherHistCooldownUntil.set(key, Date.now() + 30000);
+    }
+
+    const activeCity = window.pulseWeatherState && window.pulseWeatherState.city;
+    if (activeCity && getWeatherHistCoordKey(activeCity) === key) {
+      updatePulseWeatherHistoryDom();
+    }
+  })().finally(() => {
+    pulseWeatherHistInFlight.delete(key);
+  });
+
+  pulseWeatherHistInFlight.set(key, task);
+  return task;
 }
 
 // ==========================================================================
@@ -10446,7 +10734,7 @@ function renderPulseWeatherUI(data, city, updatedTime = '') {
     `;
   }
 
-  // 5. Історичні кліматичні рекорди (за останні 130 років спостережень)
+  // 5. Історичні кліматичні рекорди (реальний архів Open-Meteo ERA5 з 1940 р.)
   let histDay = now.getDate();
   let histMonth = now.getMonth();
   if (daily.time && daily.time[activeTab]) {
@@ -10461,21 +10749,11 @@ function renderPulseWeatherUI(data, city, updatedTime = '') {
     'липня', 'серпня', 'вересня', 'жовтня', 'листопада', 'грудня'
   ];
   const histDateLabelFull = `${histDay} ${monthsUkGenitive[histMonth]}`;
-  const hist = getHistoricalClimateRecord(histMonth, histDay);
+  const histView = buildPulseWeatherHistoryView(city, histMonth, histDay, histDateLabelFull);
 
   container.innerHTML = `
-    <!-- 1. Верхня панель: перемикачі Sinoptik + компактний вертикальний ротатор інфо-рядка (Світловий день / Стан неба / Дорожня порада) -->
+    <!-- 1. Верхня панель: компактний вертикальний ротатор інфо-рядка (Світловий день / Стан неба / Дорожня порада) + перемикачі Sinoptik -->
     <div class="pulse-w2-top-panel">
-      <div class="pulse-w2-tabs">
-        ${tabsHtml}
-      </div>
-      <div class="pulse-w2-rot-divider">
-        <div class="pulse-w2-rot-dots-center" id="pulseWeatherRotDots" title="Індикатор активного слайда (натисніть для переходу)">
-          <span class="pulse-w2-rot-dot active" data-idx="0" onclick="window.setPulseWeatherSlide(0); event.stopPropagation();" title="Світловий день (схід / захід)"></span>
-          <span class="pulse-w2-rot-dot" data-idx="1" onclick="window.setPulseWeatherSlide(1); event.stopPropagation();" title="Стан погоди на добу"></span>
-          <span class="pulse-w2-rot-dot" data-idx="2" onclick="window.setPulseWeatherSlide(2); event.stopPropagation();" title="Порада водіям та пішоходам"></span>
-        </div>
-      </div>
       <div class="pulse-w2-rotator-bar" id="pulseWeatherRotatorBar" onclick="window.rotatePulseWeatherInfo(1)" title="Натисніть для перегортання (автоповорот кожні 7 секунд)">
         <div class="pulse-w2-rot-viewport">
           <div class="pulse-w2-rot-track" id="pulseWeatherRotTrack">
@@ -10497,6 +10775,16 @@ function renderPulseWeatherUI(data, city, updatedTime = '') {
             </div>
           </div>
         </div>
+      </div>
+      <div class="pulse-w2-rot-divider">
+        <div class="pulse-w2-rot-dots-center" id="pulseWeatherRotDots" title="Індикатор активного слайда (натисніть для переходу)">
+          <span class="pulse-w2-rot-dot active" data-idx="0" onclick="window.setPulseWeatherSlide(0); event.stopPropagation();" title="Світловий день (схід / захід)"></span>
+          <span class="pulse-w2-rot-dot" data-idx="1" onclick="window.setPulseWeatherSlide(1); event.stopPropagation();" title="Стан погоди на добу"></span>
+          <span class="pulse-w2-rot-dot" data-idx="2" onclick="window.setPulseWeatherSlide(2); event.stopPropagation();" title="Порада водіям та пішоходам"></span>
+        </div>
+      </div>
+      <div class="pulse-w2-tabs">
+        ${tabsHtml}
       </div>
     </div>
 
@@ -10562,12 +10850,9 @@ function renderPulseWeatherUI(data, city, updatedTime = '') {
         </div>
       </div>
 
-      <!-- Історичні кліматичні рекорди за 130 років спостережень (в один чистий рядок) -->
-      <div class="pulse-w2-history-box" title="Кліматичні температурні рекорди за останні 130 років спостережень (з 1881 р.) для обраної дати">
-        <span class="pulse-w2-hist-date">${histDateLabelFull}:</span>
-        <span class="pulse-w2-hist-item max">МАКС: <strong>${hist.maxT > 0 ? '+' : ''}${hist.maxT}°C</strong> <span class="pulse-w2-hist-year">(${hist.maxYear})</span></span>
-        <span class="pulse-w2-hist-sep">•</span>
-        <span class="pulse-w2-hist-item min">МІН: <strong>${hist.minT > 0 ? '+' : ''}${hist.minT}°C</strong> <span class="pulse-w2-hist-year">(${hist.minYear})</span></span>
+      <!-- Історичні кліматичні рекорди за даними Open-Meteo ERA5 з 1940 р. (в один чистий рядок) -->
+      <div class="pulse-w2-history-box" id="pulseWeatherHistoryBox" title="${histView.title}">
+        ${histView.html}
       </div>
     </div>
 
@@ -10581,6 +10866,10 @@ function renderPulseWeatherUI(data, city, updatedTime = '') {
       </span>
     </div>
   `;
+
+  if (histView.needsFetch) {
+    ensurePulseWeatherHistory(city);
+  }
 
   if (typeof window.initPulseWeatherRotator === 'function') {
     window.initPulseWeatherRotator();
@@ -11578,12 +11867,12 @@ function renderPulseDrawerLayout(container) {
             </div>
           </div>
 
-          <div class="pulse-eco-footer" style="margin-bottom: 2px;">
+          <div class="pulse-eco-footer">
             <span class="pulse-eco-footer-text" title="Дані з відкритих датчиків SaveEcoBot, EcoCity та супутників моніторингу">
-              <i class="fas fa-broadcast-tower text-success" style="margin-right: 1px;"></i>SaveEcoBot / EcoCity
+              <i class="fas fa-broadcast-tower text-success"></i> SaveEcoBot / EcoCity
             </span>
             <a href="https://www.saveecobot.com/" target="_blank" rel="noopener" class="pulse-eco-link" title="Відкрити мапу радіаційного фону та якості повітря на SaveEcoBot">
-              Мапа датчиків <i class="fas fa-external-link-alt ms-1"></i>
+              Мапа датчиків <i class="fas fa-external-link-alt"></i>
             </a>
           </div>
         </div>
@@ -11726,7 +12015,8 @@ function renderPulseDrawerLayout(container) {
 
           <div class="pulse-finance-footer">
             <span class="pulse-finance-footer-note" title="Офіційний курс НБУ та середньозважені міжбанківські котирування">
-              <i class="fas fa-university text-primary" style="margin-right: 3px;"></i>Курс НБУ / Міжбанк • <span id="pulseFinanceDateNote">Оновлення щодня</span>
+              <i class="fas fa-university text-primary"></i>
+              <span>Курс НБУ / Міжбанк • <span id="pulseFinanceDateNote">Оновлення щодня</span></span>
             </span>
           </div>
         </div>
@@ -11795,7 +12085,9 @@ function renderPulseDrawerLayout(container) {
           <div class="pulse-conv-quick-row">
             <span class="pulse-conv-quick-lbl">Швидкі суми:</span>
             <div class="pulse-conv-quick-buttons">
+              <button type="button" class="pulse-conv-quick-btn" data-amount="25">25</button>
               <button type="button" class="pulse-conv-quick-btn" data-amount="50">50</button>
+              <button type="button" class="pulse-conv-quick-btn" data-amount="75">75</button>
               <button type="button" class="pulse-conv-quick-btn" data-amount="100">100</button>
               <button type="button" class="pulse-conv-quick-btn" data-amount="500">500</button>
               <button type="button" class="pulse-conv-quick-btn" data-amount="1000">1 000</button>
@@ -11844,11 +12136,11 @@ function renderPulseDrawerLayout(container) {
           </div>
 
           <div class="pulse-fuel-bottom">
-            <span class="text-muted" style="font-size: 0.67rem;" title="Ціни оновлюються автоматично щодня о 08:10 за київським часом">
-              <i class="fas fa-clock text-info me-2"></i> Оновлення щодня о 08:10 • грн/л
+            <span class="pulse-fuel-footer-note" title="Ціни оновлюються автоматично щодня о 08:10 за київським часом">
+              <i class="fas fa-clock text-info"></i> Оновлення щодня о 08:10 • грн/л
             </span>
             <a href="https://minfin.com.ua/ua/fuel/" target="_blank" rel="noopener" class="pulse-fuel-link" title="Моніторинг цін на пальне на Мінфін">
-              Мінфін АЗС <i class="fas fa-external-link-alt ms-1"></i>
+              Мінфін АЗС <i class="fas fa-external-link-alt"></i>
             </a>
           </div>
         </div>
@@ -11901,10 +12193,10 @@ function renderPulseDrawerLayout(container) {
 
           <div class="pulse-news-footer">
             <span class="pulse-news-footer-source" title="Провідні інформаційні агенції України">
-              <i class="fas fa-rss text-danger me-1"></i>УП • ТСН • BBC • Еспресо • Суспільне
+              <i class="fas fa-rss text-danger"></i> УП • ТСН • BBC • Еспресо • Суспільне
             </span>
             <a href="./news.html" class="pulse-fuel-link" title="Перейти до повного каталогу українських та світових новин">
-              Всі ЗМІ <i class="fas fa-arrow-right ms-1"></i>
+              Всі ЗМІ <i class="fas fa-arrow-right"></i>
             </a>
           </div>
         </div>

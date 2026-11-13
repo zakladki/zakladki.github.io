@@ -247,6 +247,159 @@ app.get('/api/fuel-prices', (req, res) => {
   });
 });
 
+// Historical weather extremes API (Open-Meteo ERA5 archive 1940-present with persistent JSON cache)
+const WEATHER_HIST_CACHE_FILE = path.join(__dirname, 'data', 'weather-history-cache.json');
+const WEATHER_HIST_TTL_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
+let weatherHistMemoryCache = null;
+const weatherHistInFlight = new Map();
+
+function loadWeatherHistCache() {
+  if (weatherHistMemoryCache) return weatherHistMemoryCache;
+  try {
+    if (fs.existsSync(WEATHER_HIST_CACHE_FILE)) {
+      const raw = fs.readFileSync(WEATHER_HIST_CACHE_FILE, 'utf8');
+      const parsed = JSON.parse(raw);
+      if (parsed && typeof parsed === 'object') {
+        weatherHistMemoryCache = parsed;
+        return weatherHistMemoryCache;
+      }
+    }
+  } catch (e) {}
+  weatherHistMemoryCache = {};
+  return weatherHistMemoryCache;
+}
+
+function saveWeatherHistCache(cacheObj) {
+  try {
+    const dir = path.dirname(WEATHER_HIST_CACHE_FILE);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+    fs.writeFileSync(WEATHER_HIST_CACHE_FILE, JSON.stringify(cacheObj), 'utf8');
+  } catch (e) {
+    console.warn('Unable to persist weather history cache:', e.message);
+  }
+}
+
+async function fetchOpenMeteoHistoricalSummary(lat, lon) {
+  const endDate = new Date(Date.now() - 6 * 86400000).toISOString().slice(0, 10);
+  const endYear = parseInt(endDate.slice(0, 4), 10) || new Date().getFullYear();
+  const ranges = [
+    ['1940-01-01', '1962-12-31'],
+    ['1963-01-01', '1984-12-31'],
+    ['1985-01-01', '2006-12-31'],
+    ['2007-01-01', endDate]
+  ];
+
+  const responses = await Promise.all(
+    ranges.map(async ([start, end]) => {
+      const url = `https://archive-api.open-meteo.com/v1/archive?latitude=${lat}&longitude=${lon}&start_date=${start}&end_date=${end}&daily=temperature_2m_max,temperature_2m_min&timezone=auto`;
+      const resp = await fetch(url, { signal: AbortSignal.timeout(15000) });
+      const json = await resp.json();
+      if (resp.status === 429 || (json && json.error && /limit/i.test(json.reason || ''))) {
+        const err = new Error(json.reason || 'Open-Meteo rate limit exceeded');
+        err.statusCode = 429;
+        throw err;
+      }
+      if (!resp.ok || !json || json.error || !json.daily || !Array.isArray(json.daily.time)) {
+        const err = new Error((json && json.reason) || `Open-Meteo HTTP ${resp.status}`);
+        err.statusCode = resp.status || 502;
+        throw err;
+      }
+      return json.daily;
+    })
+  );
+
+  const days = {};
+  for (const daily of responses) {
+    const times = daily.time;
+    const maxArr = daily.temperature_2m_max || [];
+    const minArr = daily.temperature_2m_min || [];
+    for (let i = 0; i < times.length; i++) {
+      const dateStr = times[i];
+      if (!dateStr || dateStr.length < 10) continue;
+      const year = parseInt(dateStr.slice(0, 4), 10);
+      const mmdd = dateStr.slice(5, 10);
+      const mx = maxArr[i];
+      const mn = minArr[i];
+      let entry = days[mmdd];
+      if (!entry) {
+        entry = [null, null, null, null]; // [maxT, maxYear, minT, minYear]
+        days[mmdd] = entry;
+      }
+      if (typeof mx === 'number' && !Number.isNaN(mx)) {
+        if (entry[0] === null || mx > entry[0]) {
+          entry[0] = Math.round(mx * 10) / 10;
+          entry[1] = year;
+        }
+      }
+      if (typeof mn === 'number' && !Number.isNaN(mn)) {
+        if (entry[2] === null || mn < entry[2]) {
+          entry[2] = Math.round(mn * 10) / 10;
+          entry[3] = year;
+        }
+      }
+    }
+  }
+
+  return {
+    updatedAt: Date.now(),
+    startYear: 1940,
+    endYear,
+    source: 'Open-Meteo ERA5',
+    days
+  };
+}
+
+app.get('/api/weather-history', async (req, res) => {
+  const lat = parseFloat(req.query.lat);
+  const lon = parseFloat(req.query.lon);
+  if (Number.isNaN(lat) || Number.isNaN(lon)) {
+    return res.status(400).json({ error: 'Invalid lat/lon coordinates' });
+  }
+
+  const latRounded = Math.round(lat * 10000) / 10000;
+  const lonRounded = Math.round(lon * 10000) / 10000;
+  const key = `${latRounded.toFixed(4)}_${lonRounded.toFixed(4)}`;
+  const cache = loadWeatherHistCache();
+  const cached = cache[key];
+
+  if (cached && cached.days && (Date.now() - (cached.updatedAt || 0) < WEATHER_HIST_TTL_MS)) {
+    res.setHeader('Cache-Control', 'public, max-age=86400');
+    return res.json({ status: 'ok', cached: true, key, ...cached });
+  }
+
+  try {
+    let promise = weatherHistInFlight.get(key);
+    if (!promise) {
+      promise = fetchOpenMeteoHistoricalSummary(latRounded, lonRounded)
+        .then((summary) => {
+          cache[key] = summary;
+          saveWeatherHistCache(cache);
+          return summary;
+        })
+        .finally(() => {
+          weatherHistInFlight.delete(key);
+        });
+      weatherHistInFlight.set(key, promise);
+    }
+
+    const summary = await promise;
+    res.setHeader('Cache-Control', 'public, max-age=86400');
+    return res.json({ status: 'ok', cached: false, key, ...summary });
+  } catch (err) {
+    if (cached && cached.days) {
+      return res.json({ status: 'ok', cached: true, stale: true, key, ...cached });
+    }
+    const statusCode = err && err.statusCode === 429 ? 429 : 502;
+    return res.status(statusCode).json({
+      status: 'error',
+      rateLimited: statusCode === 429,
+      message: (err && err.message) || 'Failed to fetch historical archive'
+    });
+  }
+});
+
 // Radio stream proxy route to fix Mixed Content (HTTP stream on HTTPS site)
 app.get('/api/radio', (req, res) => {
   const streamUrl = 'http://82.207.23.148:8000/radio';
