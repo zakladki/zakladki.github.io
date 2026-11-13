@@ -963,6 +963,7 @@ document.addEventListener("DOMContentLoaded", () => {
   listItems.forEach(li => {
     const link = li.querySelector('a');
     if (link) {
+      li.querySelectorAll('a').forEach(a => decorateResourceBracketNotes(a));
       const description = link.getAttribute('title');
       if (description && description.trim() !== '') {
         // Запобігаємо появі стандартного спливаючого підказувача браузера
@@ -6367,6 +6368,57 @@ function escapeHtml(str) {
     .replace(/'/g, '&#039;');
 }
 
+function formatResourceTitleBracketsHtml(rawText) {
+  const safeText = escapeHtml(rawText || '');
+  return safeText.replace(/\[([^\]]+)\]/g, '<span class="resource-bracket-note">[$1]</span>');
+}
+
+function decorateResourceBracketNotes(rootEl) {
+  if (!rootEl || typeof document === 'undefined') return;
+  const walker = document.createTreeWalker(rootEl, NodeFilter.SHOW_TEXT, null);
+  const textNodes = [];
+  let node;
+  while ((node = walker.nextNode())) {
+    if (!node.nodeValue || node.nodeValue.indexOf('[') === -1) continue;
+    if (node.parentElement && node.parentElement.closest('.resource-bracket-note')) continue;
+    textNodes.push(node);
+  }
+
+  textNodes.forEach(textNode => {
+    const val = textNode.nodeValue;
+    const regex = /\[([^\]]+)\]/g;
+    let lastIndex = 0;
+    let match;
+    const frag = document.createDocumentFragment();
+    let hasMatches = false;
+
+    while ((match = regex.exec(val)) !== null) {
+      hasMatches = true;
+      if (match.index > lastIndex) {
+        frag.appendChild(document.createTextNode(val.slice(lastIndex, match.index)));
+      }
+      const span = document.createElement('span');
+      const afterText = val.slice(regex.lastIndex);
+      span.className = 'resource-bracket-note' + (/^\s*\S/.test(afterText) ? ' has-after' : '');
+      span.textContent = `[${match[1]}]`;
+      frag.appendChild(span);
+      lastIndex = regex.lastIndex;
+    }
+
+    if (hasMatches) {
+      if (lastIndex < val.length) {
+        frag.appendChild(document.createTextNode(val.slice(lastIndex)));
+      }
+      textNode.parentNode.replaceChild(frag, textNode);
+    }
+  });
+}
+
+if (typeof window !== 'undefined') {
+  window.formatResourceTitleBracketsHtml = formatResourceTitleBracketsHtml;
+  window.decorateResourceBracketNotes = decorateResourceBracketNotes;
+}
+
 function normalizeUrl(u) {
   if (!u) return '';
   try {
@@ -7006,7 +7058,7 @@ function openChooseCardForBookmarkModal(linkName, cleanUrl, description) {
       <div class="mb-2 d-flex align-items-center gap-2">
         <img src="${escapeHtml(getFaviconForUrl(cleanUrl))}" style="width: 22px; height: 22px; border-radius: 4px; object-fit: contain; flex-shrink: 0;" alt="" onerror="this.onerror=null;this.src='favicon.ico'">
         <div style="min-width: 0; flex: 1;">
-          <div class="font-weight-bold" style="font-size: 0.95rem;">${escapeHtml(linkName)}</div>
+          <div class="font-weight-bold" style="font-size: 0.95rem;">${formatResourceTitleBracketsHtml(linkName)}</div>
           <div class="small text-muted text-truncate" style="word-break: break-all;">${escapeHtml(cleanUrl)}</div>
         </div>
       </div>
@@ -7353,7 +7405,7 @@ function openAddBookmarkModal(defaultCard = '') {
           <div class="bm-catalog-item-result" data-idx="${idx}">
             <img src="${faviconUrl}" alt="" onerror="this.onerror=null;this.src='favicon.ico'">
             <div class="bm-catalog-item-text" style="min-width: 0; flex: 1;">
-              <div class="bm-catalog-item-name">${escapeHtml(m.name)}</div>
+              <div class="bm-catalog-item-name">${formatResourceTitleBracketsHtml(m.name)}</div>
               <div class="bm-catalog-item-domain">${escapeHtml(domain)}</div>
             </div>
             ${m.card ? `<span class="bm-catalog-item-card">${escapeHtml(m.card)}</span>` : ''}
@@ -7371,7 +7423,7 @@ function openAddBookmarkModal(defaultCard = '') {
             selectedCatalogItem = item;
             const faviconUrl = getFaviconForUrl(item.url);
             if (selFavicon) selFavicon.src = faviconUrl;
-            if (selName) selName.textContent = item.name;
+            if (selName) selName.innerHTML = formatResourceTitleBracketsHtml(item.name);
             if (selUrl) selUrl.textContent = item.url;
             if (selectedWrap) selectedWrap.style.display = 'block';
             dropdown.style.display = 'none';
@@ -8013,7 +8065,7 @@ async function renderBookmarksPage() {
               <li class="bm-link-row">
                 <img src="${faviconUrl}" class="bm-item-favicon" alt="" onerror="this.onerror=null;this.src='favicon.ico'">
                 <a href="${escapeHtml(bm.url)}" target="${(userProfileSettings && userProfileSettings.openInNewTab === false) ? '_self' : '_blank'}" rel="noopener noreferrer" class="bm-item-link" title="${escapeHtml(bm.name)}">
-                  ${escapeHtml(bm.name)}
+                  ${formatResourceTitleBracketsHtml(bm.name)}
                 </a>
                 <div class="bm-row-actions-wrap">
                   <div class="bm-row-actions-slider">

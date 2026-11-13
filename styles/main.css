@@ -507,6 +507,32 @@ body.dark-mode .group-title .group-add-btn {
   text-overflow: ellipsis;
 }
 
+/* Пояснення у квадратних дужках [ ... ] в назвах ресурсів: менший шрифт і приглушений сірий колір */
+.resource-bracket-note {
+  font-size: 0.78em;
+  font-weight: 400;
+  color: #64748b;
+  letter-spacing: 0;
+  transition: color 0.15s ease;
+}
+.group li a .resource-bracket-note {
+  margin-left: 0.28em;
+}
+.group li a .resource-bracket-note.has-after {
+  margin-right: 0.28em;
+}
+.group li a:hover .resource-bracket-note,
+.bm-item-link:hover .resource-bracket-note {
+  color: #475569;
+}
+body.dark-mode .resource-bracket-note {
+  color: #94a3b8;
+}
+body.dark-mode .group li a:hover .resource-bracket-note,
+body.dark-mode .bm-item-link:hover .resource-bracket-note {
+  color: #cbd5e1;
+}
+
 .group li .icontoo {
   width: 29px;
   height: 16px;
