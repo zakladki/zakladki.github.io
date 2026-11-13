@@ -9227,9 +9227,8 @@ function getEventsForDate(date) {
   const combined = [...relative, ...fixed];
 
   if (combined.length === 0) {
-    const daysShort = ['Нд', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
     return [
-      { title: `День стійкості, щоденної праці та єдності України (${daysShort[date.getDay()]})`, icon: '🇺🇦', cat: 'ua' }
+      { title: 'День стійкості, щоденної праці та єдності України', icon: '🇺🇦', cat: 'ua' }
     ];
   }
 
@@ -9835,6 +9834,9 @@ async function loadPulseWeatherData(forceRefresh = false) {
       const cached = JSON.parse(localStorage.getItem(cacheKey) || 'null');
       if (cached && (now - cached.timestamp < 30 * 60 * 1000) && cached.data && cached.data.daily && Array.isArray(cached.data.daily.precipitation_sum)) {
         renderPulseWeatherUI(cached.data, city, cached.updatedText);
+        if (typeof window.syncPulseHeaderUpdatedTime === 'function' && cached.updatedText) {
+          window.syncPulseHeaderUpdatedTime(cached.updatedText, cached.timestamp);
+        }
         if (refreshIcon) refreshIcon.classList.remove('fa-spin');
         return;
       }
@@ -9861,6 +9863,9 @@ async function loadPulseWeatherData(forceRefresh = false) {
     } catch (e) {}
 
     renderPulseWeatherUI(data, city, timeStr);
+    if (typeof window.syncPulseHeaderUpdatedTime === 'function') {
+      window.syncPulseHeaderUpdatedTime(timeStr, now);
+    }
   } catch (err) {
     console.warn('Помилка завантаження Open-Meteo:', err);
 
@@ -11258,6 +11263,9 @@ function renderPulseEcoUI(data, region) {
     const timeStr = `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
     ecoLiveBadge.textContent = timeStr;
     ecoLiveBadge.title = `SaveEcoBot / EcoCity • ${region.name || 'Новомиргород'} (Оновлено: ${timeStr})`;
+    if (typeof window.syncPulseHeaderUpdatedTime === 'function') {
+      window.syncPulseHeaderUpdatedTime(timeStr, d.getTime());
+    }
   }
 
   if (pm25El) pm25El.innerHTML = formatEcoDecimalNum(data.pm25);
@@ -12156,6 +12164,14 @@ function renderPulseDrawerLayout(container) {
           <div class="pulse-holidays-container" id="pulseHolidaysContainer">
             <!-- Заповнюється динамічно функцією renderPulseHolidaysUI -->
           </div>
+
+          <div class="pulse-holiday-footer">
+            <span class="pulse-holiday-footer-note" title="Державні, церковні, професійні та міжнародні пам'ятні дати">
+              <i class="fas fa-calendar-check text-info"></i>
+              <span>Календар подій України та світу</span>
+            </span>
+            <span class="pulse-holiday-footer-year">${new Date().getFullYear()} р.</span>
+          </div>
         </div>
       </div>
 
@@ -12172,7 +12188,7 @@ function renderPulseDrawerLayout(container) {
             </div>
           </div>
 
-          <!-- Вкладки категорій новин та кнопка-індикатор важливих новин (червоний кружечок) -->
+          <!-- Вкладки категорій новин та кнопка фільтра важливих новин -->
           <div class="pulse-news-tabs-wrap">
             <div class="pulse-rates-tab-group" id="pulseNewsTabGroup">
               <button type="button" class="pulse-rate-tab-btn active" data-tab="all">Всі</button>
@@ -12181,8 +12197,9 @@ function renderPulseDrawerLayout(container) {
               <button type="button" class="pulse-rate-tab-btn" data-tab="econ">Економіка</button>
               <button type="button" class="pulse-rate-tab-btn" data-tab="world">Світ</button>
             </div>
-            <button type="button" class="pulse-news-important-filter-btn" id="pulseNewsImportantBtn" title="Показати лише важливі новини (з червоною лінією)" aria-label="Лише важливі новини">
+            <button type="button" class="pulse-news-important-filter-btn" id="pulseNewsImportantBtn" title="Показати лише важливі новини (з червоною позначкою)" aria-label="Лише важливі новини">
               <span class="pulse-news-filter-red-dot"></span>
+              <span class="pulse-news-filter-lbl">Топ</span>
             </button>
           </div>
 
@@ -12683,6 +12700,17 @@ function renderPulseDrawerLayout(container) {
   loadPulseLiveNews(false);
 }
 
+function syncPulseHeaderUpdatedTime(timeStr, epochMs = Date.now(), force = false) {
+  if (!timeStr) return;
+  if (!force && window._pulseLatestUpdateEpoch && epochMs < window._pulseLatestUpdateEpoch) {
+    return;
+  }
+  window._pulseLatestUpdateEpoch = epochMs;
+  const label = document.getElementById('pulseLastUpdatedLabel');
+  if (label) label.textContent = `Оновлено: ${timeStr}`;
+}
+window.syncPulseHeaderUpdatedTime = syncPulseHeaderUpdatedTime;
+
 async function loadPulseDrawerData(forceRefresh = false) {
   const spin = document.getElementById('pulseRefreshSpin');
   if (spin) spin.classList.add('fa-spin');
@@ -12708,8 +12736,7 @@ async function loadPulseDrawerData(forceRefresh = false) {
       renderGeomagForecastUI(cached.geomagForecast);
     }
     if (cached.lastUpdatedText) {
-      const label = document.getElementById('pulseLastUpdatedLabel');
-      if (label) label.textContent = `Оновлено: ${cached.lastUpdatedText}`;
+      syncPulseHeaderUpdatedTime(cached.lastUpdatedText, cached.timestamp || 0);
     }
     loadPulseWeatherData(false);
     fetchLiveFuelPrices();
@@ -12747,8 +12774,7 @@ async function loadPulseDrawerData(forceRefresh = false) {
     }
 
     const timeStr = new Date().toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' });
-    const label = document.getElementById('pulseLastUpdatedLabel');
-    if (label) label.textContent = `Оновлено: ${timeStr}`;
+    syncPulseHeaderUpdatedTime(timeStr, now, true);
 
     loadPulseWeatherData(forceRefresh);
     fetchLiveFuelPrices();
