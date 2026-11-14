@@ -14087,7 +14087,7 @@ body.dark-mode .pulse-finance-footer {
 .pulse-w2-top-panel {
   display: flex;
   flex-direction: column;
-  background: var(--bg-subtle, rgba(241, 245, 249, 0.75));
+  background: #edf2f7;
   border: 1px solid var(--border-color, #e2e8f0);
   border-top-left-radius: 9px;
   border-top-right-radius: 9px;
@@ -14098,7 +14098,7 @@ body.dark-mode .pulse-finance-footer {
   margin-bottom: 0;
 }
 body.dark-mode .pulse-w2-top-panel {
-  background: rgba(15, 23, 42, 0.6);
+  background: rgba(15, 23, 42, 0.72);
   border-color: #334155;
 }
 
@@ -14163,16 +14163,16 @@ body.dark-mode .pulse-w2-tab:has(.pulse-w2-flask-wrap:hover) {
   z-index: 50 !important;
 }
 
-/* Активна вкладка: без верхньої та нижньої границь, виключно бічні роздільні напрямні */
+/* Активна вкладка (Варіант 1): усі 3 дні 100% читабельні, а обраний день виділяється верхнім акцентом і м'якою небесною підсвіткою */
 .pulse-w2-tab.active {
-  background: var(--card-bg, #ffffff);
+  background: linear-gradient(180deg, rgba(14, 165, 233, 0.12) 0%, #ffffff 68%);
   border-top: none !important;
   border-bottom: none !important;
-  border-left: 1px solid rgba(14, 165, 233, 0.45) !important;
-  border-right: 1px solid rgba(14, 165, 233, 0.45) !important;
+  border-left: 1px solid rgba(14, 165, 233, 0.5) !important;
+  border-right: 1px solid rgba(14, 165, 233, 0.5) !important;
   border-radius: 0 !important;
   color: var(--text-main, #0f172a);
-  box-shadow: none !important;
+  box-shadow: inset 0 2.5px 0 #0284c7 !important;
   z-index: 2;
 }
 .pulse-w2-tab:first-child.active {
@@ -14191,13 +14191,13 @@ body.dark-mode .pulse-w2-tab:has(.pulse-w2-flask-wrap:hover) {
   z-index: 50 !important;
 }
 body.dark-mode .pulse-w2-tab.active {
-  background: #1e293b;
+  background: linear-gradient(180deg, rgba(56, 189, 248, 0.16) 0%, #1e293b 72%);
   border-top: none !important;
   border-bottom: none !important;
-  border-left-color: rgba(56, 189, 248, 0.45) !important;
-  border-right-color: rgba(56, 189, 248, 0.45) !important;
+  border-left-color: rgba(56, 189, 248, 0.55) !important;
+  border-right-color: rgba(56, 189, 248, 0.55) !important;
   color: #f8fafc;
-  box-shadow: none !important;
+  box-shadow: inset 0 2.5px 0 #38bdf8 !important;
 }
 
 /* 1. Верхня шапочка вкладки (назви «Сьогодні / Завтра / Післязавтра» та дата) — строго центровані по всій ширині вкладки */
@@ -14849,25 +14849,34 @@ body.dark-mode .pulse-w2-table-wrap {
 }
 
 .pulse-w2-th-row th {
-  background: var(--bg-subtle, #f8fafc);
+  background-color: var(--bg-subtle, #f8fafc);
   color: var(--text-muted, #64748b);
   font-weight: 600;
   font-size: 0.73rem;
   text-align: center !important;
   padding: 5px 2px;
   border-bottom: 1px solid var(--border-color, #e2e8f0);
-  border-right: 1px solid var(--border-color, #e2e8f0);
+  border-right: none;
   white-space: nowrap;
   vertical-align: middle;
 }
+.pulse-w2-th-row th:not(:last-child) {
+  background-image: linear-gradient(180deg, rgba(148, 163, 184, 0) 8%, rgba(100, 116, 139, 0.45) 50%, rgba(148, 163, 184, 0) 92%);
+  background-repeat: no-repeat;
+  background-size: 1px 100%;
+  background-position: right center;
+}
 .pulse-w2-th-row th:last-child {
   border-right: none;
+  background-image: none;
 }
 body.dark-mode .pulse-w2-th-row th {
-  background: #1e293b;
+  background-color: #1e293b;
   color: #94a3b8;
   border-color: #334155;
-  border-right-color: #334155;
+}
+body.dark-mode .pulse-w2-th-row th:not(:last-child) {
+  background-image: linear-gradient(180deg, rgba(148, 163, 184, 0) 8%, rgba(148, 163, 184, 0.45) 50%, rgba(148, 163, 184, 0) 92%);
 }
 .pulse-w2-th-row th i {
   display: inline-block;
