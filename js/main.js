@@ -6370,6 +6370,16 @@ function escapeHtml(str) {
 
 function formatResourceTitleBracketsHtml(rawText) {
   const safeText = escapeHtml(rawText || '');
+  const dotIdx = safeText.search(/[·•]/);
+  if (dotIdx !== -1) {
+    const beforeDot = safeText.slice(0, dotIdx);
+    const dotChar = safeText[dotIdx];
+    const afterDot = safeText.slice(dotIdx + 1).replace(/^\s+/, '');
+    if (afterDot) {
+      const headText = beforeDot ? beforeDot.replace(/\s*$/, ' ') : '';
+      return `${headText}<span class="resource-dot-sep" aria-hidden="true">${dotChar}</span> <span class="resource-bracket-note">${afterDot}</span>`;
+    }
+  }
   return safeText.replace(/\[([^\]]+)\]/g, '<span class="resource-bracket-note">[$1]</span>');
 }
 
@@ -6379,13 +6389,36 @@ function decorateResourceBracketNotes(rootEl) {
   const textNodes = [];
   let node;
   while ((node = walker.nextNode())) {
-    if (!node.nodeValue || node.nodeValue.indexOf('[') === -1) continue;
-    if (node.parentElement && node.parentElement.closest('.resource-bracket-note')) continue;
+    if (!node.nodeValue || (node.nodeValue.indexOf('·') === -1 && node.nodeValue.indexOf('•') === -1 && node.nodeValue.indexOf('[') === -1)) continue;
+    if (node.parentElement && node.parentElement.closest('.resource-bracket-note, .resource-dot-sep')) continue;
     textNodes.push(node);
   }
 
   textNodes.forEach(textNode => {
     const val = textNode.nodeValue;
+    const dotIdx = val.search(/[·•]/);
+    if (dotIdx !== -1) {
+      const beforeDot = val.slice(0, dotIdx);
+      const dotChar = val[dotIdx];
+      const afterDot = val.slice(dotIdx + 1).replace(/^\s+/, '');
+      if (!afterDot) return;
+      const frag = document.createDocumentFragment();
+      const headText = beforeDot ? beforeDot.replace(/\s*$/, ' ') : '';
+      if (headText) frag.appendChild(document.createTextNode(headText));
+      const dotSpan = document.createElement('span');
+      dotSpan.className = 'resource-dot-sep';
+      dotSpan.setAttribute('aria-hidden', 'true');
+      dotSpan.textContent = dotChar;
+      frag.appendChild(dotSpan);
+      frag.appendChild(document.createTextNode(' '));
+      const noteSpan = document.createElement('span');
+      noteSpan.className = 'resource-bracket-note';
+      noteSpan.textContent = afterDot;
+      frag.appendChild(noteSpan);
+      textNode.parentNode.replaceChild(frag, textNode);
+      return;
+    }
+
     const regex = /\[([^\]]+)\]/g;
     let lastIndex = 0;
     let match;
@@ -10809,8 +10842,18 @@ function renderPulseWeatherUI(data, city, updatedTime = '') {
   const histView = buildPulseWeatherHistoryView(city, histMonth, histDay, histDateLabelFull);
 
   container.innerHTML = `
-    <!-- 1. Верхня панель: компактний вертикальний ротатор інфо-рядка (Світловий день / Стан неба / Дорожня порада) + перемикачі Sinoptik -->
+    <!-- 1. Верхній блок: перемикачі днів Sinoptik + компактний вертикальний ротатор інфо-рядка (Світловий день / Стан неба / Дорожня порада) -->
     <div class="pulse-w2-top-panel">
+      <div class="pulse-w2-tabs">
+        ${tabsHtml}
+      </div>
+      <div class="pulse-w2-rot-divider">
+        <div class="pulse-w2-rot-dots-center" id="pulseWeatherRotDots" title="Індикатор активного слайда (натисніть для переходу)">
+          <span class="pulse-w2-rot-dot active" data-idx="0" onclick="window.setPulseWeatherSlide(0); event.stopPropagation();" title="Світловий день (схід / захід)"></span>
+          <span class="pulse-w2-rot-dot" data-idx="1" onclick="window.setPulseWeatherSlide(1); event.stopPropagation();" title="Стан погоди на добу"></span>
+          <span class="pulse-w2-rot-dot" data-idx="2" onclick="window.setPulseWeatherSlide(2); event.stopPropagation();" title="Порада водіям та пішоходам"></span>
+        </div>
+      </div>
       <div class="pulse-w2-rotator-bar" id="pulseWeatherRotatorBar" onclick="window.rotatePulseWeatherInfo(1)" title="Натисніть для перегортання (автоповорот кожні 7 секунд)">
         <div class="pulse-w2-rot-viewport">
           <div class="pulse-w2-rot-track" id="pulseWeatherRotTrack">
@@ -10832,16 +10875,6 @@ function renderPulseWeatherUI(data, city, updatedTime = '') {
             </div>
           </div>
         </div>
-      </div>
-      <div class="pulse-w2-rot-divider">
-        <div class="pulse-w2-rot-dots-center" id="pulseWeatherRotDots" title="Індикатор активного слайда (натисніть для переходу)">
-          <span class="pulse-w2-rot-dot active" data-idx="0" onclick="window.setPulseWeatherSlide(0); event.stopPropagation();" title="Світловий день (схід / захід)"></span>
-          <span class="pulse-w2-rot-dot" data-idx="1" onclick="window.setPulseWeatherSlide(1); event.stopPropagation();" title="Стан погоди на добу"></span>
-          <span class="pulse-w2-rot-dot" data-idx="2" onclick="window.setPulseWeatherSlide(2); event.stopPropagation();" title="Порада водіям та пішоходам"></span>
-        </div>
-      </div>
-      <div class="pulse-w2-tabs">
-        ${tabsHtml}
       </div>
     </div>
 
