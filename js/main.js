@@ -10060,6 +10060,105 @@ function getMoonPhaseInfo(date = new Date()) {
   };
 }
 
+function getMoonTimesForCityDay(dateStr, lat, lon, utcOffsetSec) {
+  const RAD = Math.PI / 180;
+  const dayMs = 86400000;
+  const J1970 = 2440588;
+  const J2000 = 2451545;
+  const obl = RAD * 23.4397;
+  const hc = 0.133 * RAD;
+
+  let year, month, day;
+  if (dateStr && /^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+    const p = dateStr.split('-').map(Number);
+    year = p[0];
+    month = p[1];
+    day = p[2];
+  } else {
+    const now = new Date();
+    year = now.getFullYear();
+    month = now.getMonth() + 1;
+    day = now.getDate();
+  }
+
+  const offsetSec = (typeof utcOffsetSec === 'number' && !isNaN(utcOffsetSec))
+    ? utcOffsetSec
+    : -(new Date().getTimezoneOffset() * 60);
+  const t0 = Date.UTC(year, month - 1, day, 0, 0, 0) - offsetSec * 1000;
+  const lw = RAD * (-(typeof lon === 'number' ? lon : 31.6447));
+  const phi = RAD * (typeof lat === 'number' ? lat : 48.8025);
+
+  function moonAlt(ms) {
+    const d = (ms / dayMs - 0.5 + J1970) - J2000;
+    const L = RAD * (218.316 + 13.176396 * d);
+    const M = RAD * (134.963 + 13.064993 * d);
+    const F = RAD * (93.272 + 13.229350 * d);
+    const l = L + RAD * 6.289 * Math.sin(M);
+    const b = RAD * 5.128 * Math.sin(F);
+    const ra = Math.atan2(Math.sin(l) * Math.cos(obl) - Math.tan(b) * Math.sin(obl), Math.cos(l));
+    const dec = Math.asin(Math.sin(b) * Math.cos(obl) + Math.cos(b) * Math.sin(obl) * Math.sin(l));
+    const H = RAD * (280.16 + 360.9856235 * d) - lw - ra;
+    let h = Math.asin(Math.sin(phi) * Math.sin(dec) + Math.cos(phi) * Math.cos(dec) * Math.cos(H));
+    const hRef = h < 0 ? 0 : h;
+    h += 0.0002967 / Math.tan(hRef + 0.00312536 / (hRef + 0.08901179));
+    return h;
+  }
+
+  function formatHourFloat(hVal) {
+    if (hVal === null || isNaN(hVal)) return '--:--';
+    let totalMins = Math.round(hVal * 60);
+    if (totalMins < 0) totalMins = 0;
+    if (totalMins >= 1440) totalMins = totalMins % 1440;
+    const hh = Math.floor(totalMins / 60);
+    const mm = totalMins % 60;
+    return `${String(hh).padStart(2, '0')}:${String(mm).padStart(2, '0')}`;
+  }
+
+  let y0 = moonAlt(t0) - hc;
+  let riseHours = null;
+  let setHours = null;
+
+  for (let i = 1; i <= 24; i += 2) {
+    const y1 = moonAlt(t0 + i * 3600000) - hc;
+    const y2 = moonAlt(t0 + (i + 1) * 3600000) - hc;
+    const a = (y0 + y2) / 2 - y1;
+    const b = (y2 - y0) / 2;
+    const xe = a !== 0 ? -b / (2 * a) : 0;
+    const ye = (a * xe + b) * xe + y1;
+    const disc = b * b - 4 * a * y1;
+    let roots = 0;
+    let x1 = 0;
+    let x2 = 0;
+
+    if (disc >= 0 && a !== 0) {
+      const dx = Math.sqrt(disc) / (Math.abs(a) * 2);
+      x1 = xe - dx;
+      x2 = xe + dx;
+      if (Math.abs(x1) <= 1) roots++;
+      if (Math.abs(x2) <= 1) roots++;
+      if (x1 < -1) x1 = x2;
+    }
+
+    if (roots === 1) {
+      if (y0 < 0) riseHours = i + x1;
+      else setHours = i + x1;
+    } else if (roots === 2) {
+      riseHours = i + (ye < 0 ? x2 : x1);
+      setHours = i + (ye < 0 ? x1 : x2);
+    }
+
+    if (riseHours !== null && setHours !== null) break;
+    y0 = y2;
+  }
+
+  return {
+    rise: formatHourFloat(riseHours),
+    set: formatHourFloat(setHours),
+    hasRise: riseHours !== null,
+    hasSet: setHours !== null
+  };
+}
+
 // ==========================================================================
 // БАЗА КЛІМАТИЧНИХ РЕКОРДІВ OPEN-METEO ERA5 (1940 - ПОТОЧНИЙ РІК)
 // ==========================================================================
@@ -10529,12 +10628,16 @@ function renderPulseWeatherUI(data, city, updatedTime = '') {
   // 2. Вставка сходу/заходу сонця та світлового дня для обраного дня (органічно з'єднана із вкладками)
   const sunriseStr = (daily.sunrise && daily.sunrise[activeTab]) ? daily.sunrise[activeTab].slice(11, 16) : '06:46';
   const sunsetStr = (daily.sunset && daily.sunset[activeTab]) ? daily.sunset[activeTab].slice(11, 16) : '16:27';
+  const nextSunriseStr = (daily.sunrise && daily.sunrise[activeTab + 1]) ? daily.sunrise[activeTab + 1].slice(11, 16) : sunriseStr;
 
   let daylightStr = '9:41';
   let daylightTooltip = 'Тривалість дня';
+  let nightStr = '14:19';
+  let nightTooltip = 'Тривалість ночі';
   try {
     const srParts = sunriseStr.split(':').map(Number);
     const ssParts = sunsetStr.split(':').map(Number);
+    const nextSrParts = nextSunriseStr.split(':').map(Number);
     if (srParts.length === 2 && ssParts.length === 2 && !isNaN(srParts[0]) && !isNaN(ssParts[0])) {
       const srMins = srParts[0] * 60 + srParts[1];
       const ssMins = ssParts[0] * 60 + ssParts[1];
@@ -10544,34 +10647,26 @@ function renderPulseWeatherUI(data, city, updatedTime = '') {
       const dMins = diff % 60;
       daylightStr = `${dHours}:${String(dMins).padStart(2, '0')}`;
       daylightTooltip = `Тривалість дня: ${dHours} год ${dMins} хв`;
+
+      const nextSrMins = (nextSrParts.length === 2 && !isNaN(nextSrParts[0]))
+        ? (nextSrParts[0] * 60 + nextSrParts[1])
+        : srMins;
+      let nightDiff = (24 * 60 - ssMins) + nextSrMins;
+      if (nightDiff < 0) nightDiff += 24 * 60;
+      if (nightDiff >= 24 * 60) nightDiff -= 24 * 60;
+      const nHours = Math.floor(nightDiff / 60);
+      const nMins = nightDiff % 60;
+      nightStr = `${nHours}:${String(nMins).padStart(2, '0')}`;
+      nightTooltip = `Тривалість ночі: ${nHours} год ${nMins} хв`;
     }
   } catch (e) {}
 
+  const targetDateStrAstro = (daily.time && daily.time[activeTab]) ? daily.time[activeTab] : '';
   const targetDateForMoon = new Date(now.getFullYear(), now.getMonth(), now.getDate() + activeTab);
   const moonPhase = getMoonPhaseInfo(targetDateForMoon);
-
-  const sunBarHtml = `
-    <div class="pulse-w2-sun-bar" title="Світловий день та астрономічні дані для обраного дня">
-      <div class="pulse-w2-sun-side" title="Схід сонця о ${sunriseStr}">
-        <span class="pulse-w2-sun-time">${sunriseStr}</span>
-        <span class="pulse-w2-sun-lbl">СХІД</span>
-      </div>
-      <div class="pulse-w2-sun-mid" title="${daylightTooltip}">
-        <span class="pulse-sun-spinner" title="Сонце (тривалість дня)">
-          <svg class="pulse-sun-icon-svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="4.5" fill="#fef08a" stroke="#f59e0b"></circle>
-            <path d="M12 2v2.5M12 19.5V22M4.93 4.93l1.77 1.77M17.3 17.3l1.77 1.77M2 12h2.5M19.5 12H22M4.93 19.07l1.77-1.77M17.3 6.7l1.77-1.77"></path>
-          </svg>
-        </span>
-        <span class="pulse-w2-daylight-val">${daylightStr}</span>
-        <span class="pulse-moon-phase-wrap" title="${moonPhase.tooltip}">${moonPhase.svg}</span>
-      </div>
-      <div class="pulse-w2-sun-side" title="Захід сонця о ${sunsetStr}">
-        <span class="pulse-w2-sun-lbl">ЗАХІД</span>
-        <span class="pulse-w2-sun-time">${sunsetStr}</span>
-      </div>
-    </div>
-  `;
+  const moonTimes = getMoonTimesForCityDay(targetDateStrAstro, city.lat, city.lon, data && data.utc_offset_seconds);
+  const moonSvgCompact = moonPhase.svg.replace(/width="13"\s+height="13"/g, 'width="11" height="11"');
+  const sunSvgCompact = `<svg class="pulse-sun-icon-svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4.5" fill="#fef08a" stroke="#f59e0b"></circle><path d="M12 2v2.5M12 19.5V22M4.93 4.93l1.77 1.77M17.3 17.3l1.77 1.77M2 12h2.5M19.5 12H22M4.93 19.07l1.77-1.77M17.3 6.7l1.77-1.77"></path></svg>`;
 
   // 3. Розрахунок стану погоди та поради водіям/пішоходам для обраного дня
   const tabWCode = (daily.weather_code && daily.weather_code[activeTab] !== undefined)
@@ -10857,11 +10952,23 @@ function renderPulseWeatherUI(data, city, updatedTime = '') {
       <div class="pulse-w2-rotator-bar" id="pulseWeatherRotatorBar" onclick="window.rotatePulseWeatherInfo(1)" title="Натисніть для перегортання (автоповорот кожні 7 секунд)">
         <div class="pulse-w2-rot-viewport">
           <div class="pulse-w2-rot-track" id="pulseWeatherRotTrack">
-            <!-- Слайд 1: Схід / Тривалість дня / Захід -->
-            <div class="pulse-w2-rot-slide pulse-w2-rot-sun" title="${daylightTooltip}">
-              <span class="pulse-w2-rot-sun-side" title="Схід сонця: ${sunriseStr}"><span class="pulse-w2-rot-time">${sunriseStr}</span> <span class="pulse-w2-rot-lbl">СХІД</span></span>
-              <span class="pulse-w2-rot-sun-mid" title="${daylightTooltip}"><span class="pulse-sun-spinner" style="display:inline-flex; vertical-align:middle; margin-right:2px;"><svg class="pulse-sun-icon-svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4.5" fill="#fef08a" stroke="#f59e0b"></circle><path d="M12 2v2.5M12 19.5V22M4.93 4.93l1.77 1.77M17.3 17.3l1.77 1.77M2 12h2.5M19.5 12H22M4.93 19.07l1.77-1.77M17.3 6.7l1.77-1.77"></path></svg></span> <strong class="pulse-w2-rot-daylight">${daylightStr}</strong> <span class="pulse-moon-phase-wrap" style="display:inline-flex; vertical-align:middle; margin-left:2px;" title="${moonPhase.tooltip}">${moonPhase.svg}</span></span>
-              <span class="pulse-w2-rot-sun-side" title="Захід сонця: ${sunsetStr}"><span class="pulse-w2-rot-lbl">ЗАХІД</span> <span class="pulse-w2-rot-time">${sunsetStr}</span></span>
+            <!-- Слайд 1: Сонце (ліворуч) | Місяць та ніч (праворуч) -->
+            <div class="pulse-w2-rot-slide pulse-w2-rot-sun" title="${daylightTooltip} • ${nightTooltip} • ${moonPhase.tooltip}">
+              <span class="pulse-w2-astro-group is-sun">
+                <span class="pulse-w2-rot-time" title="Схід сонця: ${sunriseStr}">${sunriseStr}</span>
+                <span class="pulse-sun-spinner" title="Схід сонця: ${sunriseStr}">${sunSvgCompact}</span>
+                <strong class="pulse-w2-rot-daylight" title="${daylightTooltip}">${daylightStr}</strong>
+                <span class="pulse-sun-spinner" title="Захід сонця: ${sunsetStr}">${sunSvgCompact}</span>
+                <span class="pulse-w2-rot-time" title="Захід сонця: ${sunsetStr}">${sunsetStr}</span>
+              </span>
+              <span class="pulse-w2-astro-sep" aria-hidden="true"></span>
+              <span class="pulse-w2-astro-group is-moon">
+                <span class="pulse-w2-rot-time" title="${moonTimes.hasRise ? `Схід місяця: ${moonTimes.rise}` : 'Схід місяця: цієї доби не сходить'}">${moonTimes.rise}</span>
+                <span class="pulse-moon-phase-wrap" title="${moonPhase.tooltip}">${moonSvgCompact}</span>
+                <strong class="pulse-w2-rot-nightlight" title="${nightTooltip} • ${moonPhase.tooltip}">${nightStr}</strong>
+                <span class="pulse-moon-phase-wrap" title="${moonPhase.tooltip}">${moonSvgCompact}</span>
+                <span class="pulse-w2-rot-time" title="${moonTimes.hasSet ? `Захід місяця: ${moonTimes.set}` : 'Захід місяця: цієї доби не заходить'}">${moonTimes.set}</span>
+              </span>
             </div>
             <!-- Слайд 2: Стан погоди -->
             <div class="pulse-w2-rot-slide pulse-w2-rot-cond" title="Стан погоди: ${skyConditionText}">
@@ -12659,6 +12766,22 @@ function renderPulseDrawerLayout(container) {
     refTo.textContent = `1 ${cTo} = ${formatRefRate(rateReverse)} ${cFrom}`;
   }
 
+  const quickAmtBtns = container.querySelectorAll('.pulse-conv-quick-btn');
+
+  function syncQuickAmountActiveState() {
+    if (!inpFrom || !quickAmtBtns.length) return;
+    const raw = String(inpFrom.value || '').trim().replace(/\s+/g, '').replace(',', '.');
+    const numVal = raw === '' ? NaN : parseFloat(raw);
+    quickAmtBtns.forEach(btn => {
+      const btnVal = parseFloat(btn.getAttribute('data-amount') || '');
+      if (!isNaN(numVal) && !isNaN(btnVal) && numVal === btnVal) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+  }
+
   function convertFromTo() {
     if (!inpFrom || !inpTo || !selFrom || !selTo) return;
     const cleanStr = String(inpFrom.value).replace(',', '.');
@@ -12670,6 +12793,7 @@ function renderPulseDrawerLayout(container) {
     const result = (amt * rFromUah) / rToUah;
     inpTo.value = formatConvertedValue(result);
     updateConverterRatesRef();
+    syncQuickAmountActiveState();
   }
 
   function convertToFrom() {
@@ -12683,6 +12807,7 @@ function renderPulseDrawerLayout(container) {
     const result = (amt * rToUah) / rFromUah;
     inpFrom.value = formatConvertedValue(result);
     updateConverterRatesRef();
+    syncQuickAmountActiveState();
   }
 
   window.updatePulseConverterLive = convertFromTo;
@@ -12711,7 +12836,6 @@ function renderPulseDrawerLayout(container) {
     convertFromTo();
 
     // Обробники кліків для швидких сум конвертера
-    const quickAmtBtns = container.querySelectorAll('.pulse-conv-quick-btn');
     quickAmtBtns.forEach(b => {
       b.onclick = () => {
         const amt = b.getAttribute('data-amount');

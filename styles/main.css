@@ -11443,7 +11443,7 @@ body.dark-mode .pulse-holidays-container {
   display: flex;
   flex-direction: column;
   gap: 2px;
-  border-bottom: 1px dashed rgba(226, 232, 240, 0.85);
+  border-bottom: 1px solid #e2e8f0;
   padding-bottom: 3px;
 }
 .pulse-holiday-day-group:last-child {
@@ -11451,7 +11451,7 @@ body.dark-mode .pulse-holidays-container {
   padding-bottom: 1px;
 }
 body.dark-mode .pulse-holiday-day-group {
-  border-color: rgba(255, 255, 255, 0.08);
+  border-color: rgba(51, 65, 85, 0.6);
 }
 
 .pulse-holiday-day-header {
@@ -11547,7 +11547,7 @@ body.dark-mode .pulse-holiday-item.is-main .pulse-holiday-text {
   width: 100%;
   margin: 5px 0 0;
   padding: 4px 2px 0;
-  border-top: 1px dashed var(--border-color, #e2e8f0);
+  border-top: 1px solid #e2e8f0;
   font-size: 0.65rem;
   font-weight: 500;
   line-height: 1.2;
@@ -12758,15 +12758,15 @@ body.dark-mode .pulse-geomag-footer-more a:hover {
    ========================================================================== */
 /* Єдиний об'єднаний блок екології та радіації з тонкими внутрішніми роздільними лініями */
 .pulse-eco-unified-panel {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
   margin-bottom: 0;
 }
 body.dark-mode .pulse-eco-unified-panel {
-  background: #1e293b;
+  background: rgba(15, 23, 42, 0.45);
   border-color: #334155;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
@@ -12777,10 +12777,12 @@ body.dark-mode .pulse-eco-unified-panel {
   margin: 0;
   width: 100%;
   box-sizing: border-box;
-  border-bottom: 2px solid #e2e8f0; /* Трішки товстіша, м'яка нейтрально-сіра лінія без різкого контрасту */
+  background: transparent;
+  border-bottom: 1px solid #d5dfe9;
 }
 body.dark-mode .pulse-eco-metrics-row {
-  border-bottom: 2px solid #334155;
+  background: transparent;
+  border-bottom: 1px solid #3b4b63;
 }
 .pulse-eco-metric-box {
   padding: 5px 8px;
@@ -12794,10 +12796,10 @@ body.dark-mode .pulse-eco-metrics-row {
   gap: 3px;
 }
 .pulse-eco-metric-box:first-child {
-  border-right: 1px solid #cbd5e1;
+  border-right: 1px solid #d5dfe9;
 }
 body.dark-mode .pulse-eco-metric-box:first-child {
-  border-right-color: #475569;
+  border-right-color: #3b4b63;
 }
 .pulse-eco-metric-title {
   font-size: 0.67rem;
@@ -12919,14 +12921,14 @@ body.dark-mode .pulse-eco-strip {
   min-width: 0;
   cursor: help;
   white-space: nowrap;
-  border-right: 1px solid #cbd5e1; /* Роздільні лінії між колонками (2-а лінія точно збігається з лінією верхнього ряду на 50%) */
+  border-right: 1px solid #d5dfe9; /* Помітна делікатна роздільна лінія між колонками (2-а лінія точно збігається з лінією верхнього ряду на 50%) */
   box-sizing: border-box;
 }
 .pulse-eco-strip-item:last-child {
   border-right: none;
 }
 body.dark-mode .pulse-eco-strip-item {
-  border-right-color: #475569;
+  border-right-color: #3b4b63;
 }
 .pulse-eco-strip-title {
   font-size: 0.67rem;
@@ -13073,18 +13075,18 @@ body.dark-mode .pulse-news-tabs-wrap .pulse-rate-tab-btn:hover {
   border-color: #475569;
 }
 .pulse-news-tabs-wrap .pulse-rate-tab-btn.active {
-  background: #ffffff;
+  background: #f0f9ff;
   color: #0284c7;
   font-weight: 700;
-  border-color: #0284c7;
-  box-shadow: 0 1px 3px rgba(2, 132, 199, 0.2), inset 0 0 0 1px #0284c7;
+  border-color: #38bdf8;
+  box-shadow: 0 1px 2px rgba(2, 132, 199, 0.12);
 }
 body.dark-mode .pulse-news-tabs-wrap .pulse-rate-tab-btn.active {
-  background: #1e293b;
+  background: rgba(56, 189, 248, 0.16);
   color: #38bdf8;
   font-weight: 700;
-  border-color: #38bdf8;
-  box-shadow: 0 1px 3px rgba(56, 189, 248, 0.25), inset 0 0 0 1px #38bdf8;
+  border-color: rgba(56, 189, 248, 0.65);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
 }
 /* Напис «ВСІ» виділено жирним шрифтом */
 .pulse-news-tabs-wrap .pulse-rate-tab-btn[data-tab="all"] {
@@ -13163,7 +13165,10 @@ body.dark-mode .pulse-news-important-filter-btn.active {
   max-height: 480px;
   overflow-y: auto;
   padding-right: 2px;
+  padding-bottom: 12px;
   scrollbar-width: thin;
+  mask-image: linear-gradient(to bottom, black 0%, black calc(100% - 16px), transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, black 0%, black calc(100% - 16px), transparent 100%);
 }
 .pulse-news-feed::-webkit-scrollbar {
   width: 3px;
@@ -13497,7 +13502,7 @@ body.dark-mode .pulse-fuel-region-select {
   margin: 0;
   overflow-x: auto;
   border-radius: 6px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid #cbd5e1;
   background: #ffffff;
   box-sizing: border-box;
 }
@@ -13515,24 +13520,33 @@ body.dark-mode .pulse-fuel-table-wrap {
 }
 
 .pulse-fuel-table thead {
-  background: #f1f5f9;
-  border-bottom: 1px solid #cbd5e1;
+  background: linear-gradient(180deg, #eff4fa 0%, #e6eef7 100%);
+  border-bottom: 1.5px solid #cbd5e1;
 }
 body.dark-mode .pulse-fuel-table thead {
-  background: #0f172a;
-  border-bottom-color: #334155;
+  background: linear-gradient(180deg, #162032 0%, #0f172a 100%);
+  border-bottom: 1.5px solid #3b4b63;
 }
 
 .pulse-fuel-table th {
-  padding: 4px 2px;
-  font-size: 0.65rem;
+  padding: 5px 2px;
+  font-size: 0.67rem;
   font-weight: 700;
-  color: #475569;
+  color: #1e293b;
   text-align: center;
   white-space: nowrap;
 }
+.pulse-fuel-table th:not(:last-child) {
+  background-image: linear-gradient(180deg, rgba(148, 163, 184, 0) 12%, rgba(100, 116, 139, 0.5) 50%, rgba(148, 163, 184, 0) 88%);
+  background-repeat: no-repeat;
+  background-size: 1px 100%;
+  background-position: right center;
+}
 body.dark-mode .pulse-fuel-table th {
-  color: #94a3b8;
+  color: #e2e8f0;
+}
+body.dark-mode .pulse-fuel-table th:not(:last-child) {
+  background-image: linear-gradient(180deg, rgba(148, 163, 184, 0) 12%, rgba(148, 163, 184, 0.5) 50%, rgba(148, 163, 184, 0) 88%);
 }
 
 .pulse-fuel-table th.fuel-th-brand {
@@ -13541,11 +13555,11 @@ body.dark-mode .pulse-fuel-table th {
 }
 
 .pulse-fuel-table tbody tr {
-  border-bottom: 1px solid #f1f5f9;
+  border-bottom: 1px solid #e2e8f0;
   transition: background 0.12s ease;
 }
 body.dark-mode .pulse-fuel-table tbody tr {
-  border-bottom-color: rgba(255, 255, 255, 0.05);
+  border-bottom-color: rgba(51, 65, 85, 0.55);
 }
 
 .pulse-fuel-table tbody tr:last-child {
@@ -13724,13 +13738,13 @@ body.dark-mode .pulse-rate-tab-btn.active {
   height: 90px;
   border-radius: 7px;
   border: 1px solid #cbd5e1;
-  background: #ffffff;
+  background: #f8fafc;
   overflow: hidden;
 }
 body.dark-mode .pulse-rates-grid,
 body.dark-mode .pulse-rates-row {
   border-color: #334155;
-  background: #1e293b;
+  background: rgba(15, 23, 42, 0.5);
 }
 .pulse-rate-item {
   height: 100%;
@@ -13749,23 +13763,23 @@ body.dark-mode .pulse-rates-row {
   min-width: 0;
 }
 .pulse-rate-item:not(:nth-child(4n)) {
-  border-right: 1px solid #cbd5e1;
+  border-right: 1px solid #d5dfe9;
 }
 .pulse-rate-item:nth-child(-n+4) {
-  border-bottom: 1px solid #cbd5e1;
+  border-bottom: 1px solid #d5dfe9;
 }
 .pulse-rate-item:hover {
-  background: rgba(56, 189, 248, 0.08);
+  background: rgba(56, 189, 248, 0.09);
 }
 body.dark-mode .pulse-rate-item {
   background: transparent;
-  border-color: #334155;
+  border-color: #3b4b63;
 }
 body.dark-mode .pulse-rate-item:not(:nth-child(4n)) {
-  border-right-color: #334155;
+  border-right-color: #3b4b63;
 }
 body.dark-mode .pulse-rate-item:nth-child(-n+4) {
-  border-bottom-color: #334155;
+  border-bottom-color: #3b4b63;
 }
 body.dark-mode .pulse-rate-item:hover {
   background: rgba(56, 189, 248, 0.12);
@@ -13848,24 +13862,26 @@ body.dark-mode .pulse-calc-heading {
 .pulse-conv-box {
   flex: 1;
   min-width: 0;
-  background: #ffffff;
+  background: #f8fafc;
   border: 1px solid #cbd5e1;
   border-radius: 8px;
   padding: 4px 7px 5px;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
-  transition: border-color 0.15s ease;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
   box-sizing: border-box;
   overflow: hidden;
 }
 .pulse-conv-box:focus-within {
+  background: #ffffff;
   border-color: #0284c7;
 }
 body.dark-mode .pulse-conv-box {
-  background: #1e293b;
+  background: rgba(15, 23, 42, 0.5);
   border-color: #334155;
   box-shadow: none;
 }
 body.dark-mode .pulse-conv-box:focus-within {
+  background: #1e293b;
   border-color: #38bdf8;
 }
 
@@ -13909,7 +13925,11 @@ body.dark-mode .pulse-conv-label {
 }
 body.dark-mode .pulse-conv-select {
   color: #f8fafc;
+  background: transparent;
+}
+body.dark-mode .pulse-conv-select option {
   background: #1e293b;
+  color: #f8fafc;
 }
 
 .pulse-conv-input-row {
@@ -14017,7 +14037,7 @@ body.dark-mode .pulse-conv-quick-lbl {
 }
 .pulse-conv-quick-btn {
   border: 1px solid #cbd5e1;
-  background: #ffffff;
+  background: #f8fafc;
   color: #334155;
   font-size: 0.61rem;
   font-weight: 600;
@@ -14027,19 +14047,31 @@ body.dark-mode .pulse-conv-quick-lbl {
   line-height: 1.2;
   transition: all 0.15s ease;
   font-variant-numeric: tabular-nums;
+  outline: none !important;
+  -webkit-tap-highlight-color: transparent;
 }
-.pulse-conv-quick-btn:hover {
+.pulse-conv-quick-btn:focus,
+.pulse-conv-quick-btn:focus-visible,
+.pulse-conv-quick-btn:active {
+  outline: none !important;
+}
+.pulse-conv-quick-btn:hover,
+.pulse-conv-quick-btn.active {
   background: #e0f2fe;
   border-color: #38bdf8;
   color: #0284c7;
 }
+.pulse-conv-quick-btn.active {
+  font-weight: 700;
+}
 body.dark-mode .pulse-conv-quick-btn {
-  background: #1e293b;
+  background: rgba(15, 23, 42, 0.5);
   border-color: #334155;
   color: #cbd5e1;
 }
-body.dark-mode .pulse-conv-quick-btn:hover {
-  background: rgba(56, 189, 248, 0.2);
+body.dark-mode .pulse-conv-quick-btn:hover,
+body.dark-mode .pulse-conv-quick-btn.active {
+  background: rgba(56, 189, 248, 0.22);
   border-color: #38bdf8;
   color: #38bdf8;
 }
@@ -14772,11 +14804,39 @@ body.dark-mode .pulse-w2-rot-slide {
   color: #94a3b8;
 }
 
-/* Слайд 1: Світловий день та астрономічні дані */
+/* Слайд 1: Сонце (ліворуч) та Місяць/ніч (праворуч) */
 .pulse-w2-rot-slide.pulse-w2-rot-sun {
   justify-content: space-between;
+  align-items: center;
   width: 100%;
-  font-size: 0.67rem;
+  gap: 4px;
+  font-size: 0.65rem;
+}
+.pulse-w2-astro-group {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  min-width: 0;
+  white-space: nowrap;
+}
+.pulse-w2-astro-group .pulse-sun-spinner,
+.pulse-w2-astro-group .pulse-moon-phase-wrap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.pulse-w2-astro-sep {
+  flex: 1;
+  min-width: 10px;
+  max-width: 22px;
+  height: 1.5px;
+  border-radius: 1px;
+  background: linear-gradient(90deg, rgba(148, 163, 184, 0.08) 0%, rgba(100, 116, 139, 0.5) 50%, rgba(148, 163, 184, 0.08) 100%);
+}
+body.dark-mode .pulse-w2-astro-sep {
+  background: linear-gradient(90deg, rgba(148, 163, 184, 0.08) 0%, rgba(148, 163, 184, 0.55) 50%, rgba(148, 163, 184, 0.08) 100%);
 }
 .pulse-w2-rot-sun-side {
   display: inline-flex;
@@ -14784,12 +14844,13 @@ body.dark-mode .pulse-w2-rot-slide {
   gap: 4px;
 }
 .pulse-w2-rot-time {
-  font-weight: 700;
-  color: var(--text-main, #0f172a);
+  font-weight: 500;
+  color: #475569;
   font-variant-numeric: tabular-nums;
+  font-size: 0.64rem;
 }
 body.dark-mode .pulse-w2-rot-time {
-  color: #f1f5f9;
+  color: #94a3b8;
 }
 .pulse-w2-rot-lbl {
   font-size: 0.60rem;
@@ -14804,12 +14865,21 @@ body.dark-mode .pulse-w2-rot-time {
 }
 .pulse-w2-rot-daylight {
   color: #d97706;
-  font-weight: 700;
-  font-size: 0.69rem;
+  font-weight: 600;
+  font-size: 0.66rem;
   font-variant-numeric: tabular-nums;
 }
 body.dark-mode .pulse-w2-rot-daylight {
   color: #fbbf24;
+}
+.pulse-w2-rot-nightlight {
+  color: #4f46e5;
+  font-weight: 600;
+  font-size: 0.66rem;
+  font-variant-numeric: tabular-nums;
+}
+body.dark-mode .pulse-w2-rot-nightlight {
+  color: #818cf8;
 }
 
 /* Слайди 2 і 3: Стан погоди та порада */
@@ -14831,7 +14901,7 @@ body.dark-mode .pulse-w2-rot-text {
 .pulse-w2-table-wrap {
   width: 100%;
   overflow-x: auto;
-  border: 1px solid var(--border-color, #e2e8f0);
+  border: 1px solid #cbd5e1;
   border-radius: 8px;
   background: var(--card-bg, #ffffff);
 }
@@ -14849,47 +14919,46 @@ body.dark-mode .pulse-w2-table-wrap {
 }
 
 .pulse-w2-th-row th {
-  background-color: var(--bg-subtle, #f8fafc);
-  color: var(--text-muted, #64748b);
+  background: linear-gradient(180deg, #eff4fa 0%, #e6eef7 100%);
+  color: #475569;
   font-weight: 600;
   font-size: 0.73rem;
   text-align: center !important;
   padding: 5px 2px;
-  border-bottom: 1px solid var(--border-color, #e2e8f0);
+  border-bottom: 1.5px solid #cbd5e1;
   border-right: none;
   white-space: nowrap;
   vertical-align: middle;
 }
 .pulse-w2-th-row th:not(:last-child) {
-  background-image: linear-gradient(180deg, rgba(148, 163, 184, 0) 8%, rgba(100, 116, 139, 0.45) 50%, rgba(148, 163, 184, 0) 92%);
-  background-repeat: no-repeat;
-  background-size: 1px 100%;
-  background-position: right center;
+  background-image: linear-gradient(180deg, rgba(148, 163, 184, 0) 8%, rgba(100, 116, 139, 0.5) 50%, rgba(148, 163, 184, 0) 92%), linear-gradient(180deg, #eff4fa 0%, #e6eef7 100%);
+  background-repeat: no-repeat, no-repeat;
+  background-size: 1px 100%, 100% 100%;
+  background-position: right center, center center;
 }
 .pulse-w2-th-row th:last-child {
   border-right: none;
-  background-image: none;
 }
 body.dark-mode .pulse-w2-th-row th {
-  background-color: #1e293b;
-  color: #94a3b8;
-  border-color: #334155;
+  background: linear-gradient(180deg, #162032 0%, #0f172a 100%);
+  color: #cbd5e1;
+  border-color: #3b4b63;
 }
 body.dark-mode .pulse-w2-th-row th:not(:last-child) {
-  background-image: linear-gradient(180deg, rgba(148, 163, 184, 0) 8%, rgba(148, 163, 184, 0.45) 50%, rgba(148, 163, 184, 0) 92%);
+  background-image: linear-gradient(180deg, rgba(148, 163, 184, 0) 8%, rgba(148, 163, 184, 0.5) 50%, rgba(148, 163, 184, 0) 92%), linear-gradient(180deg, #162032 0%, #0f172a 100%);
 }
 .pulse-w2-th-row th i {
   display: inline-block;
   font-size: 0.80rem;
-  opacity: 0.9;
+  opacity: 0.92;
 }
 
 .pulse-w2-row {
-  border-bottom: 1px solid var(--border-subtle, rgba(226, 232, 240, 0.65));
+  border-bottom: 1px solid #e2e8f0;
   transition: background 0.15s ease;
 }
 body.dark-mode .pulse-w2-row {
-  border-color: rgba(51, 65, 85, 0.45);
+  border-color: rgba(51, 65, 85, 0.55);
 }
 .pulse-w2-row:last-child {
   border-bottom: none;
@@ -15236,8 +15305,8 @@ body.dark-mode .pulse-w2-ticker-badge {
   height: 100%;
   display: flex;
   align-items: center;
-  mask-image: linear-gradient(to right, transparent 0px, black 8px, black calc(100% - 8px), transparent 100%);
-  -webkit-mask-image: linear-gradient(to right, transparent 0px, black 8px, black calc(100% - 8px), transparent 100%);
+  mask-image: linear-gradient(to right, transparent 0px, black 16px, black calc(100% - 16px), transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, transparent 0px, black 16px, black calc(100% - 16px), transparent 100%);
 }
 
 .pulse-w2-ticker-track {
