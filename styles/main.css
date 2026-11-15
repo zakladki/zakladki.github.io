@@ -12943,40 +12943,40 @@ body.dark-mode .pulse-eco-strip-title {
 }
 .pulse-eco-pulse-dot {
   position: relative;
-  width: 5px;
-  height: 5px;
+  width: 4px;
+  height: 4px;
   border-radius: 50%;
   flex-shrink: 0;
-  margin: 0 1px;
+  margin: 0 0.5px;
 }
 .pulse-eco-pulse-dot::before {
   content: '';
   position: absolute;
-  top: -1px;
-  left: -1px;
-  width: calc(100% + 2px);
-  height: calc(100% + 2px);
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   border-radius: 50%;
   background: inherit;
   animation: ecoPulsePing 1.9s cubic-bezier(0, 0, 0.2, 1) infinite;
-  opacity: 0.85;
+  opacity: 0.72;
 }
 @keyframes ecoPulsePing {
-  0% { transform: scale(1); opacity: 0.85; }
-  65% { transform: scale(2.4); opacity: 0; }
-  100% { transform: scale(2.4); opacity: 0; }
+  0% { transform: scale(1); opacity: 0.72; }
+  65% { transform: scale(2.1); opacity: 0; }
+  100% { transform: scale(2.1); opacity: 0; }
 }
 .pulse-eco-pulse-dot.green {
   background-color: #10b981;
-  box-shadow: 0 0 3px rgba(16, 185, 129, 0.65);
+  box-shadow: 0 0 2px rgba(16, 185, 129, 0.52);
 }
 .pulse-eco-pulse-dot.yellow {
   background-color: #f59e0b;
-  box-shadow: 0 0 3px rgba(245, 158, 11, 0.65);
+  box-shadow: 0 0 2px rgba(245, 158, 11, 0.52);
 }
 .pulse-eco-pulse-dot.red {
   background-color: #ef4444;
-  box-shadow: 0 0 3px rgba(239, 68, 68, 0.7);
+  box-shadow: 0 0 2px rgba(239, 68, 68, 0.58);
 }
 .pulse-eco-strip-val {
   font-size: 0.68rem;
@@ -13444,19 +13444,18 @@ body.dark-mode .pulse-eco-link {
 .pulse-fuel-region-bar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 8px;
+  gap: 5px;
   width: 100%;
-  margin: 0 0 7px;
-  padding: 5px 8px;
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 6px;
+  margin: 0 0 4px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: 0;
   box-sizing: border-box;
 }
 body.dark-mode .pulse-fuel-region-bar {
-  background: #0f172a;
-  border-color: #334155;
+  background: transparent;
+  border-color: transparent;
 }
 
 .pulse-fuel-region-label {
@@ -13465,7 +13464,7 @@ body.dark-mode .pulse-fuel-region-bar {
   color: #475569;
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 5px;
   margin: 0;
   white-space: nowrap;
 }
@@ -13476,25 +13475,26 @@ body.dark-mode .pulse-fuel-region-label {
 .pulse-fuel-region-select {
   flex: 1;
   min-width: 0;
-  font-size: 0.72rem;
+  font-size: 0.73rem;
   font-weight: 600;
-  padding: 3px 6px;
+  padding: 2px 6px;
+  height: 25px;
   border-radius: 5px;
   border: 1px solid #cbd5e1;
   background-color: #ffffff;
   color: #0f172a;
   outline: none;
   cursor: pointer;
-  transition: border-color 0.15s ease;
+  transition: border-color 0.2s ease;
 }
 .pulse-fuel-region-select:focus {
-  border-color: #0284c7;
-  box-shadow: 0 0 0 2px rgba(2, 132, 199, 0.15);
+  border-color: #38bdf8;
+  box-shadow: none;
 }
 body.dark-mode .pulse-fuel-region-select {
   background-color: #1e293b;
-  border-color: #475569;
-  color: #f1f5f9;
+  border-color: #334155;
+  color: #f8fafc;
 }
 
 .pulse-fuel-table-wrap {
@@ -14804,7 +14804,7 @@ body.dark-mode .pulse-w2-rot-slide {
   color: #94a3b8;
 }
 
-/* Слайд 1: Сонце (ліворуч) та Місяць/ніч (праворуч) */
+/* Слайд 1: Варіант 1-4б - два короткі горизонтальні штрихи = між Сонцем та Місяцем */
 .pulse-w2-rot-slide.pulse-w2-rot-sun {
   justify-content: space-between;
   align-items: center;
@@ -14820,6 +14820,30 @@ body.dark-mode .pulse-w2-rot-slide {
   min-width: 0;
   white-space: nowrap;
 }
+.pulse-w2-astro-sep.is-double-dash {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  min-width: 14px;
+  max-width: 24px;
+  gap: 3px;
+}
+.pulse-w2-astro-sep.is-double-dash::before,
+.pulse-w2-astro-sep.is-double-dash::after {
+  content: '';
+  display: block;
+  width: 100%;
+  max-width: 14px;
+  height: 1px;
+  border-radius: 1px;
+  background: linear-gradient(90deg, rgba(148, 163, 184, 0), rgba(100, 116, 139, 0.58) 26%, rgba(100, 116, 139, 0.58) 74%, rgba(148, 163, 184, 0));
+}
+body.dark-mode .pulse-w2-astro-sep.is-double-dash::before,
+body.dark-mode .pulse-w2-astro-sep.is-double-dash::after {
+  background: linear-gradient(90deg, rgba(148, 163, 184, 0), rgba(148, 163, 184, 0.58) 26%, rgba(148, 163, 184, 0.58) 74%, rgba(148, 163, 184, 0));
+}
 .pulse-w2-astro-group .pulse-sun-spinner,
 .pulse-w2-astro-group .pulse-moon-phase-wrap {
   display: inline-flex;
@@ -14827,16 +14851,11 @@ body.dark-mode .pulse-w2-rot-slide {
   justify-content: center;
   flex-shrink: 0;
 }
-.pulse-w2-astro-sep {
-  flex: 1;
-  min-width: 10px;
-  max-width: 22px;
-  height: 1.5px;
-  border-radius: 1px;
-  background: linear-gradient(90deg, rgba(148, 163, 184, 0.08) 0%, rgba(100, 116, 139, 0.5) 50%, rgba(148, 163, 184, 0.08) 100%);
-}
-body.dark-mode .pulse-w2-astro-sep {
-  background: linear-gradient(90deg, rgba(148, 163, 184, 0.08) 0%, rgba(148, 163, 184, 0.55) 50%, rgba(148, 163, 184, 0.08) 100%);
+.pulse-w2-rot-inline-moon {
+  display: inline-flex;
+  align-items: center;
+  vertical-align: middle;
+  margin: 0 2px;
 }
 .pulse-w2-rot-sun-side {
   display: inline-flex;
@@ -15384,28 +15403,122 @@ body.dark-mode .pulse-w2-bottom-panel {
   background: transparent;
 }
 
-.pulse-w2-bottom-panel .pulse-w2-ticker-wrap {
-  border: none;
-  border-top: 1px solid var(--border-color, #e2e8f0);
-  border-radius: 0;
-  margin: 0;
-  background: var(--bg-subtle, rgba(241, 245, 249, 0.55));
+.pulse-w2-bottom-panel .pulse-w2-info-combined {
+  display: flex;
+  align-items: center;
+  height: 24px;
+  border-top: 1px solid #e2e8f0;
+  background: rgba(241, 245, 249, 0.45);
+  overflow: hidden;
+  position: relative;
 }
-body.dark-mode .pulse-w2-bottom-panel .pulse-w2-ticker-wrap {
+body.dark-mode .pulse-w2-bottom-panel .pulse-w2-info-combined {
   border-top-color: #334155;
-  background: rgba(15, 23, 42, 0.45);
+  background: rgba(15, 23, 42, 0.38);
 }
 
-.pulse-w2-bottom-panel .pulse-w2-history-box {
+.pulse-w2-info-trigger {
+  width: 26px;
+  height: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
   border: none;
-  border-top: 1px dashed var(--border-color, #e2e8f0);
+  padding: 0;
+  margin: 0;
+  color: #0284c7;
+  font-size: 0.85rem;
+  line-height: 1;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background-color 0.18s ease, color 0.18s ease, transform 0.15s ease;
+  outline: none !important;
+}
+.pulse-w2-info-trigger:hover {
+  background: rgba(2, 132, 199, 0.08);
+  color: #0369a1;
+}
+.pulse-w2-info-combined.is-help-open .pulse-w2-info-trigger {
+  background: rgba(2, 132, 199, 0.12);
+  color: #0284c7;
+}
+body.dark-mode .pulse-w2-info-trigger {
+  color: #38bdf8;
+}
+body.dark-mode .pulse-w2-info-trigger:hover {
+  background: rgba(56, 189, 248, 0.12);
+  color: #7dd3fc;
+}
+body.dark-mode .pulse-w2-info-combined.is-help-open .pulse-w2-info-trigger {
+  background: rgba(56, 189, 248, 0.16);
+  color: #7dd3fc;
+}
+
+.pulse-w2-info-divider {
+  width: 1px;
+  height: 15px;
+  flex-shrink: 0;
+  background: linear-gradient(180deg, rgba(148, 163, 184, 0) 0%, rgba(148, 163, 184, 0.78) 50%, rgba(148, 163, 184, 0) 100%);
+}
+body.dark-mode .pulse-w2-info-divider {
+  background: linear-gradient(180deg, rgba(100, 116, 139, 0) 0%, rgba(148, 163, 184, 0.55) 50%, rgba(100, 116, 139, 0) 100%);
+}
+
+.pulse-w2-info-stage {
+  position: relative;
+  flex: 1;
+  height: 100%;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.pulse-w2-info-stage .pulse-w2-history-box {
+  width: 100%;
+  height: 100%;
+  border: none;
   border-radius: 0;
   margin: 0;
-  background: var(--bg-subtle, rgba(241, 245, 249, 0.35));
+  padding: 0 6px;
+  background: transparent;
+  cursor: pointer;
+  transition: opacity 0.2s ease, transform 0.2s ease;
 }
-body.dark-mode .pulse-w2-bottom-panel .pulse-w2-history-box {
-  border-top-color: #334155;
-  background: rgba(15, 23, 42, 0.25);
+body.dark-mode .pulse-w2-info-stage .pulse-w2-history-box {
+  background: transparent;
+}
+.pulse-w2-info-combined.is-help-open .pulse-w2-info-stage .pulse-w2-history-box {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-4px);
+}
+
+.pulse-w2-info-stage .pulse-w2-ticker-viewport {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(4px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.pulse-w2-info-stage .pulse-w2-ticker-track {
+  animation-play-state: paused;
+}
+.pulse-w2-info-combined.is-help-open .pulse-w2-info-stage .pulse-w2-ticker-viewport {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+.pulse-w2-info-combined.is-help-open .pulse-w2-info-stage .pulse-w2-ticker-track {
+  animation-play-state: running;
+}
+.pulse-w2-info-combined.is-help-open .pulse-w2-info-stage:hover .pulse-w2-ticker-track {
+  animation-play-state: paused;
 }
 
 /* Історичні кліматичні рекорди (Open-Meteo ERA5 з 1940 р., в один рядок) */

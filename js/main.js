@@ -9793,26 +9793,33 @@ function formatPulseTempHtml(t, showPlus = true) {
   return `<span${cls}>${sign}${t}°</span>`;
 }
 
-function getPulseWeatherAdvice(temp, cond, precipProb, windSpeed) {
-  if (temp <= 0 && (cond.type === 'rain' || cond.type === 'snow' || cond.type === 'drizzle')) {
-    return { icon: 'fa-snowflake', text: 'Ожеледиця: слизька дорога' };
+function getPulseWeatherAdvice(temp, cond, precipProb, windSpeed, minTemp, maxTemp, windGustMax) {
+  const minT = (typeof minTemp === 'number' && !isNaN(minTemp)) ? minTemp : temp;
+  const maxT = (typeof maxTemp === 'number' && !isNaN(maxTemp)) ? maxTemp : temp;
+  const gust = (typeof windGustMax === 'number' && !isNaN(windGustMax)) ? windGustMax : windSpeed;
+
+  if (minT <= 0 && (cond.type === 'rain' || cond.type === 'snow' || cond.type === 'drizzle')) {
+    return { icon: 'fa-snowflake', text: `Ожеледиця: слизька дорога (до ${minT > 0 ? '+' : ''}${minT}°)` };
   }
   if (cond.type === 'rain' || cond.type === 'drizzle' || precipProb >= 40) {
-    return { icon: 'fa-car-side', text: 'Мокра дорога: тримайте дистанцію' };
+    return { icon: 'fa-umbrella', text: `Мокра дорога · візьміть парасолю (до ${Math.round(precipProb)}%)` };
   }
-  if (windSpeed >= 6.5) {
-    return { icon: 'fa-wind', text: `Поривчастий вітер (${windSpeed.toFixed(1)} м/с)` };
+  if (gust >= 12 || windSpeed >= 6.5) {
+    return { icon: 'fa-wind', text: `Сильний вітер (пориви до ${Math.round(Math.max(gust, windSpeed))} м/с) - тепліше одяг` };
   }
   if (cond.type === 'fog') {
-    return { icon: 'fa-smog', text: 'Туман: обмежена видимість' };
+    return { icon: 'fa-smog', text: 'Туман: обмежена видимість на дорозі' };
   }
-  if (temp <= 2 && temp >= -1) {
-    return { icon: 'fa-temperature-low', text: 'Увага: можлива паморозь на мостах' };
+  if (minT <= 1 && maxT >= 4) {
+    return { icon: 'fa-temperature-low', text: `Ранковий приморозок (${minT > 0 ? '+' : ''}${minT}°): обережно на мостах` };
   }
-  if (temp >= 28) {
-    return { icon: 'fa-sun', text: 'Спека: пийте більше води' };
+  if (maxT <= 2) {
+    return { icon: 'fa-mitten', text: `Морозно (до ${maxT > 0 ? '+' : ''}${maxT}°): теплий одяг та шапка` };
   }
-  return { icon: 'fa-road', text: 'Суха дорога: сприятливі умови' };
+  if (maxT >= 28) {
+    return { icon: 'fa-sun', text: `Спека (+${maxT}°): головний убір та більше води` };
+  }
+  return { icon: 'fa-road', text: 'Суха дорога · комфортні умови на вулиці' };
 }
 
 function getActiveWeatherCity() {
@@ -10722,14 +10729,16 @@ function renderPulseWeatherUI(data, city, updatedTime = '') {
     evalPrecip = (daily.precipitation_probability_max && daily.precipitation_probability_max[activeTab] !== undefined) ? daily.precipitation_probability_max[activeTab] : 0;
     evalWind = (daily.wind_speed_10m_max && daily.wind_speed_10m_max[activeTab] !== undefined) ? daily.wind_speed_10m_max[activeTab] : 3.5;
   }
-  const weatherAdvice = getPulseWeatherAdvice(evalTemp, activeCondInfo, evalPrecip, evalWind);
-
   // 4. Будуємо 8 рядків для таблиці (0:00, 3:00, 6:00, 9:00, 12:00, 15:00, 18:00, 21:00)
   const targetDateStr = (daily.time && daily.time[activeTab]) ? daily.time[activeTab] : '';
   const hours = [0, 3, 6, 9, 12, 15, 18, 21];
   const curHourNow = now.getHours();
 
   let rowsHtml = '';
+  const dayPressures = [];
+  const dayKps = [];
+  const dayTemps = [];
+  const dayGusts = [];
   for (let k = 0; k < hours.length; k++) {
     const h = hours[k];
     const hStr = `${h}:00`;
@@ -10847,6 +10856,11 @@ function renderPulseWeatherUI(data, city, updatedTime = '') {
     const kpParts = kpFixed.split('.');
     const kpHtml = `${kpParts[0]}.<span class="pulse-decimal">${kpParts[1]}</span>`;
 
+    dayPressures.push(pressVal);
+    dayKps.push(kpVal);
+    dayTemps.push(tVal);
+    dayGusts.push(windGust);
+
     const hourPrecipTooltip = `Ймовірність опадів: ${precipVal}%${hourlyPrecipMm > 0 ? ` • Очікується: ${hourlyPrecipMm} мм` : ''}`;
 
     // Сума опадів за 3-годинний слот для міні-колбочки в рядку таблиці
@@ -10919,6 +10933,91 @@ function renderPulseWeatherUI(data, city, updatedTime = '') {
     `;
   }
 
+  // Зведені показники доби для розширених слайдів 2-5
+  const dailyMinTemp = (daily.temperature_2m_min && daily.temperature_2m_min[activeTab] !== undefined)
+    ? Math.round(daily.temperature_2m_min[activeTab])
+    : (dayTemps.length ? Math.min(...dayTemps) : Math.round(evalTemp));
+  const dailyMaxTemp = (daily.temperature_2m_max && daily.temperature_2m_max[activeTab] !== undefined)
+    ? Math.round(daily.temperature_2m_max[activeTab])
+    : (dayTemps.length ? Math.max(...dayTemps) : Math.round(evalTemp));
+  const dailyPrecipSum = (daily.precipitation_sum && daily.precipitation_sum[activeTab] !== undefined && daily.precipitation_sum[activeTab] !== null)
+    ? Number(daily.precipitation_sum[activeTab])
+    : 0;
+  const dailyGustMax = (daily.wind_gusts_10m_max && daily.wind_gusts_10m_max[activeTab] !== undefined && daily.wind_gusts_10m_max[activeTab] !== null)
+    ? Number(daily.wind_gusts_10m_max[activeTab])
+    : (dayGusts.length ? Math.max(...dayGusts) : evalWind);
+  const dailyWindDirDeg = (daily.wind_direction_10m_dominant && daily.wind_direction_10m_dominant[activeTab] !== undefined)
+    ? daily.wind_direction_10m_dominant[activeTab]
+    : 0;
+  const domWindInfo = getWindDirectionInfo(dailyWindDirDeg);
+
+  // Слайд 2: Підсумок доби (стан неба, сума опадів та максимальні пориви)
+  const slide2PrecipText = dailyPrecipSum >= 0.1
+    ? `за добу ${dailyPrecipSum.toFixed(1)} мм`
+    : 'без опадів';
+  const slide2WindText = `пориви ${Math.round(dailyGustMax)} м/с (${domWindInfo.code})`;
+  const slide2SummaryText = `${skyConditionText} · ${slide2PrecipText} · ${slide2WindText}`;
+  const slide2Tooltip = `Стан: ${skyConditionText} • Опади за добу: ${dailyPrecipSum.toFixed(1)} мм • Вітер: ${domWindInfo.dirName}, пориви до ${dailyGustMax.toFixed(1)} м/с`;
+
+  // Слайд 3: Порада водіям, пішоходам та щодо одягу
+  const weatherAdvice = getPulseWeatherAdvice(evalTemp, activeCondInfo, evalPrecip, evalWind, dailyMinTemp, dailyMaxTemp, dailyGustMax);
+
+  // Слайд 4: УФ-індекс та фаза Місяця
+  const uvValRaw = (daily.uv_index_max && daily.uv_index_max[activeTab] !== undefined && daily.uv_index_max[activeTab] !== null)
+    ? Number(daily.uv_index_max[activeTab])
+    : 1.5;
+  let uvLevelText = 'низький';
+  let uvBadgeClass = 'text-success';
+  if (uvValRaw >= 8) {
+    uvLevelText = 'дуже високий';
+    uvBadgeClass = 'text-danger';
+  } else if (uvValRaw >= 6) {
+    uvLevelText = 'високий';
+    uvBadgeClass = 'text-warning';
+  } else if (uvValRaw >= 3) {
+    uvLevelText = 'помірний';
+    uvBadgeClass = 'text-warning';
+  }
+  const moonShortNames = {
+    new: 'Молодик',
+    waxing_crescent: 'Зростаючий серп',
+    first_quarter: 'Перша чверть',
+    waxing_gibbous: 'Зростаючий місяць',
+    full: 'Повня',
+    waning_gibbous: 'Спадаючий місяць',
+    last_quarter: 'Остання чверть',
+    waning_crescent: 'Спадний серп'
+  };
+  const moonShortLabel = moonShortNames[moonPhase.phaseKey] || moonPhase.name;
+  const slide4Tooltip = `УФ-індекс: ${uvValRaw.toFixed(1)} (${uvLevelText}) • ${moonPhase.tooltip}`;
+
+  // Слайд 5: Тиск за добу та піковий геомагнітний індекс (Kp)
+  const pMin = dayPressures.length ? Math.min(...dayPressures) : 750;
+  const pMax = dayPressures.length ? Math.max(...dayPressures) : 750;
+  const pFirst = dayPressures.length ? dayPressures[0] : 750;
+  const pLast = dayPressures.length ? dayPressures[dayPressures.length - 1] : 750;
+  const pDelta = pLast - pFirst;
+  let pressSummaryText = `Тиск стабільний (${pMin === pMax ? pMin : `${pMin}-${pMax}`})`;
+  if (pDelta >= 4) {
+    pressSummaryText = `Тиск росте (${pFirst}→${pLast})`;
+  } else if (pDelta <= -4) {
+    pressSummaryText = `Тиск падає (${pFirst}→${pLast})`;
+  } else if ((pMax - pMin) >= 5) {
+    pressSummaryText = `Тиск коливається (${pMin}-${pMax})`;
+  }
+
+  const kpDayMax = dayKps.length ? Math.max(...dayKps) : 1.5;
+  let kpSummaryText = `Kp ${kpDayMax.toFixed(1)} спокійно`;
+  let kpIconClass = 'text-success';
+  if (kpDayMax >= 5.0) {
+    kpSummaryText = `Kp ${kpDayMax.toFixed(1)} буря`;
+    kpIconClass = 'text-danger';
+  } else if (kpDayMax >= 3.0) {
+    kpSummaryText = `Kp ${kpDayMax.toFixed(1)} збурення`;
+    kpIconClass = 'text-warning';
+  }
+  const slide5Tooltip = `Атмосферний тиск за добу: ${pMin}-${pMax} мм рт. ст. • Пікова геомагнітна активність: Kp ${kpDayMax.toFixed(1)}`;
+
   // 5. Історичні кліматичні рекорди (реальний архів Open-Meteo ERA5 з 1940 р.)
   let histDay = now.getDate();
   let histMonth = now.getMonth();
@@ -10937,22 +11036,24 @@ function renderPulseWeatherUI(data, city, updatedTime = '') {
   const histView = buildPulseWeatherHistoryView(city, histMonth, histDay, histDateLabelFull);
 
   container.innerHTML = `
-    <!-- 1. Верхній блок: перемикачі днів Sinoptik + компактний вертикальний ротатор інфо-рядка (Світловий день / Стан неба / Дорожня порада) -->
+    <!-- 1. Верхній блок: перемикачі днів Sinoptik + компактний 5-слайдовий вертикальний ротатор -->
     <div class="pulse-w2-top-panel">
       <div class="pulse-w2-tabs">
         ${tabsHtml}
       </div>
       <div class="pulse-w2-rot-divider">
         <div class="pulse-w2-rot-dots-center" id="pulseWeatherRotDots" title="Індикатор активного слайда (натисніть для переходу)">
-          <span class="pulse-w2-rot-dot active" data-idx="0" onclick="window.setPulseWeatherSlide(0); event.stopPropagation();" title="Світловий день (схід / захід)"></span>
-          <span class="pulse-w2-rot-dot" data-idx="1" onclick="window.setPulseWeatherSlide(1); event.stopPropagation();" title="Стан погоди на добу"></span>
-          <span class="pulse-w2-rot-dot" data-idx="2" onclick="window.setPulseWeatherSlide(2); event.stopPropagation();" title="Порада водіям та пішоходам"></span>
+          <span class="pulse-w2-rot-dot active" data-idx="0" onclick="window.setPulseWeatherSlide(0); event.stopPropagation();" title="Сонце та Місяць (схід / захід / тривалість)"></span>
+          <span class="pulse-w2-rot-dot" data-idx="1" onclick="window.setPulseWeatherSlide(1); event.stopPropagation();" title="Підсумок доби (стан неба, опади, пориви)"></span>
+          <span class="pulse-w2-rot-dot" data-idx="2" onclick="window.setPulseWeatherSlide(2); event.stopPropagation();" title="Порада на день (дорога та одяг)"></span>
+          <span class="pulse-w2-rot-dot" data-idx="3" onclick="window.setPulseWeatherSlide(3); event.stopPropagation();" title="УФ-індекс та фаза Місяця"></span>
+          <span class="pulse-w2-rot-dot" data-idx="4" onclick="window.setPulseWeatherSlide(4); event.stopPropagation();" title="Атмосферний тиск і магнітний фон (Kp)"></span>
         </div>
       </div>
-      <div class="pulse-w2-rotator-bar" id="pulseWeatherRotatorBar" onclick="window.rotatePulseWeatherInfo(1)" title="Натисніть для перегортання (автоповорот кожні 7 секунд)">
+      <div class="pulse-w2-rotator-bar" id="pulseWeatherRotatorBar" onclick="window.rotatePulseWeatherInfo(1)" title="Натисніть для перегортання (автоповорот кожні 7.5 секунд)">
         <div class="pulse-w2-rot-viewport">
           <div class="pulse-w2-rot-track" id="pulseWeatherRotTrack">
-            <!-- Слайд 1: Сонце (ліворуч) | Місяць та ніч (праворуч) -->
+            <!-- Слайд 1: Варіант 1-4б (два короткі горизонтальні штрихи =) -->
             <div class="pulse-w2-rot-slide pulse-w2-rot-sun" title="${daylightTooltip} • ${nightTooltip} • ${moonPhase.tooltip}">
               <span class="pulse-w2-astro-group is-sun">
                 <span class="pulse-w2-rot-time" title="Схід сонця: ${sunriseStr}">${sunriseStr}</span>
@@ -10961,7 +11062,7 @@ function renderPulseWeatherUI(data, city, updatedTime = '') {
                 <span class="pulse-sun-spinner" title="Захід сонця: ${sunsetStr}">${sunSvgCompact}</span>
                 <span class="pulse-w2-rot-time" title="Захід сонця: ${sunsetStr}">${sunsetStr}</span>
               </span>
-              <span class="pulse-w2-astro-sep" aria-hidden="true"></span>
+              <span class="pulse-w2-astro-sep is-double-dash" aria-hidden="true"></span>
               <span class="pulse-w2-astro-group is-moon">
                 <span class="pulse-w2-rot-time" title="${moonTimes.hasRise ? `Схід місяця: ${moonTimes.rise}` : 'Схід місяця: цієї доби не сходить'}">${moonTimes.rise}</span>
                 <span class="pulse-moon-phase-wrap" title="${moonPhase.tooltip}">${moonSvgCompact}</span>
@@ -10970,15 +11071,25 @@ function renderPulseWeatherUI(data, city, updatedTime = '') {
                 <span class="pulse-w2-rot-time" title="${moonTimes.hasSet ? `Захід місяця: ${moonTimes.set}` : 'Захід місяця: цієї доби не заходить'}">${moonTimes.set}</span>
               </span>
             </div>
-            <!-- Слайд 2: Стан погоди -->
-            <div class="pulse-w2-rot-slide pulse-w2-rot-cond" title="Стан погоди: ${skyConditionText}">
+            <!-- Слайд 2: Підсумок доби (небо, опади, пориви вітру) -->
+            <div class="pulse-w2-rot-slide pulse-w2-rot-cond" title="${slide2Tooltip}">
               <i class="fas ${skyIconClass} ${skyIconColorClass} pulse-w2-rot-icon"></i>
-              <span class="pulse-w2-rot-text">${skyConditionText}</span>
+              <span class="pulse-w2-rot-text">${slide2SummaryText}</span>
             </div>
-            <!-- Слайд 3: Порада водіям та пішоходам -->
-            <div class="pulse-w2-rot-slide pulse-w2-rot-advice" title="Порада водіям та пішоходам на основі погодних умов">
+            <!-- Слайд 3: Порада на день (дорога, приморозок та одяг) -->
+            <div class="pulse-w2-rot-slide pulse-w2-rot-advice" title="Порада водіям та пішоходам на основі прогнозу">
               <i class="fas ${weatherAdvice.icon} text-primary pulse-w2-rot-icon"></i>
               <span class="pulse-w2-rot-text">${weatherAdvice.text}</span>
+            </div>
+            <!-- Слайд 4: УФ-індекс та Фаза Місяця -->
+            <div class="pulse-w2-rot-slide pulse-w2-rot-astro" title="${slide4Tooltip}">
+              <i class="fas fa-sun ${uvBadgeClass} pulse-w2-rot-icon"></i>
+              <span class="pulse-w2-rot-text">УФ: <strong>${uvValRaw.toFixed(1)}</strong> (${uvLevelText}) · <span class="pulse-w2-rot-inline-moon">${moonSvgCompact}</span> ${moonShortLabel} (${moonPhase.illumPercent}%)</span>
+            </div>
+            <!-- Слайд 5: Тиск та магнітний фон -->
+            <div class="pulse-w2-rot-slide pulse-w2-rot-biomet" title="${slide5Tooltip}">
+              <i class="fas fa-tachometer-alt text-info pulse-w2-rot-icon"></i>
+              <span class="pulse-w2-rot-text">${pressSummaryText} · <i class="fas fa-magnet ${kpIconClass}" style="font-size:0.68rem;"></i> ${kpSummaryText}</span>
             </div>
           </div>
         </div>
@@ -11007,49 +11118,61 @@ function renderPulseWeatherUI(data, city, updatedTime = '') {
         </table>
       </div>
 
-      <!-- Бігуча стрічка (Ticker): коротке роз'яснення показників таблиці -->
-      <div class="pulse-w2-ticker-wrap" title="Довідка за показниками таблиці (наведіть курсор для паузи)">
-        <div class="pulse-w2-ticker-badge">
-          <i class="fas fa-info-circle text-primary"></i>
-          <span>Довідка</span>
-        </div>
-        <div class="pulse-w2-ticker-viewport">
-          <div class="pulse-w2-ticker-track">
-            <div class="pulse-w2-ticker-content">
-              <span class="pulse-w2-ticker-item">🧭 <strong>Атмосферний тиск:</strong> норма 750-760 мм рт. ст. (нижче 748 - знижений, вище 762 - підвищений)</span>
-              <span class="pulse-w2-ticker-sep">•</span>
-              <span class="pulse-w2-ticker-item">🧲 <strong>Геомагнітні бурі (шкала-Kp):</strong> 0-2 спокійно, 3-4 помірні збурення, 5+ магнітна буря</span>
-              <span class="pulse-w2-ticker-sep">•</span>
-              <span class="pulse-w2-ticker-item">💨 <strong>Вітер (м/с):</strong> швидкість і напрямок (стрілка показує куди дме вітер, від 8 м/с - сильний)</span>
-              <span class="pulse-w2-ticker-sep">•</span>
-              <span class="pulse-w2-ticker-item">💧 <strong>Вологість (%):</strong> оптимальний комфортний рівень 40-60%</span>
-              <span class="pulse-w2-ticker-sep">•</span>
-              <span class="pulse-w2-ticker-item">🌡️ <strong>Температура (C°):</strong> фактична / відчувається (з урахуванням вітру та вологості)</span>
-              <span class="pulse-w2-ticker-sep">•</span>
-              <span class="pulse-w2-ticker-item">🌧️ <strong>Опади (%):</strong> розрахункова ймовірність дощу чи снігу на вказаний час</span>
-              <span class="pulse-w2-ticker-sep">•</span>
-            </div>
-            <div class="pulse-w2-ticker-content" aria-hidden="true">
-              <span class="pulse-w2-ticker-item">🧭 <strong>Атмосферний тиск:</strong> норма 750-760 мм рт. ст. (нижче 748 - знижений, вище 762 - підвищений)</span>
-              <span class="pulse-w2-ticker-sep">•</span>
-              <span class="pulse-w2-ticker-item">🧲 <strong>Геомагнітні бурі (шкала-Kp):</strong> 0-2 спокійно, 3-4 помірні збурення, 5+ магнітна буря</span>
-              <span class="pulse-w2-ticker-sep">•</span>
-              <span class="pulse-w2-ticker-item">💨 <strong>Вітер (м/с):</strong> швидкість і напрямок (стрілка показує куди дме вітер, від 8 м/с - сильний)</span>
-              <span class="pulse-w2-ticker-sep">•</span>
-              <span class="pulse-w2-ticker-item">💧 <strong>Вологість (%):</strong> оптимальний комфортний рівень 40-60%</span>
-              <span class="pulse-w2-ticker-sep">•</span>
-              <span class="pulse-w2-ticker-item">🌡️ <strong>Температура (C°):</strong> фактична / відчувається (з урахуванням вітру та вологості)</span>
-              <span class="pulse-w2-ticker-sep">•</span>
-              <span class="pulse-w2-ticker-item">🌧️ <strong>Опади (%):</strong> розрахункова ймовірність дощу чи снігу на вказаний час</span>
-              <span class="pulse-w2-ticker-sep">•</span>
+      <!-- Об'єднаний нижній рядок (Варіант А): [ ⓘ | Історичні рекорди <-> Бігуча довідка при кліку ] -->
+      <div class="pulse-w2-info-combined${window.pulseWeatherState && window.pulseWeatherState.helpOpen ? ' is-help-open' : ''}" id="pulseWeatherCombinedBar">
+        <button type="button" class="pulse-w2-info-trigger" id="pulseWeatherHelpToggle" onclick="window.togglePulseWeatherHelp(event)" title="${window.pulseWeatherState && window.pulseWeatherState.helpOpen ? 'Повернутися до історичних рекордів' : 'Показати довідку за показниками'}" aria-label="Довідка за показниками" aria-expanded="${window.pulseWeatherState && window.pulseWeatherState.helpOpen ? 'true' : 'false'}">
+          <i class="fas fa-info-circle"></i>
+        </button>
+        <span class="pulse-w2-info-divider" aria-hidden="true"></span>
+        <div class="pulse-w2-info-stage" onclick="window.togglePulseWeatherHelp(event)">
+          <div class="pulse-w2-history-box" id="pulseWeatherHistoryBox" title="${histView.title} • Натисніть для перегляду довідки">
+            ${histView.html}
+          </div>
+          <div class="pulse-w2-ticker-viewport" id="pulseWeatherHelpTicker" aria-hidden="${window.pulseWeatherState && window.pulseWeatherState.helpOpen ? 'false' : 'true'}" title="Довідка за показниками (наведіть для паузи, натисніть щоб повернутися до рекордів)">
+            <div class="pulse-w2-ticker-track">
+              <div class="pulse-w2-ticker-content">
+                <span class="pulse-w2-ticker-item">🧭 <strong>Атмосферний тиск:</strong> норма 750-760 мм рт. ст. (нижче 748 - знижений, вище 762 - підвищений)</span>
+                <span class="pulse-w2-ticker-sep">•</span>
+                <span class="pulse-w2-ticker-item">🧲 <strong>Геомагнітні бурі (шкала Kp):</strong> 0-2 спокійно, 3-4 помірні збурення, 5+ магнітна буря</span>
+                <span class="pulse-w2-ticker-sep">•</span>
+                <span class="pulse-w2-ticker-item">💨 <strong>Вітер (м/с):</strong> швидкість, пориви та напрямок (стрілка показує куди дме, від 8 м/с - сильний)</span>
+                <span class="pulse-w2-ticker-sep">•</span>
+                <span class="pulse-w2-ticker-item">💧 <strong>Вологість (%):</strong> оптимальний комфортний рівень 40-60%</span>
+                <span class="pulse-w2-ticker-sep">•</span>
+                <span class="pulse-w2-ticker-item">🌡️ <strong>Температура (C°):</strong> фактична / відчувається (з урахуванням вітру та вологості)</span>
+                <span class="pulse-w2-ticker-sep">•</span>
+                <span class="pulse-w2-ticker-item">🌧️ <strong>Опади (% / мм):</strong> ймовірність на годину та добова сума на картках днів</span>
+                <span class="pulse-w2-ticker-sep">•</span>
+                <span class="pulse-w2-ticker-item">☀️ <strong>УФ-індекс (UV):</strong> 0-2 низький, 3-5 помірний, 6+ високий (потрібен захист)</span>
+                <span class="pulse-w2-ticker-sep">•</span>
+                <span class="pulse-w2-ticker-item">🌗 <strong>Сонце і Місяць:</strong> схід - тривалість дня/ночі - захід і фаза освітленості</span>
+                <span class="pulse-w2-ticker-sep">•</span>
+                <span class="pulse-w2-ticker-item">📅 <strong>Рекорди МАКС/МІН:</strong> історичні дані для обраної дати з 1940 р. (Open-Meteo ERA5)</span>
+                <span class="pulse-w2-ticker-sep">•</span>
+              </div>
+              <div class="pulse-w2-ticker-content" aria-hidden="true">
+                <span class="pulse-w2-ticker-item">🧭 <strong>Атмосферний тиск:</strong> норма 750-760 мм рт. ст. (нижче 748 - знижений, вище 762 - підвищений)</span>
+                <span class="pulse-w2-ticker-sep">•</span>
+                <span class="pulse-w2-ticker-item">🧲 <strong>Геомагнітні бурі (шкала Kp):</strong> 0-2 спокійно, 3-4 помірні збурення, 5+ магнітна буря</span>
+                <span class="pulse-w2-ticker-sep">•</span>
+                <span class="pulse-w2-ticker-item">💨 <strong>Вітер (м/с):</strong> швидкість, пориви та напрямок (стрілка показує куди дме, від 8 м/с - сильний)</span>
+                <span class="pulse-w2-ticker-sep">•</span>
+                <span class="pulse-w2-ticker-item">💧 <strong>Вологість (%):</strong> оптимальний комфортний рівень 40-60%</span>
+                <span class="pulse-w2-ticker-sep">•</span>
+                <span class="pulse-w2-ticker-item">🌡️ <strong>Температура (C°):</strong> фактична / відчувається (з урахуванням вітру та вологості)</span>
+                <span class="pulse-w2-ticker-sep">•</span>
+                <span class="pulse-w2-ticker-item">🌧️ <strong>Опади (% / мм):</strong> ймовірність на годину та добова сума на картках днів</span>
+                <span class="pulse-w2-ticker-sep">•</span>
+                <span class="pulse-w2-ticker-item">☀️ <strong>УФ-індекс (UV):</strong> 0-2 низький, 3-5 помірний, 6+ високий (потрібен захист)</span>
+                <span class="pulse-w2-ticker-sep">•</span>
+                <span class="pulse-w2-ticker-item">🌗 <strong>Сонце і Місяць:</strong> схід - тривалість дня/ночі - захід і фаза освітленості</span>
+                <span class="pulse-w2-ticker-sep">•</span>
+                <span class="pulse-w2-ticker-item">📅 <strong>Рекорди МАКС/МІН:</strong> історичні дані для обраної дати з 1940 р. (Open-Meteo ERA5)</span>
+                <span class="pulse-w2-ticker-sep">•</span>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-
-      <!-- Історичні кліматичні рекорди за даними Open-Meteo ERA5 з 1940 р. (в один чистий рядок) -->
-      <div class="pulse-w2-history-box" id="pulseWeatherHistoryBox" title="${histView.title}">
-        ${histView.html}
       </div>
     </div>
 
@@ -11073,11 +11196,33 @@ function renderPulseWeatherUI(data, city, updatedTime = '') {
   }
 }
 
+window.togglePulseWeatherHelp = function(ev) {
+  if (ev) {
+    ev.preventDefault();
+    ev.stopPropagation();
+  }
+  const bar = document.getElementById('pulseWeatherCombinedBar');
+  if (!bar) return;
+  const isOpen = bar.classList.toggle('is-help-open');
+  if (window.pulseWeatherState) {
+    window.pulseWeatherState.helpOpen = isOpen;
+  }
+  const btn = document.getElementById('pulseWeatherHelpToggle');
+  if (btn) {
+    btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    btn.title = isOpen ? 'Повернутися до історичних рекордів' : 'Показати довідку за показниками';
+  }
+  const ticker = document.getElementById('pulseWeatherHelpTicker');
+  if (ticker) {
+    ticker.setAttribute('aria-hidden', isOpen ? 'false' : 'true');
+  }
+};
+
 window.pulseWeatherRotatorIndex = window.pulseWeatherRotatorIndex || 0;
 window.rotatePulseWeatherInfo = function(step = 1) {
   const track = document.getElementById('pulseWeatherRotTrack');
   if (!track) return;
-  const totalSlides = 3;
+  const totalSlides = track.querySelectorAll('.pulse-w2-rot-slide').length || 5;
   window.pulseWeatherRotatorIndex = (window.pulseWeatherRotatorIndex + step + totalSlides) % totalSlides;
   const idx = window.pulseWeatherRotatorIndex;
   track.style.transform = `translateY(-${idx * 24}px)`;
@@ -11099,7 +11244,7 @@ window.rotatePulseWeatherInfo = function(step = 1) {
 window.setPulseWeatherSlide = function(slideIdx) {
   const track = document.getElementById('pulseWeatherRotTrack');
   if (!track) return;
-  const totalSlides = 3;
+  const totalSlides = track.querySelectorAll('.pulse-w2-rot-slide').length || 5;
   window.pulseWeatherRotatorIndex = ((slideIdx % totalSlides) + totalSlides) % totalSlides;
   const idx = window.pulseWeatherRotatorIndex;
   track.style.transform = `translateY(-${idx * 24}px)`;
@@ -11120,7 +11265,9 @@ window.setPulseWeatherSlide = function(slideIdx) {
 
 window.initPulseWeatherRotator = function() {
   const track = document.getElementById('pulseWeatherRotTrack');
-  const idx = window.pulseWeatherRotatorIndex || 0;
+  const totalSlides = track ? (track.querySelectorAll('.pulse-w2-rot-slide').length || 5) : 5;
+  const idx = ((window.pulseWeatherRotatorIndex || 0) % totalSlides + totalSlides) % totalSlides;
+  window.pulseWeatherRotatorIndex = idx;
   if (track) {
     track.style.transform = `translateY(-${idx * 24}px)`;
   }
@@ -11476,31 +11623,31 @@ function renderPulseEcoUI(data, region) {
 // ==========================================================================
 const UKRAINE_FUEL_REGIONS = [
   { id: 'ua', name: 'Вся Україна (середнє)', delta: 0 },
-  { id: 'kyiv', name: 'м. Київ', delta: 0 },
-  { id: 'kyiv_obl', name: 'Київська обл.', delta: -0.10 },
-  { id: 'vinnytsia', name: 'Вінницька обл.', delta: -0.20 },
-  { id: 'volyn', name: 'Волинська обл.', delta: -0.40 },
-  { id: 'dnipro', name: 'Дніпропетровська обл.', delta: 0.20 },
-  { id: 'donetsk', name: 'Донецька обл.', delta: 0.60 },
-  { id: 'zhytomyr', name: 'Житомирська обл.', delta: -0.20 },
-  { id: 'zakarpattia', name: 'Закарпатська обл.', delta: -0.40 },
-  { id: 'zaporizhzhia', name: 'Запорізька обл.', delta: 0.40 },
-  { id: 'ivano_frankivsk', name: 'Івано-Франківська обл.', delta: -0.30 },
-  { id: 'kirovohrad', name: 'Кіровоградська обл.', delta: 0.10 },
-  { id: 'luhansk', name: 'Луганська обл.', delta: 0.60 },
-  { id: 'lviv', name: 'Львівська обл.', delta: -0.40 },
-  { id: 'mykolaiv', name: 'Миколаївська обл.', delta: 0.10 },
-  { id: 'odesa', name: 'Одеська обл.', delta: 0.00 },
-  { id: 'poltava', name: 'Полтавська обл.', delta: 0.10 },
-  { id: 'rivne', name: 'Рівненська обл.', delta: -0.30 },
-  { id: 'sumy', name: 'Сумська обл.', delta: 0.20 },
-  { id: 'ternopil', name: 'Тернопільська обл.', delta: -0.30 },
-  { id: 'kharkiv', name: 'Харківська обл.', delta: 0.40 },
-  { id: 'kherson', name: 'Херсонська обл.', delta: 0.50 },
-  { id: 'khmelnytskyi', name: 'Хмельницька обл.', delta: -0.20 },
-  { id: 'cherkasy', name: 'Черкаська обл.', delta: 0.00 },
-  { id: 'chernivtsi', name: 'Чернівецька обл.', delta: -0.30 },
-  { id: 'chernihiv', name: 'Чернігівська обл.', delta: 0.10 }
+  { id: 'kyiv', name: 'м. Київ', delta: 0, lat: 50.4501, lon: 30.5234, keys: ['місто київ', 'м. київ', 'kyiv city'] },
+  { id: 'kyiv_obl', name: 'Київська обл.', delta: -0.10, lat: 50.2547, lon: 30.3125, keys: ['київськ', 'kyiv oblast'] },
+  { id: 'vinnytsia', name: 'Вінницька обл.', delta: -0.20, lat: 49.2331, lon: 28.4682, keys: ['вінниц', 'vinnyts'] },
+  { id: 'volyn', name: 'Волинська обл.', delta: -0.40, lat: 50.7472, lon: 25.3254, keys: ['волин', 'луцьк', 'volyn'] },
+  { id: 'dnipro', name: 'Дніпропетровська обл.', delta: 0.20, lat: 48.4647, lon: 35.0462, keys: ['дніпропетр', 'dnipropetr'] },
+  { id: 'donetsk', name: 'Донецька обл.', delta: 0.60, lat: 48.0159, lon: 37.8029, keys: ['донец', 'donetsk'] },
+  { id: 'zhytomyr', name: 'Житомирська обл.', delta: -0.20, lat: 50.2547, lon: 28.6587, keys: ['житомир', 'zhytomyr'] },
+  { id: 'zakarpattia', name: 'Закарпатська обл.', delta: -0.40, lat: 48.6208, lon: 22.2879, keys: ['закарпат', 'ужгород', 'zakarpatt'] },
+  { id: 'zaporizhzhia', name: 'Запорізька обл.', delta: 0.40, lat: 47.8388, lon: 35.1396, keys: ['запоріз', 'zaporizh'] },
+  { id: 'ivano_frankivsk', name: 'Івано-Франківська обл.', delta: -0.30, lat: 48.9226, lon: 24.7111, keys: ['івано-франків', 'ivano-frankivsk'] },
+  { id: 'kirovohrad', name: 'Кіровоградська обл.', delta: 0.10, lat: 48.5079, lon: 32.2623, keys: ['кіровоград', 'кропивниц', 'новомиргород', 'kirovohrad'] },
+  { id: 'luhansk', name: 'Луганська обл.', delta: 0.60, lat: 48.5740, lon: 39.3078, keys: ['луган', 'luhansk'] },
+  { id: 'lviv', name: 'Львівська обл.', delta: -0.40, lat: 49.8397, lon: 24.0297, keys: ['львів', 'lviv'] },
+  { id: 'mykolaiv', name: 'Миколаївська обл.', delta: 0.10, lat: 46.9750, lon: 31.9946, keys: ['миколаїв', 'mykolaiv'] },
+  { id: 'odesa', name: 'Одеська обл.', delta: 0.00, lat: 46.4825, lon: 30.7233, keys: ['одес', 'odesa'] },
+  { id: 'poltava', name: 'Полтавська обл.', delta: 0.10, lat: 49.5883, lon: 34.5514, keys: ['полтав', 'poltava'] },
+  { id: 'rivne', name: 'Рівненська обл.', delta: -0.30, lat: 50.6199, lon: 26.2516, keys: ['рівнен', 'рівне', 'rivne'] },
+  { id: 'sumy', name: 'Сумська обл.', delta: 0.20, lat: 50.9077, lon: 34.7981, keys: ['сумськ', 'суми', 'sumy'] },
+  { id: 'ternopil', name: 'Тернопільська обл.', delta: -0.30, lat: 49.5535, lon: 25.5948, keys: ['тернопіл', 'ternopil'] },
+  { id: 'kharkiv', name: 'Харківська обл.', delta: 0.40, lat: 49.9935, lon: 36.2304, keys: ['харків', 'kharkiv'] },
+  { id: 'kherson', name: 'Херсонська обл.', delta: 0.50, lat: 46.6354, lon: 32.6169, keys: ['херсон', 'kherson'] },
+  { id: 'khmelnytskyi', name: 'Хмельницька обл.', delta: -0.20, lat: 49.4230, lon: 26.9871, keys: ['хмельниц', 'khmelnytskyi'] },
+  { id: 'cherkasy', name: 'Черкаська обл.', delta: 0.00, lat: 49.4444, lon: 32.0598, keys: ['черкас', 'умань', 'cherkasy'] },
+  { id: 'chernivtsi', name: 'Чернівецька обл.', delta: -0.30, lat: 48.2921, lon: 25.9358, keys: ['чернівец', 'чернівці', 'chernivtsi'] },
+  { id: 'chernihiv', name: 'Чернігівська обл.', delta: 0.10, lat: 51.4982, lon: 31.2893, keys: ['чернігів', 'chernihiv'] }
 ];
 
 const BASE_FUEL_NETWORKS = [
@@ -11971,7 +12118,7 @@ function renderPulseDrawerLayout(container) {
           <!-- Вибір місцевості (міста) з автоматичним збереженням -->
           <div class="pulse-weather-city-bar">
             <label for="pulseWeatherCitySelect" class="pulse-weather-city-label">
-              <i class="fas fa-map-marker-alt text-danger me-1"></i> Місто:
+              <i class="fas fa-map-marker-alt text-warning me-1"></i> Місто:
             </label>
             <select id="pulseWeatherCitySelect" class="pulse-weather-city-select" aria-label="Обрати місто для прогнозу погоди">
               ${renderWeatherCityOptions()}
@@ -12309,11 +12456,14 @@ function renderPulseDrawerLayout(container) {
           <!-- Вибір регіону / області (збереження в браузері та профілі) -->
           <div class="pulse-fuel-region-bar">
             <label for="pulseFuelRegionSelect" class="pulse-fuel-region-label">
-              <i class="fas fa-map-marker-alt text-danger"></i> Регіон:
+              <i class="fas fa-map-marker-alt text-danger me-1"></i> Регіон:
             </label>
             <select id="pulseFuelRegionSelect" class="pulse-fuel-region-select" aria-label="Обрати область для перегляду цін на пальне">
               ${UKRAINE_FUEL_REGIONS.map(r => `<option value="${r.id}">${r.name}</option>`).join('')}
             </select>
+            <button type="button" id="pulseFuelGeoBtn" class="pulse-weather-tool-btn pulse-weather-geo-btn-inline" title="Визначити мою область автоматично (GPS / IP)" aria-label="Автовизначення області">
+              <i class="fas fa-crosshairs"></i>
+            </button>
           </div>
 
           <!-- Таблиця цін на пальне по провідних мережах АЗС -->
@@ -12620,23 +12770,108 @@ function renderPulseDrawerLayout(container) {
   const fuelRegionSelect = container.querySelector('#pulseFuelRegionSelect');
   const savedRegion = localStorage.getItem('user_fuel_region') || 'ua';
   let fuelRegionSaveDebounce = null;
+  const saveFuelRegionSelection = (chosen) => {
+    localStorage.setItem('user_fuel_region', chosen);
+    renderPulseFuelTable(chosen);
+    clearTimeout(fuelRegionSaveDebounce);
+    fuelRegionSaveDebounce = setTimeout(() => {
+      if (currentUser && firebaseDb) {
+        firebaseDb.collection('users').doc(currentUser.uid).set({
+          fuelRegion: chosen
+        }, { merge: true }).catch(() => {});
+      }
+    }, 500);
+  };
   if (fuelRegionSelect) {
     fuelRegionSelect.value = savedRegion;
-    fuelRegionSelect.onchange = (e) => {
-      const chosen = e.target.value;
-      localStorage.setItem('user_fuel_region', chosen);
-      renderPulseFuelTable(chosen);
-      clearTimeout(fuelRegionSaveDebounce);
-      fuelRegionSaveDebounce = setTimeout(() => {
-        if (currentUser && firebaseDb) {
-          firebaseDb.collection('users').doc(currentUser.uid).set({
-            fuelRegion: chosen
-          }, { merge: true }).catch(() => {});
-        }
-      }, 500);
-    };
+    fuelRegionSelect.onchange = (e) => saveFuelRegionSelection(e.target.value);
   }
   renderPulseFuelTable(savedRegion);
+
+  // Кнопка автовизначення області для цін на пальне (GPS / IP / збережені координати)
+  const fuelGeoBtn = container.querySelector('#pulseFuelGeoBtn');
+  if (fuelGeoBtn) {
+    fuelGeoBtn.onclick = async (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      fuelGeoBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+      const findRegionByText = (txt) => {
+        if (!txt) return null;
+        const low = String(txt).toLowerCase();
+        // Спершу перевіряємо м. Київ окремо від Київської області
+        if (low === 'київ' || low === 'м. київ' || low === 'місто київ' || low === 'kyiv') {
+          return UKRAINE_FUEL_REGIONS.find(r => r.id === 'kyiv');
+        }
+        return UKRAINE_FUEL_REGIONS.find(r => Array.isArray(r.keys) && r.keys.some(k => low.includes(k))) || null;
+      };
+
+      const applyNearestFuelRegion = async (lat, lon, regionHint = '') => {
+        let matched = findRegionByText(regionHint);
+        if (!matched) {
+          try {
+            const rg = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=uk`);
+            if (rg.ok) {
+              const res = await rg.json();
+              const sub = res.principalSubdivision || res.city || res.locality || '';
+              matched = findRegionByText(sub);
+            }
+          } catch (err) {}
+        }
+        if (!matched) {
+          let minDist = Infinity;
+          for (const r of UKRAINE_FUEL_REGIONS) {
+            if (typeof r.lat !== 'number' || typeof r.lon !== 'number') continue;
+            const dist = Math.hypot(r.lat - lat, r.lon - lon);
+            if (dist < minDist) {
+              minDist = dist;
+              matched = r;
+            }
+          }
+        }
+        if (matched && fuelRegionSelect) {
+          fuelRegionSelect.value = matched.id;
+          saveFuelRegionSelection(matched.id);
+          showQuickToast(`Ціни на пальне: обрано регіон (${matched.name})`, 'success');
+        }
+        fuelGeoBtn.innerHTML = '<i class="fas fa-crosshairs"></i>';
+      };
+
+      try {
+        const customGeo = JSON.parse(localStorage.getItem('pulse_weather_custom_geo') || 'null');
+        if (customGeo && customGeo.lat && customGeo.lon) {
+          await applyNearestFuelRegion(customGeo.lat, customGeo.lon, customGeo.region || customGeo.name || '');
+          return;
+        }
+      } catch (err) {}
+
+      if ('geolocation' in navigator) {
+        navigator.geolocation.getCurrentPosition(
+          (pos) => {
+            applyNearestFuelRegion(pos.coords.latitude, pos.coords.longitude);
+          },
+          async () => {
+            try {
+              const ipRes = await fetch('https://ipapi.co/json/');
+              if (ipRes.ok) {
+                const ipData = await ipRes.json();
+                if (ipData && ipData.latitude && ipData.longitude) {
+                  await applyNearestFuelRegion(ipData.latitude, ipData.longitude, ipData.region || ipData.city || '');
+                  return;
+                }
+              }
+            } catch (e2) {}
+            showQuickToast('Не вдалося визначити область автоматично', 'warning');
+            fuelGeoBtn.innerHTML = '<i class="fas fa-crosshairs"></i>';
+          },
+          { timeout: 6000 }
+        );
+      } else {
+        showQuickToast('Геолокація не підтримується браузером', 'warning');
+        fuelGeoBtn.innerHTML = '<i class="fas fa-crosshairs"></i>';
+      }
+    };
+  }
 
   // Перемикач вкладок Валюти / Крипта у сітці
   const tabBtnFiat = container.querySelector('#pulseTabBtnFiat');
