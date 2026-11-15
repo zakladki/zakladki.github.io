@@ -11075,6 +11075,18 @@ body.dark-mode .pulse-day-drawer {
   color: #f8fafc;
   border-bottom-color: #38bdf8;
 }
+.pulse-day-drawer button,
+.pulse-day-drawer select,
+.pulse-day-drawer a {
+  -webkit-tap-highlight-color: transparent;
+}
+.pulse-day-drawer button:focus,
+.pulse-day-drawer button:focus-visible,
+.pulse-day-drawer button:active,
+.pulse-day-drawer select:focus,
+.pulse-day-drawer select:focus-visible {
+  outline: none !important;
+}
 
 /* Шапка всередині виїзної шторки */
 .pulse-drawer-header {
@@ -11223,6 +11235,28 @@ body.dark-mode .pulse-close-btn {
     grid-template-columns: repeat(4, minmax(285px, 310px));
     gap: 8px;
     padding: 8px 6px 14px;
+    align-items: stretch;
+  }
+  #pulseColEcoFinance {
+    gap: 5px;
+    justify-content: space-between;
+  }
+  #pulseColFuelHoliday {
+    justify-content: space-between;
+  }
+  #pulseColNews {
+    height: 100%;
+    min-height: 0;
+  }
+  #pulseCardNews {
+    height: 100%;
+    min-height: 0;
+  }
+  #pulseCardNews .pulse-news-feed {
+    flex: 1 1 0;
+    height: 0;
+    min-height: 320px;
+    max-height: none;
   }
 }
 @media (max-width: 1199.98px) and (min-width: 900px) {
@@ -13018,7 +13052,7 @@ body.dark-mode .pulse-eco-strip-val .pulse-eco-dec {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 5px;
+  gap: 4px;
   margin-bottom: 7px;
 }
 .pulse-news-tabs-wrap .pulse-rates-tab-group {
@@ -13031,7 +13065,7 @@ body.dark-mode .pulse-eco-strip-val .pulse-eco-dec {
   border: 1px solid #e2e8f0;
   border-radius: 6px;
   padding: 2px;
-  gap: 3px; /* Чіткий візуальний проміжок між окремими розділами */
+  gap: 2px; /* Чіткий візуальний проміжок між окремими розділами */
   box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.04);
 }
 body.dark-mode .pulse-news-tabs-wrap .pulse-rates-tab-group {
@@ -13045,8 +13079,8 @@ body.dark-mode .pulse-news-tabs-wrap .pulse-rates-tab-group {
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 2.5px 3px;
-  font-size: 0.63rem;
+  padding: 2.5px 2px;
+  font-size: 0.61rem;
   font-weight: 600;
   white-space: nowrap;
   border-radius: 4px;
@@ -13097,7 +13131,7 @@ body.dark-mode .pulse-news-tabs-wrap .pulse-rate-tab-btn.active {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 3.5px;
+  gap: 3px;
   width: auto;
   height: 23px;
   border-radius: 6px;
@@ -13105,7 +13139,8 @@ body.dark-mode .pulse-news-tabs-wrap .pulse-rate-tab-btn.active {
   background: rgba(239, 68, 68, 0.08);
   color: #b91c1c;
   cursor: pointer;
-  padding: 0 6px;
+  padding: 0 5px;
+  white-space: nowrap;
   transition: all 0.15s ease;
   flex-shrink: 0;
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
@@ -13122,8 +13157,8 @@ body.dark-mode .pulse-news-tabs-wrap .pulse-rate-tab-btn.active {
   box-shadow: 0 1px 4px rgba(239, 68, 68, 0.35);
 }
 .pulse-news-filter-red-dot {
-  width: 7px;
-  height: 7px;
+  width: 6.5px;
+  height: 6.5px;
   border-radius: 50%;
   background-color: #ef4444;
   display: block;
@@ -13131,11 +13166,27 @@ body.dark-mode .pulse-news-tabs-wrap .pulse-rate-tab-btn.active {
   transition: transform 0.15s ease, background-color 0.15s ease;
   flex-shrink: 0;
 }
+.pulse-news-filter-text {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 3px;
+  line-height: 1;
+}
 .pulse-news-filter-lbl {
-  font-size: 0.63rem;
+  font-size: 0.62rem;
   font-weight: 700;
   line-height: 1;
   letter-spacing: 0.1px;
+}
+.pulse-news-filter-count {
+  font-size: 0.62rem;
+  font-weight: 700;
+  line-height: 1;
+  opacity: 0.9;
+  font-variant-numeric: tabular-nums;
+}
+.pulse-news-filter-count:empty {
+  display: none;
 }
 .pulse-news-important-filter-btn:hover .pulse-news-filter-red-dot {
   transform: scale(1.15);
@@ -13598,6 +13649,13 @@ body.dark-mode .pulse-fuel-table td.fuel-td-brand {
 body.dark-mode .pulse-fuel-table td.fuel-td-val {
   color: #e2e8f0;
 }
+.pulse-fuel-table td.fuel-td-val.is-best-price {
+  color: #15803d;
+  font-weight: 700;
+}
+body.dark-mode .pulse-fuel-table td.fuel-td-val.is-best-price {
+  color: #4ade80;
+}
 
 .pulse-fuel-bottom {
   display: flex;
@@ -13761,6 +13819,7 @@ body.dark-mode .pulse-rates-row {
   align-items: center;
   transition: background-color 0.15s ease;
   min-width: 0;
+  cursor: pointer;
 }
 .pulse-rate-item:not(:nth-child(4n)) {
   border-right: 1px solid #d5dfe9;
@@ -13935,11 +13994,13 @@ body.dark-mode .pulse-conv-select option {
 .pulse-conv-input-row {
   display: flex;
   align-items: center;
+  gap: 3px;
   width: 100%;
   margin: 1px 0;
 }
 
 .pulse-conv-input {
+  flex: 1;
   width: 100%;
   min-width: 0;
   border: none;
@@ -13953,6 +14014,60 @@ body.dark-mode .pulse-conv-select option {
 }
 body.dark-mode .pulse-conv-input {
   color: #e2e8f0;
+}
+
+.pulse-conv-copy-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border-radius: 5px;
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  color: #64748b;
+  font-size: 0.65rem;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.15s ease;
+}
+.pulse-conv-copy-btn:hover {
+  color: #0284c7;
+  border-color: #38bdf8;
+  background: #f0f9ff;
+}
+.pulse-conv-copy-btn.is-copied {
+  color: #16a34a;
+  border-color: #22c55e;
+  background: rgba(34, 197, 94, 0.12);
+}
+body.dark-mode .pulse-conv-copy-btn {
+  background: #0f172a;
+  border-color: #334155;
+  color: #94a3b8;
+}
+body.dark-mode .pulse-conv-copy-btn:hover {
+  color: #38bdf8;
+  border-color: #38bdf8;
+  background: rgba(56, 189, 248, 0.14);
+}
+body.dark-mode .pulse-conv-copy-btn.is-copied {
+  color: #4ade80;
+  border-color: #22c55e;
+  background: rgba(34, 197, 94, 0.2);
+}
+
+@keyframes pulseConvFlash {
+  0% {
+    box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.45);
+  }
+  100% {
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.07), 0 1px 2px rgba(15, 23, 42, 0.04);
+  }
+}
+.pulse-card.is-conv-flash {
+  animation: pulseConvFlash 0.55s ease;
 }
 
 .pulse-conv-rate-ref {
@@ -14133,17 +14248,123 @@ body.dark-mode .pulse-w2-top-panel {
   background: rgba(15, 23, 42, 0.72);
   border-color: #334155;
 }
+.pulse-w2-top-panel.is-extended-day {
+  border-color: rgba(99, 102, 241, 0.45);
+}
+body.dark-mode .pulse-w2-top-panel.is-extended-day {
+  border-color: rgba(129, 140, 248, 0.45);
+}
 
-/* Вкладки у стилі Sinoptik (Сьогодні / Завтра / Післязавтра) */
+/* Вкладки у стилі Sinoptik з плавним гортанням до 8 днів */
 .pulse-w2-tabs {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 0;
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  width: 100%;
   background: transparent;
   padding: 0;
   border: none;
   border-radius: 0;
+}
+.pulse-w2-tabs-viewport {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
   position: relative;
+}
+.pulse-w2-tabs-track {
+  display: flex;
+  flex-wrap: nowrap;
+  width: 100%;
+  transition: transform 0.36s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+
+.pulse-w2-tabs-nav-btn {
+  flex: 0 0 14px;
+  width: 14px;
+  padding: 0;
+  border: none;
+  background: rgba(148, 163, 184, 0.08);
+  color: #64748b;
+  font-size: 0.56rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.16s ease, color 0.16s ease, opacity 0.16s ease;
+}
+.pulse-w2-tabs-nav-btn.is-prev {
+  border-top-left-radius: 8px;
+  border-right: 1px solid rgba(148, 163, 184, 0.25);
+}
+.pulse-w2-tabs-nav-btn.is-next {
+  border-top-right-radius: 8px;
+  border-left: 1px solid rgba(148, 163, 184, 0.25);
+}
+.pulse-w2-tabs-nav-btn:not(:disabled):hover {
+  background: rgba(14, 165, 233, 0.14);
+  color: #0284c7;
+}
+.pulse-w2-tabs-nav-btn.is-disabled,
+.pulse-w2-tabs-nav-btn:disabled {
+  opacity: 0.28;
+  cursor: default;
+  pointer-events: none;
+}
+body.dark-mode .pulse-w2-tabs-nav-btn {
+  background: rgba(255, 255, 255, 0.03);
+  color: #94a3b8;
+}
+body.dark-mode .pulse-w2-tabs-nav-btn.is-prev {
+  border-right-color: rgba(148, 163, 184, 0.2);
+}
+body.dark-mode .pulse-w2-tabs-nav-btn.is-next {
+  border-left-color: rgba(148, 163, 184, 0.2);
+}
+body.dark-mode .pulse-w2-tabs-nav-btn:not(:disabled):hover {
+  background: rgba(56, 189, 248, 0.18);
+  color: #38bdf8;
+}
+
+.pulse-w2-ext-day-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 5px;
+  border: 1px solid rgba(99, 102, 241, 0.35);
+  background: rgba(99, 102, 241, 0.11);
+  color: #4338ca;
+  font-size: 0.64rem;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+.pulse-w2-ext-day-pill:hover {
+  background: rgba(99, 102, 241, 0.2);
+  border-color: rgba(99, 102, 241, 0.58);
+  color: #312e81;
+}
+.pulse-w2-ext-day-pill .pulse-w2-ext-close {
+  font-size: 0.74rem;
+  line-height: 1;
+  opacity: 0.75;
+  margin-left: 1px;
+}
+body.dark-mode .pulse-w2-ext-day-pill {
+  background: rgba(129, 140, 248, 0.18);
+  border-color: rgba(129, 140, 248, 0.42);
+  color: #c7d2fe;
+}
+body.dark-mode .pulse-w2-ext-day-pill:hover {
+  background: rgba(129, 140, 248, 0.28);
+  border-color: rgba(129, 140, 248, 0.65);
+  color: #e0e7ff;
 }
 
 .pulse-w2-tab {
@@ -14152,6 +14373,9 @@ body.dark-mode .pulse-w2-top-panel {
   align-items: center !important;
   justify-content: center !important;
   position: relative !important;
+  flex: 0 0 calc(100% / 3);
+  width: calc(100% / 3);
+  min-width: 0;
   background: transparent;
   border: none !important;
   border-top: none !important;
@@ -14165,18 +14389,13 @@ body.dark-mode .pulse-w2-top-panel {
   color: var(--text-muted, #64748b);
   font-family: inherit;
   outline: none;
-  width: 100%;
   box-sizing: border-box;
   overflow: visible;
   z-index: 1;
 }
-.pulse-w2-tab:first-child {
-  border-radius: 0 !important;
-  border-top-left-radius: 8px !important;
-}
+.pulse-w2-tab:first-child,
 .pulse-w2-tab:last-child {
   border-radius: 0 !important;
-  border-top-right-radius: 8px !important;
 }
 .pulse-w2-tab:hover,
 .pulse-w2-tab.is-hovered,
@@ -14207,15 +14426,9 @@ body.dark-mode .pulse-w2-tab:has(.pulse-w2-flask-wrap:hover) {
   box-shadow: inset 0 2.5px 0 #0284c7 !important;
   z-index: 2;
 }
-.pulse-w2-tab:first-child.active {
-  border-left: none !important;
-  border-radius: 0 !important;
-  border-top-left-radius: 8px !important;
-}
+.pulse-w2-tab:first-child.active,
 .pulse-w2-tab:last-child.active {
-  border-right: none !important;
   border-radius: 0 !important;
-  border-top-right-radius: 8px !important;
 }
 .pulse-w2-tab.active:hover,
 .pulse-w2-tab.active.is-hovered,
@@ -14295,6 +14508,10 @@ body.dark-mode .pulse-w2-flask-popover {
 .pulse-w2-flask-wrap:hover .pulse-w2-flask-popover {
   opacity: 1;
   visibility: visible;
+}
+.pulse-w2-tab.is-slot-right .pulse-w2-flask-popover {
+  left: auto;
+  right: -76px;
 }
 .pulse-w2-pop-title {
   font-weight: 700 !important; /* Верхній рядок підказки жирним шрифтом */
@@ -14426,10 +14643,13 @@ body.dark-mode .pulse-w2-row-flask {
 
 /* 3. Кольорове маркування вітру та плавне чергування поривів кожні 5 секунд */
 .pulse-w2-wind-cell {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: center;
   gap: 3px;
+  height: 25px;
+  width: 100%;
+  line-height: 1;
 }
 .pulse-hour-wind-arrow {
   flex-shrink: 0;
@@ -14570,7 +14790,7 @@ body.dark-mode .pulse-wind-line.gust-storm {
 }
 
 .pulse-w2-tab-title {
-  font-size: 0.73rem;
+  font-size: 0.70rem;
   font-weight: 700;
   line-height: 1.1;
 }
@@ -14582,7 +14802,7 @@ body.dark-mode .pulse-w2-tab.active .pulse-w2-tab-title {
 }
 
 .pulse-w2-tab-date {
-  font-size: 0.63rem;
+  font-size: 0.61rem;
   color: var(--text-muted, #64748b);
   line-height: 1.1;
   white-space: nowrap;
@@ -14931,19 +15151,26 @@ body.dark-mode .pulse-w2-table-wrap {
 
 .pulse-w2-table {
   width: 100%;
+  table-layout: fixed;
   border-collapse: collapse;
   font-size: 0.72rem;
   line-height: 1.25;
   font-variant-numeric: tabular-nums;
 }
 
+.pulse-w2-th-row {
+  height: 27px;
+}
+
 .pulse-w2-th-row th {
+  height: 27px;
+  box-sizing: border-box;
   background: linear-gradient(180deg, #eff4fa 0%, #e6eef7 100%);
   color: #475569;
   font-weight: 600;
   font-size: 0.73rem;
   text-align: center !important;
-  padding: 5px 2px;
+  padding: 4px 2px;
   border-bottom: 1.5px solid #cbd5e1;
   border-right: none;
   white-space: nowrap;
@@ -14970,9 +15197,202 @@ body.dark-mode .pulse-w2-th-row th:not(:last-child) {
   display: inline-block;
   font-size: 0.80rem;
   opacity: 0.92;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.pulse-w2-th-row th.is-clickable,
+.pulse-w2-th-row th.is-lens-back {
+  cursor: pointer;
+  user-select: none;
+  transition: color 0.15s ease, box-shadow 0.15s ease;
+}
+.pulse-w2-th-row th.is-clickable:hover,
+.pulse-w2-th-row th.is-lens-back:hover {
+  color: #0284c7;
+}
+.pulse-w2-th-row th.is-clickable:hover i,
+.pulse-w2-th-row th.is-lens-back:hover i {
+  opacity: 1;
+  transform: scale(1.08);
+}
+.pulse-w2-th-row th.is-lens-active {
+  color: #0284c7 !important;
+  box-shadow: inset 0 -2px 0 #0284c7;
+}
+.pulse-w2-th-row th.is-lens-back {
+  color: #0284c7;
+}
+body.dark-mode .pulse-w2-th-row th.is-clickable:hover,
+body.dark-mode .pulse-w2-th-row th.is-lens-back:hover,
+body.dark-mode .pulse-w2-th-row th.is-lens-back {
+  color: #38bdf8;
+}
+body.dark-mode .pulse-w2-th-row th.is-lens-active {
+  color: #38bdf8 !important;
+  box-shadow: inset 0 -2px 0 #38bdf8;
+}
+
+@keyframes pulseW2TbodyFade {
+  from {
+    opacity: 0.25;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.pulse-w2-tbody-fade {
+  animation: pulseW2TbodyFade 0.2s ease;
+}
+
+/* Детальний режим (лінза показника) всередині таблиці */
+.pulse-w2-lens-cell {
+  padding: 2.5px 8px 2.5px 6px !important;
+  height: 31px;
+  box-sizing: border-box;
+  text-align: left !important;
+  vertical-align: middle;
+}
+.pulse-w2-lens-grid {
+  display: grid;
+  grid-template-columns: 62px 1fr 78px;
+  align-items: center;
+  gap: 8px;
+  height: 25px;
+  width: 100%;
+}
+.pulse-w2-lens-grid.is-weather {
+  grid-template-columns: 54px 1fr 94px;
+}
+.pulse-w2-lens-val {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  white-space: nowrap;
+  font-size: 0.71rem;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+.pulse-w2-lens-val svg {
+  flex-shrink: 0;
+}
+.pulse-w2-lens-num {
+  font-weight: 600;
+  color: #0f172a;
+}
+.pulse-w2-lens-num.is-accent {
+  color: #0284c7;
+}
+.pulse-w2-lens-num.tone-red {
+  color: #dc2626;
+}
+body.dark-mode .pulse-w2-lens-num {
+  color: #f1f5f9;
+}
+body.dark-mode .pulse-w2-lens-num.is-accent {
+  color: #38bdf8;
+}
+body.dark-mode .pulse-w2-lens-num.tone-red {
+  color: #f87171;
+}
+.pulse-w2-lens-delta {
+  font-size: 0.61rem;
+  font-weight: 600;
+  color: #64748b;
+}
+.pulse-w2-lens-delta.is-warn {
+  color: #dc2626;
+}
+body.dark-mode .pulse-w2-lens-delta {
+  color: #94a3b8;
+}
+body.dark-mode .pulse-w2-lens-delta.is-warn {
+  color: #f87171;
+}
+.pulse-w2-lens-bar-track {
+  display: block;
+  width: 100%;
+  height: 5px;
+  border-radius: 999px;
+  background: rgba(148, 163, 184, 0.22);
+  overflow: hidden;
+}
+body.dark-mode .pulse-w2-lens-bar-track {
+  background: rgba(148, 163, 184, 0.16);
+}
+.pulse-w2-lens-bar-fill {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.22s ease;
+}
+.pulse-w2-lens-bar-fill.tone-green {
+  background: linear-gradient(90deg, #22c55e, #16a34a);
+}
+.pulse-w2-lens-bar-fill.tone-amber {
+  background: linear-gradient(90deg, #facc15, #f59e0b);
+}
+.pulse-w2-lens-bar-fill.tone-orange {
+  background: linear-gradient(90deg, #fb923c, #ea580c);
+}
+.pulse-w2-lens-bar-fill.tone-red {
+  background: linear-gradient(90deg, #f87171, #dc2626);
+}
+.pulse-w2-lens-bar-fill.tone-blue {
+  background: linear-gradient(90deg, #38bdf8, #0284c7);
+}
+.pulse-w2-lens-bar-fill.tone-blue-strong {
+  background: linear-gradient(90deg, #0ea5e9, #1d4ed8);
+}
+.pulse-w2-lens-bar-fill.tone-cyan {
+  background: linear-gradient(90deg, #38bdf8, #06b6d4);
+}
+.pulse-w2-lens-bar-fill.tone-teal {
+  background: linear-gradient(90deg, #2dd4bf, #0d9488);
+}
+.pulse-w2-lens-status {
+  font-size: 0.65rem;
+  font-weight: 500;
+  color: #475569;
+  text-align: right;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+body.dark-mode .pulse-w2-lens-status {
+  color: #94a3b8;
+}
+.pulse-w2-lens-status.tone-green {
+  color: #15803d;
+}
+.pulse-w2-lens-status.tone-amber {
+  color: #b45309;
+}
+.pulse-w2-lens-status.tone-red {
+  color: #b91c1c;
+  font-weight: 600;
+}
+.pulse-w2-lens-status.tone-blue {
+  color: #0284c7;
+}
+.pulse-w2-lens-status.tone-cyan {
+  color: #0369a1;
+}
+body.dark-mode .pulse-w2-lens-status.tone-green {
+  color: #4ade80;
+}
+body.dark-mode .pulse-w2-lens-status.tone-amber {
+  color: #fde047;
+}
+body.dark-mode .pulse-w2-lens-status.tone-red {
+  color: #f87171;
+}
+body.dark-mode .pulse-w2-lens-status.tone-blue,
+body.dark-mode .pulse-w2-lens-status.tone-cyan {
+  color: #38bdf8;
 }
 
 .pulse-w2-row {
+  height: 31px;
   border-bottom: 1px solid #e2e8f0;
   transition: background 0.15s ease;
 }
@@ -14989,6 +15409,16 @@ body.dark-mode .pulse-w2-row:hover {
   background: rgba(30, 41, 59, 0.4);
 }
 
+.pulse-w2-row.is-drillable {
+  cursor: pointer;
+}
+.pulse-w2-row.is-drillable:hover {
+  background: rgba(14, 165, 233, 0.08);
+}
+body.dark-mode .pulse-w2-row.is-drillable:hover {
+  background: rgba(56, 189, 248, 0.12);
+}
+
 /* Підсвічування актуального періоду для Сьогодні (без зсуву таблиці) */
 .pulse-w2-row.pulse-w2-row-current {
   background: rgba(14, 165, 233, 0.12) !important;
@@ -14999,50 +15429,67 @@ body.dark-mode .pulse-w2-row.pulse-w2-row-current {
 }
 
 .pulse-w2-table td {
-  padding: 3.5px 2px;
+  height: 31px;
+  box-sizing: border-box;
+  padding: 2.5px 2px;
   text-align: center;
   vertical-align: middle;
 }
 
-/* Час: фіксована стабільна ширина */
+/* Час / День: фіксована стабільна ширина під обидва формати ("21:00" та "Нд • 15") */
 .pulse-w2-th-time {
-  width: 32px;
+  width: 13.5%;
   text-align: center !important;
-  padding: 5px 2px !important;
+  padding: 4px 2px !important;
 }
 .pulse-w2-col-time {
   font-weight: 600;
   color: var(--text-muted, #475569);
-  width: 32px;
+  width: 13.5%;
+  white-space: nowrap;
 }
 body.dark-mode .pulse-w2-col-time {
   color: #cbd5e1;
 }
 .pulse-w2-time-val {
   font-size: 0.71rem;
+  line-height: 1;
+}
+.pulse-w2-day-badge {
+  display: inline-block;
+  font-size: 0.67rem;
+  font-weight: 600;
+  letter-spacing: -0.25px;
+  line-height: 1;
+}
+.pulse-w2-lens-sep {
+  font-size: 0.62rem;
+  color: #94a3b8;
+  margin: 0 1px;
 }
 
 /* Об'єднана колонка: стан погоди (хмаринки/сонце) + цифрове значення опадів з крапельками (шапка по центру, значення ліворуч) */
 .pulse-w2-th-weather {
-  width: 58px;
+  width: 20%;
   text-align: center !important;
-  padding: 5px 2px !important;
+  padding: 4px 2px !important;
 }
 .pulse-w2-th-weather i {
   font-size: 0.86rem;
 }
 .pulse-w2-col-weather {
-  width: 60px;
+  width: 20%;
   text-align: left !important;
   padding: 2.5px 2px 2.5px 3px !important;
   white-space: nowrap;
 }
 .pulse-w2-weather-cell {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: flex-start;
   gap: 2.5px;
   line-height: 1;
+  height: 25px;
   width: 100%;
 }
 .pulse-w2-weather-cell .pulse-w2-cell-icon {
@@ -15080,18 +15527,18 @@ body.dark-mode .pulse-w2-cell-precip.high {
 
 /* Температура: формат "+1°/-3°" без пробілів (шапка та значення по центру) */
 .pulse-w2-th-temp {
-  width: 56px;
+  width: 19%;
   font-size: 0.72rem;
   font-weight: 600;
   letter-spacing: 0.2px;
   text-align: center !important;
-  padding: 5px 2px !important;
+  padding: 4px 2px !important;
 }
 .pulse-w2-col-temp {
-  width: 56px;
+  width: 19%;
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
-  padding: 3.5px 2px !important;
+  padding: 2.5px 2px !important;
   text-align: center !important;
 }
 .pulse-w2-temp-actual {
@@ -15113,21 +15560,24 @@ body.dark-mode .pulse-w2-temp-feels {
 
 /* Вітер: горизонтальне центрування всієї колонки та чітка стрілка 13.5px */
 .pulse-w2-th-wind {
-  width: 44px;
+  width: 15.5%;
   text-align: center !important;
-  padding: 5px 2px !important;
+  padding: 4px 2px !important;
 }
 .pulse-w2-col-wind {
-  width: 44px;
+  width: 15.5%;
   position: relative;
   text-align: center !important;
-  padding: 3.5px 2px !important;
+  padding: 2.5px 2px !important;
 }
 .pulse-w2-wind-cell {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: center;
   gap: 3px;
+  height: 25px;
+  width: 100%;
+  line-height: 1;
   white-space: nowrap;
   color: var(--text-main, #0f172a);
 }
@@ -15155,12 +15605,12 @@ body.dark-mode .pulse-w2-wind-cell .pulse-hour-wind-arrow {
 
 /* Вологість: шапка по центру, значення синюватим кольором (як ймовірність опадів) */
 .pulse-w2-th-hum {
-  width: 30px;
+  width: 10.5%;
   text-align: center !important;
-  padding: 5px 2px !important;
+  padding: 4px 2px !important;
 }
 .pulse-w2-col-hum {
-  width: 30px;
+  width: 10.5%;
   text-align: center !important;
 }
 .pulse-w2-hum-num {
@@ -15175,12 +15625,12 @@ body.dark-mode .pulse-w2-hum-num {
 
 /* Тиск з кольоровим підсвіченням норми - звичайний нежирний шрифт */
 .pulse-w2-th-press {
-  width: 34px;
+  width: 12%;
   text-align: center !important;
-  padding: 5px 2px !important;
+  padding: 4px 2px !important;
 }
 .pulse-w2-col-press {
-  width: 34px;
+  width: 12%;
   font-weight: 400 !important;
 }
 .pulse-w2-press-badge {
@@ -15222,13 +15672,13 @@ body.dark-mode .pulse-w2-press-badge.red {
 
 /* Магнітні бурі (Kp індекс): звичайний нежирний шрифт */
 .pulse-w2-th-geomag {
-  width: 28px;
+  width: 10%;
   text-align: center !important;
-  padding: 5px 1px !important;
+  padding: 4px 1px !important;
 }
 .pulse-w2-col-geomag {
-  width: 28px;
-  padding: 3.5px 1px !important;
+  width: 10%;
+  padding: 2.5px 1px !important;
   font-weight: 400 !important;
 }
 .pulse-w2-kp-badge {
@@ -15526,13 +15976,13 @@ body.dark-mode .pulse-w2-info-stage .pulse-w2-history-box {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 5px;
+  gap: 4px;
   background: var(--bg-subtle, rgba(241, 245, 249, 0.7));
   border: 1px dashed var(--border-color, #e2e8f0);
   border-radius: 6px;
-  padding: 3px 6px;
+  padding: 3px 4px;
   margin-top: 2px;
-  font-size: 0.63rem;
+  font-size: 0.625rem;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -15548,6 +15998,13 @@ body.dark-mode .pulse-w2-history-box {
 }
 body.dark-mode .pulse-w2-hist-date {
   color: #f1f5f9;
+}
+.pulse-w2-hist-date.is-extended-day {
+  color: #4338ca;
+  font-weight: 700;
+}
+body.dark-mode .pulse-w2-hist-date.is-extended-day {
+  color: #a5b4fc;
 }
 .pulse-w2-hist-item {
   display: inline-flex;
