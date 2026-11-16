@@ -1438,6 +1438,44 @@ body.page-pulse .side-ad-right.side-ad-narrow {
 .seo-category-guide.cat-games {
   --cat-color: rgba(139, 92, 246, 0.9);
 }
+.seo-category-guide.pulse-seo-guide {
+  max-width: 1264px;
+  width: calc(100% - 12px);
+  margin: 4px auto 12px;
+  --cat-color: #0ea5e9;
+}
+.pulse-seo-faq {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px 14px;
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--card-border, #e2e8f0);
+}
+.pulse-seo-faq-item h3 {
+  font-size: 0.79rem;
+  font-weight: 700;
+  margin: 0 0 3px;
+  color: #1e293b;
+}
+.pulse-seo-faq-item p {
+  margin: 0;
+  font-size: 0.77rem;
+  line-height: 1.45;
+  color: #475569;
+}
+body.dark-mode .pulse-seo-faq-item h3 {
+  color: #e2e8f0;
+}
+body.dark-mode .pulse-seo-faq-item p {
+  color: #cbd5e1;
+}
+@media (max-width: 991.98px) {
+  .pulse-seo-faq {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+}
 .seo-guide-title {
   font-size: 0.92rem;
   font-weight: 700;
@@ -11002,6 +11040,7 @@ body.dark-mode .guest-bm-modal-footer {
   font-size: 0.82rem;
   font-weight: 600;
   line-height: 1;
+  text-decoration: none !important;
   outline: none;
   transition: all 0.2s ease;
   white-space: nowrap;
@@ -11029,10 +11068,12 @@ body.dark-mode .guest-bm-modal-footer {
     transform: translateY(-50%) scale(1.04);
   }
 }
-.pulse-day-btn:hover {
+.pulse-day-btn:hover,
+.pulse-day-btn:focus {
   background: rgba(56, 189, 248, 0.22) !important;
   border-color: #38bdf8 !important;
   color: #ffffff !important;
+  text-decoration: none !important;
   transform: translateY(-50%) scale(1.05) !important;
   box-shadow: 0 0 14px rgba(56, 189, 248, 0.8) !important;
 }

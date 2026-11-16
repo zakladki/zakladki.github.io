@@ -9447,8 +9447,11 @@ function initPulseDayDrawer() {
 
   if (!pulseBtn) {
     if (navbar) {
-      pulseBtn = document.createElement('button');
+      pulseBtn = document.createElement(standaloneMount ? 'button' : 'a');
       pulseBtn.id = 'pulseDayBtn';
+      if (!standaloneMount) {
+        pulseBtn.setAttribute('href', './puls');
+      }
       pulseBtn.className = standaloneMount ? 'pulse-day-btn active' : 'pulse-day-btn';
       pulseBtn.setAttribute('aria-label', 'Пульс дня');
       pulseBtn.setAttribute('title', standaloneMount ? 'Натисніть, щоб вийти з повноекранного режиму «Пульс дня»' : 'Пульс дня: свята, погода, пальне, курс валют');
@@ -9522,6 +9525,7 @@ function initPulseDayDrawer() {
       document.addEventListener('click', (e) => {
         const btn = e.target && e.target.closest ? e.target.closest('#pulseDayBtn, .pulse-day-btn') : null;
         if (btn) {
+          if (e.ctrlKey || e.metaKey || e.shiftKey || e.button === 1) return;
           e.preventDefault();
           e.stopPropagation();
           togglePulseDrawer();
@@ -9569,6 +9573,7 @@ function initPulseDayDrawer() {
   // 4. Події відкриття/закриття
   if (pulseBtn) {
     pulseBtn.onclick = (e) => {
+      if (e && (e.ctrlKey || e.metaKey || e.shiftKey || e.button === 1)) return;
       if (e) {
         e.preventDefault();
         e.stopPropagation();
@@ -9583,6 +9588,7 @@ function initPulseDayDrawer() {
     document.addEventListener('click', (e) => {
       const btn = e.target && e.target.closest ? e.target.closest('#pulseDayBtn, .pulse-day-btn') : null;
       if (btn) {
+        if (e.ctrlKey || e.metaKey || e.shiftKey || e.button === 1) return;
         e.preventDefault();
         e.stopPropagation();
         togglePulseDrawer();
