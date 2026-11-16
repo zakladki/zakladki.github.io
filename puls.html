@@ -58,9 +58,11 @@
     <!-- Required meta tags-->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+    <meta name="theme-color" content="#1e293b">
     <meta name="author" content="WebSIS &amp; Company">
     <meta name="keywords" content="пульс дня, погода україна, курс валют нбу, ціни на пальне азс, екологія радіація, свята україни, новини україни, стартова сторінка браузера, топ закладки">
-    <meta name="description" content="Пульс дня на ТОП ЗАКЛАДКИ - щоденний експрес-огляд для українця: погода на 8 днів, екологія та радіація, курс валют і конвертер, ціни на пальне АЗС, свята та головні новини України.">
+    <meta name="description" content="Пульс дня на ТОП ЗАКЛАДКИ: погода на 8 днів і Kp, курс валют НБУ і крипто, ціни на пальне АЗС, радіація й AQI, свята та головні новини України.">
     <meta name="application-name" content="ТОП Закладки">
     <meta name="apple-mobile-web-app-title" content="Пульс дня">
     <link rel="canonical" href="https://zakladki.github.io/puls">
@@ -68,12 +70,12 @@
     <meta property="og:type" content="website">
     <meta property="og:locale" content="uk_UA">
     <meta property="og:url" content="https://zakladki.github.io/puls">
-    <meta property="og:title" content="Пульс дня - Погода, Валюти, Пальне, Екологія та Новини України | ЗАКЛАДКИ">
-    <meta property="og:description" content="Щоденний експрес-огляд для українця: погода на 8 днів, радіаційний фон і повітря, курс НБУ/міжбанк і конвертер, ціни на пальне, календар подій та стрічка новин.">
+    <meta property="og:title" content="Пульс дня - Погода, Валюти, Пальне, Новини | ЗАКЛАДКИ">
+    <meta property="og:description" content="Пульс дня на ТОП ЗАКЛАДКИ: погода на 8 днів і Kp, курс валют НБУ і крипто, ціни на пальне АЗС, радіація й AQI, свята та головні новини України.">
     <meta property="og:image" content="https://zakladki.github.io/favicon.ico">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Пульс дня - Погода, Валюти, Пальне, Екологія та Новини України | ЗАКЛАДКИ">
-    <meta name="twitter:description" content="Щоденний експрес-огляд для українця: погода на 8 днів, радіаційний фон і повітря, курс НБУ/міжбанк і конвертер, ціни на пальне, календар подій та стрічка новин.">
+    <meta name="twitter:title" content="Пульс дня - Погода, Валюти, Пальне, Новини | ЗАКЛАДКИ">
+    <meta name="twitter:description" content="Пульс дня на ТОП ЗАКЛАДКИ: погода на 8 днів і Kp, курс валют НБУ і крипто, ціни на пальне АЗС, радіація й AQI, свята та головні новини України.">
     <meta name="twitter:image" content="https://zakladki.github.io/favicon.ico">
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="favicon.ico">
@@ -89,8 +91,8 @@
     <link href="styles/hamburgers.min.css" rel="stylesheet">
     <link href="styles/animation.css" rel="stylesheet">
     <link href="styles/menu_button.css" rel="stylesheet">
-    <title>Пульс дня - Погода, Валюти, Пальне, Екологія та Новини України | ЗАКЛАДКИ</title>
-    <!-- Structured Data (Schema.org): WebPage & Breadcrumbs -->
+    <title>Пульс дня - Погода, Валюти, Пальне, Новини | ЗАКЛАДКИ</title>
+    <!-- Structured Data (Schema.org): WebPage, WebApplication & Breadcrumbs -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -99,14 +101,47 @@
           "@type": "WebPage",
           "@id": "https://zakladki.github.io/puls#webpage",
           "url": "https://zakladki.github.io/puls",
-          "name": "Пульс дня - Погода, Валюти, Пальне, Екологія та Новини України | ЗАКЛАДКИ",
-          "description": "Щоденний експрес-огляд для українця: погода на 8 днів, радіаційний фон та якість повітря, курс валют і конвертер, ціни на пальне АЗС, свята та головні новини України.",
+          "name": "Пульс дня - Погода, Валюти, Пальне, Новини | ЗАКЛАДКИ",
+          "description": "Пульс дня на ТОП ЗАКЛАДКИ: погода на 8 днів і Kp, курс валют НБУ і крипто, ціни на пальне АЗС, радіація й AQI, свята та головні новини України.",
           "inLanguage": "uk",
+          "datePublished": "2026-11-16",
+          "dateModified": "2026-11-16",
+          "primaryImageOfPage": {
+            "@type": "ImageObject",
+            "url": "https://zakladki.github.io/favicon.ico"
+          },
+          "breadcrumb": {
+            "@id": "https://zakladki.github.io/puls#breadcrumb"
+          },
           "isPartOf": {
             "@type": "WebSite",
             "@id": "https://zakladki.github.io/#website",
             "url": "https://zakladki.github.io/",
             "name": "ТОП Закладки - ТОП Сайтів України"
+          }
+        },
+        {
+          "@type": "WebApplication",
+          "@id": "https://zakladki.github.io/puls#webapp",
+          "name": "Пульс дня - ТОП ЗАКЛАДКИ",
+          "url": "https://zakladki.github.io/puls",
+          "applicationCategory": "UtilitiesApplication",
+          "operatingSystem": "All",
+          "browserRequirements": "Requires JavaScript. Requires HTML5.",
+          "inLanguage": "uk",
+          "description": "Щоденний експрес-інформер для українця: 8-денний прогноз погоди та геомагнітна активність Kp, радіаційний фон і якість повітря AQI, курс валют НБУ, криптовалюти й конвертер, ціни на пальне АЗС, календар подій та стрічка новин України.",
+          "featureList": [
+            "Прогноз погоди на 8 днів і геомагнітний індекс Kp",
+            "Моніторинг радіації та якості повітря AQI (SaveEcoBot / EcoCity)",
+            "Офіційні курси валют НБУ, криптовалюти та миттєвий конвертер",
+            "Актуальні ціни на пальне по областях та мережах АЗС України",
+            "Календар державних, церковних і міжнародних свят України",
+            "Стрічка головних новин України наживо"
+          ],
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "UAH"
           }
         },
         {
@@ -296,6 +331,16 @@
         <div class="text-center py-5 text-muted small">
           <i class="fas fa-spinner fa-spin me-2 text-info"></i>Завантаження модуля «Пульс дня»...
         </div>
+        <section class="sr-only" aria-label="Огляд сервісу Пульс дня">
+          <h2>Щоденний експрес-огляд «Пульс дня» на ТОП ЗАКЛАДКИ</h2>
+          <p>Автономна стартова сторінка з оперативною інформацією для України: погодинний і 8-денний прогноз погоди (Open-Meteo та геомагнітна активність Kp NOAA), моніторинг радіаційного фону і якості повітря AQI, актуальні курси валют НБУ та криптовалют зі швидким конвертером, ціни на пальне по регіонах та мережах АЗС, календар подій і головні новини України наживо.</p>
+          <ul>
+            <li><a href="./">Головна сторінка каталогу ТОП Сайтів України</a></li>
+            <li><a href="./news.html">ТОП новинних сайтів та ЗМІ України</a></li>
+            <li><a href="./bank.html">Банкінг, фінанси та онлайн-сервіси</a></li>
+            <li><a href="./city.html">Міські служби, транспорт і довідники</a></li>
+          </ul>
+        </section>
       </div>
     </main>
 

@@ -2475,6 +2475,9 @@ function openAboutSiteModal() {
           </div>
 
           <div class="about-site-actions-bar">
+            <a href="./puls" class="btn btn-info btn-sm font-weight-bold text-white">
+              <i class="fas fa-heartbeat mr-1"></i> Пульс дня
+            </a>
             <button type="button" class="btn btn-primary btn-sm font-weight-bold" onclick="closeAboutSiteModal(); openUserCabinetModal();">
               <i class="fas fa-user-circle mr-1"></i> Особистий Кабінет
             </button>
