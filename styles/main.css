@@ -740,7 +740,9 @@ body.pulse-drawer-open .navbar-nav a.nav-link.pulse-paused-active {
 }
 
 body.pulse-drawer-open nav.navbar #pulseDayBtn.active,
-body.pulse-drawer-open #pulseDayBtn.active {
+body.pulse-drawer-open #pulseDayBtn.active,
+body.page-pulse nav.navbar #pulseDayBtn.active,
+body.page-pulse #pulseDayBtn.active {
   background-color: rgba(59, 130, 246, 0.28) !important;
   color: #ffffff !important;
   border-bottom: 3px solid #3b82f6 !important;
@@ -1389,6 +1391,31 @@ body.page-bookmarks #bookmarksPageApp ~ .bottom-multiplex-container,
   .side-ad-left,
   .side-ad-right,
   .side-ad-narrow {
+    display: none !important;
+  }
+}
+
+/* Безпечний відступ бокової реклами для широкого макета окремої сторінки /puls (1280px) */
+body.page-pulse .side-ad-left,
+body.page-pulse .side-ad-left.side-ad-narrow {
+  right: calc(50% + 640px + 8px);
+  left: auto;
+}
+body.page-pulse .side-ad-right,
+body.page-pulse .side-ad-right.side-ad-narrow {
+  left: calc(50% + 640px + 8px);
+  right: auto;
+}
+@media (max-width: 1619px) {
+  body.page-pulse .side-ad-left,
+  body.page-pulse .side-ad-right,
+  body.page-pulse .side-ad-narrow {
+    display: none !important;
+  }
+}
+@media (min-width: 1800px) and (max-width: 1899px) {
+  body.page-pulse .side-ad-left:not(.side-ad-narrow),
+  body.page-pulse .side-ad-right:not(.side-ad-narrow) {
     display: none !important;
   }
 }
@@ -11197,6 +11224,28 @@ body.dark-mode .pulse-ctrl-btn:hover {
   color: #ffffff;
   border-color: #64748b;
 }
+.pulse-fullscreen-btn {
+  text-decoration: none !important;
+  background: rgba(14, 165, 233, 0.1) !important;
+  border-color: rgba(14, 165, 233, 0.32) !important;
+  color: #0284c7 !important;
+}
+.pulse-fullscreen-btn:hover {
+  background: #0284c7 !important;
+  border-color: #0284c7 !important;
+  color: #ffffff !important;
+}
+body.dark-mode .pulse-fullscreen-btn {
+  background: rgba(56, 189, 248, 0.16) !important;
+  border-color: rgba(56, 189, 248, 0.35) !important;
+  color: #38bdf8 !important;
+}
+body.dark-mode .pulse-fullscreen-btn:hover {
+  background: #0284c7 !important;
+  border-color: #38bdf8 !important;
+  color: #ffffff !important;
+}
+
 .pulse-close-btn {
   background: rgba(239, 68, 68, 0.1) !important;
   border-color: rgba(239, 68, 68, 0.3) !important;
@@ -11209,6 +11258,44 @@ body.dark-mode .pulse-ctrl-btn:hover {
 body.dark-mode .pulse-close-btn {
   color: #f87171 !important;
   background: rgba(239, 68, 68, 0.18) !important;
+}
+
+/* Автономна повноекранна сторінка «Пульс дня» (/puls) */
+body.page-pulse {
+  background: #eaeff5;
+}
+body.page-pulse.dark-mode {
+  background: #0b1120;
+}
+.pulse-standalone-main {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  padding-bottom: 6px;
+}
+.pulse-standalone-page {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+.pulse-standalone-page button,
+.pulse-standalone-page select,
+.pulse-standalone-page a {
+  -webkit-tap-highlight-color: transparent;
+}
+.pulse-standalone-page button:focus,
+.pulse-standalone-page button:focus-visible,
+.pulse-standalone-page button:active,
+.pulse-standalone-page select:focus,
+.pulse-standalone-page select:focus-visible,
+.pulse-standalone-page a:focus,
+.pulse-standalone-page a:focus-visible {
+  outline: none !important;
+}
+body.page-pulse .bottom-multiplex-container {
+  max-width: 1280px;
+  margin-left: auto !important;
+  margin-right: auto !important;
 }
 
 /* Сітка 4 колонок: компактна ширина близько 300+ px на картку (як було раніше, щільно один до одного) */
@@ -11288,6 +11375,9 @@ body.dark-mode .pulse-close-btn {
     gap: 8px;
     padding: 6px 5px calc(95px + env(safe-area-inset-bottom, 24px));
   }
+  .pulse-standalone-page .pulse-cards-grid {
+    padding: 6px 5px 16px;
+  }
   .pulse-drawer-header {
     padding: 6px 8px 7px;
     align-items: flex-start;
@@ -11332,6 +11422,15 @@ body.dark-mode .pulse-close-btn {
     padding: 0 7px;
     height: 26px;
     font-size: 0.72rem;
+  }
+  .pulse-fullscreen-btn {
+    width: 26px;
+    min-width: 26px;
+    padding: 0;
+    justify-content: center;
+  }
+  .pulse-fullscreen-btn span {
+    display: none;
   }
   .pulse-last-updated {
     font-size: 0.67rem;
@@ -14271,6 +14370,9 @@ body.dark-mode .pulse-w2-top-panel.is-extended-day {
   min-width: 0;
   overflow: hidden;
   position: relative;
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
 }
 .pulse-w2-tabs-track {
   display: flex;
@@ -14281,51 +14383,59 @@ body.dark-mode .pulse-w2-top-panel.is-extended-day {
 }
 
 .pulse-w2-tabs-nav-btn {
-  flex: 0 0 14px;
-  width: 14px;
+  flex: 0 0 15px;
+  width: 15px;
   padding: 0;
   border: none;
-  background: rgba(148, 163, 184, 0.08);
-  color: #64748b;
-  font-size: 0.56rem;
+  background: rgba(226, 232, 240, 0.65);
+  color: #334155;
+  font-size: 0.64rem;
   line-height: 1;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: background 0.16s ease, color 0.16s ease, opacity 0.16s ease;
+  transition: background 0.16s ease, color 0.16s ease, opacity 0.16s ease, border-color 0.16s ease;
 }
 .pulse-w2-tabs-nav-btn.is-prev {
   border-top-left-radius: 8px;
-  border-right: 1px solid rgba(148, 163, 184, 0.25);
+  border-right: 1px solid rgba(148, 163, 184, 0.42);
 }
 .pulse-w2-tabs-nav-btn.is-next {
   border-top-right-radius: 8px;
-  border-left: 1px solid rgba(148, 163, 184, 0.25);
+  border-left: 1px solid rgba(148, 163, 184, 0.42);
 }
 .pulse-w2-tabs-nav-btn:not(:disabled):hover {
-  background: rgba(14, 165, 233, 0.14);
+  background: rgba(14, 165, 233, 0.18);
   color: #0284c7;
 }
 .pulse-w2-tabs-nav-btn.is-disabled,
 .pulse-w2-tabs-nav-btn:disabled {
-  opacity: 0.28;
+  background: rgba(148, 163, 184, 0.08);
+  color: #94a3b8;
+  opacity: 0.35;
   cursor: default;
   pointer-events: none;
 }
 body.dark-mode .pulse-w2-tabs-nav-btn {
-  background: rgba(255, 255, 255, 0.03);
-  color: #94a3b8;
+  background: rgba(30, 41, 59, 0.72);
+  color: #cbd5e1;
 }
 body.dark-mode .pulse-w2-tabs-nav-btn.is-prev {
-  border-right-color: rgba(148, 163, 184, 0.2);
+  border-right-color: rgba(148, 163, 184, 0.32);
 }
 body.dark-mode .pulse-w2-tabs-nav-btn.is-next {
-  border-left-color: rgba(148, 163, 184, 0.2);
+  border-left-color: rgba(148, 163, 184, 0.32);
 }
 body.dark-mode .pulse-w2-tabs-nav-btn:not(:disabled):hover {
-  background: rgba(56, 189, 248, 0.18);
+  background: rgba(56, 189, 248, 0.24);
   color: #38bdf8;
+}
+body.dark-mode .pulse-w2-tabs-nav-btn.is-disabled,
+body.dark-mode .pulse-w2-tabs-nav-btn:disabled {
+  background: rgba(15, 23, 42, 0.35);
+  color: #64748b;
+  opacity: 0.35;
 }
 
 .pulse-w2-ext-day-pill {
@@ -15505,7 +15615,7 @@ body.dark-mode .pulse-w2-col-time {
   display: inline-flex;
   align-items: center;
   gap: 1.5px;
-  font-size: 0.69rem;
+  font-size: 0.63rem;
   font-weight: 400;
   color: #0284c7;
   font-variant-numeric: tabular-nums;

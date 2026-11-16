@@ -492,6 +492,17 @@ app.get('/api/meteoprog/js/:id/:lang/:city_id', (req, res) => {
   });
 });
 
+// Clean URL route for standalone Pulse of the Day page (/puls -> puls.html)
+app.get('/puls', (req, res) => {
+  if (req.path === '/puls/') {
+    return res.redirect(301, '/puls');
+  }
+  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
+  res.sendFile(path.join(__dirname, 'puls.html'));
+});
+
 // Serve static files from root with no-cache for HTML
 app.use(express.static(__dirname, {
   setHeaders: (res, filePath) => {

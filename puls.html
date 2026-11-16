@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="uk">
+  <head>
+    <!-- Пригнічення помилок сторонніх розширень браузера (MetaMask тощо) та захисний шар для сторонніх інформерів -->
+    <script>
+      (function(){
+        function e(t){
+          if(!t)return!1;
+          var r="";
+          try{
+            r=typeof t=="string"?t:typeof t=="object"?(t.message||"")+" "+(t.stack||"")+" "+(t.reason||"")+" "+(t.name||"")+" "+String(t):String(t);
+          }catch(n){r=String(t)}
+          r=r.toLowerCase();
+          return r.indexOf("could not reach cloud firestore")!==-1||
+                 r.indexOf("offline mode")!==-1||
+                 r.indexOf("code=unavailable")!==-1||
+                 r.indexOf("metamask")!==-1||
+                 r.indexOf("failed to connect")!==-1||
+                 r.indexOf("auro wallet")!==-1||
+                 r.indexOf("phantom")!==-1||
+                 r.indexOf("coinbase")!==-1||
+                 r.indexOf("evm")!==-1||
+                 r.indexOf("resizeobserver")!==-1||
+                 r.indexOf("meteoprog")!==-1||
+                 r.indexOf("status code: 0")!==-1||
+                 r.indexOf("status code:")!==-1||
+                 r.indexOf("unexpected token '<'")!==-1||
+                 r.indexOf("unexpected token <")!==-1;
+        }
+        var o=console.error;
+        console.error=function(){
+          for(var t=0;t<arguments.length;t++) if(e(arguments[t])) return;
+          return o.apply(console,arguments);
+        };
+        var a=console.warn;
+        console.warn=function(){
+          for(var t=0;t<arguments.length;t++) if(e(arguments[t])) return;
+          return a.apply(console,arguments);
+        };
+        window.addEventListener("unhandledrejection",function(t){e(t.reason)&&(t.preventDefault(),t.stopImmediatePropagation())},!0);
+        window.addEventListener("error",function(t){(e(t.error)||e(t.message))&&(t.preventDefault(),t.stopImmediatePropagation())},!0);
+        var n=window.onerror;
+        window.onerror=function(t,r,o,a,c){return e(t)||e(c)||(n?n.apply(this,arguments):void 0)};
+      })();
+    </script>
+    <!-- Google AdSense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3065705668384801" crossorigin="anonymous"></script>
+    <!-- Global site tag (gtag.js) - Google Analytics-->
+    <script async="" src="https://www.googletagmanager.com/gtag/js?id=UA-55202239-3"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag('js', new Date());
+      gtag('config', 'UA-55202239-3');
+    </script>
+    <!-- Required meta tags-->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="author" content="WebSIS &amp; Company">
+    <meta name="keywords" content="пульс дня, погода україна, курс валют нбу, ціни на пальне азс, екологія радіація, свята україни, новини україни, стартова сторінка браузера, топ закладки">
+    <meta name="description" content="Пульс дня на ТОП ЗАКЛАДКИ - щоденний експрес-огляд для українця: погода на 8 днів, екологія та радіація, курс валют і конвертер, ціни на пальне АЗС, свята та головні новини України.">
+    <meta name="application-name" content="ТОП Закладки">
+    <meta name="apple-mobile-web-app-title" content="Пульс дня">
+    <link rel="canonical" href="https://zakladki.github.io/puls">
+    <meta property="og:site_name" content="ТОП Закладки - ТОП Сайтів України">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="uk_UA">
+    <meta property="og:url" content="https://zakladki.github.io/puls">
+    <meta property="og:title" content="Пульс дня - Погода, Валюти, Пальне, Екологія та Новини України | ЗАКЛАДКИ">
+    <meta property="og:description" content="Щоденний експрес-огляд для українця: погода на 8 днів, радіаційний фон і повітря, курс НБУ/міжбанк і конвертер, ціни на пальне, календар подій та стрічка новин.">
+    <meta property="og:image" content="https://zakladki.github.io/favicon.ico">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Пульс дня - Погода, Валюти, Пальне, Екологія та Новини України | ЗАКЛАДКИ">
+    <meta name="twitter:description" content="Щоденний експрес-огляд для українця: погода на 8 днів, радіаційний фон і повітря, курс НБУ/міжбанк і конвертер, ціни на пальне, календар подій та стрічка новин.">
+    <meta name="twitter:image" content="https://zakladki.github.io/favicon.ico">
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" href="favicon.ico">
+
+    <!-- Bootstrap CSS-->
+    <link href="styles/bootstrap.min.css" rel="stylesheet">
+    <link href="styles/all.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link href="styles/base64.css" rel="stylesheet">
+    <link href="styles/main.css" rel="stylesheet">
+    <link href="styles/hamburgers.min.css" rel="stylesheet">
+    <link href="styles/animation.css" rel="stylesheet">
+    <link href="styles/menu_button.css" rel="stylesheet">
+    <title>Пульс дня - Погода, Валюти, Пальне, Екологія та Новини України | ЗАКЛАДКИ</title>
+    <!-- Structured Data (Schema.org): WebPage & Breadcrumbs -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebPage",
+          "@id": "https://zakladki.github.io/puls#webpage",
+          "url": "https://zakladki.github.io/puls",
+          "name": "Пульс дня - Погода, Валюти, Пальне, Екологія та Новини України | ЗАКЛАДКИ",
+          "description": "Щоденний експрес-огляд для українця: погода на 8 днів, радіаційний фон та якість повітря, курс валют і конвертер, ціни на пальне АЗС, свята та головні новини України.",
+          "inLanguage": "uk",
+          "isPartOf": {
+            "@type": "WebSite",
+            "@id": "https://zakladki.github.io/#website",
+            "url": "https://zakladki.github.io/",
+            "name": "ТОП Закладки - ТОП Сайтів України"
+          }
+        },
+        {
+          "@type": "BreadcrumbList",
+          "@id": "https://zakladki.github.io/puls#breadcrumb",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Головна",
+              "item": "https://zakladki.github.io/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Пульс дня",
+              "item": "https://zakladki.github.io/puls"
+            }
+          ]
+        }
+      ]
+    }
+    </script>
+
+    <!-- Critical CSS for instant Navbar rendering without layout shift / FOUC -->
+    <style>
+      .navbar, .nav-container { position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; background-color: #1e293b; }
+      @media (max-width: 1279.98px) {
+        .navbar, .nav-container { height: 42px; display: block; }
+        .mobile-navbar-title {
+          position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+          color: #ffffff; font-weight: 600; font-size: 0.9rem; background-color: rgba(255, 255, 255, 0.08);
+          padding: 3px 10px; border-radius: 6px; white-space: nowrap; z-index: 1040; letter-spacing: 0.02em; display: block !important;
+        }
+      }
+      @media (min-width: 1280px) {
+        .mobile-navbar-title { display: none !important; }
+      }
+      .theme-toggle-btn {
+        position: absolute !important; left: 10px !important; right: auto !important; top: 50% !important;
+        transform: translateY(-50%) !important; width: 30px !important; height: 30px !important; border-radius: 7px !important;
+        background: rgba(255, 255, 255, 0.16) !important; border: 1px solid rgba(255, 255, 255, 0.3) !important;
+        color: #ffffff !important; display: inline-flex !important; align-items: center !important; justify-content: center !important;
+        padding: 0 !important; margin: 0 !important; cursor: pointer; z-index: 1050 !important; font-size: 0.95rem; line-height: 1; outline: none;
+      }
+      .notice-bell-btn {
+        position: absolute !important; right: 48px !important; left: auto !important; top: 50% !important;
+        transform: translateY(-50%) !important; width: 30px !important; height: 30px !important; border-radius: 7px !important;
+        background: rgba(255, 255, 255, 0.16) !important; border: 1px solid rgba(255, 255, 255, 0.3) !important;
+        color: #ffffff !important; display: inline-flex !important; align-items: center !important; justify-content: center !important;
+        padding: 0 !important; margin: 0 !important; cursor: pointer; z-index: 1050 !important; font-size: 0.95rem; line-height: 1; outline: none;
+      }
+      .pulse-day-btn {
+        position: absolute !important; left: 48px !important; right: auto !important; top: 50% !important;
+        transform: translateY(-50%) !important; height: 30px !important; border-radius: 7px !important;
+        background: rgba(255, 255, 255, 0.16) !important; border: 1px solid rgba(56, 189, 248, 0.75) !important;
+        color: #ffffff !important; display: inline-flex !important; align-items: center !important; justify-content: center !important;
+        gap: 5px !important; padding: 0 8px !important; cursor: pointer; z-index: 1050 !important; font-size: 0.82rem !important;
+        font-weight: 600 !important; line-height: 1; outline: none; transition: all 0.2s ease; white-space: nowrap !important;
+        box-sizing: border-box !important;
+      }
+      .pulse-day-btn.active {
+        animation: none !important;
+        background: rgba(56, 189, 248, 0.25) !important;
+        border-color: #38bdf8 !important;
+        color: #ffffff !important;
+        box-shadow: 0 0 14px rgba(56, 189, 248, 0.75) !important;
+        transform: translateY(-50%) scale(1) !important;
+      }
+      .pulse-day-btn .pulse-day-btn-icon {
+        display: inline-flex; align-items: center; justify-content: center; line-height: 1;
+      }
+      .pulse-day-btn .pulse-ecg-icon {
+        width: 16px; height: 16px; stroke: #38bdf8; stroke-width: 2.3; fill: none; vertical-align: middle;
+      }
+      .pulse-day-btn.active .pulse-ecg-icon {
+        stroke: #ffffff;
+      }
+      .pulse-day-btn .pulse-day-badge-wrap {
+        display: inline-flex !important; flex-direction: column !important; align-items: center !important;
+        justify-content: center !important; line-height: 1.05 !important;
+      }
+      .pulse-day-btn .pulse-day-badge-top {
+        font-size: 0.54rem !important; font-weight: 800 !important; letter-spacing: 0.08em !important;
+        color: #38bdf8 !important; line-height: 1 !important; text-transform: uppercase !important;
+      }
+      .pulse-day-btn.active .pulse-day-badge-top {
+        color: #ffffff !important;
+      }
+      .pulse-day-btn .pulse-day-badge-sub {
+        font-size: 0.68rem !important; font-weight: 800 !important; letter-spacing: 0.04em !important;
+        color: #ffffff !important; line-height: 1 !important; margin-top: 1px !important;
+        text-transform: uppercase !important; opacity: 0.95 !important;
+      }
+      @media (max-width: 991.98px) {
+        .pulse-day-btn {
+          width: 32px !important; min-width: 32px !important; max-width: 32px !important; padding: 0 !important;
+          justify-content: center !important; gap: 0 !important; left: 50px !important;
+        }
+        .pulse-day-btn .pulse-day-badge-wrap { display: none !important; }
+      }
+      @media (max-width: 360px) {
+        .pulse-day-btn {
+          left: 44px !important; width: 28px !important; min-width: 28px !important; max-width: 28px !important; height: 28px !important;
+        }
+      }
+      .user-auth-btn {
+        position: absolute !important; top: 50% !important; left: auto !important;
+        transform: translateY(-50%) !important; width: 30px !important; height: 30px !important; min-width: 30px !important; max-width: 30px !important; border-radius: 7px !important;
+        background: rgba(255, 255, 255, 0.16) !important; border: 1px solid rgba(255, 255, 255, 0.3) !important;
+        color: #ffffff !important; display: inline-flex !important; align-items: center !important; justify-content: center !important;
+        padding: 0 !important; margin: 0 !important; cursor: pointer; z-index: 1050 !important; font-size: 0.95rem; line-height: 1; outline: none;
+        transition: all 0.2s ease; overflow: hidden !important;
+      }
+      @media (min-width: 1280px) {
+        .user-auth-btn { right: 12px !important; }
+        .notice-bell-btn { right: 48px !important; left: auto !important; }
+      }
+      @media (max-width: 1279.98px) {
+        .user-auth-btn { right: 56px !important; }
+        .notice-bell-btn { right: 96px !important; left: auto !important; }
+      }
+      @media (max-width: 360px) {
+        .user-auth-btn { right: 48px !important; width: 28px !important; height: 28px !important; min-width: 28px !important; max-width: 28px !important; }
+        .notice-bell-btn { right: 84px !important; width: 28px !important; height: 28px !important; }
+      }
+      .user-auth-avatar {
+        width: 22px; height: 22px; border-radius: 50%; object-fit: cover; border: 1px solid rgba(255, 255, 255, 0.9); display: block;
+      }
+      .hamburger {
+        position: absolute !important; top: 50% !important; transform: translateY(-50%) scale(0.7) !important;
+        right: 10px !important; z-index: 1050 !important; transform-origin: right center !important; padding: 6px !important; margin: 0 !important;
+      }
+    </style>
+  </head>
+  <body class="page-pulse">
+    <div class="container nav-container">
+      <nav class="navbar navbar-expand-md fixed-top navbar-dark d-flex justify-content-between px-3">
+        <div class="hamburger hamburger--spring navbar-toggler" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+          <div class="hamburger-box">
+            <div class="hamburger-inner"></div>
+          </div>
+        </div>
+        <div class="mobile-navbar-title">ПУЛЬС ДНЯ</div>
+        <div class="collapse navbar-collapse text-center justify-content-center flex-grow-1" id="navbarCollapse">
+          <ul class="nav nav-pills mb-0 navbar-nav mx-auto justify-content-center">
+            <li class="nav-item"><a class="nav-link" href="./">Головна</a></li>
+            <li class="nav-item"><a class="nav-link" href="./social.html">Соціум</a></li>
+            <li class="nav-item"><a class="nav-link" href="./news.html">Новини</a></li>
+            <li class="nav-item"><a class="nav-link" href="./media.html">Медіа</a></li>
+            <li class="nav-item"><a class="nav-link" href="./games.html">Ігри</a></li>
+            <li class="nav-item"><a class="nav-link" href="./communal.html">Комуналка</a></li>
+            <li class="nav-item"><a class="nav-link" href="./bank.html">Банкінг</a></li>
+            <li class="nav-item"><a class="nav-link" href="./market.html">Ринок</a></li>
+            <li class="nav-item"><a class="nav-link" href="./shops.html">Магазини</a></li>
+            <li class="nav-item"><a class="nav-link" href="./others.html">Інше</a></li>
+            <li class="nav-item"><a class="nav-link" href="./city.html">Місто</a></li>
+            <li class="nav-item"><a class="nav-link" href="./ai.html">AI</a></li>
+            <li class="nav-item"><a class="nav-link" href="./programs.html">Soft</a></li>
+            <li class="nav-item nav-item-bookmarks" id="navItemBookmarks">
+              <a class="nav-link nav-link-bookmarks" href="./bookmarks.html" title="Мої персональні закладки" aria-label="Мої персональні закладки">
+                <span class="nav-heart-icon">❤️</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+        <button id="themeToggle" class="theme-toggle-btn" aria-label="Переключити тему" title="Переключити тему (світла/темна)"><i class="fas fa-moon"></i></button>
+        <button id="pulseDayBtn" class="pulse-day-btn active" aria-label="Пульс дня" title="Натисніть, щоб вийти з повноекранного режиму «Пульс дня»">
+          <span class="pulse-day-btn-icon">
+            <svg class="pulse-ecg-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="2 12 6 12 9 4 14 20 17 12 22 12"></polyline>
+            </svg>
+          </span>
+          <span class="pulse-day-badge-wrap">
+            <span class="pulse-day-badge-top">ПУЛЬС</span>
+            <span class="pulse-day-badge-sub">ДНЯ</span>
+          </span>
+        </button>
+        <button id="noticeBellBtn" class="notice-bell-btn" aria-label="Оголошення" title="Оголошення"><i class="fas fa-bell"></i><span class="notice-bell-badge-dot"></span></button>
+        <button id="userAuthNavBtn" class="user-auth-btn" aria-label="Особистий кабінет" title="Особистий кабінет / Вхід"><i class="far fa-user-circle"></i></button>
+      </nav>
+    </div>
+
+    <main class="container-fluid main pulse-standalone-main" id="main-content" role="main">
+      <h1 class="sr-only">Пульс дня - Погода, Екологія, Курс валют, Пальне, Свята та Новини України</h1>
+      <div id="pulseStandaloneMount" class="pulse-standalone-page">
+        <div class="text-center py-5 text-muted small">
+          <i class="fas fa-spinner fa-spin me-2 text-info"></i>Завантаження модуля «Пульс дня»...
+        </div>
+      </div>
+    </main>
+
+    <footer class="footer mt-auto py-2 ">
+      <div class="container">
+        <div class="row align-items-center justify-content-between">
+          <div class="col-sm footer-col d-flex justify-content-center">
+            <div class="kolobok d-flex align-items-center gap-3">
+              <a href="https://t.me/zakladki_top_one" target="_blank" title="Офіційний Telegram-канал із новинами та анонсами сайту"><i class="fab fa-telegram fa-lg" aria-hidden="true"></i> Telegram</a>
+              <a href="https://t.me/+1UKue84k2AVjZDcy" target="_blank" title="Чат для спілкування, запитань, обговорень та опитувань"><i class="fas fa-comments"></i> Чат</a>
+              <a href="CHANGELOG.md" class="changelog-link" target="_blank" title="Журнал змін: історія оновлень на сайті"><i class="fas fa-history"></i> Що нового?</a>
+            </div>
+          </div>
+          <div class="col-sm footer-col d-flex justify-content-center">
+            <div class="kolobok d-flex align-items-center gap-3">
+              <a class="btn btn-primary btn-sm" href="https://docs.google.com/document/d/15VLtvFvXNxhkXU_ZH74387e289Rx6If2Zmrp4m8KFAc" title="Фінансова допомога на розвиток та підтримку проекту" role="button" target="_blank">ПІДТРИМАТИ САЙТ</a>
+              <!-- MyCounter v.2.0 -->
+              <script type="text/javascript"><!--
+              my_id = 168151;
+              my_width = 88;
+              my_height = 31;
+              my_alt = "MyCounter - счётчик и статистика";
+              //--></script>
+              <script type="text/javascript"
+                src="https://get.mycounter.ua/counter2.0.js">
+              </script><noscript>
+              <a target="_blank" href="https://mycounter.ua/"><img
+              src="https://get.mycounter.ua/counter.php?id=168151"
+              title="MyCounter - счётчик и статистика"
+              alt="MyCounter - счётчик и статистика"
+              width="88" height="31" border="0" /></a></noscript>
+              <!--/ MyCounter -->
+            </div>
+          </div>
+          <div class="col-sm footer-col d-flex justify-content-center">
+            <div class="kolobok d-flex align-items-center gap-3">
+              <a href="mailto:musichitbit@gmail.com" target="_blank" title="E-mail: musichitbit@gmail.com / Написати адміністратору / Зворотний зв'язок"><i class="far fa-envelope fa-lg" aria-hidden="true"></i> E-mail</a>
+              <a href="https://youtu.be/BdZQy6upWFc" target="_blank" title="Відеоінструкція: як зробити сайт стартовою сторінкою браузера (налаштування автозапуска)"><i class="fas fa-play-circle fa-lg coloriconfuter" aria-hidden="true"></i> Інструкція</a>
+              <a href="#" class="badges-legend-link" title="Умовні позначки та індикатори на сайті (розшифровка значків)"><i class="fas fa-tags fa-lg coloriconfuter" aria-hidden="true"></i></a>
+              <a href="https://docs.google.com/document/d/15S2XrUxYaj1uu68wtfqww3Gkqa-Lq2Ra-P20AHWqKgs" target="_blank" title="Співпраця з нами, умови та прайс на послуги сайту"><i class="fas fa-handshake fa-lg coloriconfuter" aria-hidden="true"></i></a>
+              <a href="#" class="about-site-link" id="aboutSiteFooterBtn" title="Про сайт «ТОП ЗАКЛАДКИ», можливості та корисні функції"><i class="fas fa-info-circle fa-lg coloriconfuter" aria-hidden="true"></i></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
+    <!-- Firebase App, Auth & Firestore SDKs (v10.12.0 Compat for static hosting) -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+    <script src="js/main.js"></script>
+  </body>
+</html>

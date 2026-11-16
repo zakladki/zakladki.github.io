@@ -1062,10 +1062,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // 5. Динамічне додавання рекламних блоків по боках з різним розташуванням для головної та інших сторінок
   // Визначаємо, чи є поточна сторінка головною (index.html, корінь "/" або пустий шлях)
+  const isPulsePage = window.location.pathname.includes('/puls') ||
+                      document.body.classList.contains('page-pulse') ||
+                      !!document.getElementById('pulseStandaloneMount');
   const isHomepage = (window.location.pathname.endsWith('/') || 
                       window.location.pathname.endsWith('/index.html') || 
                       !window.location.pathname.includes('.html')) &&
-                      !window.location.pathname.includes('bookmarks');
+                      !window.location.pathname.includes('bookmarks') &&
+                      !isPulsePage;
 
   const screenWidth = window.innerWidth;
   let totalAdCount = 0;
@@ -9414,19 +9418,37 @@ function renderPulseHolidaysUI() {
 }
 window.renderPulseHolidaysUI = renderPulseHolidaysUI;
 
+function isStandalonePulsePage() {
+  return document.body.classList.contains('page-pulse') || !!document.getElementById('pulseStandaloneMount');
+}
+
+function exitPulseStandalonePage() {
+  try {
+    if (document.referrer && window.history.length > 1) {
+      const refUrl = new URL(document.referrer, window.location.origin);
+      if (refUrl.origin === window.location.origin && !refUrl.pathname.endsWith('/puls') && !refUrl.pathname.endsWith('/puls.html')) {
+        window.history.back();
+        return;
+      }
+    }
+  } catch (e) {}
+  window.location.href = './';
+}
+
 function initPulseDayDrawer() {
   // 1. Перевіряємо та гарантуємо наявність кнопки «Пульс дня» у верхньому меню зліва (після «Ніч/День»)
   let pulseBtn = document.getElementById('pulseDayBtn');
   const navbar = document.querySelector('nav.navbar');
   const themeToggle = document.getElementById('themeToggle');
+  const standaloneMount = document.getElementById('pulseStandaloneMount');
 
   if (!pulseBtn) {
     if (navbar) {
       pulseBtn = document.createElement('button');
       pulseBtn.id = 'pulseDayBtn';
-      pulseBtn.className = 'pulse-day-btn';
+      pulseBtn.className = standaloneMount ? 'pulse-day-btn active' : 'pulse-day-btn';
       pulseBtn.setAttribute('aria-label', 'Пульс дня');
-      pulseBtn.setAttribute('title', 'Пульс дня: свята, погода, пальне, курс валют');
+      pulseBtn.setAttribute('title', standaloneMount ? 'Натисніть, щоб вийти з повноекранного режиму «Пульс дня»' : 'Пульс дня: свята, погода, пальне, курс валют');
       pulseBtn.innerHTML = `
         <span class="pulse-day-btn-icon">
           <svg class="pulse-ecg-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
@@ -9445,7 +9467,10 @@ function initPulseDayDrawer() {
       }
     }
   } else {
-    pulseBtn.className = 'pulse-day-btn';
+    pulseBtn.className = standaloneMount ? 'pulse-day-btn active' : 'pulse-day-btn';
+    if (standaloneMount) {
+      pulseBtn.setAttribute('title', 'Натисніть, щоб вийти з повноекранного режиму «Пульс дня»');
+    }
     if (!pulseBtn.querySelector('.pulse-day-badge-wrap')) {
       pulseBtn.innerHTML = `
         <span class="pulse-day-btn-icon">
@@ -9471,6 +9496,49 @@ function initPulseDayDrawer() {
     }
   }
 
+  // Режим окремої сторінки (/puls): рендеримо модуль одразу в основний потік без виїзної шторки
+  if (standaloneMount) {
+    try {
+      renderPulseDrawerLayout(standaloneMount, { standalone: true });
+    } catch (err) {
+      console.error("Помилка генерації сторінки Пульсу дня:", err);
+    }
+
+    if (pulseBtn) {
+      pulseBtn.onclick = (e) => {
+        if (e) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+        exitPulseStandalonePage();
+      };
+    }
+
+    if (typeof document !== 'undefined' && !window._pulseDayDelegatedClickAttached) {
+      window._pulseDayDelegatedClickAttached = true;
+      document.addEventListener('click', (e) => {
+        const btn = e.target && e.target.closest ? e.target.closest('#pulseDayBtn, .pulse-day-btn') : null;
+        if (btn) {
+          e.preventDefault();
+          e.stopPropagation();
+          togglePulseDrawer();
+        }
+      });
+    }
+
+    try {
+      loadPulseWeatherData(false);
+    } catch (e) {
+      console.warn("Помилка завантаження погоди Пульсу дня:", e);
+    }
+    try {
+      loadPulseDrawerData(false);
+    } catch (e) {
+      console.warn("Помилка завантаження даних Пульсу дня:", e);
+    }
+    return;
+  }
+
   // 2. Створюємо контейнер виїзної шторки та бекдроп, якщо їх ще немає в DOM
   let backdrop = document.getElementById('pulseDrawerBackdrop');
   if (!backdrop) {
@@ -9490,7 +9558,7 @@ function initPulseDayDrawer() {
 
   // 3. Формуємо базову розмітку всередині шторки
   try {
-    renderPulseDrawerLayout(drawer);
+    renderPulseDrawerLayout(drawer, { standalone: false });
   } catch (err) {
     console.error("Помилка генерації розмітки Пульсу дня:", err);
   }
@@ -9536,11 +9604,16 @@ function initPulseDayDrawer() {
 }
 
 function isPulseDrawerOpen() {
+  if (isStandalonePulsePage()) return true;
   const drawer = document.getElementById('pulseDayDrawer');
   return drawer && drawer.classList.contains('is-open');
 }
 
 function togglePulseDrawer() {
+  if (isStandalonePulsePage()) {
+    exitPulseStandalonePage();
+    return;
+  }
   if (isPulseDrawerOpen()) {
     closePulseDrawer();
   } else {
@@ -9549,6 +9622,7 @@ function togglePulseDrawer() {
 }
 
 function openPulseDrawer() {
+  if (isStandalonePulsePage()) return;
   const drawer = document.getElementById('pulseDayDrawer');
   const backdrop = document.getElementById('pulseDrawerBackdrop');
   const btn = document.getElementById('pulseDayBtn');
@@ -10485,11 +10559,25 @@ async function ensurePulseWeatherHistory(city) {
 // ПОГОДА (НОВА СХВАЛЕНА ВЕРСІЯ: СІНОПТІК-ВКЛАДКИ ТА 7-КОЛОНКОВА ТАБЛИЦЯ)
 // ==========================================================================
 function buildPulseWeatherTableHeadHtml(focusMetric = null) {
-  const isLens = Boolean(focusMetric);
+  const isDaysMode = focusMetric === 'days';
+  const isSingleLens = Boolean(focusMetric) && !isDaysMode;
+  const col0Class = isSingleLens
+    ? ' is-lens-back'
+    : ` is-clickable${isDaysMode ? ' is-lens-active' : ''}`;
+  const col0Click = isSingleLens
+    ? `onclick="window.togglePulseWeatherMetric('time')"`
+    : `onclick="window.togglePulseWeatherMetric('days')"`;
+  const col0Title = isSingleLens
+    ? 'Повернутися до погодинної таблиці'
+    : (isDaysMode ? 'Повернутися до погодинного розкладу (0:00-21:00)' : 'Зведений прогноз на 8 днів (натисніть для перегляду по днях)');
+  const col0Icon = isSingleLens
+    ? 'fas fa-arrow-left'
+    : (isDaysMode ? 'far fa-calendar-alt' : 'far fa-clock');
+
   return `
-    <tr class="pulse-w2-th-row${isLens ? ' is-lens-mode' : ''}">
-      <th class="pulse-w2-th-time${isLens ? ' is-lens-back' : ''}" ${isLens ? 'onclick="window.togglePulseWeatherMetric(\'time\')"' : ''} title="${isLens ? 'Повернутися до погодинної таблиці' : 'Час доби'}">
-        <i class="${isLens ? 'fas fa-arrow-left' : 'far fa-clock'}"></i>
+    <tr class="pulse-w2-th-row${focusMetric ? ' is-lens-mode' : ''}">
+      <th class="pulse-w2-th-time${col0Class}" ${col0Click} title="${col0Title}">
+        <i class="${col0Icon}"></i>
       </th>
       <th class="pulse-w2-th-weather is-clickable${focusMetric === 'weather' ? ' is-lens-active' : ''}" onclick="window.togglePulseWeatherMetric('weather')" title="Стан неба та опади на 8 днів (натисніть для детального режиму)">
         <i class="fas fa-cloud-rain"></i>
@@ -10769,11 +10857,107 @@ function buildPulseWeatherLensRowHtml(dayItem, focusMetric, weekMinTemp, weekMax
   `;
 }
 
+function buildPulseWeatherDaysOverviewRowHtml(dayItem, activeTab = 0) {
+  let dayFlaskFill = 0;
+  if (dayItem.precipSum > 0) {
+    dayFlaskFill = Math.min(100, Math.max(15, Math.round((dayItem.precipSum / 8) * 100)));
+  } else if (dayItem.precipProbMax >= 40) {
+    dayFlaskFill = Math.round(dayItem.precipProbMax * 0.25);
+  }
+  const precipNote = dayItem.precipSum > 0 ? `${dayItem.precipSum} мм` : 'без опадів';
+  const weatherTooltip = `${dayItem.fullDateLabel}: ${dayItem.cond.label} • Опади: ${precipNote} (${dayItem.precipProbMax}%)`;
+
+  const hasGusts = (dayItem.gustMax >= 8.5 && (dayItem.gustMax - dayItem.windMax >= 2.0));
+  const gustStorm = dayItem.gustMax >= 17;
+  let windValHtml = '';
+  if (hasGusts) {
+    windValHtml = `
+      <div class="pulse-wind-val-box" title="Вітер до ${dayItem.windMax.toFixed(1)} м/с • пориви до ${dayItem.gustMax.toFixed(1)} м/с">
+        <div class="pulse-wind-cycler">
+          <div class="pulse-wind-line">
+            <span class="pulse-w2-wind-num ${dayItem.windMax >= 8 ? 'high' : ''}">${formatWindValHtml(dayItem.windMax)}</span>
+          </div>
+          <div class="pulse-wind-line gust-line ${gustStorm ? 'gust-storm' : ''}">
+            <span class="pulse-w2-wind-num">${formatWindValHtml(dayItem.gustMax)}</span>
+          </div>
+        </div>
+      </div>
+    `;
+  } else {
+    windValHtml = `<span class="pulse-w2-wind-num ${dayItem.windMax >= 8 ? 'high' : ''}">${formatWindValHtml(dayItem.windMax)}</span>`;
+  }
+  const windTooltip = `Вітер: ${dayItem.windInfo.dirName} (${dayItem.windInfo.code}), до ${dayItem.windMax.toFixed(1)} м/с${hasGusts ? ` • пориви до ${dayItem.gustMax.toFixed(1)} м/с` : ''}`;
+
+  let kpHtml = '—';
+  let kpBadgeCls = 'green';
+  if (dayItem.kpVal !== null) {
+    const kpFixed = dayItem.kpVal.toFixed(1);
+    const kpParts = kpFixed.split('.');
+    kpHtml = `${kpParts[0]}.<span class="pulse-decimal">${kpParts[1]}</span>`;
+    kpBadgeCls = dayItem.kpColor || 'green';
+  }
+
+  const isSelected = dayItem.dayIdx === activeTab;
+  const drillHint = 'Натисніть, щоб відкрити погодинний прогноз цього дня';
+
+  return `
+    <tr class="pulse-w2-row is-drillable${isSelected ? ' pulse-w2-row-current' : ''}" onclick="window.openPulseWeatherDayFromLens(${dayItem.dayIdx})">
+      <td class="pulse-w2-col-time" title="${dayItem.fullDateLabel} • ${drillHint}">
+        <span class="pulse-w2-day-badge">${dayItem.dayBadge}</span>
+      </td>
+      <td class="pulse-w2-col-weather" title="${weatherTooltip} • ${drillHint}">
+        <div class="pulse-w2-weather-cell">
+          <div class="pulse-w2-row-flask">
+            <div class="pulse-w2-row-flask-fill ${dayFlaskFill > 0 ? 'has-rain' : ''}" style="height: ${dayFlaskFill}%;"></div>
+          </div>
+          <span class="pulse-w2-cell-icon">${dayItem.cond.icon}</span>
+          <span class="pulse-w2-cell-precip ${dayItem.precipProbMax >= 50 ? 'high' : ''}">
+            <span class="pulse-w2-cell-precip-val">${dayItem.precipProbMax}</span>
+            <svg class="pulse-hour-precip-drops" width="8" height="8" viewBox="0 0 12 12" fill="currentColor" aria-hidden="true">
+              <path d="M2.2 1.2c-.3.6-.5 1.3-.4 1.8.1.6.6.9 1.1.8.6-.1.9-.6.8-1.2-.1-.5-.5-1.1-.9-1.5a.3.3 0 0 0-.6.1z" opacity="0.75"/>
+              <path d="M6.2 0.8c-.3.6-.5 1.3-.4 1.8.1.6.6.9 1.1.8.6-.1.9-.6.8-1.2-.1-.5-.5-1.1-.9-1.5a.3.3 0 0 0-.6.1z"/>
+              <path d="M10.2 1.2c-.3.6-.5 1.3-.4 1.8.1.6.6.9 1.1.8.6-.1.9-.6.8-1.2-.1-.5-.5-1.1-.9-1.5a.3.3 0 0 0-.6.1z" opacity="0.75"/>
+              <path d="M4.2 6.2c-.3.6-.5 1.3-.4 1.8.1.6.6.9 1.1.8.6-.1.9-.6.8-1.2-.1-.5-.5-1.1-.9-1.5a.3.3 0 0 0-.6.1z" opacity="0.85"/>
+              <path d="M8.2 6.2c-.3.6-.5 1.3-.4 1.8.1.6.6.9 1.1.8.6-.1.9-.6.8-1.2-.1-.5-.5-1.1-.9-1.5a.3.3 0 0 0-.6.1z" opacity="0.85"/>
+            </svg>
+          </span>
+        </div>
+      </td>
+      <td class="pulse-w2-col-temp" title="${dayItem.fullDateLabel}: вдень ${dayItem.maxSign}${dayItem.tMax}°, вночі ${dayItem.minSign}${dayItem.tMin}°">
+        <span class="pulse-w2-temp-actual ${dayItem.maxClass}">${dayItem.maxSign}${dayItem.tMax}°</span>/<span class="pulse-w2-temp-feels ${dayItem.minClass}">${dayItem.minSign}${dayItem.tMin}°</span>
+      </td>
+      <td class="pulse-w2-col-wind ${hasGusts ? 'has-gusts' : ''} ${gustStorm ? 'storm' : ''}" title="${windTooltip}">
+        <div class="pulse-w2-wind-cell">
+          <svg class="pulse-hour-wind-arrow ${dayItem.windArrowClass}" width="13.5" height="13.5" viewBox="0 0 24 24" fill="currentColor" stroke="none" style="transform: rotate(${dayItem.windInfo.arrowDeg}deg); transform-origin: 50% 50%;">
+            <path d="M12 1.5L7 21.5l5-4.5 5 4.5L12 1.5z"></path>
+          </svg>
+          ${windValHtml}
+        </div>
+      </td>
+      <td class="pulse-w2-col-hum" title="Середня вологість повітря: ${dayItem.avgHum}% (${dayItem.minHum}-${dayItem.maxHum}%)">
+        <span class="pulse-w2-hum-num">${dayItem.avgHum}</span>
+      </td>
+      <td class="pulse-w2-col-press" title="Середній тиск: ${dayItem.avgPress} мм (${dayItem.minPress}-${dayItem.maxPress} мм)">
+        <span class="pulse-w2-press-badge ${dayItem.pressInfo.colorClass}">${dayItem.avgPress}</span>
+      </td>
+      <td class="pulse-w2-col-geomag" title="${dayItem.kpTitle}">
+        <span class="pulse-w2-kp-badge ${kpBadgeCls}">${kpHtml}</span>
+      </td>
+    </tr>
+  `;
+}
+
 function buildPulseWeatherTableBodyHtml(daySlots, dailyLensItems, focusMetric = null, weekMinTemp = 0, weekMaxTemp = 10) {
   if (!focusMetric) {
     return Array.isArray(daySlots) ? daySlots.map(s => s.overviewRowHtml).join('') : '';
   }
   if (!Array.isArray(dailyLensItems)) return '';
+  if (focusMetric === 'days') {
+    const activeTab = (window.pulseWeatherState && typeof window.pulseWeatherState.activeTab === 'number')
+      ? window.pulseWeatherState.activeTab
+      : 0;
+    return dailyLensItems.map(d => buildPulseWeatherDaysOverviewRowHtml(d, activeTab)).join('');
+  }
   return dailyLensItems.map(d => buildPulseWeatherLensRowHtml(d, focusMetric, weekMinTemp, weekMaxTemp)).join('');
 }
 
@@ -11373,7 +11557,7 @@ function renderPulseWeatherUI(data, city, updatedTime = '') {
             <span class="pulse-w2-cell-icon">${cond.icon}</span>
             <span class="pulse-w2-cell-precip ${precipVal >= 50 ? 'high' : ''}" title="${hourPrecipTooltip}">
               <span class="pulse-w2-cell-precip-val">${precipVal}</span>
-              <svg class="pulse-hour-precip-drops" width="9" height="9" viewBox="0 0 12 12" fill="currentColor" aria-hidden="true">
+              <svg class="pulse-hour-precip-drops" width="8" height="8" viewBox="0 0 12 12" fill="currentColor" aria-hidden="true">
                 <path d="M2.2 1.2c-.3.6-.5 1.3-.4 1.8.1.6.6.9 1.1.8.6-.1.9-.6.8-1.2-.1-.5-.5-1.1-.9-1.5a.3.3 0 0 0-.6.1z" opacity="0.75"/>
                 <path d="M6.2 0.8c-.3.6-.5 1.3-.4 1.8.1.6.6.9 1.1.8.6-.1.9-.6.8-1.2-.1-.5-.5-1.1-.9-1.5a.3.3 0 0 0-.6.1z"/>
                 <path d="M10.2 1.2c-.3.6-.5 1.3-.4 1.8.1.6.6.9 1.1.8.6-.1.9-.6.8-1.2-.1-.5-.5-1.1-.9-1.5a.3.3 0 0 0-.6.1z" opacity="0.75"/>
@@ -11796,6 +11980,7 @@ window.initPulseWeatherRotator = function() {
 
 window.setPulseWeatherTab = function(dayIndex, customOffset) {
   if (!window.pulseWeatherState) return;
+  if (window._pulseLastTabSwipeAt && (Date.now() - window._pulseLastTabSwipeAt < 180)) return;
   const { maxOffset } = getPulseWeatherMaxTabOffset(window.pulseWeatherState.data);
   window.pulseWeatherState.activeTab = dayIndex;
   if (typeof customOffset === 'number') {
@@ -12627,8 +12812,9 @@ function renderPulseNewsFeed(filter = 'all') {
 }
 
 
-function renderPulseDrawerLayout(container) {
+function renderPulseDrawerLayout(container, options = {}) {
   const holiday = getTodayHolidayInfo();
+  const isStandalone = !!(options && options.standalone) || (container && container.id === 'pulseStandaloneMount');
 
   container.innerHTML = `
     <div class="pulse-drawer-header">
@@ -12646,9 +12832,18 @@ function renderPulseDrawerLayout(container) {
           <button type="button" class="pulse-ctrl-btn" id="btnPulseRefresh" title="Оновити дані">
             <i class="fas fa-sync-alt" id="pulseRefreshSpin"></i> <span>Оновити</span>
           </button>
-          <button type="button" class="pulse-ctrl-btn pulse-close-btn" id="btnPulseClose" title="Згорнути панель">
-            <i class="fas fa-chevron-up"></i> <span>Згорнути</span>
-          </button>
+          ${!isStandalone ? `
+            <a href="./puls" class="pulse-ctrl-btn pulse-fullscreen-btn" id="btnPulseFullscreen" title="Відкрити «Пульс дня» на окремій сторінці на весь екран (можна зробити стартовою сторінкою браузера)" aria-label="На весь екран">
+              <i class="fas fa-expand-arrows-alt"></i> <span>На весь екран</span>
+            </a>
+            <button type="button" class="pulse-ctrl-btn pulse-close-btn" id="btnPulseClose" title="Згорнути панель">
+              <i class="fas fa-chevron-up"></i> <span>Згорнути</span>
+            </button>
+          ` : `
+            <button type="button" class="pulse-ctrl-btn pulse-fullscreen-btn pulse-exit-fullscreen-btn" id="btnPulseExitFullscreen" title="Вийти з повноекранного режиму на сайт" aria-label="Вийти з повноекранного режиму">
+              <i class="fas fa-compress-arrows-alt"></i> <span>Вийти</span>
+            </button>
+          `}
         </div>
         <span class="pulse-last-updated" id="pulseLastUpdatedLabel">Синхронізація...</span>
       </div>
@@ -13132,11 +13327,53 @@ function renderPulseDrawerLayout(container) {
   const btnClose = container.querySelector('#btnPulseClose');
   if (btnClose) btnClose.onclick = closePulseDrawer;
 
+  const btnExitFullscreen = container.querySelector('#btnPulseExitFullscreen');
+  if (btnExitFullscreen) btnExitFullscreen.onclick = exitPulseStandalonePage;
+
   const btnRefresh = container.querySelector('#btnPulseRefresh');
   if (btnRefresh) {
     btnRefresh.onclick = () => {
       loadPulseDrawerData(true);
     };
+  }
+
+  // Свайп пальцем на сенсорних екранах по верхній 8-денній смузі карток Погоди
+  const weatherContainerEl = container.querySelector('#pulseWeatherContainer');
+  if (weatherContainerEl && !weatherContainerEl._pulseTabsSwipeBound) {
+    weatherContainerEl._pulseTabsSwipeBound = true;
+    let swipeStartX = 0;
+    let swipeStartY = 0;
+    let swipeStartTime = 0;
+    let isTrackingSwipe = false;
+
+    weatherContainerEl.addEventListener('touchstart', (e) => {
+      if (!e.touches || e.touches.length !== 1) return;
+      const inViewport = e.target && e.target.closest && e.target.closest('.pulse-w2-tabs-viewport');
+      if (!inViewport) {
+        isTrackingSwipe = false;
+        return;
+      }
+      swipeStartX = e.touches[0].clientX;
+      swipeStartY = e.touches[0].clientY;
+      swipeStartTime = Date.now();
+      isTrackingSwipe = true;
+    }, { passive: true });
+
+    weatherContainerEl.addEventListener('touchend', (e) => {
+      if (!isTrackingSwipe || !e.changedTouches || !e.changedTouches.length) return;
+      isTrackingSwipe = false;
+      const dx = e.changedTouches[0].clientX - swipeStartX;
+      const dy = e.changedTouches[0].clientY - swipeStartY;
+      const dt = Date.now() - swipeStartTime;
+      if (dt < 650 && Math.abs(dx) >= 32 && Math.abs(dx) > Math.abs(dy) * 1.25) {
+        window._pulseLastTabSwipeAt = Date.now();
+        if (dx < 0) {
+          window.shiftPulseWeatherTabs(1);
+        } else {
+          window.shiftPulseWeatherTabs(-1);
+        }
+      }
+    }, { passive: true });
   }
 
   // Обробник вибору міста для погоди (Open-Meteo)
