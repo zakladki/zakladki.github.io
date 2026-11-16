@@ -1267,7 +1267,8 @@ document.addEventListener("DOMContentLoaded", () => {
                           document.body.classList.contains('page-bookmarks');
   if (!isHomepage && !isBookmarksPage && screenWidth >= 1280) {
     const footer = document.querySelector('footer.footer');
-    if (footer) {
+    const pulseSeoGuide = isPulsePage ? document.querySelector('.pulse-seo-guide') : null;
+    if (footer || pulseSeoGuide) {
       const multiplexContainer = document.createElement('div');
       multiplexContainer.className = 'container bottom-multiplex-container';
       multiplexContainer.innerHTML = `
@@ -1276,7 +1277,11 @@ document.addEventListener("DOMContentLoaded", () => {
              data-ad-client="ca-pub-3065705668384801"
              data-ad-slot="1571652834"></ins>
       `;
-      footer.parentNode.insertBefore(multiplexContainer, footer);
+      if (pulseSeoGuide && pulseSeoGuide.parentNode) {
+        pulseSeoGuide.parentNode.insertBefore(multiplexContainer, pulseSeoGuide);
+      } else if (footer && footer.parentNode) {
+        footer.parentNode.insertBefore(multiplexContainer, footer);
+      }
       totalAdCount += 1; // 1 блок нижнього мультиплексу
       observeAdStatus(multiplexContainer);
     }
