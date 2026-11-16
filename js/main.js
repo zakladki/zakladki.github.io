@@ -11209,30 +11209,26 @@ function updatePulseWeatherExtDayPill() {
   if (!pill || !window.pulseWeatherState || !window.pulseWeatherState.data) return;
   const activeTab = typeof window.pulseWeatherState.activeTab === 'number' ? window.pulseWeatherState.activeTab : 0;
   const tabOffset = typeof window.pulseWeatherState.tabOffset === 'number' ? window.pulseWeatherState.tabOffset : 0;
-  const isOutOfWindow = activeTab < tabOffset || activeTab > tabOffset + 2;
-  if (activeTab >= 3 || isOutOfWindow) {
-    const daily = window.pulseWeatherState.data.daily || {};
-    const monthsUkShort = ['січ', 'лют', 'бер', 'кві', 'тра', 'чер', 'лип', 'сер', 'вер', 'жов', 'лис', 'гру'];
-    const dowsUkShort = ['Нд', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
-    const now = new Date();
-    let dObj = new Date(now.getFullYear(), now.getMonth(), now.getDate() + activeTab);
-    if (daily.time && daily.time[activeTab]) {
-      const parts = daily.time[activeTab].split('-');
-      if (parts.length === 3) {
-        dObj = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
-      }
+  const isResettable = activeTab > 0 || tabOffset > 0;
+  const daily = window.pulseWeatherState.data.daily || {};
+  const monthsUkShort = ['січ', 'лют', 'бер', 'кві', 'тра', 'чер', 'лип', 'сер', 'вер', 'жов', 'лис', 'гру'];
+  const dowsUkShort = ['Нд', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
+  const now = new Date();
+  let dObj = new Date(now.getFullYear(), now.getMonth(), now.getDate() + activeTab);
+  if (daily.time && daily.time[activeTab]) {
+    const parts = daily.time[activeTab].split('-');
+    if (parts.length === 3) {
+      dObj = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
     }
-    const label = activeTab === 0
-      ? 'Сьогодні'
-      : `${dowsUkShort[dObj.getDay()]} • ${dObj.getDate()} ${monthsUkShort[dObj.getMonth()]}`;
-    pill.innerHTML = `<i class="far fa-calendar-alt"></i> <span>${label}</span> <span class="pulse-w2-ext-close" aria-hidden="true">×</span>`;
-    pill.title = activeTab === 0
-      ? 'Показано прогноз на Сьогодні • Натисніть, щоб повернути список вкладок на початок'
-      : `Обрано ${label} • Натисніть, щоб повернутися на Сьогодні`;
-    pill.style.display = 'inline-flex';
-  } else {
-    pill.style.display = 'none';
   }
+  const label = `${dowsUkShort[dObj.getDay()]} • ${dObj.getDate()} ${monthsUkShort[dObj.getMonth()]}`;
+  const closeHtml = isResettable ? ' <span class="pulse-w2-ext-close" aria-hidden="true">×</span>' : '';
+  pill.innerHTML = `<i class="far fa-calendar-alt"></i> <span>${label}</span>${closeHtml}`;
+  pill.classList.toggle('is-today', !isResettable);
+  pill.title = isResettable
+    ? `Обрано ${label} • Натисніть, щоб повернутися на Сьогодні`
+    : `Сьогодні (${label})`;
+  pill.style.display = 'inline-flex';
 }
 
 function renderPulseWeatherUI(data, city, updatedTime = '') {
@@ -12859,7 +12855,7 @@ function renderPulseDrawerLayout(container, options = {}) {
           <div class="pulse-card-header">
             <span class="pulse-card-title"><i class="fas fa-cloud-sun text-warning"></i> Погода</span>
             <div class="d-flex align-items-center" style="gap: 5px;">
-              <button type="button" class="pulse-w2-ext-day-pill" id="pulseWeatherExtDayPill" onclick="window.setPulseWeatherTab(0)" title="Повернутися до прогнозу на Сьогодні" style="display: none;"></button>
+              <button type="button" class="pulse-w2-ext-day-pill" id="pulseWeatherExtDayPill" onclick="window.setPulseWeatherTab(0, 0)" title="Повернутися до прогнозу на Сьогодні" style="display: none;"></button>
               <span class="pulse-card-badge badge-green" id="pulseWeatherLiveBadge">Наживо</span>
               <button type="button" id="pulseWeatherRefreshBtn" class="pulse-weather-refresh-action-btn" title="Оновити погоду" aria-label="Оновити погоду">
                 <i class="fas fa-sync-alt" id="pulseWeatherRefreshIcon"></i>

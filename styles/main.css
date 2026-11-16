@@ -14553,6 +14553,19 @@ body.dark-mode .pulse-w2-ext-day-pill:hover {
   border-color: rgba(129, 140, 248, 0.65);
   color: #e0e7ff;
 }
+.pulse-w2-ext-day-pill.is-today {
+  cursor: default;
+}
+.pulse-w2-ext-day-pill.is-today:hover {
+  background: rgba(99, 102, 241, 0.11);
+  border-color: rgba(99, 102, 241, 0.35);
+  color: #4338ca;
+}
+body.dark-mode .pulse-w2-ext-day-pill.is-today:hover {
+  background: rgba(129, 140, 248, 0.18);
+  border-color: rgba(129, 140, 248, 0.42);
+  color: #c7d2fe;
+}
 
 .pulse-w2-tab {
   display: flex !important;
