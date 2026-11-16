@@ -1,6 +1,10 @@
 *У файлі (CHANGELOG) ведеться хронологія змін, додавання ресурсів, покращень та виправлень на сайті.*
 
 ## [2026-11-16]
+- **Усунення причини неіндексації `games.html` у Google Search Console (`games.html`, `styles/main.css`, `sitemap.xml`)**:
+  - Усунено проблему «тонкого контенту» (86 слів -> 290+ корисних слів): додано компактний інформаційний блок-довідник категорії (`.seo-category-guide`) про магазини ПК-ігор, браузерні HTML5-ігри, хмарний геймінг та кіберспорт із внутрішньою перелінковкою на суміжні розділи та `/puls`.
+  - Додано `rel="nofollow noopener noreferrer"` для всіх азартних і букмекерських посилань, оновлено застарілі `http://` та `/ru` посилання на `https://` та глобальні/локалізовані аналоги (`Poki`, `Wargaming`, `Game-game`, `2048game`, `Pinnacle`).
+  - Оптимізовано довжину `<title>` (53 символи) і `description` (154 символи), додано `<meta name="robots">`, структурований `ItemList` у Schema.org та оновлено `lastmod`/`priority` у `sitemap.xml`.
 - **SEO-оптимізація та індексація нової сторінки `/puls` (`puls.html`, `index.html`, `robots.txt`, `sitemap.xml`, `js/main.js`)**:
   - Узгоджено довжину `title` (53 символи) та `description` (146 символів) у `puls.html` під оптимальні сніпети Google/Bing, додано `robots` (`index, follow, max-snippet:-1, max-image-preview:large`), `theme-color`, розширену Schema.org розмітку (`WebPage` + `WebApplication` із переліком можливостей + `BreadcrumbList`) та семантичний опис модуля для первинної індексації.
   - На Головній (`index.html`) додано `/puls` до структурованого списку навігації Schema.org `SiteNavigationElement`, `robots` мета-тег, `<noscript>`-посилання та швидкий перехід у вікні «Про сайт», а в `robots.txt` закрито службовий шлях `/api/` та оновлено `sitemap.xml`.
