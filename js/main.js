@@ -10572,12 +10572,59 @@ async function ensurePulseWeatherHistory(city) {
 // ==========================================================================
 // ПОГОДА (НОВА СХВАЛЕНА ВЕРСІЯ: СІНОПТІК-ВКЛАДКИ ТА 7-КОЛОНКОВА ТАБЛИЦЯ)
 // ==========================================================================
+const PULSE_WEATHER_DAYS_HINT_KEY = 'pulse_weather_days_hint_seen';
+let pulseWeatherDaysHintSeenMemory = false;
+
+function hasSeenPulseWeatherClockHint() {
+  if (pulseWeatherDaysHintSeenMemory) return true;
+  try {
+    if (window.localStorage && window.localStorage.getItem(PULSE_WEATHER_DAYS_HINT_KEY) === '1') {
+      pulseWeatherDaysHintSeenMemory = true;
+      return true;
+    }
+  } catch (e) {}
+  return false;
+}
+
+function markPulseWeatherClockHintSeen() {
+  pulseWeatherDaysHintSeenMemory = true;
+  try {
+    if (window.localStorage) {
+      window.localStorage.setItem(PULSE_WEATHER_DAYS_HINT_KEY, '1');
+    }
+  } catch (e) {}
+}
+
+function buildPulseWeatherModeChipInnerHtml(focusMetric = null) {
+  const isDaysMode = focusMetric === 'days';
+  return isDaysMode
+    ? '<i class="far fa-clock" aria-hidden="true"></i><span>Години ⇄</span>'
+    : '<i class="far fa-calendar-alt" aria-hidden="true"></i><span>8 днів ⇄</span>';
+}
+
+function getPulseWeatherModeChipTitle(focusMetric = null) {
+  return focusMetric === 'days'
+    ? 'Повернутися до погодинного розкладу (дублює іконку календаря в таблиці)'
+    : 'Зведений прогноз на 8 днів (дублює клік по іконці годинника)';
+}
+
+function updatePulseWeatherModeChip(focusMetric = null) {
+  const chip = document.getElementById('pulseWeatherModeChip');
+  if (!chip) return;
+  const isDaysMode = focusMetric === 'days';
+  chip.classList.toggle('is-active', isDaysMode);
+  chip.setAttribute('aria-pressed', isDaysMode ? 'true' : 'false');
+  chip.title = getPulseWeatherModeChipTitle(focusMetric);
+  chip.innerHTML = buildPulseWeatherModeChipInnerHtml(focusMetric);
+}
+
 function buildPulseWeatherTableHeadHtml(focusMetric = null) {
   const isDaysMode = focusMetric === 'days';
   const isSingleLens = Boolean(focusMetric) && !isDaysMode;
+  const showClockBeacon = !isSingleLens && !isDaysMode && !hasSeenPulseWeatherClockHint();
   const col0Class = isSingleLens
     ? ' is-lens-back'
-    : ` is-clickable${isDaysMode ? ' is-lens-active' : ''}`;
+    : ` is-clickable${isDaysMode ? ' is-lens-active' : ''}${showClockBeacon ? ' has-clock-beacon' : ''}`;
   const col0Click = isSingleLens
     ? `onclick="window.togglePulseWeatherMetric('time')"`
     : `onclick="window.togglePulseWeatherMetric('days')"`;
@@ -10591,7 +10638,7 @@ function buildPulseWeatherTableHeadHtml(focusMetric = null) {
   return `
     <tr class="pulse-w2-th-row${focusMetric ? ' is-lens-mode' : ''}">
       <th class="pulse-w2-th-time${col0Class}" ${col0Click} title="${col0Title}">
-        <i class="${col0Icon}"></i>
+        <i class="${col0Icon}"></i>${showClockBeacon ? '<span class="pulse-w2-time-beacon" aria-hidden="true"></span>' : ''}
       </th>
       <th class="pulse-w2-th-weather is-clickable${focusMetric === 'weather' ? ' is-lens-active' : ''}" onclick="window.togglePulseWeatherMetric('weather')" title="Стан неба та опади на 8 днів (натисніть для детального режиму)">
         <i class="fas fa-cloud-rain"></i>
@@ -10977,6 +11024,9 @@ function buildPulseWeatherTableBodyHtml(daySlots, dailyLensItems, focusMetric = 
 
 window.togglePulseWeatherMetric = function(metricKey) {
   if (!window.pulseWeatherState) return;
+  if (metricKey === 'days') {
+    markPulseWeatherClockHintSeen();
+  }
   const nextMetric = (metricKey === 'time' || window.pulseWeatherState.focusMetric === metricKey)
     ? null
     : metricKey;
@@ -11007,6 +11057,7 @@ window.togglePulseWeatherMetric = function(metricKey) {
     void tbody.offsetWidth;
     tbody.classList.add('pulse-w2-tbody-fade');
   }
+  updatePulseWeatherModeChip(nextMetric);
 };
 
 window.openPulseWeatherDayFromLens = function(dayIndex) {
@@ -11881,8 +11932,11 @@ function renderPulseWeatherUI(data, city, updatedTime = '') {
     <!-- Підвал блоку Погода -->
     <div class="pulse-w2-footer">
       <span class="pulse-w2-footer-city" title="Місто прогнозу">
-        <i class="fas fa-location-dot text-primary"></i> ${city.name || 'Україна'}
+        <i class="fas fa-location-dot text-primary"></i><span class="pulse-w2-footer-city-name">${city.name || 'Україна'}</span>
       </span>
+      <button type="button" class="pulse-w2-mode-chip${activeFocusMetric === 'days' ? ' is-active' : ''}" id="pulseWeatherModeChip" onclick="window.togglePulseWeatherMetric('days')" title="${getPulseWeatherModeChipTitle(activeFocusMetric)}" aria-pressed="${activeFocusMetric === 'days' ? 'true' : 'false'}">
+        ${buildPulseWeatherModeChipInnerHtml(activeFocusMetric)}
+      </button>
       <span class="pulse-w2-footer-source">
         <i class="fas fa-cloud text-info"></i> Open-Meteo & NOAA Kp
       </span>

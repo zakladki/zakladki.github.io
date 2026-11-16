@@ -15679,9 +15679,36 @@ body.dark-mode .pulse-w2-row.pulse-w2-row-current {
 
 /* Час / День: фіксована стабільна ширина під обидва формати ("21:00" та "Нд • 15") */
 .pulse-w2-th-time {
+  position: relative;
   width: 13.5%;
   text-align: center !important;
   padding: 4px 2px !important;
+}
+.pulse-w2-time-beacon {
+  position: absolute;
+  top: 4px;
+  right: 5px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #06b6d4;
+  box-shadow: 0 0 0 0 rgba(6, 182, 212, 0.55);
+  pointer-events: none;
+  animation: pulseW2ClockBeacon 2.6s ease-in-out infinite;
+}
+body.dark-mode .pulse-w2-time-beacon {
+  background: #22d3ee;
+  box-shadow: 0 0 0 0 rgba(34, 211, 238, 0.55);
+}
+@keyframes pulseW2ClockBeacon {
+  0%, 100% {
+    opacity: 0.85;
+    box-shadow: 0 0 0 0 rgba(6, 182, 212, 0.55);
+  }
+  55% {
+    opacity: 1;
+    box-shadow: 0 0 0 4px rgba(6, 182, 212, 0);
+  }
 }
 .pulse-w2-col-time {
   font-weight: 600;
@@ -16296,7 +16323,7 @@ body.dark-mode .pulse-w2-hist-loading {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 6px;
+  gap: 5px;
   margin: 5px 0 0;
   padding: 0 2px;
   font-size: 0.65rem;
@@ -16308,11 +16335,67 @@ body.dark-mode .pulse-w2-hist-loading {
 body.dark-mode .pulse-w2-footer {
   color: #94a3b8;
 }
-.pulse-w2-footer-city,
+.pulse-w2-footer-city {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  flex: 0 1 auto;
+}
+.pulse-w2-footer-city-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 .pulse-w2-footer-source {
   display: inline-flex;
   align-items: center;
   gap: 4px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.pulse-w2-mode-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  height: 18px;
+  padding: 0 6px;
+  border-radius: 5px;
+  border: 1px solid rgba(14, 165, 233, 0.28);
+  background: rgba(14, 165, 233, 0.08);
+  color: #0369a1;
+  font-size: 0.60rem;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  flex-shrink: 0;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+.pulse-w2-mode-chip i {
+  font-size: 0.58rem;
+  opacity: 0.9;
+}
+.pulse-w2-mode-chip:hover {
+  background: rgba(14, 165, 233, 0.15);
+  border-color: rgba(2, 132, 199, 0.5);
+  color: #0284c7;
+}
+.pulse-w2-mode-chip.is-active {
+  background: rgba(14, 165, 233, 0.17);
+  border-color: rgba(2, 132, 199, 0.55);
+  color: #0284c7;
+}
+body.dark-mode .pulse-w2-mode-chip {
+  background: rgba(56, 189, 248, 0.12);
+  border-color: rgba(56, 189, 248, 0.3);
+  color: #7dd3fc;
+}
+body.dark-mode .pulse-w2-mode-chip:hover,
+body.dark-mode .pulse-w2-mode-chip.is-active {
+  background: rgba(56, 189, 248, 0.22);
+  border-color: rgba(56, 189, 248, 0.55);
+  color: #bae6fd;
 }
 
 
