@@ -11630,11 +11630,13 @@ body.dark-mode .pulse-card-badge {
   color: #94a3b8;
 }
 .pulse-card-badge.badge-green {
-  background: rgba(16, 185, 129, 0.14);
+  background: rgba(16, 185, 129, 0.06);
+  border: 1px solid rgba(16, 185, 129, 0.15);
   color: #059669;
 }
 body.dark-mode .pulse-card-badge.badge-green {
-  background: rgba(16, 185, 129, 0.2);
+  background: rgba(16, 185, 129, 0.09);
+  border: 1px solid rgba(52, 211, 153, 0.16);
   color: #34d399;
 }
 
@@ -14472,7 +14474,14 @@ body.dark-mode .pulse-w2-top-panel.is-extended-day {
   border-color: rgba(129, 140, 248, 0.45);
 }
 
-/* Вкладки у стилі Sinoptik з плавним гортанням до 8 днів */
+/* Вкладки у стилі Sinoptik з плавним гортанням до 8 днів та верхня метеограма */
+.pulse-w2-tabs-stage {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
 .pulse-w2-tabs {
   position: relative;
   display: flex;
@@ -14482,6 +14491,234 @@ body.dark-mode .pulse-w2-top-panel.is-extended-day {
   padding: 0;
   border: none;
   border-radius: 0;
+  transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+.pulse-w2-top-panel.is-days-mode .pulse-w2-tabs {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+.pulse-w2-meteogram {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.22s ease, visibility 0.22s ease;
+  background: linear-gradient(180deg, rgba(248, 250, 252, 0.94) 0%, #ffffff 100%);
+  z-index: 6;
+}
+body.dark-mode .pulse-w2-meteogram {
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.78) 0%, rgba(30, 41, 59, 0.88) 100%);
+}
+.pulse-w2-top-panel.is-days-mode .pulse-w2-meteogram {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+.pulse-w2-meteo-svg-wrap {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 15px;
+  bottom: 15px;
+  pointer-events: none;
+  z-index: 1;
+}
+.pulse-w2-meteo-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  overflow: visible;
+}
+.pulse-w2-meteo-bar-prob {
+  fill: rgba(14, 165, 233, 0.14);
+}
+.pulse-w2-meteo-bar-prob.is-wet {
+  fill: rgba(14, 165, 233, 0.21);
+}
+body.dark-mode .pulse-w2-meteo-bar-prob {
+  fill: rgba(56, 189, 248, 0.15);
+}
+body.dark-mode .pulse-w2-meteo-bar-prob.is-wet {
+  fill: rgba(56, 189, 248, 0.22);
+}
+.pulse-w2-meteo-bar-cap {
+  stroke: rgba(14, 165, 233, 0.42);
+  stroke-width: 1;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+.pulse-w2-meteo-bar-cap.is-wet {
+  stroke: rgba(2, 132, 199, 0.65);
+}
+body.dark-mode .pulse-w2-meteo-bar-cap {
+  stroke: rgba(56, 189, 248, 0.45);
+}
+body.dark-mode .pulse-w2-meteo-bar-cap.is-wet {
+  stroke: rgba(56, 189, 248, 0.72);
+}
+.pulse-w2-meteo-bar-mm {
+  fill: rgba(2, 132, 199, 0.56);
+}
+.pulse-w2-meteo-bar-mm.is-heavy {
+  fill: rgba(3, 105, 161, 0.78);
+}
+body.dark-mode .pulse-w2-meteo-bar-mm {
+  fill: rgba(56, 189, 248, 0.58);
+}
+body.dark-mode .pulse-w2-meteo-bar-mm.is-heavy {
+  fill: rgba(14, 165, 233, 0.82);
+}
+.pulse-w2-meteo-zero {
+  stroke: rgba(100, 116, 139, 0.62);
+  stroke-width: 0.9;
+  stroke-dasharray: 2.5 2.5;
+  vector-effect: non-scaling-stroke;
+}
+body.dark-mode .pulse-w2-meteo-zero {
+  stroke: rgba(148, 163, 184, 0.56);
+}
+.pulse-w2-meteo-line-max {
+  stroke: #f59e0b;
+  stroke-width: 1.35;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+.pulse-w2-meteo-line-min {
+  stroke: #0284c7;
+  stroke-width: 1.25;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+body.dark-mode .pulse-w2-meteo-line-max {
+  stroke: #fb923c;
+}
+body.dark-mode .pulse-w2-meteo-line-min {
+  stroke: #38bdf8;
+}
+.pulse-w2-meteo-dot-max {
+  fill: #ea580c;
+  stroke: #ffffff;
+  stroke-width: 0.7;
+}
+.pulse-w2-meteo-dot-min {
+  fill: #0284c7;
+  stroke: #ffffff;
+  stroke-width: 0.7;
+}
+body.dark-mode .pulse-w2-meteo-dot-max {
+  fill: #fb923c;
+  stroke: #0f172a;
+}
+body.dark-mode .pulse-w2-meteo-dot-min {
+  fill: #38bdf8;
+  stroke: #0f172a;
+}
+.pulse-w2-meteogram-cols {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  width: 100%;
+  height: 100%;
+}
+.pulse-w2-meteo-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 3px 1px 3px;
+  border: none;
+  border-right: 1px solid rgba(148, 163, 184, 0.16);
+  background: transparent;
+  cursor: pointer;
+  outline: none !important;
+  box-sizing: border-box;
+  min-width: 0;
+  transition: background 0.14s ease;
+}
+.pulse-w2-meteo-col:last-child {
+  border-right: none;
+}
+body.dark-mode .pulse-w2-meteo-col {
+  border-right-color: rgba(148, 163, 184, 0.14);
+}
+.pulse-w2-meteo-col:hover {
+  background: rgba(14, 165, 233, 0.08);
+}
+body.dark-mode .pulse-w2-meteo-col:hover {
+  background: rgba(56, 189, 248, 0.12);
+}
+.pulse-w2-meteo-col.is-active {
+  background: rgba(14, 165, 233, 0.08);
+  box-shadow: inset 0 2px 0 #0284c7;
+}
+body.dark-mode .pulse-w2-meteo-col.is-active {
+  background: rgba(56, 189, 248, 0.12);
+  box-shadow: inset 0 2px 0 #38bdf8;
+}
+.pulse-w2-meteo-day {
+  font-size: 0.56rem;
+  font-weight: 600;
+  color: #64748b;
+  line-height: 1.05;
+  white-space: nowrap;
+  letter-spacing: -0.25px;
+}
+.pulse-w2-meteo-col.is-today .pulse-w2-meteo-day,
+.pulse-w2-meteo-col.is-active .pulse-w2-meteo-day {
+  color: #0284c7;
+  font-weight: 700;
+}
+body.dark-mode .pulse-w2-meteo-day {
+  color: #94a3b8;
+}
+body.dark-mode .pulse-w2-meteo-col.is-today .pulse-w2-meteo-day,
+body.dark-mode .pulse-w2-meteo-col.is-active .pulse-w2-meteo-day {
+  color: #38bdf8;
+}
+.pulse-w2-meteo-spacer {
+  flex: 1 1 auto;
+  min-height: 32px;
+}
+.pulse-w2-meteo-temps {
+  display: inline-flex;
+  align-items: baseline;
+  justify-content: center;
+  white-space: nowrap;
+  line-height: 1;
+  letter-spacing: -0.45px;
+  font-variant-numeric: tabular-nums;
+}
+.pulse-w2-meteo-tmax {
+  font-size: 0.54rem;
+  font-weight: 400;
+  color: #1e293b;
+}
+body.dark-mode .pulse-w2-meteo-tmax {
+  color: #e2e8f0;
+}
+.pulse-w2-meteo-tsep {
+  font-size: 0.48rem;
+  font-weight: 400;
+  color: #94a3b8;
+  letter-spacing: -0.65px;
+  margin: 0 0.5px;
+}
+body.dark-mode .pulse-w2-meteo-tsep {
+  color: #64748b;
+}
+.pulse-w2-meteo-tmin {
+  font-size: 0.52rem;
+  font-weight: 400;
+  color: #64748b;
+}
+body.dark-mode .pulse-w2-meteo-tmin {
+  color: #94a3b8;
 }
 .pulse-w2-tabs-viewport {
   flex: 1;
@@ -14491,6 +14728,7 @@ body.dark-mode .pulse-w2-top-panel.is-extended-day {
   touch-action: pan-y;
   user-select: none;
   -webkit-user-select: none;
+  transition: opacity 0.2s ease;
 }
 .pulse-w2-tabs-track {
   display: flex;
@@ -14556,56 +14794,15 @@ body.dark-mode .pulse-w2-tabs-nav-btn:disabled {
   opacity: 0.35;
 }
 
-.pulse-w2-ext-day-pill {
-  display: inline-flex;
-  align-items: center;
+.pulse-w2-header-actions,
+.pulse-finance-header-actions {
   gap: 4px;
-  height: 20px;
-  padding: 0 6px;
-  border-radius: 5px;
-  border: 1px solid rgba(99, 102, 241, 0.35);
-  background: rgba(99, 102, 241, 0.11);
-  color: #4338ca;
-  font-size: 0.64rem;
-  font-weight: 700;
-  line-height: 1;
+  min-width: 0;
+  flex-shrink: 1;
+}
+.pulse-w2-header-actions .pulse-rate-tab-btn,
+.pulse-finance-header-actions .pulse-rate-tab-btn {
   white-space: nowrap;
-  cursor: pointer;
-  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
-}
-.pulse-w2-ext-day-pill:hover {
-  background: rgba(99, 102, 241, 0.2);
-  border-color: rgba(99, 102, 241, 0.58);
-  color: #312e81;
-}
-.pulse-w2-ext-day-pill .pulse-w2-ext-close {
-  font-size: 0.74rem;
-  line-height: 1;
-  opacity: 0.75;
-  margin-left: 1px;
-}
-body.dark-mode .pulse-w2-ext-day-pill {
-  background: rgba(129, 140, 248, 0.18);
-  border-color: rgba(129, 140, 248, 0.42);
-  color: #c7d2fe;
-}
-body.dark-mode .pulse-w2-ext-day-pill:hover {
-  background: rgba(129, 140, 248, 0.28);
-  border-color: rgba(129, 140, 248, 0.65);
-  color: #e0e7ff;
-}
-.pulse-w2-ext-day-pill.is-today {
-  cursor: default;
-}
-.pulse-w2-ext-day-pill.is-today:hover {
-  background: rgba(99, 102, 241, 0.11);
-  border-color: rgba(99, 102, 241, 0.35);
-  color: #4338ca;
-}
-body.dark-mode .pulse-w2-ext-day-pill.is-today:hover {
-  background: rgba(129, 140, 248, 0.18);
-  border-color: rgba(129, 140, 248, 0.42);
-  color: #c7d2fe;
 }
 
 .pulse-w2-tab {
@@ -15679,36 +15876,9 @@ body.dark-mode .pulse-w2-row.pulse-w2-row-current {
 
 /* Час / День: фіксована стабільна ширина під обидва формати ("21:00" та "Нд • 15") */
 .pulse-w2-th-time {
-  position: relative;
   width: 13.5%;
   text-align: center !important;
   padding: 4px 2px !important;
-}
-.pulse-w2-time-beacon {
-  position: absolute;
-  top: 4px;
-  right: 5px;
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: #06b6d4;
-  box-shadow: 0 0 0 0 rgba(6, 182, 212, 0.55);
-  pointer-events: none;
-  animation: pulseW2ClockBeacon 2.6s ease-in-out infinite;
-}
-body.dark-mode .pulse-w2-time-beacon {
-  background: #22d3ee;
-  box-shadow: 0 0 0 0 rgba(34, 211, 238, 0.55);
-}
-@keyframes pulseW2ClockBeacon {
-  0%, 100% {
-    opacity: 0.85;
-    box-shadow: 0 0 0 0 rgba(6, 182, 212, 0.55);
-  }
-  55% {
-    opacity: 1;
-    box-shadow: 0 0 0 4px rgba(6, 182, 212, 0);
-  }
 }
 .pulse-w2-col-time {
   font-weight: 600;
@@ -16323,7 +16493,7 @@ body.dark-mode .pulse-w2-hist-loading {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 5px;
+  gap: 6px;
   margin: 5px 0 0;
   padding: 0 2px;
   font-size: 0.65rem;
@@ -16335,67 +16505,11 @@ body.dark-mode .pulse-w2-hist-loading {
 body.dark-mode .pulse-w2-footer {
   color: #94a3b8;
 }
-.pulse-w2-footer-city {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  min-width: 0;
-  flex: 0 1 auto;
-}
-.pulse-w2-footer-city-name {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
+.pulse-w2-footer-city,
 .pulse-w2-footer-source {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-.pulse-w2-mode-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  height: 18px;
-  padding: 0 6px;
-  border-radius: 5px;
-  border: 1px solid rgba(14, 165, 233, 0.28);
-  background: rgba(14, 165, 233, 0.08);
-  color: #0369a1;
-  font-size: 0.60rem;
-  font-weight: 600;
-  line-height: 1;
-  white-space: nowrap;
-  flex-shrink: 0;
-  cursor: pointer;
-  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
-}
-.pulse-w2-mode-chip i {
-  font-size: 0.58rem;
-  opacity: 0.9;
-}
-.pulse-w2-mode-chip:hover {
-  background: rgba(14, 165, 233, 0.15);
-  border-color: rgba(2, 132, 199, 0.5);
-  color: #0284c7;
-}
-.pulse-w2-mode-chip.is-active {
-  background: rgba(14, 165, 233, 0.17);
-  border-color: rgba(2, 132, 199, 0.55);
-  color: #0284c7;
-}
-body.dark-mode .pulse-w2-mode-chip {
-  background: rgba(56, 189, 248, 0.12);
-  border-color: rgba(56, 189, 248, 0.3);
-  color: #7dd3fc;
-}
-body.dark-mode .pulse-w2-mode-chip:hover,
-body.dark-mode .pulse-w2-mode-chip.is-active {
-  background: rgba(56, 189, 248, 0.22);
-  border-color: rgba(56, 189, 248, 0.55);
-  color: #bae6fd;
 }
 
 
