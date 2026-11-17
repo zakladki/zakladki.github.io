@@ -10624,7 +10624,7 @@ function buildPulseWeatherMeteogramHtml(dailyItems, weekMinTemp, weekMaxTemp, ac
 
   const n = items.length;
   const svgW = 320;
-  const svgH = 46;
+  const svgH = 44;
   const colW = svgW / n;
   const padTop = 5;
   const padBot = 5;
@@ -10638,6 +10638,13 @@ function buildPulseWeatherMeteogramHtml(dailyItems, weekMinTemp, weekMaxTemp, ac
   const maxPts = items.map((d, i) => ({ x: (i + 0.5) * colW, y: mapY(d.tMax) }));
   const minPts = items.map((d, i) => ({ x: (i + 0.5) * colW, y: mapY(d.tMin) }));
 
+  let maxIdx = 0;
+  let minIdx = 0;
+  for (let i = 1; i < n; i++) {
+    if (items[i].tMax > items[maxIdx].tMax) maxIdx = i;
+    if (items[i].tMin < items[minIdx].tMin) minIdx = i;
+  }
+
   const maxLinePath = `M${maxPts[0].x.toFixed(1)},${maxPts[0].y.toFixed(1)} ${buildPulseWeatherSmoothSvgPath(maxPts, false)}`;
   const minLinePath = `M${minPts[0].x.toFixed(1)},${minPts[0].y.toFixed(1)} ${buildPulseWeatherSmoothSvgPath(minPts, false)}`;
   const bandAreaPath = `${maxLinePath} L${minPts[minPts.length - 1].x.toFixed(1)},${minPts[minPts.length - 1].y.toFixed(1)} ${buildPulseWeatherSmoothSvgPath(minPts, true)} Z`;
@@ -10646,52 +10653,140 @@ function buildPulseWeatherMeteogramHtml(dailyItems, weekMinTemp, weekMaxTemp, ac
     ? `<line x1="4" y1="${mapY(0).toFixed(1)}" x2="${svgW - 4}" y2="${mapY(0).toFixed(1)}" class="pulse-w2-meteo-zero" />`
     : '';
 
-  const maxBarH = 24;
-  const precipBarsHtml = items.map((d, i) => {
-    const prob = Number(d.precipProbMax) || 0;
-    const sum = Number(d.precipSum) || 0;
-    if (prob < 10 && sum < 0.1) return '';
-    const probPct = Math.max(prob, sum >= 0.1 ? 16 : 0);
-    const bgH = Math.max(4, (probPct / 100) * maxBarH);
-    const barX = (i + 0.5) * colW - 8;
-    const barY = svgH - bgH;
-    const isWet = prob >= 40 || sum >= 1.5;
-
-    let mmRectHtml = '';
-    if (sum >= 0.1) {
-      const mmRatio = Math.min(1, Math.pow(sum / 10, 0.72));
-      const mmH = Math.min(bgH, Math.max(2.2, mmRatio * maxBarH));
-      const mmY = svgH - mmH;
-      const isHeavy = sum >= 4;
-      mmRectHtml = `<rect x="${(barX + 1.5).toFixed(1)}" y="${mmY.toFixed(1)}" width="13" height="${mmH.toFixed(1)}" rx="1" class="pulse-w2-meteo-bar-mm${isHeavy ? ' is-heavy' : ''}" />`;
-    }
-
-    return `
-      <rect x="${barX.toFixed(1)}" y="${barY.toFixed(1)}" width="16" height="${bgH.toFixed(1)}" rx="1.5" class="pulse-w2-meteo-bar-prob${isWet ? ' is-wet' : ''}" />
-      <line x1="${(barX + 0.5).toFixed(1)}" y1="${barY.toFixed(1)}" x2="${(barX + 15.5).toFixed(1)}" y2="${barY.toFixed(1)}" class="pulse-w2-meteo-bar-cap${isWet ? ' is-wet' : ''}" />
-      ${mmRectHtml}
-    `;
-  }).join('');
-
-  const dotsMaxHtml = maxPts.map((p, i) => `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${i === activeTab ? '2.3' : '1.7'}" class="pulse-w2-meteo-dot-max${i === activeTab ? ' is-active' : ''}" />`).join('');
-  const dotsMinHtml = minPts.map((p, i) => `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${i === activeTab ? '2.1' : '1.6'}" class="pulse-w2-meteo-dot-min${i === activeTab ? ' is-active' : ''}" />`).join('');
+  const peakRingsHtml = `
+    <circle cx="${maxPts[maxIdx].x.toFixed(1)}" cy="${maxPts[maxIdx].y.toFixed(1)}" r="3.8" class="pulse-w2-meteo-peak-ring is-max" />
+    <circle cx="${minPts[minIdx].x.toFixed(1)}" cy="${minPts[minIdx].y.toFixed(1)}" r="3.8" class="pulse-w2-meteo-peak-ring is-min" />
+  `;
+  const dotsMaxHtml = maxPts.map((p, i) => (
+    `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${(i === maxIdx || i === activeTab) ? '2.2' : '1.45'}" class="pulse-w2-meteo-dot-max${i === activeTab ? ' is-active' : ''}${i === maxIdx ? ' is-peak' : ''}" />`
+  )).join('');
+  const dotsMinHtml = minPts.map((p, i) => (
+    `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${(i === minIdx || i === activeTab) ? '2.1' : '1.45'}" class="pulse-w2-meteo-dot-min${i === activeTab ? ' is-active' : ''}${i === minIdx ? ' is-peak' : ''}" />`
+  )).join('');
 
   const colsHtml = items.map((d, i) => {
     const dayShortLbl = (d.dayBadge || '').replace(' • ', ' ');
     const isAct = i === activeTab;
     const prob = Number(d.precipProbMax) || 0;
     const sum = Number(d.precipSum) || 0;
+    const windVal = Number(d.windMax) || 0;
+    const gustVal = Number(d.gustMax) || windVal;
+    const windCls = d.windArrowClass || 'wind-calm';
+    const windArrowDeg = (d.windInfo && typeof d.windInfo.arrowDeg === 'number') ? d.windInfo.arrowDeg : 0;
+    const windDirCode = (d.windInfo && d.windInfo.code) ? d.windInfo.code : '';
+
+    // Міні-візуал опадів для верхньої зони (хмарка + серпанок + 1..6 штрихів дощу/снігу, відкалібровано під колби таблиці)
+    let skyVisualHtml = '';
+    if (prob >= 15 || sum >= 0.1) {
+      const sW = 36;
+      const sH = 18;
+      const cx = sW / 2;
+      let rainVolScore = 0;
+      if (sum > 0) {
+        rainVolScore = Math.min(100, Math.max(15, Math.round((sum / 8) * 100)));
+      } else if (prob >= 40) {
+        rainVolScore = Math.round(prob * 0.25);
+      } else if (prob >= 15) {
+        rainVolScore = Math.round(prob * 0.15);
+      }
+
+      let volTier = 'trace';
+      if (rainVolScore >= 95) volTier = 'downpour';
+      else if (rainVolScore >= 75) volTier = 'heavy';
+      else if (rainVolScore >= 45) volTier = 'medium';
+      else if (rainVolScore >= 15) volTier = 'light';
+
+      const isSnow = d.tMax <= 1;
+      const mistH = Math.max(6, (Math.max(rainVolScore, 14) / 100) * sH);
+      const gradId = `pulseMeteoColMist_${i}`;
+      const mistColor = isSnow
+        ? (volTier === 'downpour' || volTier === 'heavy' ? '#0891b2' : '#06b6d4')
+        : (volTier === 'downpour' ? '#0369a1' : (volTier === 'heavy' ? '#0284c7' : '#0ea5e9'));
+      const mistOpMap = { downpour: '0.30', heavy: '0.21', medium: '0.14', light: '0.09', trace: '0.05' };
+      const mistOp = mistOpMap[volTier];
+
+      const widthMap = { downpour: 31, heavy: 28, medium: 25, light: 21, trace: 18 };
+      const cloudW = widthMap[volTier];
+      const depthMap = { downpour: 3.6, heavy: 3.3, medium: 2.9, light: 2.5, trace: 2.2 };
+      const cloudD = depthMap[volTier];
+      const x0 = cx - cloudW / 2;
+      const x1 = cx + cloudW / 2;
+      const w3 = cloudW / 3;
+      const cPath = [
+        `M${x0.toFixed(1)},0`,
+        `L${x1.toFixed(1)},0`,
+        `C${x1.toFixed(1)},${(cloudD * 1.02).toFixed(1)} ${(x1 - w3 * 0.85).toFixed(1)},${(cloudD * 1.08).toFixed(1)} ${(x1 - w3).toFixed(1)},${(cloudD * 0.48).toFixed(1)}`,
+        `C${(cx + w3 * 0.42).toFixed(1)},${(cloudD * 1.38).toFixed(1)} ${(cx - w3 * 0.42).toFixed(1)},${(cloudD * 1.38).toFixed(1)} ${(x0 + w3).toFixed(1)},${(cloudD * 0.48).toFixed(1)}`,
+        `C${(x0 + w3 * 0.85).toFixed(1)},${(cloudD * 1.08).toFixed(1)} ${x0.toFixed(1)},${(cloudD * 1.02).toFixed(1)} ${x0.toFixed(1)},0`,
+        'Z'
+      ].join(' ');
+      const tierCls = `is-${volTier}`;
+      const capCls = `pulse-w2-meteo-sky-cap ${tierCls}${isSnow ? ' is-snow' : ''}`;
+
+      let dropOffsets = [];
+      if (volTier === 'downpour') {
+        dropOffsets = [-10.5, -6.3, -2.1, 2.1, 6.3, 10.5];
+      } else if (volTier === 'heavy') {
+        dropOffsets = [-8.8, -4.4, 0, 4.4, 8.8];
+      } else if (volTier === 'medium') {
+        dropOffsets = [-6.6, -2.2, 2.2, 6.6];
+      } else if (volTier === 'light') {
+        dropOffsets = rainVolScore >= 26 ? [-5.0, 0, 5.0] : [-3.4, 3.4];
+      } else if (prob >= 28) {
+        dropOffsets = [-3.0, 3.0];
+      } else if (prob >= 15) {
+        dropOffsets = [0];
+      }
+
+      let dropsHtml = '';
+      if (dropOffsets.length) {
+        if (isSnow) {
+          const snowR = (volTier === 'downpour' || volTier === 'heavy') ? '1.25' : '1.12';
+          dropsHtml = dropOffsets.map((dx, idx) =>
+            `<circle cx="${(cx + dx).toFixed(1)}" cy="${(6.6 + (idx % 2) * 2.4).toFixed(1)}" r="${snowR}" class="pulse-w2-meteo-drop is-snow ${tierCls}" />`
+          ).join('');
+        } else {
+          const dropLen = volTier === 'trace' ? 3.5 : 3.9;
+          dropsHtml = dropOffsets.map((dx, idx) => {
+            const sx = cx + dx;
+            const sy = 5.4 + (idx % 2) * 2.0;
+            return `<line x1="${sx.toFixed(1)}" y1="${sy.toFixed(1)}" x2="${(sx - 1.5).toFixed(1)}" y2="${(sy + dropLen).toFixed(1)}" class="pulse-w2-meteo-drop ${tierCls}" />`;
+          }).join('');
+        }
+      }
+
+      skyVisualHtml = `
+        <svg class="pulse-w2-meteo-sky-svg" viewBox="0 0 ${sW} ${sH}" preserveAspectRatio="xMidYMin meet">
+          <defs>
+            <linearGradient id="${gradId}" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="${mistColor}" stop-opacity="${mistOp}" />
+              <stop offset="100%" stop-color="${mistColor}" stop-opacity="0" />
+            </linearGradient>
+          </defs>
+          <rect x="${(cx - 14).toFixed(1)}" y="1.5" width="28" height="${(mistH - 1.5).toFixed(1)}" rx="3" fill="url(#${gradId})" />
+          <path d="${cPath}" class="${capCls}" />
+          ${dropsHtml}
+        </svg>
+      `;
+    }
+
+    const condLabel = (d.cond && d.cond.label) ? d.cond.label : '';
     const precipHint = (prob >= 10 || sum >= 0.1)
       ? `, опади ${prob}%${sum > 0 ? ` (${sum.toFixed(1)} мм)` : ''}`
       : '';
-    const colTitle = `${d.fullDateLabel}: ${d.maxSign}${d.tMax}°...${d.minSign}${d.tMin}° (${d.cond.desc}${precipHint}) • Натисніть для погодинного розкладу`;
+    const windHint = `, вітер ${Math.round(windVal)} м/с ${windDirCode}${gustVal > windVal + 1 ? ` (пор. ${Math.round(gustVal)})` : ''}`;
+    const colTitle = `${d.fullDateLabel}: ${d.maxSign}${d.tMax}°...${d.minSign}${d.tMin}°${condLabel ? ` (${condLabel}${precipHint}${windHint})` : `${precipHint}${windHint}`} • Натисніть для погодинного розкладу`;
+
     return `
-      <button type="button" class="pulse-w2-meteo-col${d.isToday ? ' is-today' : ''}${isAct ? ' is-active' : ''}" onclick="window.openPulseWeatherDayFromLens(${d.dayIdx})" title="${colTitle}" aria-label="${colTitle}">
+      <button type="button" class="pulse-w2-meteo-col${d.isToday ? ' is-today' : ''}${isAct ? ' is-active' : ''}" style="--meteo-delay: ${i * 110}ms;" onclick="window.openPulseWeatherDayFromLens(${d.dayIdx})" title="${colTitle}" aria-label="${colTitle}">
         <span class="pulse-w2-meteo-day">${dayShortLbl}</span>
-        <span class="pulse-w2-meteo-spacer"></span>
-        <span class="pulse-w2-meteo-temps">
-          <span class="pulse-w2-meteo-tmax">${d.maxSign}${d.tMax}°</span><span class="pulse-w2-meteo-tsep">...</span><span class="pulse-w2-meteo-tmin">${d.minSign}${d.tMin}°</span>
+        <span class="pulse-w2-meteo-slot">
+          <span class="pulse-w2-meteo-sky-slot" aria-hidden="true">${skyVisualHtml}</span>
+          <span class="pulse-w2-meteo-wind-slot" aria-hidden="true">
+            <svg class="pulse-hour-wind-arrow ${windCls}" width="13.5" height="13.5" viewBox="0 0 24 24" fill="currentColor" stroke="none" style="transform: rotate(${windArrowDeg}deg); transform-origin: 50% 50%;"><path d="M12 1.5L7 21.5l5-4.5 5 4.5L12 1.5z"></path></svg>
+          </span>
         </span>
+        <span class="pulse-w2-meteo-spacer"></span>
       </button>
     `;
   }).join('');
@@ -10701,15 +10796,15 @@ function buildPulseWeatherMeteogramHtml(dailyItems, weekMinTemp, weekMaxTemp, ac
       <svg class="pulse-w2-meteo-svg" viewBox="0 0 ${svgW} ${svgH}" preserveAspectRatio="none">
         <defs>
           <linearGradient id="pulseMeteoBandGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.20" />
-            <stop offset="100%" stop-color="#0ea5e9" stop-opacity="0.11" />
+            <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.18" />
+            <stop offset="100%" stop-color="#0ea5e9" stop-opacity="0.10" />
           </linearGradient>
         </defs>
-        ${precipBarsHtml}
         ${zeroLineHtml}
         <path d="${bandAreaPath}" fill="url(#pulseMeteoBandGrad)" />
         <path d="${minLinePath}" class="pulse-w2-meteo-line-min" fill="none" />
         <path d="${maxLinePath}" class="pulse-w2-meteo-line-max" fill="none" />
+        ${peakRingsHtml}
         ${dotsMinHtml}
         ${dotsMaxHtml}
       </svg>
