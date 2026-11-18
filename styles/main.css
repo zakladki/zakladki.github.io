@@ -14523,7 +14523,7 @@ body.dark-mode .pulse-w2-meteogram {
   left: 0;
   right: 0;
   top: 28px;
-  bottom: 4px;
+  bottom: 5px;
   pointer-events: none;
   z-index: 1;
 }
@@ -14929,6 +14929,32 @@ body.dark-mode .pulse-w2-meteo-col.is-active .pulse-w2-meteo-day {
 .pulse-w2-meteo-spacer {
   flex: 1 1 auto;
   min-height: 24px;
+}
+.pulse-w2-meteo-kp-bar {
+  display: block;
+  width: 72%;
+  height: 2px;
+  border-radius: 999px;
+  margin-top: 1px;
+  flex-shrink: 0;
+  background: transparent;
+  pointer-events: none;
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+.pulse-w2-meteo-kp-bar.is-yellow {
+  background: rgba(217, 119, 6, 0.88);
+}
+body.dark-mode .pulse-w2-meteo-kp-bar.is-yellow {
+  background: rgba(251, 191, 36, 0.90);
+}
+.pulse-w2-meteo-kp-bar.is-red {
+  height: 2.5px;
+  background: rgba(220, 38, 38, 0.94);
+  box-shadow: 0 -1px 4px rgba(220, 38, 38, 0.28);
+}
+body.dark-mode .pulse-w2-meteo-kp-bar.is-red {
+  background: rgba(248, 113, 113, 0.96);
+  box-shadow: 0 -1px 5px rgba(248, 113, 113, 0.32);
 }
 .pulse-w2-tabs-viewport {
   flex: 1;
