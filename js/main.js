@@ -14517,8 +14517,34 @@ async function loadPulseDrawerData(forceRefresh = false) {
       applyCryptoToUI(pulseCryptoData);
       fetchLiveCryptoRates();
     }
+    if (cached.geomagDailyMap && typeof cached.geomagDailyMap === 'object') {
+      window.currentGeomagDailyMap = cached.geomagDailyMap;
+    }
     if (cached.geomagForecast) {
       renderGeomagForecastUI(cached.geomagForecast);
+    }
+    if (!window.currentGeomagDailyMap || Object.keys(window.currentGeomagDailyMap).length === 0) {
+      fetch('https://services.swpc.noaa.gov/text/27-day-outlook.txt')
+        .then(r => r.ok ? r.text() : '')
+        .then(txt27 => {
+          if (!txt27) return;
+          const parsed27 = parseNoaa27DayOutlook(txt27);
+          if (parsed27 && Object.keys(parsed27).length > 0) {
+            window.currentGeomagDailyMap = parsed27;
+            try {
+              const curCache = JSON.parse(localStorage.getItem(cacheKey) || 'null');
+              if (curCache) {
+                curCache.geomagDailyMap = parsed27;
+                localStorage.setItem(cacheKey, JSON.stringify(curCache));
+              }
+            } catch (e) {}
+            const wState = window.pulseWeatherState || window.pulseWeather2State;
+            if (wState && wState.data) {
+              renderPulseWeatherUI(wState.data, wState.city, wState.updatedTime);
+            }
+          }
+        })
+        .catch(() => {});
     }
     if (cached.lastUpdatedText) {
       updatePulseFinanceLiveBadge(cached.lastUpdatedText);
@@ -14578,7 +14604,8 @@ async function loadPulseDrawerData(forceRefresh = false) {
         lastUpdatedText: timeStr,
         rates: finalRates,
         crypto: finalCrypto,
-        geomagForecast: finalForecast
+        geomagForecast: finalForecast,
+        geomagDailyMap: window.currentGeomagDailyMap || null
       }));
     } catch (e) {}
 
@@ -14778,9 +14805,10 @@ function parseNoaa27DayOutlook(rawText) {
   };
   const lines = rawText.split(/\r?\n/);
   for (let i = 0; i < lines.length; i++) {
-    const m = lines[i].match(/^(\d{4})\s+(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+(\d{2})\s+(\d+)\s+(\d+)\s+(\d+)\s*$/);
+    const line = lines[i].trim();
+    const m = line.match(/^(\d{4})\s+(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+(\d{1,2})\s+(\d+)\s+(\d+)\s+(\d+)$/);
     if (!m) continue;
-    const ymd = `${m[1]}-${monMap[m[2]]}-${m[3]}`;
+    const ymd = `${m[1]}-${monMap[m[2]]}-${m[3].padStart(2, '0')}`;
     map[ymd] = {
       flux: parseInt(m[4], 10),
       aIndex: parseInt(m[5], 10),
