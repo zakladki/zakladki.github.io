@@ -10618,6 +10618,51 @@ function buildPulseWeatherSmoothSvgPath(pts, reverse = false) {
   return segs.join(' ');
 }
 
+function getPulseWindArrowClass(windSpeed, windGust) {
+  const w = Number(windSpeed) || 0;
+  const g = (windGust !== undefined && windGust !== null && !isNaN(Number(windGust))) ? Number(windGust) : w;
+  if (w >= 17 || g >= 22) return 'wind-storm';
+  if (w >= 11 || g >= 15) return 'wind-strong';
+  if (w >= 5.5 || g >= 9) return 'wind-moderate';
+  if (w < 2.5 && g < 5.0) return 'wind-still';
+  return 'wind-calm';
+}
+
+function buildPulseWindArrowSvgHtml(windSpeed, windGust, arrowDeg = 0, windArrowClass = 'wind-calm', size = 16) {
+  const windVal = Number(windSpeed) || 0;
+  const gustVal = (windGust !== undefined && windGust !== null && !isNaN(Number(windGust))) ? Number(windGust) : windVal;
+  const deg = (typeof arrowDeg === 'number' && !isNaN(arrowDeg)) ? arrowDeg : 0;
+
+  // Візуалізація сили та поривів вітру за стрілкою (0-3 хвильові дуги напору позаду хвостика)
+  let windArcCount = 0;
+  if (windVal >= 11.0 || gustVal >= 15.0) windArcCount = 3;
+  else if (windVal >= 7.5 || gustVal >= 11.0) windArcCount = 2;
+  else if (windVal >= 4.5 || gustVal >= 7.5) windArcCount = 1;
+
+  const hasWindGustPulse = windArcCount >= 2 && (gustVal - windVal >= 2.0 || gustVal >= 15.0);
+  let windArrowPath = 'M14 0.8 L8.5 25.5 L14 20.5 L19.5 25.5 Z';
+  let windArcsHtml = '';
+  if (windArcCount === 1) {
+    windArrowPath = 'M14 0.6 L8.6 20.8 L14 16.4 L19.4 20.8 Z';
+    windArcsHtml = '<path d="M8.8 23.0 Q14 25.6 19.2 23.0" class="pulse-w2-meteo-wind-arc is-arc-1" />';
+  } else if (windArcCount === 2) {
+    windArrowPath = 'M14 0.5 L8.6 19.2 L14 15.0 L19.4 19.2 Z';
+    windArcsHtml = [
+      '<path d="M9.0 21.2 Q14 23.6 19.0 21.2" class="pulse-w2-meteo-wind-arc is-arc-1" />',
+      '<path d="M7.2 24.4 Q14 27.2 20.8 24.4" class="pulse-w2-meteo-wind-arc is-arc-2" />'
+    ].join('');
+  } else if (windArcCount >= 3) {
+    windArrowPath = 'M14 0.4 L8.6 18.0 L14 14.0 L19.4 18.0 Z';
+    windArcsHtml = [
+      '<path d="M9.0 19.9 Q14 22.1 19.0 19.9" class="pulse-w2-meteo-wind-arc is-arc-1" />',
+      '<path d="M7.2 22.9 Q14 25.4 20.8 22.9" class="pulse-w2-meteo-wind-arc is-arc-2" />',
+      '<path d="M5.4 25.8 Q14 28.6 22.6 25.8" class="pulse-w2-meteo-wind-arc is-arc-3" />'
+    ].join('');
+  }
+
+  return `<svg class="pulse-hour-wind-arrow pulse-w2-meteo-wind-svg ${windArrowClass}${hasWindGustPulse ? ' is-gusty' : ''}" width="${size}" height="${size}" viewBox="0 0 28 28" fill="currentColor" stroke="none" style="transform: rotate(${deg}deg); transform-origin: 50% 50%;"><path class="pulse-w2-wind-arrow-body" d="${windArrowPath}"></path>${windArcsHtml}</svg>`;
+}
+
 function buildPulseWeatherMeteogramHtml(dailyItems, weekMinTemp, weekMaxTemp, activeTab = 0) {
   const items = Array.isArray(dailyItems) ? dailyItems : [];
   if (!items.length) return '';
@@ -10849,34 +10894,7 @@ function buildPulseWeatherMeteogramHtml(dailyItems, weekMinTemp, weekMaxTemp, ac
     const windHint = `, вітер ${Math.round(windVal)} м/с ${windDirCode}${gustVal > windVal + 1 ? ` (пор. ${Math.round(gustVal)})` : ''}`;
     const colTitle = `${d.fullDateLabel}: ${d.maxSign}${d.tMax}°...${d.minSign}${d.tMin}°${condLabel ? ` (${condLabel}${precipHint}${windHint})` : `${precipHint}${windHint}`} • Натисніть для погодинного розкладу`;
 
-    // Візуалізація сили та поривів вітру за стрілкою (0-3 хвильові дуги напору позаду хвостика)
-    let windArcCount = 0;
-    if (windVal >= 11.0 || gustVal >= 15.0) windArcCount = 3;
-    else if (windVal >= 7.5 || gustVal >= 11.0) windArcCount = 2;
-    else if (windVal >= 4.5 || gustVal >= 7.5) windArcCount = 1;
-
-    const hasWindGustPulse = windArcCount >= 2 && (gustVal - windVal >= 2.0 || gustVal >= 15.0);
-    let windArrowPath = 'M14 3.5 L9.0 21.0 L14 17.0 L19.0 21.0 Z';
-    let windArcsHtml = '';
-    if (windArcCount === 1) {
-      windArrowPath = 'M14 2.5 L9.2 17.8 L14 14.8 L18.8 17.8 Z';
-      windArcsHtml = '<path d="M9.6 20.2 Q14 22.4 18.4 20.2" class="pulse-w2-meteo-wind-arc is-arc-1" />';
-    } else if (windArcCount === 2) {
-      windArrowPath = 'M14 2.0 L9.2 17.0 L14 14.0 L18.8 17.0 Z';
-      windArcsHtml = [
-        '<path d="M9.6 19.3 Q14 21.5 18.4 19.3" class="pulse-w2-meteo-wind-arc is-arc-1" />',
-        '<path d="M7.8 22.1 Q14 24.8 20.2 22.1" class="pulse-w2-meteo-wind-arc is-arc-2" />'
-      ].join('');
-    } else if (windArcCount >= 3) {
-      windArrowPath = 'M14 1.5 L9.2 16.5 L14 13.5 L18.8 16.5 Z';
-      windArcsHtml = [
-        '<path d="M9.6 18.8 Q14 21.0 18.4 18.8" class="pulse-w2-meteo-wind-arc is-arc-1" />',
-        '<path d="M7.8 21.6 Q14 24.4 20.2 21.6" class="pulse-w2-meteo-wind-arc is-arc-2" />',
-        '<path d="M6.0 24.4 Q14 27.6 22.0 24.4" class="pulse-w2-meteo-wind-arc is-arc-3" />'
-      ].join('');
-    }
-
-    const windSvgHtml = `<svg class="pulse-hour-wind-arrow pulse-w2-meteo-wind-svg ${windCls}${hasWindGustPulse ? ' is-gusty' : ''}" width="17" height="17" viewBox="0 0 28 28" fill="currentColor" stroke="none" style="transform: rotate(${windArrowDeg}deg); transform-origin: 50% 50%;"><path d="${windArrowPath}"></path>${windArcsHtml}</svg>`;
+    const windSvgHtml = buildPulseWindArrowSvgHtml(windVal, gustVal, windArrowDeg, windCls, 17);
 
     return `
       <button type="button" class="pulse-w2-meteo-col${d.isToday ? ' is-today' : ''}${isAct ? ' is-active' : ''}" style="--meteo-delay: ${i * 110}ms;" onclick="window.openPulseWeatherDayFromLens(${d.dayIdx})" title="${colTitle}" aria-label="${colTitle}">
@@ -11021,10 +11039,7 @@ function buildPulseWeatherDailyLensItems(data) {
       ? daily.wind_direction_10m_dominant[d]
       : 0;
     const windInfo = getWindDirectionInfo(windDeg);
-    let windArrowClass = 'wind-calm';
-    if (windMax >= 17 || gustMax >= 22) windArrowClass = 'wind-storm';
-    else if (windMax >= 11 || gustMax >= 15) windArrowClass = 'wind-strong';
-    else if (windMax >= 5.5 || gustMax >= 9) windArrowClass = 'wind-moderate';
+    const windArrowClass = getPulseWindArrowClass(windMax, gustMax);
 
     const bucket = hourlyByDate[dateStr] || { hums: [], presses: [], dayCodes: [] };
     const dayBestCode = (bucket.dayCodes && bucket.dayCodes.length) ? Math.min(...bucket.dayCodes) : rawWCode;
@@ -11163,7 +11178,7 @@ function buildPulseWeatherLensRowHtml(dayItem, focusMetric, weekMinTemp, weekMax
     statusTone = dayItem.tMax < 0 ? 'tone-cyan' : '';
     rowTitle = `${dayItem.fullDateLabel}: вночі ${dayItem.minSign}${dayItem.tMin}°C, вдень до ${dayItem.maxSign}${dayItem.tMax}°C`;
   } else if (focusMetric === 'wind') {
-    valHtml = `<svg class="pulse-hour-wind-arrow ${dayItem.windArrowClass}" width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="none" style="transform: rotate(${dayItem.windInfo.arrowDeg}deg); transform-origin: 50% 50%;"><path d="M12 1.5L7 21.5l5-4.5 5 4.5L12 1.5z"></path></svg><span class="pulse-w2-lens-num${dayItem.windMax >= 8 ? ' tone-red' : ''}">${dayItem.windMax.toFixed(1)}</span>`;
+    valHtml = `${buildPulseWindArrowSvgHtml(dayItem.windMax, dayItem.gustMax, dayItem.windInfo.arrowDeg, dayItem.windArrowClass, 17)}<span class="pulse-w2-lens-num${dayItem.windMax >= 8 ? ' tone-red' : ''}">${dayItem.windMax.toFixed(1)}</span>`;
     pct = Math.max(6, Math.min(100, Math.round((dayItem.windMax / 18) * 100)));
     barTone = (dayItem.windMax >= 12 || dayItem.gustMax >= 17) ? 'tone-red' : ((dayItem.windMax >= 7.5 || dayItem.gustMax >= 11) ? 'tone-amber' : 'tone-teal');
     statusHtml = `${dayItem.windInfo.code} · пор. ${Math.round(dayItem.gustMax)}`;
@@ -11272,7 +11287,8 @@ function buildPulseWeatherDaysOverviewRowHtml(dayItem, activeTab = 0) {
   } else {
     windValHtml = `<span class="pulse-w2-wind-num ${dayItem.windMax >= 8 ? 'high' : ''}">${formatWindValHtml(dayItem.windMax)}</span>`;
   }
-  const windTooltip = `Вітер: ${dayItem.windInfo.dirName} (${dayItem.windInfo.code}), до ${dayItem.windMax.toFixed(1)} м/с${hasGusts ? ` • пориви до ${dayItem.gustMax.toFixed(1)} м/с` : ''}`;
+  const windCalmHint = dayItem.windArrowClass === 'wind-still' ? ' · штиль' : '';
+  const windTooltip = `Вітер: ${dayItem.windInfo.dirName} (${dayItem.windInfo.code}), до ${dayItem.windMax.toFixed(1)} м/с${hasGusts ? ` • пориви до ${dayItem.gustMax.toFixed(1)} м/с` : ''}${windCalmHint}`;
 
   let kpHtml = '—';
   let kpBadgeCls = 'green';
@@ -11314,9 +11330,7 @@ function buildPulseWeatherDaysOverviewRowHtml(dayItem, activeTab = 0) {
       </td>
       <td class="pulse-w2-col-wind ${hasGusts ? 'has-gusts' : ''} ${gustStorm ? 'storm' : ''}" title="${windTooltip}">
         <div class="pulse-w2-wind-cell">
-          <svg class="pulse-hour-wind-arrow ${dayItem.windArrowClass}" width="13.5" height="13.5" viewBox="0 0 24 24" fill="currentColor" stroke="none" style="transform: rotate(${dayItem.windInfo.arrowDeg}deg); transform-origin: 50% 50%;">
-            <path d="M12 1.5L7 21.5l5-4.5 5 4.5L12 1.5z"></path>
-          </svg>
+          ${buildPulseWindArrowSvgHtml(dayItem.windMax, dayItem.gustMax, dayItem.windInfo.arrowDeg, dayItem.windArrowClass, 19)}
           ${windValHtml}
         </div>
       </td>
@@ -11804,14 +11818,7 @@ function renderPulseWeatherUI(data, city, updatedTime = '') {
     const feelsSign = feelsVal > 0 ? '+' : '';
 
     // Вітер: класифікація сили за шкалою ДСНС / Бофорта та стрілка
-    let windArrowClass = 'wind-calm';
-    if (windSpeed >= 17 || windGust >= 22) {
-      windArrowClass = 'wind-storm';
-    } else if (windSpeed >= 11 || windGust >= 15) {
-      windArrowClass = 'wind-strong';
-    } else if (windSpeed >= 5.5 || windGust >= 9) {
-      windArrowClass = 'wind-moderate';
-    }
+    const windArrowClass = getPulseWindArrowClass(windSpeed, windGust);
 
     // Пориви вітру (поперемінний показ кожні 5 сек, якщо порив суттєвий: gust >= 8.5 та на 2+ м/с більше за середню швидкість)
     const hasGusts = (windGust >= 8.5 && (windGust - windSpeed >= 2.0));
@@ -11833,7 +11840,8 @@ function renderPulseWeatherUI(data, city, updatedTime = '') {
     } else {
       windValHtml = `<span class="pulse-w2-wind-num ${windSpeed >= 8 ? 'high' : ''}">${formatWindValHtml(windSpeed)}</span>`;
     }
-    const windCellTooltip = `Вітер: ${windInfo.dirName} (${windInfo.code}, ${windInfo.deg}°), середня швидкість ${windSpeed.toFixed(1)} м/с${hasGusts ? ` • пориви до ${windGust.toFixed(1)} м/с` : ''}`;
+    const windCalmHint = windArrowClass === 'wind-still' ? ' · штиль / майже відсутній' : '';
+    const windCellTooltip = `Вітер: ${windInfo.dirName} (${windInfo.code}, ${windInfo.deg}°), середня швидкість ${windSpeed.toFixed(1)} м/с${hasGusts ? ` • пориви до ${windGust.toFixed(1)} м/с` : ''}${windCalmHint}`;
 
     // Тиск: кольорове підсвічування норми чи відхилення (звичайний нежирний шрифт)
     const prevPressVal = k > 0 ? dayPressures[k - 1] : null;
@@ -11931,9 +11939,7 @@ function renderPulseWeatherUI(data, city, updatedTime = '') {
         </td>
         <td class="pulse-w2-col-wind ${hasGusts ? 'has-gusts' : ''} ${gustStorm ? 'storm' : ''}" title="${windCellTooltip}">
           <div class="pulse-w2-wind-cell">
-            <svg class="pulse-hour-wind-arrow ${windArrowClass}" width="13.5" height="13.5" viewBox="0 0 24 24" fill="currentColor" stroke="none" style="transform: rotate(${windInfo.arrowDeg}deg); transform-origin: 50% 50%;">
-              <path d="M12 1.5L7 21.5l5-4.5 5 4.5L12 1.5z"></path>
-            </svg>
+            ${buildPulseWindArrowSvgHtml(windSpeed, windGust, windInfo.arrowDeg, windArrowClass, 19)}
             ${windValHtml}
           </div>
         </td>

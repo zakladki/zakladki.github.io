@@ -14847,7 +14847,7 @@ body.dark-mode .pulse-w2-meteo-col.is-active .pulse-w2-meteo-day {
 .pulse-w2-meteo-wind-arc {
   fill: none;
   stroke: currentColor;
-  stroke-width: 1.75;
+  stroke-width: 1.85;
   stroke-linecap: round;
 }
 .pulse-w2-meteo-wind-arc.is-arc-1 {
@@ -14859,11 +14859,11 @@ body.dark-mode .pulse-w2-meteo-col.is-active .pulse-w2-meteo-day {
 .pulse-w2-meteo-wind-arc.is-arc-3 {
   opacity: 0.54;
 }
-.pulse-w2-top-panel.is-days-mode .pulse-w2-meteo-wind-svg.is-gusty .pulse-w2-meteo-wind-arc.is-arc-2 {
+.pulse-w2-meteo-wind-svg.is-gusty .pulse-w2-meteo-wind-arc.is-arc-2 {
   animation: pulseMeteoGustArc 1.6s ease-in-out infinite;
   animation-delay: 0.2s;
 }
-.pulse-w2-top-panel.is-days-mode .pulse-w2-meteo-wind-svg.is-gusty .pulse-w2-meteo-wind-arc.is-arc-3 {
+.pulse-w2-meteo-wind-svg.is-gusty .pulse-w2-meteo-wind-arc.is-arc-3 {
   animation: pulseMeteoGustArc 1.6s ease-in-out infinite;
   animation-delay: 0.45s;
 }
@@ -14916,7 +14916,7 @@ body.dark-mode .pulse-w2-meteo-col.is-active .pulse-w2-meteo-day {
 @media (prefers-reduced-motion: reduce) {
   .pulse-w2-top-panel.is-days-mode .pulse-w2-meteo-sky-slot,
   .pulse-w2-top-panel.is-days-mode .pulse-w2-meteo-wind-slot,
-  .pulse-w2-top-panel.is-days-mode .pulse-w2-meteo-wind-svg.is-gusty .pulse-w2-meteo-wind-arc {
+  .pulse-w2-meteo-wind-svg.is-gusty .pulse-w2-meteo-wind-arc {
     animation: none;
   }
   .pulse-w2-meteo-sky-slot {
@@ -15294,14 +15294,29 @@ body.dark-mode .pulse-w2-row-flask {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 3px;
+  gap: 1px;
   height: 25px;
   width: 100%;
   line-height: 1;
 }
 .pulse-hour-wind-arrow {
   flex-shrink: 0;
-  transition: color 0.2s ease;
+  transition: color 0.2s ease, opacity 0.2s ease;
+}
+.pulse-hour-wind-arrow.wind-still {
+  color: #64748b !important; /* Штиль / мінімальний вітер (< 2.5 м/с і пориви < 5.0 м/с) */
+  opacity: 0.54;
+}
+body.dark-mode .pulse-hour-wind-arrow.wind-still {
+  color: #94a3b8 !important;
+  opacity: 0.56;
+}
+.pulse-hour-wind-arrow.wind-still .pulse-w2-wind-arrow-body {
+  fill: currentColor;
+  fill-opacity: 0.16;
+  stroke: currentColor;
+  stroke-width: 1.20;
+  stroke-linejoin: round;
 }
 .pulse-hour-wind-arrow.wind-calm {
   color: #64748b !important;
@@ -15336,9 +15351,9 @@ body.dark-mode .pulse-hour-wind-arrow.wind-storm {
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  padding: 0;
-  width: 23px;
-  min-width: 23px;
+  padding: 0 1px;
+  width: auto;
+  min-width: 18px;
   height: 16px;
   box-sizing: content-box;
   vertical-align: middle;
@@ -16145,6 +16160,7 @@ body.dark-mode .pulse-w2-col-time {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  margin-left: -2px;
 }
 .pulse-w2-weather-cell .pulse-w2-cell-icon svg {
   display: block;
@@ -16206,23 +16222,23 @@ body.dark-mode .pulse-w2-temp-feels {
   color: #94a3b8;
 }
 
-/* Вітер: горизонтальне центрування всієї колонки та чітка стрілка 13.5px */
+/* Вітер: мінімальні внутрішні відступи, тісний зазор і збільшена витягнута стрілка 19px з дугами */
 .pulse-w2-th-wind {
   width: 15.5%;
   text-align: center !important;
-  padding: 4px 2px !important;
+  padding: 4px 1px !important;
 }
 .pulse-w2-col-wind {
   width: 15.5%;
   position: relative;
   text-align: center !important;
-  padding: 2.5px 2px !important;
+  padding: 2.5px 0 !important;
 }
 .pulse-w2-wind-cell {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 3px;
+  gap: 1px;
   height: 25px;
   width: 100%;
   line-height: 1;
@@ -16234,8 +16250,8 @@ body.dark-mode .pulse-w2-wind-cell {
 }
 .pulse-w2-wind-cell .pulse-hour-wind-arrow {
   color: #64748b;
-  width: 13.5px;
-  height: 13.5px;
+  width: 19px;
+  height: 19px;
   flex-shrink: 0;
   transition: transform 0.25s ease;
 }
