@@ -10675,84 +10675,158 @@ function buildPulseWeatherMeteogramHtml(dailyItems, weekMinTemp, weekMaxTemp, ac
     const windArrowDeg = (d.windInfo && typeof d.windInfo.arrowDeg === 'number') ? d.windInfo.arrowDeg : 0;
     const windDirCode = (d.windInfo && d.windInfo.code) ? d.windInfo.code : '';
 
-    // Міні-візуал опадів для верхньої зони (хмарка + серпанок + 1..6 штрихів дощу/снігу, відкалібровано під колби таблиці)
+    // Верхній візуал неба (сонце, сонце за хмаркою, суха хмарка/туман або 2..6 штрихів опадів під хмарою)
+    const sW = 36;
+    const sH = 18;
+    const cx = sW / 2;
+    const wType = d.condType || 'cloudy';
+    const dayBestCode = (typeof d.dayBestCode === 'number') ? d.dayBestCode : 3;
+    const dayClearRatio = (typeof d.dayClearRatio === 'number') ? d.dayClearRatio : 0;
+    const hasPrecip = sum >= 0.2 || prob >= 30;
+    const gradId = `pulseMeteoColMist_${i}`;
+
+    const buildCloudPath = (centerX, cloudW, cloudD) => {
+      const x0 = centerX - cloudW / 2;
+      const x1 = centerX + cloudW / 2;
+      const w3 = cloudW / 3;
+      return [
+        `M${x0.toFixed(1)},0`,
+        `L${x1.toFixed(1)},0`,
+        `C${x1.toFixed(1)},${(cloudD * 1.02).toFixed(1)} ${(x1 - w3 * 0.85).toFixed(1)},${(cloudD * 1.08).toFixed(1)} ${(x1 - w3).toFixed(1)},${(cloudD * 0.48).toFixed(1)}`,
+        `C${(centerX + w3 * 0.42).toFixed(1)},${(cloudD * 1.38).toFixed(1)} ${(centerX - w3 * 0.42).toFixed(1)},${(cloudD * 1.38).toFixed(1)} ${(x0 + w3).toFixed(1)},${(cloudD * 0.48).toFixed(1)}`,
+        `C${(x0 + w3 * 0.85).toFixed(1)},${(cloudD * 1.08).toFixed(1)} ${x0.toFixed(1)},${(cloudD * 1.02).toFixed(1)} ${x0.toFixed(1)},0`,
+        'Z'
+      ].join(' ');
+    };
+
     let skyVisualHtml = '';
-    if (prob >= 15 || sum >= 0.1) {
-      const sW = 36;
-      const sH = 18;
-      const cx = sW / 2;
+    if (!hasPrecip) {
+      if (wType === 'clear' || (dayBestCode === 0 && dayClearRatio >= 0.5)) {
+        const sunRays = [0, 45, 90, 135, 180, 225, 270, 315].map(deg => {
+          const rad = (deg * Math.PI) / 180;
+          const x1 = cx + Math.cos(rad) * 5.2;
+          const y1 = 8.8 + Math.sin(rad) * 5.2;
+          const x2 = cx + Math.cos(rad) * 7.0;
+          const y2 = 8.8 + Math.sin(rad) * 7.0;
+          return `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" class="pulse-w2-meteo-sun-ray" />`;
+        }).join('');
+        skyVisualHtml = `
+          <svg class="pulse-w2-meteo-sky-svg" viewBox="0 0 ${sW} ${sH}" preserveAspectRatio="xMidYMin meet">
+            <defs>
+              <radialGradient id="${gradId}" cx="50%" cy="48%" r="50%">
+                <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.28" />
+                <stop offset="100%" stop-color="#f59e0b" stop-opacity="0" />
+              </radialGradient>
+            </defs>
+            <circle cx="${cx}" cy="8.8" r="8.5" fill="url(#${gradId})" />
+            ${sunRays}
+            <circle cx="${cx}" cy="8.8" r="3.7" class="pulse-w2-meteo-sun-core" />
+          </svg>
+        `;
+      } else if (wType === 'partly' || dayBestCode <= 2) {
+        const sunCx = 23.5;
+        const sunCy = 5.8;
+        const partRays = [-15, 25, 65, 108].map(deg => {
+          const rad = (deg * Math.PI) / 180;
+          const x1 = sunCx + Math.cos(rad) * 4.4;
+          const y1 = sunCy + Math.sin(rad) * 4.4;
+          const x2 = sunCx + Math.cos(rad) * 6.0;
+          const y2 = sunCy + Math.sin(rad) * 6.0;
+          return `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" class="pulse-w2-meteo-sun-ray" />`;
+        }).join('');
+        const pCloudPath = buildCloudPath(15.0, 21.0, 3.6);
+        skyVisualHtml = `
+          <svg class="pulse-w2-meteo-sky-svg" viewBox="0 0 ${sW} ${sH}" preserveAspectRatio="xMidYMin meet">
+            <defs>
+              <radialGradient id="${gradId}" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.22" />
+                <stop offset="100%" stop-color="#f59e0b" stop-opacity="0" />
+              </radialGradient>
+            </defs>
+            <circle cx="${sunCx}" cy="${sunCy}" r="7.5" fill="url(#${gradId})" />
+            ${partRays}
+            <circle cx="${sunCx}" cy="${sunCy}" r="3.1" class="pulse-w2-meteo-sun-core" />
+            <path d="${pCloudPath}" class="pulse-w2-meteo-sky-cap is-partly" />
+          </svg>
+        `;
+      } else if (wType === 'fog') {
+        const fCloudPath = buildCloudPath(cx, 22, 2.7);
+        skyVisualHtml = `
+          <svg class="pulse-w2-meteo-sky-svg" viewBox="0 0 ${sW} ${sH}" preserveAspectRatio="xMidYMin meet">
+            <path d="${fCloudPath}" class="pulse-w2-meteo-sky-cap is-dry" />
+            <line x1="10.5" y1="7.2" x2="25.5" y2="7.2" class="pulse-w2-meteo-fog-line" />
+            <line x1="12.5" y1="10.2" x2="23.5" y2="10.2" class="pulse-w2-meteo-fog-line" />
+          </svg>
+        `;
+      } else {
+        const dCloudPath = buildCloudPath(cx, 23, 2.9);
+        skyVisualHtml = `
+          <svg class="pulse-w2-meteo-sky-svg" viewBox="0 0 ${sW} ${sH}" preserveAspectRatio="xMidYMin meet">
+            <defs>
+              <linearGradient id="${gradId}" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#64748b" stop-opacity="0.11" />
+                <stop offset="100%" stop-color="#64748b" stop-opacity="0" />
+              </linearGradient>
+            </defs>
+            <rect x="${(cx - 12).toFixed(1)}" y="1.5" width="24" height="7.5" rx="3" fill="url(#${gradId})" />
+            <path d="${dCloudPath}" class="pulse-w2-meteo-sky-cap is-dry" />
+          </svg>
+        `;
+      }
+    } else {
       let rainVolScore = 0;
       if (sum > 0) {
         rainVolScore = Math.min(100, Math.max(15, Math.round((sum / 8) * 100)));
       } else if (prob >= 40) {
         rainVolScore = Math.round(prob * 0.25);
-      } else if (prob >= 15) {
-        rainVolScore = Math.round(prob * 0.15);
+      } else {
+        rainVolScore = Math.round(prob * 0.18);
       }
 
-      let volTier = 'trace';
+      let volTier = 'light';
       if (rainVolScore >= 95) volTier = 'downpour';
       else if (rainVolScore >= 75) volTier = 'heavy';
       else if (rainVolScore >= 45) volTier = 'medium';
-      else if (rainVolScore >= 15) volTier = 'light';
 
       const isSnow = d.tMax <= 1;
-      const mistH = Math.max(6, (Math.max(rainVolScore, 14) / 100) * sH);
-      const gradId = `pulseMeteoColMist_${i}`;
+      const mistH = Math.max(7, (Math.max(rainVolScore, 18) / 100) * sH);
       const mistColor = isSnow
         ? (volTier === 'downpour' || volTier === 'heavy' ? '#0891b2' : '#06b6d4')
         : (volTier === 'downpour' ? '#0369a1' : (volTier === 'heavy' ? '#0284c7' : '#0ea5e9'));
-      const mistOpMap = { downpour: '0.30', heavy: '0.21', medium: '0.14', light: '0.09', trace: '0.05' };
+      const mistOpMap = { downpour: '0.30', heavy: '0.21', medium: '0.14', light: '0.09' };
       const mistOp = mistOpMap[volTier];
 
-      const widthMap = { downpour: 31, heavy: 28, medium: 25, light: 21, trace: 18 };
+      const widthMap = { downpour: 31, heavy: 28, medium: 25, light: 21.5 };
       const cloudW = widthMap[volTier];
-      const depthMap = { downpour: 3.6, heavy: 3.3, medium: 2.9, light: 2.5, trace: 2.2 };
+      const depthMap = { downpour: 3.6, heavy: 3.3, medium: 2.9, light: 2.6 };
       const cloudD = depthMap[volTier];
-      const x0 = cx - cloudW / 2;
-      const x1 = cx + cloudW / 2;
-      const w3 = cloudW / 3;
-      const cPath = [
-        `M${x0.toFixed(1)},0`,
-        `L${x1.toFixed(1)},0`,
-        `C${x1.toFixed(1)},${(cloudD * 1.02).toFixed(1)} ${(x1 - w3 * 0.85).toFixed(1)},${(cloudD * 1.08).toFixed(1)} ${(x1 - w3).toFixed(1)},${(cloudD * 0.48).toFixed(1)}`,
-        `C${(cx + w3 * 0.42).toFixed(1)},${(cloudD * 1.38).toFixed(1)} ${(cx - w3 * 0.42).toFixed(1)},${(cloudD * 1.38).toFixed(1)} ${(x0 + w3).toFixed(1)},${(cloudD * 0.48).toFixed(1)}`,
-        `C${(x0 + w3 * 0.85).toFixed(1)},${(cloudD * 1.08).toFixed(1)} ${x0.toFixed(1)},${(cloudD * 1.02).toFixed(1)} ${x0.toFixed(1)},0`,
-        'Z'
-      ].join(' ');
+      const cPath = buildCloudPath(cx, cloudW, cloudD);
       const tierCls = `is-${volTier}`;
       const capCls = `pulse-w2-meteo-sky-cap ${tierCls}${isSnow ? ' is-snow' : ''}`;
 
-      let dropOffsets = [];
+      let dropOffsets = [-3.4, 3.4];
       if (volTier === 'downpour') {
         dropOffsets = [-10.5, -6.3, -2.1, 2.1, 6.3, 10.5];
       } else if (volTier === 'heavy') {
         dropOffsets = [-8.8, -4.4, 0, 4.4, 8.8];
       } else if (volTier === 'medium') {
         dropOffsets = [-6.6, -2.2, 2.2, 6.6];
-      } else if (volTier === 'light') {
-        dropOffsets = rainVolScore >= 26 ? [-5.0, 0, 5.0] : [-3.4, 3.4];
-      } else if (prob >= 28) {
-        dropOffsets = [-3.0, 3.0];
-      } else if (prob >= 15) {
-        dropOffsets = [0];
+      } else if (rainVolScore >= 26) {
+        dropOffsets = [-5.0, 0, 5.0];
       }
 
       let dropsHtml = '';
-      if (dropOffsets.length) {
-        if (isSnow) {
-          const snowR = (volTier === 'downpour' || volTier === 'heavy') ? '1.25' : '1.12';
-          dropsHtml = dropOffsets.map((dx, idx) =>
-            `<circle cx="${(cx + dx).toFixed(1)}" cy="${(6.6 + (idx % 2) * 2.4).toFixed(1)}" r="${snowR}" class="pulse-w2-meteo-drop is-snow ${tierCls}" />`
-          ).join('');
-        } else {
-          const dropLen = volTier === 'trace' ? 3.5 : 3.9;
-          dropsHtml = dropOffsets.map((dx, idx) => {
-            const sx = cx + dx;
-            const sy = 5.4 + (idx % 2) * 2.0;
-            return `<line x1="${sx.toFixed(1)}" y1="${sy.toFixed(1)}" x2="${(sx - 1.5).toFixed(1)}" y2="${(sy + dropLen).toFixed(1)}" class="pulse-w2-meteo-drop ${tierCls}" />`;
-          }).join('');
-        }
+      if (isSnow) {
+        const snowR = (volTier === 'downpour' || volTier === 'heavy') ? '1.25' : '1.12';
+        dropsHtml = dropOffsets.map((dx, idx) =>
+          `<circle cx="${(cx + dx).toFixed(1)}" cy="${(6.6 + (idx % 2) * 2.4).toFixed(1)}" r="${snowR}" class="pulse-w2-meteo-drop is-snow ${tierCls}" />`
+        ).join('');
+      } else {
+        dropsHtml = dropOffsets.map((dx, idx) => {
+          const sx = cx + dx;
+          const sy = 5.4 + (idx % 2) * 2.0;
+          return `<line x1="${sx.toFixed(1)}" y1="${sy.toFixed(1)}" x2="${(sx - 1.5).toFixed(1)}" y2="${(sy + 3.9).toFixed(1)}" class="pulse-w2-meteo-drop ${tierCls}" />`;
+        }).join('');
       }
 
       skyVisualHtml = `
@@ -10777,14 +10851,41 @@ function buildPulseWeatherMeteogramHtml(dailyItems, weekMinTemp, weekMaxTemp, ac
     const windHint = `, вітер ${Math.round(windVal)} м/с ${windDirCode}${gustVal > windVal + 1 ? ` (пор. ${Math.round(gustVal)})` : ''}`;
     const colTitle = `${d.fullDateLabel}: ${d.maxSign}${d.tMax}°...${d.minSign}${d.tMin}°${condLabel ? ` (${condLabel}${precipHint}${windHint})` : `${precipHint}${windHint}`} • Натисніть для погодинного розкладу`;
 
+    // Візуалізація сили та поривів вітру за стрілкою (0-3 хвильові дуги напору позаду хвостика)
+    let windArcCount = 0;
+    if (windVal >= 11.0 || gustVal >= 15.0) windArcCount = 3;
+    else if (windVal >= 7.5 || gustVal >= 11.0) windArcCount = 2;
+    else if (windVal >= 4.5 || gustVal >= 7.5) windArcCount = 1;
+
+    const hasWindGustPulse = windArcCount >= 2 && (gustVal - windVal >= 2.0 || gustVal >= 15.0);
+    let windArrowPath = 'M14 3.5 L9.0 21.0 L14 17.0 L19.0 21.0 Z';
+    let windArcsHtml = '';
+    if (windArcCount === 1) {
+      windArrowPath = 'M14 2.5 L9.2 17.8 L14 14.8 L18.8 17.8 Z';
+      windArcsHtml = '<path d="M9.6 20.2 Q14 22.4 18.4 20.2" class="pulse-w2-meteo-wind-arc is-arc-1" />';
+    } else if (windArcCount === 2) {
+      windArrowPath = 'M14 2.0 L9.2 17.0 L14 14.0 L18.8 17.0 Z';
+      windArcsHtml = [
+        '<path d="M9.6 19.3 Q14 21.5 18.4 19.3" class="pulse-w2-meteo-wind-arc is-arc-1" />',
+        '<path d="M7.8 22.1 Q14 24.8 20.2 22.1" class="pulse-w2-meteo-wind-arc is-arc-2" />'
+      ].join('');
+    } else if (windArcCount >= 3) {
+      windArrowPath = 'M14 1.5 L9.2 16.5 L14 13.5 L18.8 16.5 Z';
+      windArcsHtml = [
+        '<path d="M9.6 18.8 Q14 21.0 18.4 18.8" class="pulse-w2-meteo-wind-arc is-arc-1" />',
+        '<path d="M7.8 21.6 Q14 24.4 20.2 21.6" class="pulse-w2-meteo-wind-arc is-arc-2" />',
+        '<path d="M6.0 24.4 Q14 27.6 22.0 24.4" class="pulse-w2-meteo-wind-arc is-arc-3" />'
+      ].join('');
+    }
+
+    const windSvgHtml = `<svg class="pulse-hour-wind-arrow pulse-w2-meteo-wind-svg ${windCls}${hasWindGustPulse ? ' is-gusty' : ''}" width="17" height="17" viewBox="0 0 28 28" fill="currentColor" stroke="none" style="transform: rotate(${windArrowDeg}deg); transform-origin: 50% 50%;"><path d="${windArrowPath}"></path>${windArcsHtml}</svg>`;
+
     return `
       <button type="button" class="pulse-w2-meteo-col${d.isToday ? ' is-today' : ''}${isAct ? ' is-active' : ''}" style="--meteo-delay: ${i * 110}ms;" onclick="window.openPulseWeatherDayFromLens(${d.dayIdx})" title="${colTitle}" aria-label="${colTitle}">
         <span class="pulse-w2-meteo-day">${dayShortLbl}</span>
         <span class="pulse-w2-meteo-slot">
           <span class="pulse-w2-meteo-sky-slot" aria-hidden="true">${skyVisualHtml}</span>
-          <span class="pulse-w2-meteo-wind-slot" aria-hidden="true">
-            <svg class="pulse-hour-wind-arrow ${windCls}" width="13.5" height="13.5" viewBox="0 0 24 24" fill="currentColor" stroke="none" style="transform: rotate(${windArrowDeg}deg); transform-origin: 50% 50%;"><path d="M12 1.5L7 21.5l5-4.5 5 4.5L12 1.5z"></path></svg>
-          </span>
+          <span class="pulse-w2-meteo-wind-slot" aria-hidden="true">${windSvgHtml}</span>
         </span>
         <span class="pulse-w2-meteo-spacer"></span>
       </button>
@@ -10872,7 +10973,11 @@ function buildPulseWeatherDailyLensItems(data) {
       if (typeof tStr !== 'string' || tStr.length < 10) continue;
       const dKey = tStr.slice(0, 10);
       if (!hourlyByDate[dKey]) {
-        hourlyByDate[dKey] = { hums: [], presses: [] };
+        hourlyByDate[dKey] = { hums: [], presses: [], dayCodes: [] };
+      }
+      const hourNum = Number(tStr.slice(11, 13));
+      if (hourNum >= 9 && hourNum <= 17 && Array.isArray(hourly.weather_code) && typeof hourly.weather_code[i] === 'number' && !isNaN(hourly.weather_code[i])) {
+        hourlyByDate[dKey].dayCodes.push(hourly.weather_code[i]);
       }
       if (Array.isArray(hourly.relative_humidity_2m) && typeof hourly.relative_humidity_2m[i] === 'number' && !isNaN(hourly.relative_humidity_2m[i])) {
         hourlyByDate[dKey].hums.push(hourly.relative_humidity_2m[i]);
@@ -10897,6 +11002,7 @@ function buildPulseWeatherDailyLensItems(data) {
 
     const wCode = (daily.weather_code && daily.weather_code[d] !== undefined) ? daily.weather_code[d] : 3;
     const cond = getWeatherConditionInfo(wCode, 1, 22);
+    const condType = (WMO_WEATHER_MAP[wCode] && WMO_WEATHER_MAP[wCode].type) ? WMO_WEATHER_MAP[wCode].type : 'cloudy';
     const precipProbMax = (daily.precipitation_probability_max && daily.precipitation_probability_max[d] !== undefined && daily.precipitation_probability_max[d] !== null)
       ? Math.round(daily.precipitation_probability_max[d])
       : 0;
@@ -10924,7 +11030,11 @@ function buildPulseWeatherDailyLensItems(data) {
     else if (windMax >= 11 || gustMax >= 15) windArrowClass = 'wind-strong';
     else if (windMax >= 5.5 || gustMax >= 9) windArrowClass = 'wind-moderate';
 
-    const bucket = hourlyByDate[dateStr] || { hums: [], presses: [] };
+    const bucket = hourlyByDate[dateStr] || { hums: [], presses: [], dayCodes: [] };
+    const dayBestCode = (bucket.dayCodes && bucket.dayCodes.length) ? Math.min(...bucket.dayCodes) : wCode;
+    const dayClearRatio = (bucket.dayCodes && bucket.dayCodes.length)
+      ? (bucket.dayCodes.filter(c => c <= 2).length / bucket.dayCodes.length)
+      : (wCode <= 2 ? 1 : 0);
     const avgHum = bucket.hums.length ? Math.round(bucket.hums.reduce((a, b) => a + b, 0) / bucket.hums.length) : 65;
     const minHum = bucket.hums.length ? Math.round(Math.min(...bucket.hums)) : avgHum;
     const maxHum = bucket.hums.length ? Math.round(Math.max(...bucket.hums)) : avgHum;
@@ -10975,6 +11085,9 @@ function buildPulseWeatherDailyLensItems(data) {
       fullDateLabel,
       isToday: d === 0,
       cond,
+      condType,
+      dayBestCode,
+      dayClearRatio,
       precipProbMax,
       precipSum,
       tMin,

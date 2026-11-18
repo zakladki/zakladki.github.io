@@ -14533,68 +14533,91 @@ body.dark-mode .pulse-w2-meteogram {
   display: block;
   overflow: visible;
 }
-.pulse-w2-meteo-sky-cap {
-  fill: rgba(14, 165, 233, 0.18);
+.pulse-w2-meteo-sun-core {
+  fill: #fde047;
+  stroke: #f59e0b;
+  stroke-width: 1.15;
 }
-.pulse-w2-meteo-sky-cap.is-trace {
-  fill: rgba(56, 189, 248, 0.16);
+.pulse-w2-meteo-sun-ray {
+  stroke: #f59e0b;
+  stroke-width: 1.2;
+  stroke-linecap: round;
+}
+body.dark-mode .pulse-w2-meteo-sun-core {
+  fill: #facc15;
+  stroke: #fb923c;
+}
+body.dark-mode .pulse-w2-meteo-sun-ray {
+  stroke: #fbbf24;
+}
+.pulse-w2-meteo-fog-line {
+  stroke: rgba(100, 116, 139, 0.72);
+  stroke-width: 1.2;
+  stroke-linecap: round;
+}
+body.dark-mode .pulse-w2-meteo-fog-line {
+  stroke: rgba(148, 163, 184, 0.76);
+}
+.pulse-w2-meteo-sky-cap {
+  fill: rgba(14, 165, 233, 0.36);
+}
+.pulse-w2-meteo-sky-cap.is-dry {
+  fill: rgba(100, 116, 139, 0.42);
+}
+.pulse-w2-meteo-sky-cap.is-partly {
+  fill: rgba(100, 116, 139, 0.64);
 }
 .pulse-w2-meteo-sky-cap.is-light {
-  fill: rgba(56, 189, 248, 0.26);
+  fill: rgba(14, 165, 233, 0.44);
 }
 .pulse-w2-meteo-sky-cap.is-medium {
-  fill: rgba(14, 165, 233, 0.42);
+  fill: rgba(2, 132, 199, 0.62);
 }
 .pulse-w2-meteo-sky-cap.is-heavy {
-  fill: rgba(2, 132, 199, 0.58);
+  fill: rgba(3, 105, 161, 0.78);
 }
 .pulse-w2-meteo-sky-cap.is-downpour {
-  fill: rgba(3, 105, 161, 0.76);
-}
-.pulse-w2-meteo-sky-cap.is-snow.is-trace {
-  fill: rgba(34, 211, 238, 0.18);
+  fill: rgba(7, 89, 133, 0.92);
 }
 .pulse-w2-meteo-sky-cap.is-snow.is-light {
-  fill: rgba(6, 182, 212, 0.28);
-}
-.pulse-w2-meteo-sky-cap.is-snow.is-medium {
   fill: rgba(6, 182, 212, 0.44);
 }
+.pulse-w2-meteo-sky-cap.is-snow.is-medium {
+  fill: rgba(6, 182, 212, 0.62);
+}
 .pulse-w2-meteo-sky-cap.is-snow.is-heavy {
-  fill: rgba(8, 145, 178, 0.60);
+  fill: rgba(8, 145, 178, 0.78);
 }
 .pulse-w2-meteo-sky-cap.is-snow.is-downpour {
-  fill: rgba(14, 116, 144, 0.78);
+  fill: rgba(14, 116, 144, 0.92);
 }
-body.dark-mode .pulse-w2-meteo-sky-cap.is-trace {
-  fill: rgba(56, 189, 248, 0.16);
+body.dark-mode .pulse-w2-meteo-sky-cap.is-dry,
+body.dark-mode .pulse-w2-meteo-sky-cap.is-partly {
+  fill: rgba(148, 163, 184, 0.48);
 }
 body.dark-mode .pulse-w2-meteo-sky-cap.is-light {
-  fill: rgba(56, 189, 248, 0.28);
-}
-body.dark-mode .pulse-w2-meteo-sky-cap.is-medium {
   fill: rgba(56, 189, 248, 0.44);
 }
-body.dark-mode .pulse-w2-meteo-sky-cap.is-heavy {
-  fill: rgba(14, 165, 233, 0.62);
+body.dark-mode .pulse-w2-meteo-sky-cap.is-medium {
+  fill: rgba(56, 189, 248, 0.64);
 }
-body.dark-mode .pulse-w2-meteo-sky-cap.is-downpour {
+body.dark-mode .pulse-w2-meteo-sky-cap.is-heavy {
   fill: rgba(14, 165, 233, 0.80);
 }
-body.dark-mode .pulse-w2-meteo-sky-cap.is-snow.is-trace {
-  fill: rgba(103, 232, 249, 0.18);
+body.dark-mode .pulse-w2-meteo-sky-cap.is-downpour {
+  fill: rgba(14, 165, 233, 0.94);
 }
 body.dark-mode .pulse-w2-meteo-sky-cap.is-snow.is-light {
-  fill: rgba(103, 232, 249, 0.30);
+  fill: rgba(103, 232, 249, 0.44);
 }
 body.dark-mode .pulse-w2-meteo-sky-cap.is-snow.is-medium {
-  fill: rgba(34, 211, 238, 0.46);
+  fill: rgba(34, 211, 238, 0.64);
 }
 body.dark-mode .pulse-w2-meteo-sky-cap.is-snow.is-heavy {
-  fill: rgba(6, 182, 212, 0.64);
+  fill: rgba(6, 182, 212, 0.80);
 }
 body.dark-mode .pulse-w2-meteo-sky-cap.is-snow.is-downpour {
-  fill: rgba(6, 182, 212, 0.80);
+  fill: rgba(6, 182, 212, 0.92);
 }
 .pulse-w2-meteo-drop {
   stroke: rgba(2, 132, 199, 0.88);
@@ -14817,6 +14840,41 @@ body.dark-mode .pulse-w2-meteo-col.is-active .pulse-w2-meteo-day {
 .pulse-w2-meteo-wind-slot {
   opacity: 0;
 }
+.pulse-w2-meteo-wind-svg {
+  display: block;
+  overflow: visible;
+}
+.pulse-w2-meteo-wind-arc {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.75;
+  stroke-linecap: round;
+}
+.pulse-w2-meteo-wind-arc.is-arc-1 {
+  opacity: 0.92;
+}
+.pulse-w2-meteo-wind-arc.is-arc-2 {
+  opacity: 0.72;
+}
+.pulse-w2-meteo-wind-arc.is-arc-3 {
+  opacity: 0.54;
+}
+.pulse-w2-top-panel.is-days-mode .pulse-w2-meteo-wind-svg.is-gusty .pulse-w2-meteo-wind-arc.is-arc-2 {
+  animation: pulseMeteoGustArc 1.6s ease-in-out infinite;
+  animation-delay: 0.2s;
+}
+.pulse-w2-top-panel.is-days-mode .pulse-w2-meteo-wind-svg.is-gusty .pulse-w2-meteo-wind-arc.is-arc-3 {
+  animation: pulseMeteoGustArc 1.6s ease-in-out infinite;
+  animation-delay: 0.45s;
+}
+@keyframes pulseMeteoGustArc {
+  0%, 100% {
+    opacity: 0.45;
+  }
+  50% {
+    opacity: 0.96;
+  }
+}
 .pulse-w2-top-panel.is-days-mode .pulse-w2-meteo-sky-slot {
   animation: pulseMeteoSkyCycle 8.4s ease-in-out infinite;
   animation-delay: var(--meteo-delay, 0ms);
@@ -14857,7 +14915,8 @@ body.dark-mode .pulse-w2-meteo-col.is-active .pulse-w2-meteo-day {
 }
 @media (prefers-reduced-motion: reduce) {
   .pulse-w2-top-panel.is-days-mode .pulse-w2-meteo-sky-slot,
-  .pulse-w2-top-panel.is-days-mode .pulse-w2-meteo-wind-slot {
+  .pulse-w2-top-panel.is-days-mode .pulse-w2-meteo-wind-slot,
+  .pulse-w2-top-panel.is-days-mode .pulse-w2-meteo-wind-svg.is-gusty .pulse-w2-meteo-wind-arc {
     animation: none;
   }
   .pulse-w2-meteo-sky-slot {
