@@ -10675,14 +10675,12 @@ function buildPulseWeatherMeteogramHtml(dailyItems, weekMinTemp, weekMaxTemp, ac
     const windArrowDeg = (d.windInfo && typeof d.windInfo.arrowDeg === 'number') ? d.windInfo.arrowDeg : 0;
     const windDirCode = (d.windInfo && d.windInfo.code) ? d.windInfo.code : '';
 
-    // Верхній візуал неба (сонце, сонце за хмаркою, суха хмарка/туман або 2..6 штрихів опадів під хмарою)
+    // Верхній візуал неба: 100% синхронізований зі станом погоди та опадами у таблиці
     const sW = 36;
     const sH = 18;
     const cx = sW / 2;
     const wType = d.condType || 'cloudy';
-    const dayBestCode = (typeof d.dayBestCode === 'number') ? d.dayBestCode : 3;
-    const dayClearRatio = (typeof d.dayClearRatio === 'number') ? d.dayClearRatio : 0;
-    const hasPrecip = sum >= 0.2 || prob >= 30;
+    const hasPrecip = (typeof d.hasRealPrecip === 'boolean') ? d.hasRealPrecip : (sum >= 0.2 || prob >= 30);
     const gradId = `pulseMeteoColMist_${i}`;
 
     const buildCloudPath = (centerX, cloudW, cloudD) => {
@@ -10701,7 +10699,7 @@ function buildPulseWeatherMeteogramHtml(dailyItems, weekMinTemp, weekMaxTemp, ac
 
     let skyVisualHtml = '';
     if (!hasPrecip) {
-      if (wType === 'clear' || (dayBestCode === 0 && dayClearRatio >= 0.5)) {
+      if (wType === 'clear') {
         const sunRays = [0, 45, 90, 135, 180, 225, 270, 315].map(deg => {
           const rad = (deg * Math.PI) / 180;
           const x1 = cx + Math.cos(rad) * 5.2;
@@ -10723,7 +10721,7 @@ function buildPulseWeatherMeteogramHtml(dailyItems, weekMinTemp, weekMaxTemp, ac
             <circle cx="${cx}" cy="8.8" r="3.7" class="pulse-w2-meteo-sun-core" />
           </svg>
         `;
-      } else if (wType === 'partly' || dayBestCode <= 2) {
+      } else if (wType === 'partly') {
         const sunCx = 23.5;
         const sunCy = 5.8;
         const partRays = [-15, 25, 65, 108].map(deg => {
@@ -10788,7 +10786,7 @@ function buildPulseWeatherMeteogramHtml(dailyItems, weekMinTemp, weekMaxTemp, ac
       else if (rainVolScore >= 75) volTier = 'heavy';
       else if (rainVolScore >= 45) volTier = 'medium';
 
-      const isSnow = d.tMax <= 1;
+      const isSnow = (wType === 'snow' || d.tMax <= 1);
       const mistH = Math.max(7, (Math.max(rainVolScore, 18) / 100) * sH);
       const mistColor = isSnow
         ? (volTier === 'downpour' || volTier === 'heavy' ? '#0891b2' : '#06b6d4')
@@ -11000,9 +10998,7 @@ function buildPulseWeatherDailyLensItems(data) {
     const dayBadge = `${daysShort[dt.getDay()]} • ${dt.getDate()}`;
     const fullDateLabel = `${fullDayNames[dt.getDay()]}, ${dt.getDate()} ${monthsUkGen[dt.getMonth()]}`;
 
-    const wCode = (daily.weather_code && daily.weather_code[d] !== undefined) ? daily.weather_code[d] : 3;
-    const cond = getWeatherConditionInfo(wCode, 1, 22);
-    const condType = (WMO_WEATHER_MAP[wCode] && WMO_WEATHER_MAP[wCode].type) ? WMO_WEATHER_MAP[wCode].type : 'cloudy';
+    const rawWCode = (daily.weather_code && daily.weather_code[d] !== undefined) ? daily.weather_code[d] : 3;
     const precipProbMax = (daily.precipitation_probability_max && daily.precipitation_probability_max[d] !== undefined && daily.precipitation_probability_max[d] !== null)
       ? Math.round(daily.precipitation_probability_max[d])
       : 0;
@@ -11031,10 +11027,29 @@ function buildPulseWeatherDailyLensItems(data) {
     else if (windMax >= 5.5 || gustMax >= 9) windArrowClass = 'wind-moderate';
 
     const bucket = hourlyByDate[dateStr] || { hums: [], presses: [], dayCodes: [] };
-    const dayBestCode = (bucket.dayCodes && bucket.dayCodes.length) ? Math.min(...bucket.dayCodes) : wCode;
+    const dayBestCode = (bucket.dayCodes && bucket.dayCodes.length) ? Math.min(...bucket.dayCodes) : rawWCode;
     const dayClearRatio = (bucket.dayCodes && bucket.dayCodes.length)
       ? (bucket.dayCodes.filter(c => c <= 2).length / bucket.dayCodes.length)
-      : (wCode <= 2 ? 1 : 0);
+      : (rawWCode <= 2 ? 1 : 0);
+
+    // Єдиний узгоджений стан дня для верхньої метеограми й рядків таблиці
+    const hasRealPrecip = precipSum >= 0.2 || precipProbMax >= 30;
+    let effectiveWmoCode = rawWCode;
+    if (!hasRealPrecip) {
+      if (rawWCode === 0 || (dayBestCode === 0 && dayClearRatio >= 0.5)) {
+        effectiveWmoCode = 0;
+      } else if (rawWCode === 1 || rawWCode === 2 || dayBestCode <= 2) {
+        effectiveWmoCode = (dayBestCode <= 1 && dayClearRatio >= 0.6) ? 1 : 2;
+      } else if (rawWCode === 45 || rawWCode === 48) {
+        effectiveWmoCode = rawWCode;
+      } else {
+        effectiveWmoCode = 3;
+      }
+    } else if (rawWCode <= 3) {
+      effectiveWmoCode = (tMax <= 1) ? 71 : (precipSum >= 0.2 ? 61 : 51);
+    }
+    const cond = getWeatherConditionInfo(effectiveWmoCode, 1, 22);
+    const condType = (WMO_WEATHER_MAP[effectiveWmoCode] && WMO_WEATHER_MAP[effectiveWmoCode].type) ? WMO_WEATHER_MAP[effectiveWmoCode].type : 'cloudy';
     const avgHum = bucket.hums.length ? Math.round(bucket.hums.reduce((a, b) => a + b, 0) / bucket.hums.length) : 65;
     const minHum = bucket.hums.length ? Math.round(Math.min(...bucket.hums)) : avgHum;
     const maxHum = bucket.hums.length ? Math.round(Math.max(...bucket.hums)) : avgHum;
@@ -11086,6 +11101,7 @@ function buildPulseWeatherDailyLensItems(data) {
       isToday: d === 0,
       cond,
       condType,
+      hasRealPrecip,
       dayBestCode,
       dayClearRatio,
       precipProbMax,
