@@ -10702,13 +10702,6 @@ function buildPulseWeatherMeteogramHtml(dailyItems, weekMinTemp, weekMaxTemp, ac
     <circle cx="${maxPts[maxIdx].x.toFixed(1)}" cy="${maxPts[maxIdx].y.toFixed(1)}" r="3.8" class="pulse-w2-meteo-peak-ring is-max" />
     <circle cx="${minPts[minIdx].x.toFixed(1)}" cy="${minPts[minIdx].y.toFixed(1)}" r="3.8" class="pulse-w2-meteo-peak-ring is-min" />
   `;
-  const pressAuraHtml = items.map((d, i) => {
-    const pTone = (d.pressInfo && d.pressInfo.colorClass) ? d.pressInfo.colorClass : 'green';
-    if (pTone !== 'yellow' && pTone !== 'red') return '';
-    const rx = (i * colW).toFixed(1);
-    const rw = colW.toFixed(1);
-    return `<rect x="${rx}" y="0" width="${rw}" height="${svgH}" class="pulse-w2-meteo-aura is-${pTone}" fill="url(#${pTone === 'red' ? 'pulseMeteoPressRedGrad' : 'pulseMeteoPressAmberGrad'})" />`;
-  }).join('');
 
   const dotsMaxHtml = maxPts.map((p, i) => (
     `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${(i === maxIdx || i === activeTab) ? '2.2' : '1.45'}" class="pulse-w2-meteo-dot-max${i === activeTab ? ' is-active' : ''}${i === maxIdx ? ' is-peak' : ''}" />`
@@ -10895,6 +10888,18 @@ function buildPulseWeatherMeteogramHtml(dailyItems, weekMinTemp, weekMaxTemp, ac
       `;
     }
 
+    const pressTone = (d.pressInfo && d.pressInfo.colorClass) ? d.pressInfo.colorClass : 'green';
+    const pressDelta = (typeof d.pressDelta === 'number' && !isNaN(d.pressDelta)) ? d.pressDelta : 0;
+    let pressSvgInner = '<circle cx="5.5" cy="4.5" r="2.35" fill="currentColor" />';
+    if (pressDelta >= 2) {
+      pressSvgInner = '<path d="M1.8 6.6 L5.5 2.2 L9.2 6.6" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" />';
+    } else if (pressDelta <= -2) {
+      pressSvgInner = '<path d="M1.8 2.4 L5.5 6.8 L9.2 2.4" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" />';
+    } else if (pressTone === 'red') {
+      pressSvgInner = '<circle cx="5.5" cy="4.5" r="3.25" fill="currentColor" />';
+    } else if (pressTone !== 'green') {
+      pressSvgInner = '<circle cx="5.5" cy="4.5" r="2.85" fill="currentColor" />';
+    }
     const kpTone = (d.kpVal === null || d.kpVal === undefined || isNaN(d.kpVal))
       ? 'muted'
       : (d.kpColor || 'green');
@@ -10919,7 +10924,12 @@ function buildPulseWeatherMeteogramHtml(dailyItems, weekMinTemp, weekMaxTemp, ac
           <span class="pulse-w2-meteo-wind-slot" aria-hidden="true">${windSvgHtml}</span>
         </span>
         <span class="pulse-w2-meteo-spacer"></span>
-        <span class="pulse-w2-meteo-kp-bar is-${kpTone}" aria-hidden="true"></span>
+        <span class="pulse-w2-meteo-signals" aria-hidden="true">
+          <span class="pulse-w2-meteo-press-sig is-${pressTone}">
+            <svg width="11" height="9" viewBox="0 0 11 9">${pressSvgInner}</svg>
+          </span>
+          <span class="pulse-w2-meteo-kp-sig is-${kpTone}"></span>
+        </span>
       </button>
     `;
   }).join('');
@@ -10932,16 +10942,7 @@ function buildPulseWeatherMeteogramHtml(dailyItems, weekMinTemp, weekMaxTemp, ac
             <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.18" />
             <stop offset="100%" stop-color="#0ea5e9" stop-opacity="0.10" />
           </linearGradient>
-          <linearGradient id="pulseMeteoPressAmberGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="18%" stop-color="#d97706" stop-opacity="0" />
-            <stop offset="100%" stop-color="#d97706" stop-opacity="0.18" />
-          </linearGradient>
-          <linearGradient id="pulseMeteoPressRedGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="15%" stop-color="#dc2626" stop-opacity="0" />
-            <stop offset="100%" stop-color="#dc2626" stop-opacity="0.21" />
-          </linearGradient>
         </defs>
-        ${pressAuraHtml}
         ${zeroLineHtml}
         <path d="${bandAreaPath}" fill="url(#pulseMeteoBandGrad)" />
         <path d="${minLinePath}" class="pulse-w2-meteo-line-min" fill="none" />

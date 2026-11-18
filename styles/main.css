@@ -14523,7 +14523,7 @@ body.dark-mode .pulse-w2-meteogram {
   left: 0;
   right: 0;
   top: 28px;
-  bottom: 5px;
+  bottom: 11px;
   pointer-events: none;
   z-index: 1;
 }
@@ -14930,31 +14930,74 @@ body.dark-mode .pulse-w2-meteo-col.is-active .pulse-w2-meteo-day {
   flex: 1 1 auto;
   min-height: 24px;
 }
-.pulse-w2-meteo-kp-bar {
-  display: block;
-  width: 72%;
-  height: 2px;
-  border-radius: 999px;
+.pulse-w2-meteo-signals {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  width: 100%;
+  height: 9px;
   margin-top: 1px;
   flex-shrink: 0;
-  background: transparent;
   pointer-events: none;
-  transition: background-color 0.2s ease, box-shadow 0.2s ease;
 }
-.pulse-w2-meteo-kp-bar.is-yellow {
-  background: rgba(217, 119, 6, 0.88);
+.pulse-w2-meteo-press-sig {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(100, 116, 139, 0.56);
+  line-height: 1;
 }
-body.dark-mode .pulse-w2-meteo-kp-bar.is-yellow {
-  background: rgba(251, 191, 36, 0.90);
+body.dark-mode .pulse-w2-meteo-press-sig {
+  color: rgba(148, 163, 184, 0.48);
 }
-.pulse-w2-meteo-kp-bar.is-red {
-  height: 2.5px;
-  background: rgba(220, 38, 38, 0.94);
-  box-shadow: 0 -1px 4px rgba(220, 38, 38, 0.28);
+.pulse-w2-meteo-press-sig.is-yellow {
+  color: rgba(234, 179, 8, 1);
 }
-body.dark-mode .pulse-w2-meteo-kp-bar.is-red {
-  background: rgba(248, 113, 113, 0.96);
-  box-shadow: 0 -1px 5px rgba(248, 113, 113, 0.32);
+body.dark-mode .pulse-w2-meteo-press-sig.is-yellow {
+  color: rgba(253, 224, 71, 0.98);
+}
+.pulse-w2-meteo-press-sig.is-red {
+  color: rgba(216, 16, 54, 1);
+}
+.pulse-w2-meteo-press-sig.is-red svg path {
+  stroke-width: 2.65;
+}
+body.dark-mode .pulse-w2-meteo-press-sig.is-red {
+  color: rgba(255, 68, 98, 1);
+}
+.pulse-w2-meteo-kp-sig {
+  display: block;
+  width: 12px;
+  height: 3px;
+  border-radius: 999px;
+  flex-shrink: 0;
+  background: rgba(148, 163, 184, 0.28);
+}
+body.dark-mode .pulse-w2-meteo-kp-sig {
+  background: rgba(148, 163, 184, 0.24);
+}
+.pulse-w2-meteo-kp-sig.is-muted {
+  background: rgba(148, 163, 184, 0.14);
+}
+body.dark-mode .pulse-w2-meteo-kp-sig.is-muted {
+  background: rgba(148, 163, 184, 0.12);
+}
+.pulse-w2-meteo-kp-sig.is-yellow {
+  height: 4px;
+  background: rgba(234, 179, 8, 1);
+}
+body.dark-mode .pulse-w2-meteo-kp-sig.is-yellow {
+  background: rgba(253, 224, 71, 0.98);
+}
+.pulse-w2-meteo-kp-sig.is-red {
+  height: 4.6px;
+  background: rgba(216, 16, 54, 1);
+  box-shadow: 0 0 0 1px rgba(216, 16, 54, 0.16), 0 0 5px rgba(216, 16, 54, 0.30);
+}
+body.dark-mode .pulse-w2-meteo-kp-sig.is-red {
+  background: rgba(255, 68, 98, 1);
+  box-shadow: 0 0 0 1px rgba(255, 68, 98, 0.22), 0 0 6px rgba(255, 68, 98, 0.36);
 }
 .pulse-w2-tabs-viewport {
   flex: 1;
