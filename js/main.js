@@ -4543,37 +4543,56 @@ function renderRequisitesBox(method, pricing, orderId) {
     let currentPayType = 'usdt'; // 'usdt' or 'native'
 
     function fetchAndRenderCoinRate(selected, targetEl, badgeEl) {
+      const renderRate = (coinPrice) => {
+        if (!(coinPrice > 0) || coinSelect.value !== selected.id) return;
+        const usdtAmount = parseFloat(pricing.finalUsdt);
+        const estimated = usdtAmount / coinPrice;
+        let formatted = '';
+        if (estimated < 0.1) formatted = estimated.toFixed(6);
+        else if (estimated < 10) formatted = estimated.toFixed(4);
+        else if (estimated < 1000) formatted = estimated.toFixed(2);
+        else formatted = Math.round(estimated).toLocaleString('uk-UA');
+
+        const rateSub = coinPrice < 1 ? coinPrice.toFixed(4) : coinPrice.toLocaleString('uk-UA', {maximumFractionDigits: 2});
+
+        if (targetEl) {
+          targetEl.innerHTML = `<strong>Орієнтовно:</strong> <span class="ad-volatile-amount">~ ${formatted} ${selected.nativeTicker}</span> <span class="ad-volatile-rate-sub">(курс: 1 ${selected.nativeTicker} ≈ $${rateSub})</span>`;
+        }
+        if (badgeEl) {
+          badgeEl.textContent = `~ ${formatted} ${selected.nativeTicker}`;
+        }
+      };
+
+      const renderFallbackMsg = () => {
+        if (targetEl) {
+          targetEl.innerHTML = `Оплата за біржовим курсом еквівалента <strong>$${pricing.finalUsdt} USDT</strong> на момент переказу.`;
+        }
+      };
+
+      if (selected.id === 'gram') {
+        fetch('https://api.coingecko.com/api/v3/simple/price?ids=the-open-network&vs_currencies=usd')
+          .then(res => res.json())
+          .then(data => {
+            const tonPrice = data && data['the-open-network'] ? parseFloat(data['the-open-network'].usd) : NaN;
+            if (!isNaN(tonPrice) && tonPrice > 0) {
+              renderRate(tonPrice);
+            } else {
+              renderFallbackMsg();
+            }
+          })
+          .catch(() => renderFallbackMsg());
+        return;
+      }
+
       if (!selected.binanceSymbol) return;
       fetch(`https://api.binance.com/api/v3/ticker/price?symbol=${selected.binanceSymbol}`)
         .then(res => res.json())
         .then(data => {
-          if (data && data.price && coinSelect.value === selected.id) {
-            const coinPrice = parseFloat(data.price);
-            if (coinPrice > 0) {
-              const usdtAmount = parseFloat(pricing.finalUsdt);
-              const estimated = usdtAmount / coinPrice;
-              let formatted = '';
-              if (estimated < 0.1) formatted = estimated.toFixed(6);
-              else if (estimated < 10) formatted = estimated.toFixed(4);
-              else if (estimated < 1000) formatted = estimated.toFixed(2);
-              else formatted = Math.round(estimated).toLocaleString('uk-UA');
-
-              const rateSub = coinPrice < 1 ? coinPrice.toFixed(4) : coinPrice.toLocaleString('uk-UA', {maximumFractionDigits: 2});
-
-              if (targetEl) {
-                targetEl.innerHTML = `<strong>Орієнтовно:</strong> <span class="ad-volatile-amount">~ ${formatted} ${selected.nativeTicker}</span> <span class="ad-volatile-rate-sub">(курс: 1 ${selected.nativeTicker} ≈ $${rateSub})</span>`;
-              }
-              if (badgeEl) {
-                badgeEl.textContent = `~ ${formatted} ${selected.nativeTicker}`;
-              }
-            }
+          if (data && data.price) {
+            renderRate(parseFloat(data.price));
           }
         })
-        .catch(() => {
-          if (targetEl) {
-            targetEl.innerHTML = `Оплата за біржовим курсом еквівалента <strong>$${pricing.finalUsdt} USDT</strong> на момент переказу.`;
-          }
-        });
+        .catch(() => renderFallbackMsg());
     }
 
     function renderCoinContent(selected) {
@@ -8750,14 +8769,14 @@ let pulseRatesData = {
 };
 
 let pulseCryptoData = {
-  BTC: { name: 'Bitcoin', price: 68450, diff: '+1.8%', symbol: 'BTCUSDT' },
-  ETH: { name: 'Ethereum', price: 2520, diff: '+2.1%', symbol: 'ETHUSDT' },
-  SOL: { name: 'Solana', price: 176.4, diff: '+3.5%', symbol: 'SOLUSDT' },
-  BNB: { name: 'BNB Chain', price: 594.2, diff: '-0.8%', symbol: 'BNBUSDT' },
-  GRAM: { name: 'Gram', price: 0.016, diff: '+4.2%', symbol: null },
-  XRP: { name: 'Ripple', price: 0.535, diff: '+1.2%', symbol: 'XRPUSDT' },
-  LTC: { name: 'Litecoin', price: 71.8, diff: '-0.5%', symbol: 'LTCUSDT' },
-  DOGE: { name: 'Dogecoin', price: 0.142, diff: '+2.8%', symbol: 'DOGEUSDT' }
+  BTC: { name: 'Bitcoin', price: 63800, diff: '-1.2%', symbol: 'BTCUSDT', cgId: 'bitcoin' },
+  ETH: { name: 'Ethereum', price: 1805, diff: '-0.3%', symbol: 'ETHUSDT', cgId: 'ethereum' },
+  SOL: { name: 'Solana', price: 74.4, diff: '-0.5%', symbol: 'SOLUSDT', cgId: 'solana' },
+  BNB: { name: 'BNB Chain', price: 590.0, diff: '-0.2%', symbol: 'BNBUSDT', cgId: 'binancecoin' },
+  GRAM: { name: 'TON / Gram', price: 1.03, diff: '-3.8%', symbol: null, cgId: 'the-open-network' },
+  XRP: { name: 'Ripple', price: 0.985, diff: '-1.0%', symbol: 'XRPUSDT', cgId: 'ripple' },
+  LTC: { name: 'Litecoin', price: 44.7, diff: '+0.2%', symbol: 'LTCUSDT', cgId: 'litecoin' },
+  DOGE: { name: 'Dogecoin', price: 0.059, diff: '-0.3%', symbol: 'DOGEUSDT', cgId: 'dogecoin' }
 };
 
 // ==========================================================================
@@ -10591,9 +10610,15 @@ window.setPulseWeatherViewMode = function(mode) {
   if (!window.pulseWeatherState) return;
   const curMetric = window.pulseWeatherState.focusMetric || null;
   if (mode === 'days') {
-    if (curMetric === 'days') return;
+    if (curMetric === 'days') {
+      if (window.pulseWeatherState.meteogramHourlyPreview && typeof window.exitPulseMeteogramHourlyPreview === 'function') {
+        window.exitPulseMeteogramHourlyPreview();
+      }
+      return;
+    }
     window.togglePulseWeatherMetric('days');
   } else {
+    window.pulseWeatherState.meteogramHourlyPreview = false;
     if (curMetric === null) return;
     window.togglePulseWeatherMetric('time');
   }
@@ -10888,21 +10913,27 @@ function buildPulseWeatherMeteogramHtml(dailyItems, weekMinTemp, weekMaxTemp, ac
       `;
     }
 
-    const pressTone = (d.pressInfo && d.pressInfo.colorClass) ? d.pressInfo.colorClass : 'green';
-    const pressDelta = (typeof d.pressDelta === 'number' && !isNaN(d.pressDelta)) ? d.pressDelta : 0;
-    let pressSvgInner = '<circle cx="5.5" cy="4.5" r="2.35" fill="currentColor" />';
-    if (pressDelta >= 2) {
+    const avgPressNum = (typeof d.avgPress === 'number' && !isNaN(d.avgPress)) ? d.avgPress : 754;
+    const rawPressTone = (d.pressInfo && d.pressInfo.colorClass) ? d.pressInfo.colorClass : 'green';
+    let pressVisualTone = 'green';
+    let pressSvgInner = '<circle cx="5.5" cy="4.5" r="2.4" fill="currentColor" />';
+    if (avgPressNum > 760) {
+      pressVisualTone = (rawPressTone === 'red') ? 'red' : 'yellow';
       pressSvgInner = '<path d="M1.8 6.6 L5.5 2.2 L9.2 6.6" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" />';
-    } else if (pressDelta <= -2) {
+    } else if (avgPressNum < 750) {
+      pressVisualTone = (rawPressTone === 'red') ? 'red' : 'yellow';
       pressSvgInner = '<path d="M1.8 2.4 L5.5 6.8 L9.2 2.4" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" />';
-    } else if (pressTone === 'red') {
-      pressSvgInner = '<circle cx="5.5" cy="4.5" r="3.25" fill="currentColor" />';
-    } else if (pressTone !== 'green') {
-      pressSvgInner = '<circle cx="5.5" cy="4.5" r="2.85" fill="currentColor" />';
     }
     const kpTone = (d.kpVal === null || d.kpVal === undefined || isNaN(d.kpVal))
       ? 'muted'
       : (d.kpColor || 'green');
+    const magnetSvgHtml = `
+      <svg width="14" height="10" viewBox="0 0 14 10" aria-hidden="true">
+        <path class="pulse-w2-meteo-magnet-body" d="M 9.6 2.4 H 4.2 A 2.6 2.6 0 0 0 4.2 7.6 H 9.6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="butt" />
+        <rect class="pulse-w2-meteo-magnet-tip" x="10.2" y="1.2" width="2.6" height="2.4" rx="0.55" />
+        <rect class="pulse-w2-meteo-magnet-tip" x="10.2" y="6.4" width="2.6" height="2.4" rx="0.55" />
+      </svg>
+    `;
     const pressHint = `, тиск ${d.avgPress} мм`;
     const kpHint = (d.kpVal !== null && d.kpVal !== undefined && !isNaN(d.kpVal))
       ? `, Kp ${Number(d.kpVal).toFixed(1)}`
@@ -10912,12 +10943,16 @@ function buildPulseWeatherMeteogramHtml(dailyItems, weekMinTemp, weekMaxTemp, ac
       ? `, опади ${prob}%${sum > 0 ? ` (${sum.toFixed(1)} мм)` : ''}`
       : '';
     const windHint = `, вітер ${Math.round(windVal)} м/с ${windDirCode}${gustVal > windVal + 1 ? ` (пор. ${Math.round(gustVal)})` : ''}`;
-    const colTitle = `${d.fullDateLabel}: ${d.maxSign}${d.tMax}°...${d.minSign}${d.tMin}°${condLabel ? ` (${condLabel}${precipHint}${windHint}${pressHint}${kpHint})` : `${precipHint}${windHint}${pressHint}${kpHint}`} • Натисніть для погодинного розкладу`;
+    const isHourlyPreview = Boolean(window.pulseWeatherState && window.pulseWeatherState.focusMetric === 'days' && window.pulseWeatherState.meteogramHourlyPreview);
+    const colActionHint = (isAct && isHourlyPreview)
+      ? 'Натисніть ще раз, щоб повернутися до таблиці по днях'
+      : 'Натисніть для погодинного розкладу цього дня';
+    const colTitle = `${d.fullDateLabel}: ${d.maxSign}${d.tMax}°...${d.minSign}${d.tMin}°${condLabel ? ` (${condLabel}${precipHint}${windHint}${pressHint}${kpHint})` : `${precipHint}${windHint}${pressHint}${kpHint}`} • ${colActionHint}`;
 
     const windSvgHtml = buildPulseWindArrowSvgHtml(windVal, gustVal, windArrowDeg, windCls, 17);
 
     return `
-      <button type="button" class="pulse-w2-meteo-col${d.isToday ? ' is-today' : ''}${isAct ? ' is-active' : ''}" style="--meteo-delay: ${i * 110}ms;" onclick="window.openPulseWeatherDayFromLens(${d.dayIdx})" title="${colTitle}" aria-label="${colTitle}">
+      <button type="button" class="pulse-w2-meteo-col${d.isToday ? ' is-today' : ''}${isAct ? ' is-active' : ''}" style="--meteo-delay: ${i * 90}ms;" onclick="window.selectPulseMeteogramDay(${d.dayIdx})" title="${colTitle}" aria-label="${colTitle}">
         <span class="pulse-w2-meteo-day">${dayShortLbl}</span>
         <span class="pulse-w2-meteo-slot">
           <span class="pulse-w2-meteo-sky-slot" aria-hidden="true">${skyVisualHtml}</span>
@@ -10925,10 +10960,10 @@ function buildPulseWeatherMeteogramHtml(dailyItems, weekMinTemp, weekMaxTemp, ac
         </span>
         <span class="pulse-w2-meteo-spacer"></span>
         <span class="pulse-w2-meteo-signals" aria-hidden="true">
-          <span class="pulse-w2-meteo-press-sig is-${pressTone}">
+          <span class="pulse-w2-meteo-press-sig is-${pressVisualTone}">
             <svg width="11" height="9" viewBox="0 0 11 9">${pressSvgInner}</svg>
           </span>
-          <span class="pulse-w2-meteo-kp-sig is-${kpTone}"></span>
+          <span class="pulse-w2-meteo-kp-sig is-${kpTone}">${magnetSvgHtml}</span>
         </span>
       </button>
     `;
@@ -10958,24 +10993,28 @@ function buildPulseWeatherMeteogramHtml(dailyItems, weekMinTemp, weekMaxTemp, ac
   `;
 }
 
-function buildPulseWeatherTableHeadHtml(focusMetric = null) {
+function buildPulseWeatherTableHeadHtml(focusMetric = null, isDaysHourly = false) {
   const isDaysMode = focusMetric === 'days';
   const isSingleLens = Boolean(focusMetric) && !isDaysMode;
-  const col0Class = isSingleLens
+  const col0Class = (isSingleLens || (isDaysMode && isDaysHourly))
     ? ' is-lens-back'
     : ` is-clickable${isDaysMode ? ' is-lens-active' : ''}`;
-  const col0Click = isSingleLens
-    ? `onclick="window.togglePulseWeatherMetric('time')"`
-    : `onclick="window.togglePulseWeatherMetric('days')"`;
-  const col0Title = isSingleLens
-    ? 'Повернутися до погодинної таблиці'
-    : (isDaysMode ? 'Повернутися до погодинного розкладу (0:00-21:00)' : 'Зведений прогноз на 8 днів (натисніть для перегляду по днях)');
-  const col0Icon = isSingleLens
+  const col0Click = (isDaysMode && isDaysHourly)
+    ? `onclick="window.exitPulseMeteogramHourlyPreview()"`
+    : (isSingleLens
+      ? `onclick="window.togglePulseWeatherMetric('time')"`
+      : `onclick="window.togglePulseWeatherMetric('days')"`);
+  const col0Title = (isDaysMode && isDaysHourly)
+    ? 'Повернутися до зведеної таблиці по днях (8 днів)'
+    : (isSingleLens
+      ? 'Повернутися до погодинної таблиці'
+      : (isDaysMode ? 'Повернутися до погодинного розкладу (0:00-21:00)' : 'Зведений прогноз на 8 днів (натисніть для перегляду по днях)'));
+  const col0Icon = (isSingleLens || (isDaysMode && isDaysHourly))
     ? 'fas fa-arrow-left'
     : (isDaysMode ? 'far fa-calendar-alt' : 'far fa-clock');
 
   return `
-    <tr class="pulse-w2-th-row${focusMetric ? ' is-lens-mode' : ''}">
+    <tr class="pulse-w2-th-row${(focusMetric && !(isDaysMode && isDaysHourly)) ? ' is-lens-mode' : ''}">
       <th class="pulse-w2-th-time${col0Class}" ${col0Click} title="${col0Title}">
         <i class="${col0Icon}"></i>
       </th>
@@ -11326,10 +11365,10 @@ function buildPulseWeatherDaysOverviewRowHtml(dayItem, activeTab = 0) {
   }
 
   const isSelected = dayItem.dayIdx === activeTab;
-  const drillHint = 'Натисніть, щоб відкрити погодинний прогноз цього дня';
+  const drillHint = 'Натисніть, щоб відкрити погодинний прогноз цього дня під метеограмою';
 
   return `
-    <tr class="pulse-w2-row is-drillable${isSelected ? ' pulse-w2-row-current' : ''}" onclick="window.openPulseWeatherDayFromLens(${dayItem.dayIdx})">
+    <tr class="pulse-w2-row is-drillable${isSelected ? ' pulse-w2-row-current' : ''}" onclick="window.selectPulseMeteogramDay(${dayItem.dayIdx})">
       <td class="pulse-w2-col-time" title="${dayItem.fullDateLabel} • ${drillHint}">
         <span class="pulse-w2-day-badge">${dayItem.dayBadge}</span>
       </td>
@@ -11373,8 +11412,8 @@ function buildPulseWeatherDaysOverviewRowHtml(dayItem, activeTab = 0) {
   `;
 }
 
-function buildPulseWeatherTableBodyHtml(daySlots, dailyLensItems, focusMetric = null, weekMinTemp = 0, weekMaxTemp = 10) {
-  if (!focusMetric) {
+function buildPulseWeatherTableBodyHtml(daySlots, dailyLensItems, focusMetric = null, weekMinTemp = 0, weekMaxTemp = 10, isDaysHourly = false) {
+  if (!focusMetric || (focusMetric === 'days' && isDaysHourly)) {
     return Array.isArray(daySlots) ? daySlots.map(s => s.overviewRowHtml).join('') : '';
   }
   if (!Array.isArray(dailyLensItems)) return '';
@@ -11393,6 +11432,7 @@ window.togglePulseWeatherMetric = function(metricKey) {
     ? null
     : metricKey;
   window.pulseWeatherState.focusMetric = nextMetric;
+  window.pulseWeatherState.meteogramHourlyPreview = false;
 
   const table = document.getElementById('pulseWeatherTable');
   if (!table || !Array.isArray(window.pulseWeatherState.currentDaySlots)) {
@@ -11405,7 +11445,7 @@ window.togglePulseWeatherMetric = function(metricKey) {
   const thead = table.querySelector('thead');
   const tbody = table.querySelector('tbody');
   if (thead) {
-    thead.innerHTML = buildPulseWeatherTableHeadHtml(nextMetric);
+    thead.innerHTML = buildPulseWeatherTableHeadHtml(nextMetric, false);
   }
   if (tbody) {
     tbody.classList.remove('pulse-w2-tbody-fade');
@@ -11414,7 +11454,8 @@ window.togglePulseWeatherMetric = function(metricKey) {
       window.pulseWeatherState.currentDailyLensItems,
       nextMetric,
       window.pulseWeatherState.currentWeekMinT,
-      window.pulseWeatherState.currentWeekMaxT
+      window.pulseWeatherState.currentWeekMaxT,
+      false
     );
     void tbody.offsetWidth;
     tbody.classList.add('pulse-w2-tbody-fade');
@@ -11426,6 +11467,74 @@ window.togglePulseWeatherMetric = function(metricKey) {
   updatePulseWeatherModeTabs(nextMetric);
 };
 
+window.exitPulseMeteogramHourlyPreview = function() {
+  if (!window.pulseWeatherState || !window.pulseWeatherState.data) return;
+  window.pulseWeatherState.focusMetric = 'days';
+  window.pulseWeatherState.meteogramHourlyPreview = false;
+
+  const table = document.getElementById('pulseWeatherTable');
+  if (!table || !Array.isArray(window.pulseWeatherState.currentDailyLensItems)) {
+    renderPulseWeatherUI(window.pulseWeatherState.data, window.pulseWeatherState.city, window.pulseWeatherState.updatedTime);
+    return;
+  }
+
+  const thead = table.querySelector('thead');
+  const tbody = table.querySelector('tbody');
+  if (thead) {
+    thead.innerHTML = buildPulseWeatherTableHeadHtml('days', false);
+  }
+  if (tbody) {
+    tbody.classList.remove('pulse-w2-tbody-fade');
+    tbody.innerHTML = buildPulseWeatherTableBodyHtml(
+      window.pulseWeatherState.currentDaySlots,
+      window.pulseWeatherState.currentDailyLensItems,
+      'days',
+      window.pulseWeatherState.currentWeekMinT,
+      window.pulseWeatherState.currentWeekMaxT,
+      false
+    );
+    void tbody.offsetWidth;
+    tbody.classList.add('pulse-w2-tbody-fade');
+  }
+  const meteoEl = document.getElementById('pulseWeatherMeteogram');
+  if (meteoEl) {
+    const activeTab = typeof window.pulseWeatherState.activeTab === 'number' ? window.pulseWeatherState.activeTab : 0;
+    meteoEl.innerHTML = buildPulseWeatherMeteogramHtml(
+      window.pulseWeatherState.currentDailyLensItems,
+      window.pulseWeatherState.currentWeekMinT,
+      window.pulseWeatherState.currentWeekMaxT,
+      activeTab
+    );
+  }
+  updatePulseWeatherModeTabs('days');
+};
+
+window.selectPulseMeteogramDay = function(dayIndex) {
+  if (!window.pulseWeatherState || typeof dayIndex !== 'number') return;
+  const times = (window.pulseWeatherState.data && window.pulseWeatherState.data.daily && Array.isArray(window.pulseWeatherState.data.daily.time))
+    ? window.pulseWeatherState.data.daily.time
+    : [];
+  const totalDays = times.length ? Math.min(8, times.length) : 8;
+  if (dayIndex < 0 || dayIndex >= totalDays) return;
+
+  const curActive = typeof window.pulseWeatherState.activeTab === 'number' ? window.pulseWeatherState.activeTab : 0;
+  if (window.pulseWeatherState.focusMetric === 'days' && window.pulseWeatherState.meteogramHourlyPreview && curActive === dayIndex) {
+    window.exitPulseMeteogramHourlyPreview();
+    return;
+  }
+
+  window.pulseWeatherState.focusMetric = 'days';
+  window.pulseWeatherState.meteogramHourlyPreview = true;
+  window.pulseWeatherState.activeTab = dayIndex;
+  const maxOffset = Math.max(0, totalDays - 3);
+  window.pulseWeatherState.tabOffset = dayIndex <= 2 ? 0 : Math.min(maxOffset, Math.max(0, dayIndex - 1));
+  renderPulseWeatherUI(
+    window.pulseWeatherState.data,
+    window.pulseWeatherState.city,
+    window.pulseWeatherState.updatedTime
+  );
+};
+
 window.openPulseWeatherDayFromLens = function(dayIndex) {
   if (!window.pulseWeatherState || typeof dayIndex !== 'number') return;
   const times = (window.pulseWeatherState.data && window.pulseWeatherState.data.daily && Array.isArray(window.pulseWeatherState.data.daily.time))
@@ -11434,6 +11543,7 @@ window.openPulseWeatherDayFromLens = function(dayIndex) {
   const totalDays = times.length ? Math.min(8, times.length) : 8;
   if (dayIndex < 0 || dayIndex >= totalDays) return;
   window.pulseWeatherState.focusMetric = null;
+  window.pulseWeatherState.meteogramHourlyPreview = false;
   const maxOffset = Math.max(0, totalDays - 3);
   const targetOffset = dayIndex <= 2 ? 0 : Math.min(maxOffset, Math.max(0, dayIndex - 1));
   window.setPulseWeatherTab(dayIndex, targetOffset);
@@ -11488,7 +11598,7 @@ function buildPulseWeatherTabsStripHtml(data, activeTab = 0, tabOffset = 0) {
       ? Math.round(daily.temperature_2m_max[d])
       : 0;
     const wCode = (daily.weather_code && daily.weather_code[d] !== undefined) ? daily.weather_code[d] : 3;
-    const cond = getWeatherConditionInfo(wCode, 1, 26);
+    const cond = getWeatherConditionInfo(wCode, 1, 31);
 
     const minClass = minT < 0 ? 'pulse-temp-subzero' : '';
     const maxClass = maxT < 0 ? 'pulse-temp-subzero' : '';
@@ -11568,13 +11678,14 @@ function buildPulseWeatherTabsStripHtml(data, activeTab = 0, tabOffset = 0) {
   const prevDisabled = clampedOffset <= 0;
   const nextDisabled = clampedOffset >= maxOffset;
   const shiftPct = -(clampedOffset * (100 / 3));
+  const trackLeftStyle = clampedOffset > 0 ? `${shiftPct.toFixed(4)}%` : '0';
 
   return `
     <button type="button" class="pulse-w2-tabs-nav-btn is-prev${prevDisabled ? ' is-disabled' : ''}" id="pulseWeatherTabsPrevBtn" onclick="window.shiftPulseWeatherTabs(-1, event)" ${prevDisabled ? 'disabled' : ''} title="Попередні дні (вліво)" aria-label="Попередні дні">
       <i class="fas fa-chevron-left"></i>
     </button>
     <div class="pulse-w2-tabs-viewport">
-      <div class="pulse-w2-tabs-track" id="pulseWeatherTabsTrack" style="transform: translateX(${shiftPct.toFixed(4)}%);">
+      <div class="pulse-w2-tabs-track" id="pulseWeatherTabsTrack" style="left: ${trackLeftStyle};">
         ${cardsHtml}
       </div>
     </div>
@@ -11602,7 +11713,7 @@ window.shiftPulseWeatherTabs = function(step, ev) {
 
   if (trackEl) {
     const shiftPct = -(nextOffset * (100 / 3));
-    trackEl.style.transform = `translateX(${shiftPct.toFixed(4)}%)`;
+    trackEl.style.left = nextOffset > 0 ? `${shiftPct.toFixed(4)}%` : '0';
     trackEl.querySelectorAll('.pulse-w2-tab').forEach(btn => {
       const idx = parseInt(btn.getAttribute('data-day-idx'), 10);
       btn.classList.toggle('is-slot-right', idx === (nextOffset + 2));
@@ -12029,12 +12140,13 @@ function renderPulseWeatherUI(data, city, updatedTime = '') {
   const domWindInfo = getWindDirectionInfo(dailyWindDirDeg);
 
   // Слайд 2: Підсумок доби (стан неба, сума опадів та максимальні пориви)
+  const slide2SkyText = skyConditionText.replace(/,\s*без опадів/i, '').trim();
   const slide2PrecipText = dailyPrecipSum >= 0.1
-    ? `за добу ${dailyPrecipSum.toFixed(1)} мм`
+    ? `${dailyPrecipSum.toFixed(1)} мм`
     : 'без опадів';
   const slide2WindText = `пориви ${Math.round(dailyGustMax)} м/с (${domWindInfo.code})`;
-  const slide2SummaryText = `${skyConditionText} · ${slide2PrecipText} · ${slide2WindText}`;
-  const slide2Tooltip = `Стан: ${skyConditionText} • Опади за добу: ${dailyPrecipSum.toFixed(1)} мм • Вітер: ${domWindInfo.dirName}, пориви до ${dailyGustMax.toFixed(1)} м/с`;
+  const slide2SummaryText = `${slide2SkyText} · ${slide2PrecipText} · ${slide2WindText}`;
+  const slide2Tooltip = `Стан: ${slide2SkyText} • Опади за добу: ${dailyPrecipSum.toFixed(1)} мм • Вітер: ${domWindInfo.dirName}, пориви до ${dailyGustMax.toFixed(1)} м/с`;
 
   // Слайд 3: Порада водіям, пішоходам та щодо одягу
   const weatherAdvice = getPulseWeatherAdvice(evalTemp, activeCondInfo, evalPrecip, evalWind, dailyMinTemp, dailyMaxTemp, dailyGustMax);
@@ -12110,19 +12222,22 @@ function renderPulseWeatherUI(data, city, updatedTime = '') {
   const histView = buildPulseWeatherHistoryView(city, histMonth, histDay, histDateLabelFull, isExtendedDay);
 
   const activeFocusMetric = window.pulseWeatherState.focusMetric || null;
+  const isDaysModeActive = activeFocusMetric === 'days';
+  const isDaysHourlyPreview = isDaysModeActive && Boolean(window.pulseWeatherState.meteogramHourlyPreview);
   updatePulseWeatherModeTabs(activeFocusMetric);
   const dailyLensSummary = buildPulseWeatherDailyLensItems(data);
   window.pulseWeatherState.currentDaySlots = daySlots;
   window.pulseWeatherState.currentDailyLensItems = dailyLensSummary.items;
   window.pulseWeatherState.currentWeekMinT = dailyLensSummary.weekMinTemp;
   window.pulseWeatherState.currentWeekMaxT = dailyLensSummary.weekMaxTemp;
-  const tableHeadHtml = buildPulseWeatherTableHeadHtml(activeFocusMetric);
+  const tableHeadHtml = buildPulseWeatherTableHeadHtml(activeFocusMetric, isDaysHourlyPreview);
   const tableBodyHtml = buildPulseWeatherTableBodyHtml(
     daySlots,
     dailyLensSummary.items,
     activeFocusMetric,
     dailyLensSummary.weekMinTemp,
-    dailyLensSummary.weekMaxTemp
+    dailyLensSummary.weekMaxTemp,
+    isDaysHourlyPreview
   );
 
   const meteogramHtml = buildPulseWeatherMeteogramHtml(
@@ -12133,7 +12248,6 @@ function renderPulseWeatherUI(data, city, updatedTime = '') {
   );
 
   const isOutOfWindow = activeTab < tabOffset || activeTab > tabOffset + 2;
-  const isDaysModeActive = activeFocusMetric === 'days';
   container.innerHTML = `
     <!-- 1. Верхній блок: гортана стрічка днів Sinoptik (до 8 днів) + 8-денна метеограма у режимі «По днях» + 5-слайдовий ротатор -->
     <div class="pulse-w2-top-panel${(isExtendedDay || isOutOfWindow) ? ' is-extended-day' : ''}${isDaysModeActive ? ' is-days-mode' : ''}">
@@ -12388,6 +12502,7 @@ window.setPulseWeatherTab = function(dayIndex, customOffset) {
   if (window.pulseWeatherState.focusMetric === 'days') {
     window.pulseWeatherState.focusMetric = null;
   }
+  window.pulseWeatherState.meteogramHourlyPreview = false;
   const { maxOffset } = getPulseWeatherMaxTabOffset(window.pulseWeatherState.data);
   window.pulseWeatherState.activeTab = dayIndex;
   if (typeof customOffset === 'number') {
@@ -12442,6 +12557,9 @@ async function detectUserWeatherLocation() {
     }
 
     await loadPulseWeatherData(true);
+    if (typeof window.syncPulseFuelRegionByLocation === 'function') {
+      window.syncPulseFuelRegionByLocation({ lat, lon, textHint: `${cityName} ${region}` });
+    }
     showQuickToast(`Локацію визначено: ${customCity.name}`, 'success');
     if (geoBtn) geoBtn.innerHTML = '<i class="fas fa-crosshairs"></i>';
   };
@@ -13036,6 +13154,20 @@ function interleaveNewsBySource(items, maxConsecutive = 2) {
   return result;
 }
 
+function updatePulseNewsLiveBadge(epochMs = Date.now()) {
+  const badge = document.getElementById('pulseNewsLiveBadge');
+  const dt = new Date(epochMs || Date.now());
+  if (isNaN(dt.getTime())) return;
+  const timeStr = `${String(dt.getHours()).padStart(2, '0')}:${String(dt.getMinutes()).padStart(2, '0')}`;
+  if (badge) {
+    badge.textContent = timeStr;
+    badge.title = `Новини України (Остання перевірка: ${timeStr})`;
+  }
+  if (typeof window.syncPulseHeaderUpdatedTime === 'function') {
+    window.syncPulseHeaderUpdatedTime(timeStr, dt.getTime());
+  }
+}
+
 async function loadPulseLiveNews(forceRefresh = false) {
   const cacheKey = 'pulse_live_news_cache_v5';
   const now = Date.now();
@@ -13046,6 +13178,7 @@ async function loadPulseLiveNews(forceRefresh = false) {
       if (cached && Array.isArray(cached.items) && cached.items.length && (now - cached.timestamp < 10 * 60 * 1000)) {
         currentPulseNewsItems = cached.items;
         renderPulseNewsFeed(currentPulseNewsTab);
+        updatePulseNewsLiveBadge(cached.timestamp || now);
         return;
       }
     } catch (e) {}
@@ -13137,6 +13270,7 @@ async function loadPulseLiveNews(forceRefresh = false) {
   }
 
   renderPulseNewsFeed(currentPulseNewsTab);
+  updatePulseNewsLiveBadge(now);
 }
 
 function renderPulseNewsFeed(filter = 'all') {
@@ -13467,57 +13601,57 @@ function renderPulseDrawerLayout(container, options = {}) {
                 <span class="pulse-rate-code">BTC</span>
                 <span class="pulse-rate-diff up" id="pulseDiffBtc" title="+1.8%">▲</span>
               </div>
-              <div class="pulse-rate-value" id="pulseRateBtc">68 450$</div>
+              <div class="pulse-rate-value" id="pulseRateBtc">68 450<span class="pulse-rate-curr">$</span></div>
             </div>
             <div class="pulse-rate-item" title="Ethereum (ETH)">
               <div class="pulse-rate-top-line">
                 <span class="pulse-rate-code">ETH</span>
                 <span class="pulse-rate-diff up" id="pulseDiffEth" title="+2.1%">▲</span>
               </div>
-              <div class="pulse-rate-value" id="pulseRateEth">2 520$</div>
+              <div class="pulse-rate-value" id="pulseRateEth">2 520<span class="pulse-rate-curr">$</span></div>
             </div>
             <div class="pulse-rate-item" title="Solana (SOL)">
               <div class="pulse-rate-top-line">
                 <span class="pulse-rate-code">SOL</span>
                 <span class="pulse-rate-diff up" id="pulseDiffSol" title="+3.5%">▲</span>
               </div>
-              <div class="pulse-rate-value" id="pulseRateSol">176.40$</div>
+              <div class="pulse-rate-value" id="pulseRateSol">176.40<span class="pulse-rate-curr">$</span></div>
             </div>
             <div class="pulse-rate-item" title="BNB Chain (BNB)">
               <div class="pulse-rate-top-line">
                 <span class="pulse-rate-code">BNB</span>
                 <span class="pulse-rate-diff down" id="pulseDiffBnb" title="-0.8%">▼</span>
               </div>
-              <div class="pulse-rate-value" id="pulseRateBnb">594,20$</div>
+              <div class="pulse-rate-value" id="pulseRateBnb">594.20<span class="pulse-rate-curr">$</span></div>
             </div>
 
-            <div class="pulse-rate-item" title="Gram / TON Telegram ecosystem (GRAM)">
+            <div class="pulse-rate-item" title="TON / Gram (Telegram Open Network)">
               <div class="pulse-rate-top-line">
                 <span class="pulse-rate-code">GRAM</span>
-                <span class="pulse-rate-diff up" id="pulseDiffGram" title="+4.2%">▲</span>
+                <span class="pulse-rate-diff down" id="pulseDiffGram" title="-3.8%">▼</span>
               </div>
-              <div class="pulse-rate-value" id="pulseRateGram">0,016$</div>
+              <div class="pulse-rate-value" id="pulseRateGram">1.03<span class="pulse-rate-curr">$</span></div>
             </div>
             <div class="pulse-rate-item" title="Ripple (XRP)">
               <div class="pulse-rate-top-line">
                 <span class="pulse-rate-code">XRP</span>
                 <span class="pulse-rate-diff up" id="pulseDiffXrp" title="+1.2%">▲</span>
               </div>
-              <div class="pulse-rate-value" id="pulseRateXrp">0,535$</div>
+              <div class="pulse-rate-value" id="pulseRateXrp">0.535<span class="pulse-rate-curr">$</span></div>
             </div>
             <div class="pulse-rate-item" title="Litecoin (LTC)">
               <div class="pulse-rate-top-line">
                 <span class="pulse-rate-code">LTC</span>
                 <span class="pulse-rate-diff down" id="pulseDiffLtc" title="-0.5%">▼</span>
               </div>
-              <div class="pulse-rate-value" id="pulseRateLtc">71,80$</div>
+              <div class="pulse-rate-value" id="pulseRateLtc">71.80<span class="pulse-rate-curr">$</span></div>
             </div>
             <div class="pulse-rate-item" title="Dogecoin (DOGE)">
               <div class="pulse-rate-top-line">
                 <span class="pulse-rate-code">DOGE</span>
                 <span class="pulse-rate-diff up" id="pulseDiffDoge" title="+2.8%">▲</span>
               </div>
-              <div class="pulse-rate-value" id="pulseRateDoge">0,142$</div>
+              <div class="pulse-rate-value" id="pulseRateDoge">0.142<span class="pulse-rate-curr">$</span></div>
             </div>
           </div>
 
@@ -13807,6 +13941,17 @@ function renderPulseDrawerLayout(container, options = {}) {
         }
       }
     }
+    // М'яка синхронізація області для Цін на пальне
+    if (typeof window.syncPulseFuelRegionByLocation === 'function') {
+      const cityMeta = UKRAINE_WEATHER_CITIES.find(c => c.id === chosen);
+      if (cityMeta) {
+        window.syncPulseFuelRegionByLocation({
+          lat: cityMeta.lat,
+          lon: cityMeta.lon,
+          textHint: `${cityMeta.name} ${cityMeta.region || ''}`
+        });
+      }
+    }
   };
 
   if (weatherCitySelect) {
@@ -13902,6 +14047,9 @@ function renderPulseDrawerLayout(container, options = {}) {
           ecoRegionSelect.value = nearest.id;
           localStorage.setItem('pulse_eco_region', nearest.id);
           loadPulseEcoData(false);
+          if (typeof window.syncPulseFuelRegionByLocation === 'function') {
+            window.syncPulseFuelRegionByLocation({ lat, lon, textHint: nearest.name });
+          }
           showQuickToast(`Екомоніторинг: обрано найближчий центр (${nearest.name})`, 'success');
         }
         ecoGeoBtn.innerHTML = '<i class="fas fa-crosshairs"></i>';
@@ -13975,8 +14123,11 @@ function renderPulseDrawerLayout(container, options = {}) {
   const fuelRegionSelect = container.querySelector('#pulseFuelRegionSelect');
   const savedRegion = localStorage.getItem('user_fuel_region') || 'ua';
   let fuelRegionSaveDebounce = null;
-  const saveFuelRegionSelection = (chosen) => {
+  const saveFuelRegionSelection = (chosen, isManual = false) => {
     localStorage.setItem('user_fuel_region', chosen);
+    if (isManual) {
+      localStorage.setItem('user_fuel_region_manual', '1');
+    }
     renderPulseFuelTable(chosen);
     clearTimeout(fuelRegionSaveDebounce);
     fuelRegionSaveDebounce = setTimeout(() => {
@@ -13989,9 +14140,55 @@ function renderPulseDrawerLayout(container, options = {}) {
   };
   if (fuelRegionSelect) {
     fuelRegionSelect.value = savedRegion;
-    fuelRegionSelect.onchange = (e) => saveFuelRegionSelection(e.target.value);
+    fuelRegionSelect.onchange = (e) => saveFuelRegionSelection(e.target.value, true);
   }
   renderPulseFuelTable(savedRegion);
+
+  const findFuelRegionByText = (txt) => {
+    if (!txt) return null;
+    const low = String(txt).toLowerCase();
+    // Спершу перевіряємо м. Київ окремо від Київської області
+    if (low === 'київ' || low === 'м. київ' || low === 'місто київ' || low === 'kyiv' || low.includes('м. київ') || low.includes('столиця')) {
+      return UKRAINE_FUEL_REGIONS.find(r => r.id === 'kyiv');
+    }
+    return UKRAINE_FUEL_REGIONS.find(r => Array.isArray(r.keys) && r.keys.some(k => low.includes(k))) || null;
+  };
+
+  window.syncPulseFuelRegionByLocation = async ({ lat, lon, textHint = '', force = false } = {}) => {
+    if (!force && localStorage.getItem('user_fuel_region_manual') === '1') return null;
+    let matched = findFuelRegionByText(textHint);
+    if (!matched && typeof lat === 'number' && typeof lon === 'number' && !isNaN(lat) && !isNaN(lon)) {
+      try {
+        const rg = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=uk`);
+        if (rg.ok) {
+          const res = await rg.json();
+          const sub = res.principalSubdivision || res.city || res.locality || '';
+          matched = findFuelRegionByText(sub);
+        }
+      } catch (err) {}
+      if (!matched) {
+        let minDist = Infinity;
+        for (const r of UKRAINE_FUEL_REGIONS) {
+          if (typeof r.lat !== 'number' || typeof r.lon !== 'number') continue;
+          const dist = Math.hypot(r.lat - lat, r.lon - lon);
+          if (dist < minDist) {
+            minDist = dist;
+            matched = r;
+          }
+        }
+      }
+    }
+    if (matched && fuelRegionSelect) {
+      if (fuelRegionSelect.value !== matched.id) {
+        fuelRegionSelect.value = matched.id;
+      }
+      if (force) {
+        localStorage.removeItem('user_fuel_region_manual');
+      }
+      saveFuelRegionSelection(matched.id, false);
+    }
+    return matched;
+  };
 
   // Кнопка автовизначення області для цін на пальне (GPS / IP / збережені координати)
   const fuelGeoBtn = container.querySelector('#pulseFuelGeoBtn');
@@ -14001,42 +14198,9 @@ function renderPulseDrawerLayout(container, options = {}) {
       e.stopPropagation();
       fuelGeoBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
 
-      const findRegionByText = (txt) => {
-        if (!txt) return null;
-        const low = String(txt).toLowerCase();
-        // Спершу перевіряємо м. Київ окремо від Київської області
-        if (low === 'київ' || low === 'м. київ' || low === 'місто київ' || low === 'kyiv') {
-          return UKRAINE_FUEL_REGIONS.find(r => r.id === 'kyiv');
-        }
-        return UKRAINE_FUEL_REGIONS.find(r => Array.isArray(r.keys) && r.keys.some(k => low.includes(k))) || null;
-      };
-
       const applyNearestFuelRegion = async (lat, lon, regionHint = '') => {
-        let matched = findRegionByText(regionHint);
-        if (!matched) {
-          try {
-            const rg = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=uk`);
-            if (rg.ok) {
-              const res = await rg.json();
-              const sub = res.principalSubdivision || res.city || res.locality || '';
-              matched = findRegionByText(sub);
-            }
-          } catch (err) {}
-        }
-        if (!matched) {
-          let minDist = Infinity;
-          for (const r of UKRAINE_FUEL_REGIONS) {
-            if (typeof r.lat !== 'number' || typeof r.lon !== 'number') continue;
-            const dist = Math.hypot(r.lat - lat, r.lon - lon);
-            if (dist < minDist) {
-              minDist = dist;
-              matched = r;
-            }
-          }
-        }
-        if (matched && fuelRegionSelect) {
-          fuelRegionSelect.value = matched.id;
-          saveFuelRegionSelection(matched.id);
+        const matched = await window.syncPulseFuelRegionByLocation({ lat, lon, textHint: regionHint, force: true });
+        if (matched) {
           showQuickToast(`Ціни на пальне: обрано регіон (${matched.name})`, 'success');
         }
         fuelGeoBtn.innerHTML = '<i class="fas fa-crosshairs"></i>';
@@ -14144,8 +14308,8 @@ function renderPulseDrawerLayout(container, options = {}) {
         updatePulseFinanceLiveBadge(timeStr);
         syncPulseHeaderUpdatedTime(timeStr, nowMs, true);
         try {
-          const prevCache = JSON.parse(localStorage.getItem('pulse_day_cache_v3') || '{}');
-          localStorage.setItem('pulse_day_cache_v3', JSON.stringify({
+          const prevCache = JSON.parse(localStorage.getItem('pulse_day_cache_v4') || '{}');
+          localStorage.setItem('pulse_day_cache_v4', JSON.stringify({
             ...prevCache,
             timestamp: nowMs,
             lastUpdatedText: timeStr,
@@ -14502,7 +14666,7 @@ async function loadPulseDrawerData(forceRefresh = false) {
   if (spin) spin.classList.add('fa-spin');
 
   const now = Date.now();
-  const cacheKey = 'pulse_day_cache_v3';
+  const cacheKey = 'pulse_day_cache_v4';
   let cached = null;
   try {
     cached = JSON.parse(localStorage.getItem(cacheKey) || 'null');
@@ -14644,30 +14808,90 @@ async function fetchLiveNbuRates() {
     const res = await fetch('https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?json');
     if (!res.ok) throw new Error('Помилка НБУ API');
     const data = await res.json();
-    if (!Array.isArray(data)) return null;
+    if (!Array.isArray(data) || !data.length) return null;
 
-    const findRate = (code, fallback) => {
-      const it = data.find(item => item.cc === code);
-      return it ? Number(it.rate.toFixed(2)) : fallback;
+    // Визначаємо реальну попередню дату курсу НБУ за полем exchangedate (DD.MM.YYYY)
+    let prevData = null;
+    try {
+      const refItem = data.find(item => item.cc === 'USD') || data[0];
+      const dateStr = refItem && refItem.exchangedate ? String(refItem.exchangedate) : '';
+      const m = dateStr.match(/^(\d{2})\.(\d{2})\.(\d{4})$/);
+      const baseDt = m
+        ? new Date(Date.UTC(parseInt(m[3], 10), parseInt(m[2], 10) - 1, parseInt(m[1], 10)))
+        : new Date();
+      const fmtYmd = (dt) => `${dt.getUTCFullYear()}${String(dt.getUTCMonth() + 1).padStart(2, '0')}${String(dt.getUTCDate()).padStart(2, '0')}`;
+
+      const prevDt1 = new Date(baseDt.getTime() - 86400000);
+      const prevRes1 = await fetch(`https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?date=${fmtYmd(prevDt1)}&json`);
+      if (prevRes1.ok) {
+        const prevJson1 = await prevRes1.json();
+        if (Array.isArray(prevJson1) && prevJson1.length) {
+          const usdToday = data.find(i => i.cc === 'USD');
+          const usdPrev1 = prevJson1.find(i => i.cc === 'USD');
+          if (usdToday && usdPrev1 && Math.abs(usdToday.rate - usdPrev1.rate) < 0.0001) {
+            // Вихідні/свята: курс повторює п'ятничний - беремо -3 дні
+            const prevDt3 = new Date(baseDt.getTime() - 3 * 86400000);
+            const prevRes3 = await fetch(`https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?date=${fmtYmd(prevDt3)}&json`).catch(() => null);
+            if (prevRes3 && prevRes3.ok) {
+              const prevJson3 = await prevRes3.json();
+              if (Array.isArray(prevJson3) && prevJson3.length) {
+                prevData = prevJson3;
+              }
+            }
+          }
+          if (!prevData) prevData = prevJson1;
+        }
+      }
+    } catch (ePrev) {}
+
+    const findRawRate = (arr, code) => {
+      if (!Array.isArray(arr)) return null;
+      const it = arr.find(item => item.cc === code);
+      return (it && typeof it.rate === 'number') ? it.rate : null;
     };
 
+    const buildRateAndDiff = (code, fallbackVal, fallbackDiff) => {
+      const rawToday = findRawRate(data, code);
+      const val = rawToday !== null ? Number(rawToday.toFixed(2)) : fallbackVal;
+      const rawPrev = findRawRate(prevData, code);
+      let diff = fallbackDiff;
+      if (rawToday !== null && rawPrev !== null) {
+        const delta = rawToday - rawPrev;
+        if (Math.abs(delta) < 0.005) {
+          diff = '0.00';
+        } else {
+          diff = (delta > 0 ? '+' : '-') + Math.abs(delta).toFixed(2);
+        }
+      }
+      return { val, diff };
+    };
+
+    const usd = buildRateAndDiff('USD', pulseRatesData.USD, '0.00');
+    const eur = buildRateAndDiff('EUR', pulseRatesData.EUR, '0.00');
+    const pln = buildRateAndDiff('PLN', pulseRatesData.PLN, '0.00');
+    const gbp = buildRateAndDiff('GBP', pulseRatesData.GBP, '0.00');
+    const czk = buildRateAndDiff('CZK', pulseRatesData.CZK, '0.00');
+    const chf = buildRateAndDiff('CHF', pulseRatesData.CHF, '0.00');
+    const cad = buildRateAndDiff('CAD', pulseRatesData.CAD, '0.00');
+    const cny = buildRateAndDiff('CNY', pulseRatesData.CNY, '0.00');
+
     const rates = {
-      USD: findRate('USD', 41.50),
-      EUR: findRate('EUR', 45.15),
-      PLN: findRate('PLN', 10.55),
-      GBP: findRate('GBP', 53.90),
-      CZK: findRate('CZK', 1.78),
-      CHF: findRate('CHF', 47.80),
-      CAD: findRate('CAD', 30.20),
-      CNY: findRate('CNY', 5.75),
-      diffUSD: '+0.04',
-      diffEUR: '+0.06',
-      diffPLN: '-0.02',
-      diffGBP: '+0.12',
-      diffCZK: '+0.01',
-      diffCHF: '+0.05',
-      diffCAD: '-0.03',
-      diffCNY: '+0.01'
+      USD: usd.val,
+      EUR: eur.val,
+      PLN: pln.val,
+      GBP: gbp.val,
+      CZK: czk.val,
+      CHF: chf.val,
+      CAD: cad.val,
+      CNY: cny.val,
+      diffUSD: usd.diff,
+      diffEUR: eur.diff,
+      diffPLN: pln.diff,
+      diffGBP: gbp.diff,
+      diffCZK: czk.diff,
+      diffCHF: chf.diff,
+      diffCAD: cad.diff,
+      diffCNY: cny.diff
     };
     pulseRatesData = rates;
     return rates;
@@ -14679,36 +14903,57 @@ async function fetchLiveNbuRates() {
 async function fetchLiveCryptoRates() {
   try {
     const symbols = '["BTCUSDT","ETHUSDT","SOLUSDT","BNBUSDT","XRPUSDT","LTCUSDT","DOGEUSDT"]';
-    const res = await fetch(`https://api.binance.com/api/v3/ticker/24hr?symbols=${encodeURIComponent(symbols)}`);
-    if (!res.ok) throw new Error('Помилка Binance API');
-    const list = await res.json();
-    if (!Array.isArray(list)) return pulseCryptoData;
+    const cgIds = 'bitcoin,ethereum,solana,binancecoin,the-open-network,ripple,litecoin,dogecoin';
 
-    const map = {};
-    list.forEach(item => {
-      map[item.symbol] = item;
-    });
+    const [binanceSettled, cgSettled] = await Promise.allSettled([
+      fetch(`https://api.binance.com/api/v3/ticker/24hr?symbols=${encodeURIComponent(symbols)}`).then(r => r.ok ? r.json() : null),
+      fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${cgIds}&vs_currencies=usd&include_24hr_change=true`).then(r => r.ok ? r.json() : null)
+    ]);
 
-    const updateCoin = (key, sym) => {
-      if (map[sym] && pulseCryptoData[key]) {
-        const p = parseFloat(map[sym].lastPrice);
-        const change = parseFloat(map[sym].priceChangePercent);
-        if (!isNaN(p)) {
+    const binanceList = binanceSettled.status === 'fulfilled' && Array.isArray(binanceSettled.value) ? binanceSettled.value : null;
+    const cgData = cgSettled.status === 'fulfilled' && cgSettled.value && typeof cgSettled.value === 'object' ? cgSettled.value : null;
+
+    const binanceMap = {};
+    if (binanceList) {
+      binanceList.forEach(item => {
+        if (item && item.symbol) binanceMap[item.symbol] = item;
+      });
+    }
+
+    const updateCoin = (key, sym, cgId, preferCg = false) => {
+      if (!pulseCryptoData[key]) return;
+      let updated = false;
+      if (!preferCg && sym && binanceMap[sym]) {
+        const p = parseFloat(binanceMap[sym].lastPrice);
+        const change = parseFloat(binanceMap[sym].priceChangePercent);
+        if (!isNaN(p) && p > 0) {
           pulseCryptoData[key].price = p;
+          updated = true;
         }
         if (!isNaN(change)) {
           pulseCryptoData[key].diff = (change >= 0 ? '+' : '') + change.toFixed(1) + '%';
         }
       }
+      if ((!updated || preferCg) && cgId && cgData && cgData[cgId]) {
+        const pCg = Number(cgData[cgId].usd);
+        const chCg = Number(cgData[cgId].usd_24h_change);
+        if (!isNaN(pCg) && pCg > 0) {
+          pulseCryptoData[key].price = pCg;
+        }
+        if (!isNaN(chCg)) {
+          pulseCryptoData[key].diff = (chCg >= 0 ? '+' : '') + chCg.toFixed(1) + '%';
+        }
+      }
     };
 
-    updateCoin('BTC', 'BTCUSDT');
-    updateCoin('ETH', 'ETHUSDT');
-    updateCoin('SOL', 'SOLUSDT');
-    updateCoin('BNB', 'BNBUSDT');
-    updateCoin('XRP', 'XRPUSDT');
-    updateCoin('LTC', 'LTCUSDT');
-    updateCoin('DOGE', 'DOGEUSDT');
+    updateCoin('BTC', 'BTCUSDT', 'bitcoin', false);
+    updateCoin('ETH', 'ETHUSDT', 'ethereum', false);
+    updateCoin('SOL', 'SOLUSDT', 'solana', false);
+    updateCoin('BNB', 'BNBUSDT', 'binancecoin', false);
+    updateCoin('GRAM', null, 'the-open-network', true);
+    updateCoin('XRP', 'XRPUSDT', 'ripple', false);
+    updateCoin('LTC', 'LTCUSDT', 'litecoin', false);
+    updateCoin('DOGE', 'DOGEUSDT', 'dogecoin', false);
 
     applyCryptoToUI(pulseCryptoData);
     return pulseCryptoData;
@@ -14722,21 +14967,23 @@ function applyCryptoToUI(cryptoData) {
   if (!cryptoData) return;
   pulseCryptoData = cryptoData;
 
-  const formatCryptoPrice = (price) => {
+  const formatCryptoPriceHtml = (price) => {
+    let numStr;
     if (price >= 1000) {
-      return Math.round(price).toLocaleString('uk-UA').replace(/\s/g, ' ') + '$';
+      numStr = Math.round(price).toLocaleString('uk-UA').replace(/\s/g, ' ');
     } else if (price >= 1) {
-      return price.toFixed(2) + '$';
+      numStr = price.toFixed(2);
     } else {
-      return price.toFixed(3) + '$';
+      numStr = price.toFixed(3);
     }
+    return `${numStr}<span class="pulse-rate-curr">$</span>`;
   };
 
   const updateCryptoItem = (code, info) => {
     if (!info) return;
     const elVal = document.getElementById(`pulseRate${code}`);
     const elDiff = document.getElementById(`pulseDiff${code}`);
-    if (elVal) elVal.textContent = formatCryptoPrice(info.price);
+    if (elVal) elVal.innerHTML = formatCryptoPriceHtml(info.price);
     if (elDiff && info.diff) {
       const isUp = info.diff.startsWith('+') || info.diff.startsWith('▲');
       elDiff.className = `pulse-rate-diff ${isUp ? 'up' : 'down'}`;
@@ -14767,22 +15014,29 @@ function applyRatesToUI(rates) {
     const elVal = document.getElementById(`pulseRate${code}`);
     const elDiff = document.getElementById(`pulseDiff${code}`);
     if (elVal) elVal.innerHTML = formatDecimalsHtml(val, 2, false);
-    if (elDiff && diff) {
-      const isUp = diff.startsWith('+') || diff.startsWith('▲');
-      elDiff.className = `pulse-rate-diff ${isUp ? 'up' : 'down'}`;
-      elDiff.textContent = isUp ? '▲' : '▼';
-      elDiff.title = diff;
+    if (elDiff && diff !== undefined && diff !== null) {
+      const diffStr = String(diff).trim();
+      if (diffStr === '0.00' || diffStr === '0' || diffStr === '—') {
+        elDiff.className = 'pulse-rate-diff flat';
+        elDiff.textContent = '•';
+        elDiff.title = 'Без змін за добу (0.00)';
+      } else {
+        const isUp = diffStr.startsWith('+') || diffStr.startsWith('▲');
+        elDiff.className = `pulse-rate-diff ${isUp ? 'up' : 'down'}`;
+        elDiff.textContent = isUp ? '▲' : '▼';
+        elDiff.title = `Зміна до попереднього дня НБУ: ${diffStr} грн`;
+      }
     }
   };
 
-  updateItem('Usd', rates.USD || 41.50, rates.diffUSD || '+0.04');
-  updateItem('Eur', rates.EUR || 45.15, rates.diffEUR || '+0.06');
-  updateItem('Pln', rates.PLN || 10.55, rates.diffPLN || '-0.02');
-  updateItem('Gbp', rates.GBP || 53.90, rates.diffGBP || '+0.12');
-  updateItem('Czk', rates.CZK || 1.78, rates.diffCZK || '+0.01');
-  updateItem('Chf', rates.CHF || 47.80, rates.diffCHF || '+0.05');
-  updateItem('Cad', rates.CAD || 30.20, rates.diffCAD || '-0.03');
-  updateItem('Cny', rates.CNY || 5.75, rates.diffCNY || '+0.01');
+  updateItem('Usd', rates.USD || 45.20, rates.diffUSD);
+  updateItem('Eur', rates.EUR || 49.57, rates.diffEUR);
+  updateItem('Pln', rates.PLN || 11.24, rates.diffPLN);
+  updateItem('Gbp', rates.GBP || 59.50, rates.diffGBP);
+  updateItem('Czk', rates.CZK || 2.03, rates.diffCZK);
+  updateItem('Chf', rates.CHF || 53.67, rates.diffCHF);
+  updateItem('Cad', rates.CAD || 31.58, rates.diffCAD);
+  updateItem('Cny', rates.CNY || 6.78, rates.diffCNY);
 
   // Оновлюємо новий конвертер валют при оновленні курсів
   if (typeof window.updatePulseConverterLive === 'function') {
