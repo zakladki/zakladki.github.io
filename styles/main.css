@@ -14574,6 +14574,7 @@ body.dark-mode .pulse-finance-footer {
   border-bottom-right-radius: 0;
   border-bottom: none;
   overflow: visible;
+  margin-top: 1px;
   margin-bottom: 0;
 }
 body.dark-mode .pulse-w2-top-panel {
@@ -14591,7 +14592,7 @@ body.dark-mode .pulse-w2-top-panel.is-extended-day {
 .pulse-w2-tabs-stage {
   position: relative;
   width: 100%;
-  overflow: hidden;
+  overflow: visible;
   border-top-left-radius: 8px;
   border-top-right-radius: 8px;
 }
@@ -14616,6 +14617,8 @@ body.dark-mode .pulse-w2-top-panel.is-extended-day {
   inset: 0;
   width: 100%;
   height: 100%;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
@@ -14873,6 +14876,7 @@ body.dark-mode .pulse-w2-meteo-peak-ring.is-min {
   height: 100%;
 }
 .pulse-w2-meteo-col {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -14887,8 +14891,12 @@ body.dark-mode .pulse-w2-meteo-peak-ring.is-min {
   min-width: 0;
   transition: background 0.14s ease;
 }
+.pulse-w2-meteo-col:first-child {
+  border-top-left-radius: 8px;
+}
 .pulse-w2-meteo-col:last-child {
   border-right: none;
+  border-top-right-radius: 8px;
 }
 body.dark-mode .pulse-w2-meteo-col {
   border-right-color: rgba(148, 163, 184, 0.14);
@@ -14901,11 +14909,34 @@ body.dark-mode .pulse-w2-meteo-col:hover {
 }
 .pulse-w2-meteo-col.is-active {
   background: rgba(14, 165, 233, 0.08);
-  box-shadow: inset 0 2px 0 #0284c7;
+}
+.pulse-w2-meteo-col.is-active::before {
+  content: '';
+  position: absolute;
+  top: -2.5px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  border-radius: 2px 2px 0 0;
+  background: #0284c7;
+  pointer-events: none;
+  z-index: 4;
+}
+.pulse-w2-meteo-col:first-child.is-active::before {
+  left: 3px;
+  border-top-left-radius: 6px;
+  border-bottom-left-radius: 0;
+}
+.pulse-w2-meteo-col:last-child.is-active::before {
+  right: 3px;
+  border-top-right-radius: 6px;
+  border-bottom-right-radius: 0;
 }
 body.dark-mode .pulse-w2-meteo-col.is-active {
   background: rgba(56, 189, 248, 0.12);
-  box-shadow: inset 0 2px 0 #38bdf8;
+}
+body.dark-mode .pulse-w2-meteo-col.is-active::before {
+  background: #38bdf8;
 }
 .pulse-w2-meteo-day {
   font-size: 0.56rem;
@@ -15136,7 +15167,8 @@ body.dark-mode .pulse-w2-meteo-kp-sig.is-red {
 .pulse-w2-tabs-viewport {
   flex: 1;
   min-width: 0;
-  overflow: hidden;
+  overflow-x: clip;
+  overflow-y: visible;
   position: relative;
   touch-action: pan-y;
   user-select: none;
@@ -15275,8 +15307,20 @@ body.dark-mode .pulse-w2-tab:has(.pulse-w2-flask-wrap:hover) {
   border-right: 1px solid rgba(14, 165, 233, 0.5) !important;
   border-radius: 0 !important;
   color: var(--text-main, #0f172a);
-  box-shadow: inset 0 2.5px 0 #0284c7 !important;
+  box-shadow: none !important;
   z-index: 2;
+}
+.pulse-w2-tab.active::before {
+  content: '';
+  position: absolute;
+  top: -2.5px;
+  left: -1px;
+  right: -1px;
+  height: 2px;
+  border-radius: 2px 2px 0 0;
+  background: #0284c7;
+  pointer-events: none;
+  z-index: 4;
 }
 .pulse-w2-tab:first-child.active,
 .pulse-w2-tab:last-child.active {
@@ -15294,7 +15338,10 @@ body.dark-mode .pulse-w2-tab.active {
   border-left-color: rgba(56, 189, 248, 0.55) !important;
   border-right-color: rgba(56, 189, 248, 0.55) !important;
   color: #f8fafc;
-  box-shadow: inset 0 2.5px 0 #38bdf8 !important;
+  box-shadow: none !important;
+}
+body.dark-mode .pulse-w2-tab.active::before {
+  background: #38bdf8;
 }
 
 /* 1. Верхня шапочка вкладки (назви «Сьогодні / Завтра / Післязавтра» та дата) — строго центровані по всій ширині вкладки */
