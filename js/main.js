@@ -2481,7 +2481,7 @@ function openAboutSiteModal() {
 
           <div class="about-site-actions-bar">
             <a href="./puls" class="btn btn-info btn-sm font-weight-bold text-white">
-              <i class="fas fa-heartbeat mr-1"></i> Пульс дня
+              <i class="fas fa-heartbeat mr-1"></i> Пульс Дня
             </a>
             <button type="button" class="btn btn-primary btn-sm font-weight-bold" onclick="closeAboutSiteModal(); openUserCabinetModal();">
               <i class="fas fa-user-circle mr-1"></i> Особистий Кабінет
@@ -9463,7 +9463,7 @@ function exitPulseStandalonePage() {
 }
 
 function initPulseDayDrawer() {
-  // 1. Перевіряємо та гарантуємо наявність кнопки «Пульс дня» у верхньому меню зліва (після «Ніч/День»)
+  // 1. Перевіряємо та гарантуємо наявність кнопки «Пульс Дня» у верхньому меню зліва (після «Ніч/День»)
   let pulseBtn = document.getElementById('pulseDayBtn');
   const navbar = document.querySelector('nav.navbar');
   const themeToggle = document.getElementById('themeToggle');
@@ -9477,8 +9477,8 @@ function initPulseDayDrawer() {
         pulseBtn.setAttribute('href', './puls');
       }
       pulseBtn.className = standaloneMount ? 'pulse-day-btn active' : 'pulse-day-btn';
-      pulseBtn.setAttribute('aria-label', 'Пульс дня');
-      pulseBtn.setAttribute('title', standaloneMount ? 'Натисніть, щоб вийти з повноекранного режиму «Пульс дня»' : 'Пульс дня: свята, погода, пальне, курс валют');
+      pulseBtn.setAttribute('aria-label', 'Пульс Дня');
+      pulseBtn.setAttribute('title', standaloneMount ? 'Натисніть, щоб вийти з повноекранного режиму «Пульс Дня»' : 'Пульс Дня: свята, погода, пальне, курс валют');
       pulseBtn.innerHTML = `
         <span class="pulse-day-btn-icon">
           <svg class="pulse-ecg-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
@@ -9499,7 +9499,7 @@ function initPulseDayDrawer() {
   } else {
     pulseBtn.className = standaloneMount ? 'pulse-day-btn active' : 'pulse-day-btn';
     if (standaloneMount) {
-      pulseBtn.setAttribute('title', 'Натисніть, щоб вийти з повноекранного режиму «Пульс дня»');
+      pulseBtn.setAttribute('title', 'Натисніть, щоб вийти з повноекранного режиму «Пульс Дня»');
     }
     if (!pulseBtn.querySelector('.pulse-day-badge-wrap')) {
       pulseBtn.innerHTML = `
@@ -9531,7 +9531,7 @@ function initPulseDayDrawer() {
     try {
       renderPulseDrawerLayout(standaloneMount, { standalone: true });
     } catch (err) {
-      console.error("Помилка генерації сторінки Пульсу дня:", err);
+      console.error("Помилка генерації сторінки Пульсу Дня:", err);
     }
 
     if (pulseBtn) {
@@ -9560,12 +9560,12 @@ function initPulseDayDrawer() {
     try {
       loadPulseWeatherData(false);
     } catch (e) {
-      console.warn("Помилка завантаження погоди Пульсу дня:", e);
+      console.warn("Помилка завантаження погоди Пульсу Дня:", e);
     }
     try {
       loadPulseDrawerData(false);
     } catch (e) {
-      console.warn("Помилка завантаження даних Пульсу дня:", e);
+      console.warn("Помилка завантаження даних Пульсу Дня:", e);
     }
     return;
   }
@@ -9591,7 +9591,7 @@ function initPulseDayDrawer() {
   try {
     renderPulseDrawerLayout(drawer, { standalone: false });
   } catch (err) {
-    console.error("Помилка генерації розмітки Пульсу дня:", err);
+    console.error("Помилка генерації розмітки Пульсу Дня:", err);
   }
 
   // 4. Події відкриття/закриття
@@ -9606,7 +9606,7 @@ function initPulseDayDrawer() {
     };
   }
 
-  // Делегований слухач для гарантованого спрацьовування кліку на кнопку «Пульс дня»
+  // Делегований слухач для гарантованого спрацьовування кліку на кнопку «Пульс Дня»
   if (typeof document !== 'undefined' && !window._pulseDayDelegatedClickAttached) {
     window._pulseDayDelegatedClickAttached = true;
     document.addEventListener('click', (e) => {
@@ -9665,14 +9665,14 @@ function openPulseDrawer() {
   if (btn) btn.classList.add('active');
   document.body.classList.add('pulse-drawer-open');
 
-  // Знімаємо активне виділення з поточної вкладки сторінки (наприклад, «Головна») доки відкритий «Пульс дня»
+  // Знімаємо активне виділення з поточної вкладки сторінки (наприклад, «Головна») доки відкритий «Пульс Дня»
   const activeNavLinks = document.querySelectorAll('.navbar-nav a.nav-link.active, .navbar-nav a.active');
   activeNavLinks.forEach(link => {
     link.classList.add('pulse-paused-active');
     link.classList.remove('active');
   });
 
-  // Автоматично згортаємо мобільне меню при відкритті «Пульсу дня»
+  // Автоматично згортаємо мобільне меню при відкритті «Пульсу Дня»
   try {
     const navbarCollapse = document.getElementById('navbarCollapse');
     if (navbarCollapse) {
@@ -9693,14 +9693,14 @@ function openPulseDrawer() {
   try {
     loadPulseWeatherData(false);
   } catch (e) {
-    console.warn("Помилка завантаження погоди Пульсу дня:", e);
+    console.warn("Помилка завантаження погоди Пульсу Дня:", e);
   }
 
   // При відкритті перевіряємо чи треба підвантажити дані
   try {
     loadPulseDrawerData(false);
   } catch (e) {
-    console.warn("Помилка завантаження даних Пульсу дня:", e);
+    console.warn("Помилка завантаження даних Пульсу Дня:", e);
   }
 }
 
@@ -10719,17 +10719,53 @@ function buildPulseWeatherMeteogramHtml(dailyItems, weekMinTemp, weekMaxTemp, ac
   const minLinePath = `M${minPts[0].x.toFixed(1)},${minPts[0].y.toFixed(1)} ${buildPulseWeatherSmoothSvgPath(minPts, false)}`;
   const bandAreaPath = `${maxLinePath} L${minPts[minPts.length - 1].x.toFixed(1)},${minPts[minPts.length - 1].y.toFixed(1)} ${buildPulseWeatherSmoothSvgPath(minPts, true)} Z`;
 
+  const getPulseMeteoMaxColor = (tempC) => {
+    const t = Number(tempC);
+    if (!isFinite(t)) return '#f59e0b';
+    const stops = [
+      { t: -2, r: 6,   g: 182, b: 212 }, // <= -2°C: крижаний бірюзово-блакитний
+      { t: 0,  r: 56,  g: 189, b: 248 }, // 0°C: морозний блакитний
+      { t: 2,  r: 148, g: 163, b: 184 }, // +2°C: прохолодний нейтральний перехід
+      { t: 5,  r: 245, g: 158, b: 11  }, // +5°C: м'який бурштин
+      { t: 12, r: 249, g: 115, b: 22  }, // +12°C: теплий помаранч
+      { t: 20, r: 239, g: 68,  b: 68  }, // +20°C: теплий коралово-червоний
+      { t: 28, r: 220, g: 38,  b: 38  }  // >= +28°C: насичений червоний (спека)
+    ];
+    if (t <= stops[0].t) return `rgb(${stops[0].r}, ${stops[0].g}, ${stops[0].b})`;
+    const last = stops[stops.length - 1];
+    if (t >= last.t) return `rgb(${last.r}, ${last.g}, ${last.b})`;
+    for (let s = 0; s < stops.length - 1; s++) {
+      const a = stops[s];
+      const b = stops[s + 1];
+      if (t >= a.t && t <= b.t) {
+        const k = (t - a.t) / (b.t - a.t);
+        const r = Math.round(a.r + (b.r - a.r) * k);
+        const g = Math.round(a.g + (b.g - a.g) * k);
+        const bl = Math.round(a.b + (b.b - a.b) * k);
+        return `rgb(${r}, ${g}, ${bl})`;
+      }
+    }
+    return '#f59e0b';
+  };
+
+  const maxColColors = items.map(d => getPulseMeteoMaxColor(d.tMax));
+  const maxPeakColor = maxColColors[maxIdx] || '#ea580c';
+  const maxLineStopsHtml = maxColColors.map((col, i) => {
+    const pct = n > 1 ? ((i / (n - 1)) * 100).toFixed(1) : '0';
+    return `<stop offset="${pct}%" stop-color="${col}" />`;
+  }).join('');
+
   const zeroLineHtml = (minT < 0 && maxT > 0)
     ? `<line x1="4" y1="${mapY(0).toFixed(1)}" x2="${svgW - 4}" y2="${mapY(0).toFixed(1)}" class="pulse-w2-meteo-zero" />`
     : '';
 
   const peakRingsHtml = `
-    <circle cx="${maxPts[maxIdx].x.toFixed(1)}" cy="${maxPts[maxIdx].y.toFixed(1)}" r="3.8" class="pulse-w2-meteo-peak-ring is-max" />
+    <circle cx="${maxPts[maxIdx].x.toFixed(1)}" cy="${maxPts[maxIdx].y.toFixed(1)}" r="3.8" class="pulse-w2-meteo-peak-ring is-max" style="stroke: ${maxPeakColor}; stroke-opacity: 0.55;" />
     <circle cx="${minPts[minIdx].x.toFixed(1)}" cy="${minPts[minIdx].y.toFixed(1)}" r="3.8" class="pulse-w2-meteo-peak-ring is-min" />
   `;
 
   const dotsMaxHtml = maxPts.map((p, i) => (
-    `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${(i === maxIdx || i === activeTab) ? '2.2' : '1.45'}" class="pulse-w2-meteo-dot-max${i === activeTab ? ' is-active' : ''}${i === maxIdx ? ' is-peak' : ''}" />`
+    `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${(i === maxIdx || i === activeTab) ? '2.2' : '1.45'}" class="pulse-w2-meteo-dot-max${i === activeTab ? ' is-active' : ''}${i === maxIdx ? ' is-peak' : ''}" style="fill: ${maxColColors[i]};" />`
   )).join('');
   const dotsMinHtml = minPts.map((p, i) => (
     `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${(i === minIdx || i === activeTab) ? '2.1' : '1.45'}" class="pulse-w2-meteo-dot-min${i === activeTab ? ' is-active' : ''}${i === minIdx ? ' is-peak' : ''}" />`
@@ -10929,9 +10965,7 @@ function buildPulseWeatherMeteogramHtml(dailyItems, weekMinTemp, weekMaxTemp, ac
       : (d.kpColor || 'green');
     const magnetSvgHtml = `
       <svg width="14" height="10" viewBox="0 0 14 10" aria-hidden="true">
-        <path class="pulse-w2-meteo-magnet-body" d="M 9.6 2.4 H 4.2 A 2.6 2.6 0 0 0 4.2 7.6 H 9.6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="butt" />
-        <rect class="pulse-w2-meteo-magnet-tip" x="10.2" y="1.2" width="2.6" height="2.4" rx="0.55" />
-        <rect class="pulse-w2-meteo-magnet-tip" x="10.2" y="6.4" width="2.6" height="2.4" rx="0.55" />
+        <path class="pulse-w2-meteo-magnet-body" d="M 11.8 2.4 H 4.2 A 2.6 2.6 0 0 0 4.2 7.6 H 11.8" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="butt" />
       </svg>
     `;
     const pressHint = `, тиск ${d.avgPress} мм`;
@@ -10969,19 +11003,25 @@ function buildPulseWeatherMeteogramHtml(dailyItems, weekMinTemp, weekMaxTemp, ac
     `;
   }).join('');
 
+  const gradX1 = maxPts[0].x.toFixed(1);
+  const gradX2 = (n > 1 ? maxPts[n - 1].x : svgW).toFixed(1);
+
   return `
     <div class="pulse-w2-meteo-svg-wrap" aria-hidden="true">
       <svg class="pulse-w2-meteo-svg" viewBox="0 0 ${svgW} ${svgH}" preserveAspectRatio="none">
         <defs>
           <linearGradient id="pulseMeteoBandGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.18" />
+            <stop offset="0%" stop-color="${maxPeakColor}" stop-opacity="0.18" />
             <stop offset="100%" stop-color="#0ea5e9" stop-opacity="0.10" />
+          </linearGradient>
+          <linearGradient id="pulseMeteoMaxLineGrad" gradientUnits="userSpaceOnUse" x1="${gradX1}" y1="0" x2="${gradX2}" y2="0">
+            ${maxLineStopsHtml}
           </linearGradient>
         </defs>
         ${zeroLineHtml}
         <path d="${bandAreaPath}" fill="url(#pulseMeteoBandGrad)" />
         <path d="${minLinePath}" class="pulse-w2-meteo-line-min" fill="none" />
-        <path d="${maxLinePath}" class="pulse-w2-meteo-line-max" fill="none" />
+        <path d="${maxLinePath}" class="pulse-w2-meteo-line-max" style="stroke: url(#pulseMeteoMaxLineGrad);" fill="none" />
         ${peakRingsHtml}
         ${dotsMinHtml}
         ${dotsMaxHtml}
@@ -13362,7 +13402,7 @@ function renderPulseDrawerLayout(container, options = {}) {
       <div class="pulse-drawer-title-group">
         <h4 class="pulse-drawer-title">
           <svg class="pulse-ecg-icon text-info" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2 12 6 12 9 4 14 20 17 12 22 12"></polyline></svg>
-          Пульс дня
+          Пульс Дня
         </h4>
         <span class="pulse-drawer-date-bullet">•</span>
         <span class="pulse-drawer-date" id="pulseDrawerHeaderDate">${getPulseDateBadge()}</span>
@@ -13374,7 +13414,7 @@ function renderPulseDrawerLayout(container, options = {}) {
             <i class="fas fa-sync-alt" id="pulseRefreshSpin"></i> <span>Оновити</span>
           </button>
           ${!isStandalone ? `
-            <a href="./puls" class="pulse-ctrl-btn pulse-fullscreen-btn" id="btnPulseFullscreen" title="Відкрити «Пульс дня» на окремій сторінці на весь екран (можна зробити стартовою сторінкою браузера)" aria-label="На весь екран">
+            <a href="./puls" class="pulse-ctrl-btn pulse-fullscreen-btn" id="btnPulseFullscreen" title="Відкрити «Пульс Дня» на окремій сторінці на весь екран (можна зробити стартовою сторінкою браузера)" aria-label="На весь екран">
               <i class="fas fa-expand-arrows-alt"></i> <span>На весь екран</span>
             </a>
             <button type="button" class="pulse-ctrl-btn pulse-close-btn" id="btnPulseClose" title="Згорнути панель">
@@ -14778,7 +14818,7 @@ async function loadPulseDrawerData(forceRefresh = false) {
       showQuickToast('Дані успішно оновлено!', 'success');
     }
   } catch (err) {
-    console.warn('Помилка завантаження Пульсу дня:', err);
+    console.warn('Помилка завантаження Пульсу Дня:', err);
   } finally {
     if (spin) spin.classList.remove('fa-spin');
   }
@@ -15403,12 +15443,12 @@ function renderGeomagForecastUI(daysForecast) {
 }
 window.renderGeomagForecastUI = renderGeomagForecastUI;
 
-// Запуск ініціалізації Пульсу дня після повного завантаження всіх констант та функцій
+// Запуск ініціалізації Пульсу Дня після повного завантаження всіх констант та функцій
 function startupPulseModule() {
   try {
     initPulseDayDrawer();
   } catch (e) {
-    console.warn("Помилка ініціалізації Пульсу дня:", e);
+    console.warn("Помилка ініціалізації Пульсу Дня:", e);
   }
 }
 
