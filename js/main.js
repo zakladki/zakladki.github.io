@@ -1267,8 +1267,8 @@ document.addEventListener("DOMContentLoaded", () => {
                           document.body.classList.contains('page-bookmarks');
   if (!isHomepage && !isBookmarksPage && screenWidth >= 1280) {
     const footer = document.querySelector('footer.footer');
-    const pulseSeoGuide = isPulsePage ? document.querySelector('.pulse-seo-guide') : null;
-    if (footer || pulseSeoGuide) {
+    const seoGuide = document.querySelector('.seo-category-guide');
+    if (footer || seoGuide) {
       const multiplexContainer = document.createElement('div');
       multiplexContainer.className = 'container bottom-multiplex-container';
       multiplexContainer.innerHTML = `
@@ -1277,8 +1277,8 @@ document.addEventListener("DOMContentLoaded", () => {
              data-ad-client="ca-pub-3065705668384801"
              data-ad-slot="1571652834"></ins>
       `;
-      if (pulseSeoGuide && pulseSeoGuide.parentNode) {
-        pulseSeoGuide.parentNode.insertBefore(multiplexContainer, pulseSeoGuide);
+      if (seoGuide && seoGuide.parentNode) {
+        seoGuide.parentNode.insertBefore(multiplexContainer, seoGuide);
       } else if (footer && footer.parentNode) {
         footer.parentNode.insertBefore(multiplexContainer, footer);
       }
@@ -1379,9 +1379,46 @@ document.addEventListener("DOMContentLoaded", () => {
   // === Розумний Дзвіночок сповіщень у шапці сайту ===
   initNoticeBell();
 
-  // === Автоматизована система замовлення та розміщення реклами/ресурсів ===
+  // === Автоматизація замовлення та розміщення реклами/ресурсів ===
   initAdOrderSystem();
+
+  // === Плавне підкручування до вмісту при розгортанні нижнього SEO-спойлера ===
+  initSeoSpoilerAutoScroll();
 });
+
+function initSeoSpoilerAutoScroll() {
+  const spoilers = document.querySelectorAll('details.seo-category-guide.seo-guide-spoiler');
+  if (!spoilers.length) return;
+
+  const prefersReducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  spoilers.forEach((details) => {
+    details.addEventListener('toggle', () => {
+      if (!details.open) return;
+
+      window.requestAnimationFrame(() => {
+        const rect = details.getBoundingClientRect();
+        const bottomPadding = 16;
+        const topNavbarOffset = 64;
+        const overflowBottom = rect.bottom - (window.innerHeight - bottomPadding);
+
+        if (overflowBottom <= 4) return;
+
+        // Якщо блок повністю влазить в екран - підкручуємо рівно настільки, щоб показати його повністю;
+        // якщо екран замалий - зупиняємо заголовок спойлера одразу під верхньою навігацією.
+        const maxTopScroll = Math.max(0, rect.top - topNavbarOffset);
+        const scrollDelta = Math.min(overflowBottom, maxTopScroll);
+
+        if (scrollDelta > 4) {
+          window.scrollBy({
+            top: scrollDelta,
+            behavior: prefersReducedMotion ? 'auto' : 'smooth'
+          });
+        }
+      });
+    });
+  });
+}
 
 // ==========================================================================
 // КОНФІГУРАЦІЯ ОГОЛОШЕНЬ ТА СПОВІЩЕНЬ САЙТУ
@@ -2487,7 +2524,7 @@ function openAboutSiteModal() {
               <i class="fas fa-user-circle mr-1"></i> Особистий Кабінет
             </button>
             <a href="./bookmarks.html" class="btn btn-outline-danger btn-sm font-weight-bold">
-              <i class="fas fa-heart mr-1"></i> Відкрити «Мої Закладки»
+              <i class="fas fa-heart mr-1"></i> Мої Закладки
             </a>
             <button type="button" class="btn btn-outline-secondary btn-sm" onclick="closeAboutSiteModal(); openBadgesModal();">
               <i class="fas fa-tags mr-1"></i> Умовні позначки
@@ -4319,11 +4356,15 @@ function submitAdOrder() {
 
   // Збереження на сервері та локально
   try {
-    fetch('/api/orders', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(orderPayload)
-    }).catch(err => console.log('Ad order local buffer:', err));
+    if (isNodeApiAvailable()) {
+      fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(orderPayload)
+      }).then(r => {
+        if (r && r.status === 404) window._staticHostingNoApi = true;
+      }).catch(() => {});
+    }
     localStorage.setItem('topz_last_ad_order', JSON.stringify(orderPayload));
   } catch (e) {}
 
@@ -5091,7 +5132,7 @@ function updateUserNavButton() {
 async function loginWithGoogle() {
   await ensureFirebaseLoaded();
   if (!firebaseAuth) {
-    alert("Сервіс Google Auth завантажується, спробуйте ще раз через секунду.");
+    showQuickToast("Сервіс Google Auth завантажується, спробуйте ще раз через секунду.", "info");
     return;
   }
   const provider = new firebase.auth.GoogleAuthProvider();
@@ -5107,7 +5148,7 @@ async function loginWithGoogle() {
     if (err.code === 'auth/popup-blocked') {
       firebaseAuth.signInWithRedirect(provider);
     } else if (err.code !== 'auth/popup-closed-by-user') {
-      alert("Не вдалося увійти через Google: " + (err.message || err.code));
+      showQuickToast("Не вдалося увійти через Google: " + (err.message || err.code), "error");
     }
   }
 }
@@ -5174,11 +5215,15 @@ async function saveOrderToFirestore(orderData) {
 async function sendOrderNotifications(orderData) {
   // 1. Збереження замовлення на локальному сервері Node.js /api/orders (orders.json)
   try {
-    fetch('/api/orders', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(orderData)
-    }).catch(() => {});
+    if (isNodeApiAvailable()) {
+      fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(orderData)
+      }).then(r => {
+        if (r && r.status === 404) window._staticHostingNoApi = true;
+      }).catch(() => {});
+    }
   } catch (e) {}
 
   // 2. Миттєве сповіщення на Email адміністратора weber515sis@gmail.com через FormSubmit AJAX
@@ -6210,7 +6255,7 @@ async function addUserBookmark() {
   const name = nameEl.value.trim();
   let url = urlEl.value.trim();
   if (!name || !url) {
-    alert("Будь ласка, введіть назву та посилання сайту.");
+    showQuickToast("Будь ласка, введіть назву та посилання сайту.", "warning");
     return;
   }
   if (!url.startsWith('http://') && !url.startsWith('https://')) {
@@ -6226,14 +6271,21 @@ async function addUserBookmark() {
     renderBookmarksPage();
     syncAllCatalogHeartButtons();
   } catch (err) {
-    alert("Не вдалося зберегти закладку: " + err.message);
+    showQuickToast("Не вдалося зберегти закладку: " + err.message, "error");
   }
 }
 
 async function deleteUserBookmark(index) {
   const bm = userBookmarksList[index];
   if (!bm) return;
-  if (!confirm(`Видалити «${bm.name}» із ваших закладок?`)) return;
+  const confirmed = await showConfirmModal({
+    title: '🗑️ Видалити закладку?',
+    messageHtml: `Видалити <strong>«${escapeHtml(bm.name)}»</strong> із ваших закладок?`,
+    confirmText: 'Видалити',
+    cancelText: 'Скасувати',
+    confirmClass: 'btn-danger'
+  });
+  if (!confirmed) return;
   if (!checkAndIncrementDailyActionLimit()) return;
 
   const targetUrl = normalizeUrl(bm.url);
@@ -6533,7 +6585,15 @@ function showQuickToast(msg, type = 'info') {
   }, duration);
 }
 
+let _pendingConfirmResolver = null;
+
 function showCustomModal({ title, bodyHtml, footerHtml }) {
+  if (_pendingConfirmResolver) {
+    const prevResolve = _pendingConfirmResolver;
+    _pendingConfirmResolver = null;
+    prevResolve(false);
+  }
+
   let modalWrap = document.getElementById('universalActionModal');
   if (!modalWrap) {
     modalWrap = document.createElement('div');
@@ -6588,6 +6648,11 @@ function showCustomModal({ title, bodyHtml, footerHtml }) {
 window.showCustomModal = showCustomModal;
 
 function closeCustomModal() {
+  if (_pendingConfirmResolver) {
+    const resolve = _pendingConfirmResolver;
+    _pendingConfirmResolver = null;
+    resolve(false);
+  }
   const modalWrap = document.getElementById('universalActionModal');
   if (modalWrap) {
     modalWrap.classList.remove('show');
@@ -6599,6 +6664,44 @@ function closeCustomModal() {
   }
 }
 window.closeCustomModal = closeCustomModal;
+
+function showConfirmModal({
+  title = 'Підтвердження дії',
+  messageHtml = '',
+  confirmText = 'Підтвердити',
+  cancelText = 'Скасувати',
+  confirmClass = 'btn-danger'
+} = {}) {
+  return new Promise((resolve) => {
+    showCustomModal({
+      title,
+      bodyHtml: `<div class="universal-confirm-message">${messageHtml}</div>`,
+      footerHtml: `
+        <button type="button" class="btn btn-secondary btn-sm" id="universalConfirmCancelBtn">${cancelText}</button>
+        <button type="button" class="btn ${confirmClass} btn-sm font-weight-bold" id="universalConfirmOkBtn">${confirmText}</button>
+      `
+    });
+    _pendingConfirmResolver = resolve;
+
+    const cancelBtn = document.getElementById('universalConfirmCancelBtn');
+    const okBtn = document.getElementById('universalConfirmOkBtn');
+
+    if (cancelBtn) {
+      cancelBtn.onclick = () => closeCustomModal();
+    }
+
+    if (okBtn) {
+      okBtn.onclick = () => {
+        const res = _pendingConfirmResolver;
+        _pendingConfirmResolver = null;
+        closeCustomModal();
+        if (res) res(true);
+      };
+      setTimeout(() => okBtn.focus(), 20);
+    }
+  });
+}
+window.showConfirmModal = showConfirmModal;
 
 if (typeof window !== 'undefined' && !window._universalModalEscAttached) {
   window._universalModalEscAttached = true;
@@ -6682,7 +6785,11 @@ function checkAndIncrementDailyActionLimit() {
   } catch (e) {}
 
   if (data.count >= DAILY_ACTION_LIMIT) {
-    alert(`Ви досягли денного ліміту операцій (${DAILY_ACTION_LIMIT} дій на добу).\n\nЦе обмеження створено для захисту сервера та бази даних від навантаження. Відпочиньте до завтра!`);
+    showCustomModal({
+      title: '⏳ Денний ліміт операцій',
+      bodyHtml: `<div class="universal-confirm-message"><p class="mb-2">Ви досягли денного ліміту операцій (<strong>${DAILY_ACTION_LIMIT}</strong> дій на добу).</p><p class="mb-0 text-muted small">Це обмеження створено для захисту сервера та бази даних від навантаження. Спробуйте знову завтра.</p></div>`,
+      footerHtml: `<button type="button" class="btn btn-primary btn-sm font-weight-bold" onclick="closeCustomModal()">Зрозуміло</button>`
+    });
     return false;
   }
 
@@ -7077,7 +7184,14 @@ async function handleQuickBookmarkClick(link, description, heartBtn) {
   if (existingIdx !== -1) {
     const bm = userBookmarksList[existingIdx];
     const card = bm.card || userBookmarkCards[0] || DEFAULT_CARD_NAME;
-    if (confirm(`Сайт «${bm.name}» уже є у ваших закладках (Картка: «${card}»).\n\nВидалити його з «❤️ Закладок»?`)) {
+    const confirmed = await showConfirmModal({
+      title: '❤️ Вже є у закладках',
+      messageHtml: `Сайт <strong>«${escapeHtml(bm.name)}»</strong> уже є у ваших закладках (Картка: <strong>«${escapeHtml(card)}»</strong>).<br><br>Видалити його з «❤️ Закладок»?`,
+      confirmText: 'Видалити',
+      cancelText: 'Залишити',
+      confirmClass: 'btn-danger'
+    });
+    if (confirmed) {
       if (!checkAndIncrementDailyActionLimit()) return;
       recordDeletedBookmarkUrl(cleanUrl);
       userBookmarksList = userBookmarksList.filter(b => normalizeUrl(b.url) !== normalizeUrl(cleanUrl));
@@ -7607,7 +7721,7 @@ window.openAddBookmarkModal = openAddBookmarkModal;
 
 function promptRenameCard(oldName) {
   if (isDefaultCard(oldName)) {
-    alert('Картка «Основні закладки» є системною за замовчуванням. Її не можна перейменувати.');
+    showQuickToast('Картка «Основні закладки» є системною за замовчуванням. Її не можна перейменувати.', 'warning');
     return;
   }
 
@@ -7676,17 +7790,29 @@ function promptRenameCard(oldName) {
 }
 window.promptRenameCard = promptRenameCard;
 
-function promptDeleteCard(cardName) {
+async function promptDeleteCard(cardName) {
   if (isDefaultCard(cardName)) {
-    alert('Картка «Основні закладки» є системною за замовчуванням. Її не можна видалити.');
+    showQuickToast('Картка «Основні закладки» є системною за замовчуванням. Її не можна видалити.', 'warning');
     return;
   }
 
-  const cardItemsCount = userBookmarksList.filter(bm => (bm.card || userBookmarkCards[0]) === cardName).length;
-  if (!confirm(`Ви дійсно бажаєте видалити картку «${cardName}» та всі її збережені сайти (${cardItemsCount})?`)) {
-    return;
-  }
+  const cardItems = userBookmarksList.filter(bm => (bm.card || userBookmarkCards[0]) === cardName);
+  const cardItemsCount = cardItems.length;
+  const confirmed = await showConfirmModal({
+    title: '🗑️ Видалити картку?',
+    messageHtml: cardItemsCount > 0
+      ? `Ви дійсно бажаєте видалити картку <strong>«${escapeHtml(cardName)}»</strong> та всі її збережені сайти (<strong>${cardItemsCount}</strong>)?`
+      : `Ви дійсно бажаєте видалити картку <strong>«${escapeHtml(cardName)}»</strong>?`,
+    confirmText: 'Видалити',
+    cancelText: 'Скасувати',
+    confirmClass: 'btn-danger'
+  });
+  if (!confirmed) return;
   if (!checkAndIncrementDailyActionLimit()) return;
+
+  cardItems.forEach(bm => {
+    if (bm && bm.url) recordDeletedBookmarkUrl(normalizeUrl(bm.url));
+  });
   userBookmarkCards = userBookmarkCards.filter(c => c !== cardName);
   for (let i = 0; i < 4; i++) {
     if (Array.isArray(userBookmarkColumns[i])) {
@@ -7698,11 +7824,15 @@ function promptDeleteCard(cardName) {
     userBookmarkCards = [DEFAULT_CARD_NAME];
   }
   syncColumnsWithCards();
-  saveUserBookmarksData().then(() => {
-    renderBookmarksPage();
-    syncAllCatalogHeartButtons();
-    showQuickToast(`Картку «${cardName}» видалено`, 'info');
-  });
+  await saveUserBookmarksData();
+  renderBookmarksPage();
+  syncAllCatalogHeartButtons();
+  showQuickToast(
+    cardItemsCount > 0
+      ? `Картку «${cardName}» та ${cardItemsCount} закл. видалено`
+      : `Картку «${cardName}» видалено`,
+    'info'
+  );
 }
 window.promptDeleteCard = promptDeleteCard;
 
@@ -7951,7 +8081,14 @@ async function deleteUserBookmarkFromPage(bookmarkIndex, bookmarkUrl, bookmarkCa
          || userBookmarksList.find(b => normalizeUrl(b.url) === norm);
   }
   const name = bm ? bm.name : (bookmarkUrl || 'цей сайт');
-  if (!confirm(`Видалити «${name}» із ваших закладок?`)) return;
+  const confirmed = await showConfirmModal({
+    title: '🗑️ Видалити закладку?',
+    messageHtml: `Видалити <strong>«${escapeHtml(name)}»</strong> із ваших закладок?`,
+    confirmText: 'Видалити',
+    cancelText: 'Скасувати',
+    confirmClass: 'btn-danger'
+  });
+  if (!confirmed) return;
   if (!checkAndIncrementDailyActionLimit()) return;
 
   const targetUrl = bm ? normalizeUrl(bm.url) : (bookmarkUrl ? normalizeUrl(bookmarkUrl) : null);
@@ -8552,7 +8689,7 @@ window.changeOrderStatus = async function(orderId, newStatus) {
     });
     renderAdminOrdersTab();
   } catch (err) {
-    alert("Помилка оновлення статусу: " + err.message);
+    showQuickToast("Помилка оновлення статусу: " + err.message, "error");
   }
 };
 
@@ -9462,6 +9599,17 @@ function exitPulseStandalonePage() {
   window.location.href = './';
 }
 
+function isNodeApiAvailable() {
+  if (typeof window === 'undefined') return false;
+  if (window._staticHostingNoApi) return false;
+  const host = (window.location && window.location.hostname) ? window.location.hostname : '';
+  const proto = (window.location && window.location.protocol) ? window.location.protocol : '';
+  if (proto === 'file:' || /(^|\.)github\.io$/i.test(host)) {
+    return false;
+  }
+  return true;
+}
+
 function initPulseDayDrawer() {
   // 1. Перевіряємо та гарантуємо наявність кнопки «Пульс Дня» у верхньому меню зліва (після «Ніч/День»)
   let pulseBtn = document.getElementById('pulseDayBtn');
@@ -9484,10 +9632,15 @@ function initPulseDayDrawer() {
           <svg class="pulse-ecg-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
             <polyline points="2 12 6 12 9 4 14 20 17 12 22 12"></polyline>
           </svg>
+          <i class="fas fa-arrow-left pulse-exit-arrow-icon" aria-hidden="true"></i>
         </span>
         <span class="pulse-day-badge-wrap">
           <span class="pulse-day-badge-top">ПУЛЬС</span>
           <span class="pulse-day-badge-sub">ДНЯ</span>
+        </span>
+        <span class="pulse-exit-badge-wrap" aria-hidden="true">
+          <span class="pulse-exit-badge-top">ВИЙТИ</span>
+          <span class="pulse-exit-badge-sub">НАЗАД</span>
         </span>
       `;
       if (themeToggle && themeToggle.nextSibling) {
@@ -9501,16 +9654,21 @@ function initPulseDayDrawer() {
     if (standaloneMount) {
       pulseBtn.setAttribute('title', 'Натисніть, щоб вийти з повноекранного режиму «Пульс Дня»');
     }
-    if (!pulseBtn.querySelector('.pulse-day-badge-wrap')) {
+    if (!pulseBtn.querySelector('.pulse-day-badge-wrap') || !pulseBtn.querySelector('.pulse-exit-badge-wrap')) {
       pulseBtn.innerHTML = `
         <span class="pulse-day-btn-icon">
           <svg class="pulse-ecg-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
             <polyline points="2 12 6 12 9 4 14 20 17 12 22 12"></polyline>
           </svg>
+          <i class="fas fa-arrow-left pulse-exit-arrow-icon" aria-hidden="true"></i>
         </span>
         <span class="pulse-day-badge-wrap">
           <span class="pulse-day-badge-top">ПУЛЬС</span>
           <span class="pulse-day-badge-sub">ДНЯ</span>
+        </span>
+        <span class="pulse-exit-badge-wrap" aria-hidden="true">
+          <span class="pulse-exit-badge-top">ВИЙТИ</span>
+          <span class="pulse-exit-badge-sub">НАЗАД</span>
         </span>
       `;
     }
@@ -10526,28 +10684,32 @@ async function ensurePulseWeatherHistory(city) {
     let rateLimited = false;
 
     // 1. Спочатку пробуємо серверний кеш-проксі /api/weather-history (2 мс, без повторних запитів до API)
-    try {
-      const apiUrl = `/api/weather-history?lat=${encodeURIComponent(city.lat)}&lon=${encodeURIComponent(city.lon)}`;
-      const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
-      const timer = controller ? setTimeout(() => controller.abort(), 16000) : null;
-      const resp = await fetch(apiUrl, controller ? { signal: controller.signal } : {});
-      if (timer) clearTimeout(timer);
-      if (resp.ok) {
-        const json = await resp.json();
-        if (json && json.days) {
-          dataset = {
-            updatedAt: json.updatedAt || Date.now(),
-            startYear: json.startYear || 1940,
-            endYear: json.endYear || new Date().getFullYear(),
-            source: json.source || 'Open-Meteo ERA5',
-            days: json.days
-          };
+    if (isNodeApiAvailable()) {
+      try {
+        const apiUrl = `/api/weather-history?lat=${encodeURIComponent(city.lat)}&lon=${encodeURIComponent(city.lon)}`;
+        const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+        const timer = controller ? setTimeout(() => controller.abort(), 16000) : null;
+        const resp = await fetch(apiUrl, controller ? { signal: controller.signal } : {});
+        if (timer) clearTimeout(timer);
+        if (resp.ok) {
+          const json = await resp.json();
+          if (json && json.days) {
+            dataset = {
+              updatedAt: json.updatedAt || Date.now(),
+              startYear: json.startYear || 1940,
+              endYear: json.endYear || new Date().getFullYear(),
+              source: json.source || 'Open-Meteo ERA5',
+              days: json.days
+            };
+          }
+        } else if (resp.status === 404) {
+          window._staticHostingNoApi = true;
+        } else if (resp.status === 429) {
+          rateLimited = true;
         }
-      } else if (resp.status === 429) {
-        rateLimited = true;
+      } catch (e) {
+        // /api/weather-history недоступний на статичному хостингу - переходимо до прямого запиту
       }
-    } catch (e) {
-      // /api/weather-history недоступний на статичному хостингу — переходимо до прямого запиту
     }
 
     // 2. Прямий запит у браузері до Open-Meteo Archive API (якщо серверний роут недоступний)
@@ -13235,19 +13397,23 @@ async function loadPulseLiveNews(forceRefresh = false) {
   let fetchedItems = [];
 
   // 1. Пріоритет: прямий виклик нашого локального проксі-роута /api/news (справжні свіжі RSS без затримок шлюзу)
-  try {
-    const apiResp = await fetch(`/api/news${forceRefresh ? '?force=1' : ''}`, { cache: 'no-cache' });
-    if (apiResp.ok) {
-      const apiData = await apiResp.json();
-      if (apiData.status === 'ok' && Array.isArray(apiData.items) && apiData.items.length > 0) {
-        fetchedItems = apiData.items.map(it => ({
-          ...it,
-          cat: detectNewsCategory(it.title),
-          priority: detectNewsPriority(it.title)
-        }));
+  if (isNodeApiAvailable()) {
+    try {
+      const apiResp = await fetch(`/api/news${forceRefresh ? '?force=1' : ''}`, { cache: 'no-cache' });
+      if (apiResp.ok) {
+        const apiData = await apiResp.json();
+        if (apiData.status === 'ok' && Array.isArray(apiData.items) && apiData.items.length > 0) {
+          fetchedItems = apiData.items.map(it => ({
+            ...it,
+            cat: detectNewsCategory(it.title),
+            priority: detectNewsPriority(it.title)
+          }));
+        }
+      } else if (apiResp.status === 404) {
+        window._staticHostingNoApi = true;
       }
-    }
-  } catch (err) {}
+    } catch (err) {}
+  }
 
   // 2. Резервний шлях: якщо /api/news недоступний (наприклад, при суто статичному хостингу)
   if (fetchedItems.length === 0) {
@@ -13875,10 +14041,7 @@ function renderPulseDrawerLayout(container, options = {}) {
             </div>
             <button type="button" class="pulse-news-important-filter-btn" id="pulseNewsImportantBtn" title="Показати лише важливі новини (з червоною позначкою)" aria-label="Лише важливі новини">
               <span class="pulse-news-filter-red-dot"></span>
-              <span class="pulse-news-filter-text">
-                <span class="pulse-news-filter-lbl">Топ</span>
-                <span class="pulse-news-filter-count" id="pulseNewsImportantCount"></span>
-              </span>
+              <span class="pulse-news-filter-count" id="pulseNewsImportantCount"></span>
             </button>
           </div>
 
@@ -14826,9 +14989,14 @@ async function loadPulseDrawerData(forceRefresh = false) {
 
 async function fetchLiveFuelPrices() {
   const curReg = localStorage.getItem('user_fuel_region') || 'ua';
+  if (!isNodeApiAvailable()) {
+    renderPulseFuelTable(curReg);
+    return;
+  }
   try {
     const res = await fetch('/api/fuel-prices');
     if (!res.ok) {
+      if (res.status === 404) window._staticHostingNoApi = true;
       renderPulseFuelTable(curReg);
       return;
     }

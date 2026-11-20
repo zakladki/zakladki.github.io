@@ -87,7 +87,7 @@
     <link href="styles/all.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link href="styles/base64.css" rel="stylesheet">
-    <link href="styles/main.css" rel="stylesheet">
+    <link href="styles/main.css?v=20261120" rel="stylesheet">
     <link href="styles/hamburgers.min.css" rel="stylesheet">
     <link href="styles/animation.css" rel="stylesheet">
     <link href="styles/menu_button.css" rel="stylesheet">
@@ -107,7 +107,7 @@
           "keywords": "пульс дня, погода на 8 днів, магнітні бурі kp, курс валют нбу, конвертер валют, криптовалюти, ціни на пальне азс, радіація aqi, свята україни, новини україни, стартова сторінка",
           "inLanguage": "uk",
           "datePublished": "2026-11-16",
-          "dateModified": "2026-11-16",
+          "dateModified": "2026-11-20",
           "mainEntity": {
             "@id": "https://zakladki.github.io/puls#webapp"
           },
@@ -350,15 +350,20 @@
           </ul>
         </div>
         <button id="themeToggle" class="theme-toggle-btn" aria-label="Переключити тему" title="Переключити тему (світла/темна)"><i class="fas fa-moon"></i></button>
-        <button id="pulseDayBtn" class="pulse-day-btn active" aria-label="Пульс Дня" title="Натисніть, щоб вийти з повноекранного режиму «Пульс Дня»">
+        <button id="pulseDayBtn" class="pulse-day-btn active" aria-label="Вийти з «Пульсу Дня» на сайт" title="Натисніть, щоб вийти з повноекранного режиму «Пульс Дня»">
           <span class="pulse-day-btn-icon">
             <svg class="pulse-ecg-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
               <polyline points="2 12 6 12 9 4 14 20 17 12 22 12"></polyline>
             </svg>
+            <i class="fas fa-arrow-left pulse-exit-arrow-icon" aria-hidden="true"></i>
           </span>
           <span class="pulse-day-badge-wrap">
             <span class="pulse-day-badge-top">ПУЛЬС</span>
             <span class="pulse-day-badge-sub">ДНЯ</span>
+          </span>
+          <span class="pulse-exit-badge-wrap" aria-hidden="true">
+            <span class="pulse-exit-badge-top">ВИЙТИ</span>
+            <span class="pulse-exit-badge-sub">НАЗАД</span>
           </span>
         </button>
         <button id="noticeBellBtn" class="notice-bell-btn" aria-label="Оголошення" title="Оголошення"><i class="fas fa-bell"></i><span class="notice-bell-badge-dot"></span></button>
@@ -417,14 +422,14 @@
         <div class="row align-items-center justify-content-between">
           <div class="col-sm footer-col d-flex justify-content-center">
             <div class="kolobok d-flex align-items-center gap-3">
-              <a href="https://t.me/zakladki_top_one" target="_blank" title="Офіційний Telegram-канал із новинами та анонсами сайту"><i class="fab fa-telegram fa-lg" aria-hidden="true"></i> Telegram</a>
-              <a href="https://t.me/+1UKue84k2AVjZDcy" target="_blank" title="Чат для спілкування, запитань, обговорень та опитувань"><i class="fas fa-comments"></i> Чат</a>
-              <a href="CHANGELOG.md" class="changelog-link" target="_blank" title="Журнал змін: історія оновлень на сайті"><i class="fas fa-history"></i> Що нового?</a>
+              <a href="https://t.me/zakladki_top_one" target="_blank" rel="noopener noreferrer" title="Офіційний Telegram-канал із новинами та анонсами сайту"><i class="fab fa-telegram fa-lg" aria-hidden="true"></i> Telegram</a>
+              <a href="https://t.me/+1UKue84k2AVjZDcy" target="_blank" rel="noopener noreferrer" title="Чат для спілкування, запитань, обговорень та опитувань"><i class="fas fa-comments"></i> Чат</a>
+              <a href="CHANGELOG.md" class="changelog-link" target="_blank" rel="noopener noreferrer" title="Журнал змін: історія оновлень на сайті"><i class="fas fa-history"></i> Що нового?</a>
             </div>
           </div>
           <div class="col-sm footer-col d-flex justify-content-center">
             <div class="kolobok d-flex align-items-center gap-3">
-              <a class="btn btn-primary btn-sm" href="https://docs.google.com/document/d/15VLtvFvXNxhkXU_ZH74387e289Rx6If2Zmrp4m8KFAc" title="Фінансова допомога на розвиток та підтримку проекту" role="button" target="_blank">ПІДТРИМАТИ САЙТ</a>
+              <a class="btn btn-primary btn-sm" href="https://docs.google.com/document/d/15VLtvFvXNxhkXU_ZH74387e289Rx6If2Zmrp4m8KFAc" title="Фінансова допомога на розвиток та підтримку проекту" role="button" target="_blank" rel="noopener noreferrer">ПІДТРИМАТИ САЙТ</a>
               <!-- MyCounter v.2.0 -->
               <script type="text/javascript"><!--
               my_id = 168151;
@@ -435,7 +440,7 @@
               <script type="text/javascript"
                 src="https://get.mycounter.ua/counter2.0.js">
               </script><noscript>
-              <a target="_blank" href="https://mycounter.ua/"><img
+              <a target="_blank" rel="noopener noreferrer" href="https://mycounter.ua/"><img
               src="https://get.mycounter.ua/counter.php?id=168151"
               title="MyCounter - счётчик и статистика"
               alt="MyCounter - счётчик и статистика"
@@ -445,10 +450,10 @@
           </div>
           <div class="col-sm footer-col d-flex justify-content-center">
             <div class="kolobok d-flex align-items-center gap-3">
-              <a href="mailto:musichitbit@gmail.com" target="_blank" title="E-mail: musichitbit@gmail.com / Написати адміністратору / Зворотний зв'язок"><i class="far fa-envelope fa-lg" aria-hidden="true"></i> E-mail</a>
-              <a href="https://youtu.be/BdZQy6upWFc" target="_blank" title="Відеоінструкція: як зробити сайт стартовою сторінкою браузера (налаштування автозапуска)"><i class="fas fa-play-circle fa-lg coloriconfuter" aria-hidden="true"></i> Інструкція</a>
+              <a href="mailto:musichitbit@gmail.com" target="_blank" rel="noopener noreferrer" title="E-mail: musichitbit@gmail.com / Написати адміністратору / Зворотний зв'язок"><i class="far fa-envelope fa-lg" aria-hidden="true"></i> E-mail</a>
+              <a href="https://youtu.be/BdZQy6upWFc" target="_blank" rel="noopener noreferrer" title="Відеоінструкція: як зробити сайт стартовою сторінкою браузера (налаштування автозапуска)"><i class="fas fa-play-circle fa-lg coloriconfuter" aria-hidden="true"></i> Інструкція</a>
               <a href="#" class="badges-legend-link" title="Умовні позначки та індикатори на сайті (розшифровка значків)"><i class="fas fa-tags fa-lg coloriconfuter" aria-hidden="true"></i></a>
-              <a href="https://docs.google.com/document/d/15S2XrUxYaj1uu68wtfqww3Gkqa-Lq2Ra-P20AHWqKgs" target="_blank" title="Співпраця з нами, умови та прайс на послуги сайту"><i class="fas fa-handshake fa-lg coloriconfuter" aria-hidden="true"></i></a>
+              <a href="https://docs.google.com/document/d/15S2XrUxYaj1uu68wtfqww3Gkqa-Lq2Ra-P20AHWqKgs" target="_blank" rel="noopener noreferrer" title="Співпраця з нами, умови та прайс на послуги сайту"><i class="fas fa-handshake fa-lg coloriconfuter" aria-hidden="true"></i></a>
               <a href="#" class="about-site-link" id="aboutSiteFooterBtn" title="Про сайт «ТОП ЗАКЛАДКИ», можливості та корисні функції"><i class="fas fa-info-circle fa-lg coloriconfuter" aria-hidden="true"></i></a>
             </div>
           </div>
@@ -463,6 +468,6 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-    <script src="js/main.js"></script>
+    <script src="js/main.js?v=20261120"></script>
   </body>
 </html>

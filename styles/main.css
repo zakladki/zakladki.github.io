@@ -739,13 +739,11 @@ body.pulse-drawer-open .navbar-nav a.nav-link.pulse-paused-active {
   text-shadow: none !important;
 }
 
-body.pulse-drawer-open nav.navbar #pulseDayBtn.active,
 body.pulse-drawer-open #pulseDayBtn.active,
-body.page-pulse nav.navbar #pulseDayBtn.active,
 body.page-pulse #pulseDayBtn.active {
-  background-color: rgba(59, 130, 246, 0.28) !important;
+  background-color: rgba(56, 189, 248, 0.25) !important;
   color: #ffffff !important;
-  border-bottom: 3px solid #3b82f6 !important;
+  border-color: #38bdf8 !important;
   font-weight: 600 !important;
 }
 
@@ -1435,9 +1433,19 @@ body.page-pulse .side-ad-right.side-ad-narrow {
   line-height: 1.5;
   box-sizing: border-box;
 }
-.seo-category-guide.cat-games {
-  --cat-color: rgba(139, 92, 246, 0.9);
-}
+.seo-category-guide.cat-home { --cat-color: rgba(37, 99, 235, 0.9); }
+.seo-category-guide.cat-social { --cat-color: rgba(59, 130, 246, 0.9); }
+.seo-category-guide.cat-news { --cat-color: rgba(16, 185, 129, 0.9); }
+.seo-category-guide.cat-media { --cat-color: rgba(245, 158, 11, 0.9); }
+.seo-category-guide.cat-games { --cat-color: rgba(139, 92, 246, 0.9); }
+.seo-category-guide.cat-communal { --cat-color: rgba(6, 182, 212, 0.9); }
+.seo-category-guide.cat-bank { --cat-color: rgba(236, 72, 153, 0.9); }
+.seo-category-guide.cat-market { --cat-color: rgba(99, 102, 241, 0.9); }
+.seo-category-guide.cat-shops { --cat-color: rgba(20, 184, 166, 0.9); }
+.seo-category-guide.cat-others { --cat-color: rgba(100, 116, 139, 0.9); }
+.seo-category-guide.cat-city { --cat-color: rgba(234, 179, 8, 0.9); }
+.seo-category-guide.cat-ai { --cat-color: rgba(168, 85, 247, 0.9); }
+.seo-category-guide.cat-programs { --cat-color: rgba(249, 115, 22, 0.9); }
 .seo-category-guide.pulse-seo-guide {
   max-width: 1264px;
   width: calc(100% - 12px);
@@ -1532,6 +1540,213 @@ body.dark-mode .seo-guide-col a {
   .seo-guide-cols {
     grid-template-columns: 1fr;
     gap: 10px;
+  }
+}
+
+/* Варіант 1А: тиха компактна SEO-довідка в 1 абзац для сторінок категорій */
+.seo-category-guide.seo-guide-compact {
+  margin: 2px auto 12px;
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.62);
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  border-top: 1px solid rgba(148, 163, 184, 0.28);
+  border-radius: 9px;
+  box-shadow: none;
+  font-size: 0.76rem;
+  line-height: 1.5;
+  color: #475569;
+}
+.seo-category-guide.seo-guide-compact .seo-guide-title {
+  font-size: 0.80rem;
+  font-weight: 700;
+  margin: 0 0 4px;
+  color: #334155;
+  gap: 6px;
+}
+.seo-category-guide.seo-guide-compact .seo-guide-title i {
+  color: #64748b;
+  font-size: 0.82rem;
+}
+.seo-category-guide.seo-guide-compact .seo-guide-text {
+  margin: 0;
+  color: #475569;
+}
+.seo-category-guide.seo-guide-compact .seo-guide-text strong {
+  font-weight: 600;
+  color: #334155;
+}
+.seo-category-guide.seo-guide-compact .seo-guide-text a {
+  color: #2563eb;
+  font-weight: 600;
+  text-decoration: none;
+}
+.seo-category-guide.seo-guide-compact .seo-guide-text a:hover {
+  text-decoration: underline;
+}
+body.dark-mode .seo-category-guide.seo-guide-compact {
+  background: rgba(15, 23, 42, 0.45);
+  border-color: rgba(148, 163, 184, 0.16);
+  color: #94a3b8;
+}
+body.dark-mode .seo-category-guide.seo-guide-compact .seo-guide-title {
+  color: #cbd5e1;
+}
+body.dark-mode .seo-category-guide.seo-guide-compact .seo-guide-title i {
+  color: #94a3b8;
+}
+body.dark-mode .seo-category-guide.seo-guide-compact .seo-guide-text {
+  color: #94a3b8;
+}
+body.dark-mode .seo-category-guide.seo-guide-compact .seo-guide-text strong {
+  color: #cbd5e1;
+}
+body.dark-mode .seo-category-guide.seo-guide-compact .seo-guide-text a {
+  color: #60a5fa;
+}
+@media (max-width: 767.98px) {
+  .seo-category-guide.seo-guide-compact {
+    margin: 0 1rem 10px;
+    padding: 9px 12px;
+  }
+}
+
+/* Варіант 1Б: згорнута компактна SEO-плашка (<details>/<summary>) */
+.seo-category-guide.seo-guide-spoiler {
+  margin: 2px auto 12px;
+  padding: 7px 14px;
+  background: rgba(255, 255, 255, 0.58);
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  border-top: 1px solid rgba(148, 163, 184, 0.28);
+  border-radius: 8px;
+  box-shadow: none;
+  font-size: 0.76rem;
+  line-height: 1.5;
+  color: #475569;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+.seo-category-guide.seo-guide-spoiler:hover,
+.seo-category-guide.seo-guide-spoiler[open] {
+  background: rgba(255, 255, 255, 0.85);
+  border-color: rgba(148, 163, 184, 0.45);
+}
+.seo-category-guide.seo-guide-spoiler[open] {
+  background: var(--card-bg, #ffffff);
+  border-top: 2px solid var(--cat-color, rgba(139, 92, 246, 0.85));
+  padding: 10px 15px 12px;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.05);
+}
+.seo-category-guide.seo-guide-spoiler .seo-guide-summary {
+  list-style: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  user-select: none;
+  outline: none;
+}
+.seo-category-guide.seo-guide-spoiler .seo-guide-summary::-webkit-details-marker {
+  display: none;
+}
+.seo-category-guide.seo-guide-spoiler .seo-guide-summary-left {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+}
+.seo-category-guide.seo-guide-spoiler .seo-guide-summary-left > i {
+  color: #64748b;
+  font-size: 0.82rem;
+  flex-shrink: 0;
+}
+.seo-category-guide.seo-guide-spoiler .seo-guide-title {
+  font-size: 0.78rem;
+  font-weight: 600;
+  margin: 0;
+  color: #334155;
+  line-height: 1.3;
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.seo-category-guide.seo-guide-spoiler .seo-guide-summary-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #64748b;
+  flex-shrink: 0;
+}
+.seo-category-guide.seo-guide-spoiler .seo-guide-chevron {
+  font-size: 0.68rem;
+  transition: transform 0.2s ease;
+}
+.seo-category-guide.seo-guide-spoiler[open] .seo-guide-chevron {
+  transform: rotate(180deg);
+}
+.seo-category-guide.seo-guide-spoiler[open] .seo-guide-hint-text {
+  display: none;
+}
+.seo-category-guide.seo-guide-spoiler .seo-guide-spoiler-body {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(148, 163, 184, 0.2);
+}
+.seo-category-guide.seo-guide-spoiler .seo-guide-text {
+  margin: 0;
+  color: #475569;
+}
+.seo-category-guide.seo-guide-spoiler .seo-guide-text strong {
+  font-weight: 600;
+  color: #334155;
+}
+.seo-category-guide.seo-guide-spoiler .seo-guide-text a {
+  color: #2563eb;
+  font-weight: 600;
+  text-decoration: none;
+}
+.seo-category-guide.seo-guide-spoiler .seo-guide-text a:hover {
+  text-decoration: underline;
+}
+body.dark-mode .seo-category-guide.seo-guide-spoiler {
+  background: rgba(15, 23, 42, 0.42);
+  border-color: rgba(148, 163, 184, 0.16);
+  color: #94a3b8;
+}
+body.dark-mode .seo-category-guide.seo-guide-spoiler:hover,
+body.dark-mode .seo-category-guide.seo-guide-spoiler[open] {
+  background: rgba(15, 23, 42, 0.65);
+  border-color: rgba(148, 163, 184, 0.3);
+}
+body.dark-mode .seo-category-guide.seo-guide-spoiler .seo-guide-summary-left > i,
+body.dark-mode .seo-category-guide.seo-guide-spoiler .seo-guide-summary-hint {
+  color: #94a3b8;
+}
+body.dark-mode .seo-category-guide.seo-guide-spoiler .seo-guide-title,
+body.dark-mode .seo-category-guide.seo-guide-spoiler .seo-guide-text strong {
+  color: #cbd5e1;
+}
+body.dark-mode .seo-category-guide.seo-guide-spoiler .seo-guide-spoiler-body {
+  border-top-color: rgba(148, 163, 184, 0.14);
+}
+body.dark-mode .seo-category-guide.seo-guide-spoiler .seo-guide-text {
+  color: #94a3b8;
+}
+body.dark-mode .seo-category-guide.seo-guide-spoiler .seo-guide-text a {
+  color: #60a5fa;
+}
+@media (max-width: 767.98px) {
+  .seo-category-guide.seo-guide-spoiler {
+    margin: 2px auto 12px;
+    padding: 7px 11px;
+  }
+  .seo-category-guide.seo-guide-spoiler[open] {
+    padding: 9px 12px 11px;
+  }
+  .seo-category-guide.seo-guide-spoiler .seo-guide-title {
+    white-space: normal;
   }
 }
 
@@ -2603,7 +2818,7 @@ body.dark-mode .badges-legend-desc {
   user-select: none;
 }
 
-/* Векторна контурна іконка магнітного лінку (Magnet / Torrent) */
+/* Векторна контурна іконка завантаження (стрілка вниз у лоток / Torrent) */
 .group li .torrent-badge::before,
 .torrent-badge::before {
   content: '';
@@ -2611,8 +2826,8 @@ body.dark-mode .badges-legend-desc {
   width: 16px;
   height: 16px;
   background-color: currentColor;
-  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M4 2h4v4H4zm12 0h4v4h-4zm-12 5.5h4V10a4 4 0 0 0 8 0V7.5h4V10a8 8 0 0 1-16 0z'/%3E%3C/svg%3E") no-repeat center / contain;
-  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M4 2h4v4H4zm12 0h4v4h-4zm-12 5.5h4V10a4 4 0 0 0 8 0V7.5h4V10a8 8 0 0 1-16 0z'/%3E%3C/svg%3E") no-repeat center / contain;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 4v11'/%3E%3Cpath d='M7.5 11l4.5 4.5 4.5-4.5'/%3E%3Cpath d='M5 17v2.5a1.5 1.5 0 0 0 1.5 1.5h11a1.5 1.5 0 0 0 1.5-1.5V17'/%3E%3C/svg%3E") no-repeat center / contain;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 4v11'/%3E%3Cpath d='M7.5 11l4.5 4.5 4.5-4.5'/%3E%3Cpath d='M5 17v2.5a1.5 1.5 0 0 0 1.5 1.5h11a1.5 1.5 0 0 0 1.5-1.5V17'/%3E%3C/svg%3E") no-repeat center / contain;
   transition: transform 0.15s ease;
 }
 
@@ -6756,6 +6971,14 @@ body.dark-mode .user-cabinet-modal {
   gap: 8px;
   background: rgba(0, 0, 0, 0.02);
   flex-shrink: 0;
+}
+.universal-confirm-message {
+  font-size: 0.92rem;
+  line-height: 1.48;
+  color: var(--text-main, #0f172a);
+}
+body.dark-mode .universal-confirm-message {
+  color: #e2e8f0;
 }
 @media (max-width: 576px) {
   .universal-modal-backdrop {
@@ -11107,14 +11330,20 @@ body.dark-mode .guest-bm-modal-footer {
 .pulse-day-btn.active .pulse-ecg-icon {
   stroke: #ffffff;
 }
-.pulse-day-btn .pulse-day-badge-wrap {
+.pulse-day-btn .pulse-day-badge-wrap,
+.pulse-day-btn .pulse-exit-badge-wrap {
   display: inline-flex !important;
   flex-direction: column !important;
   align-items: center !important;
   justify-content: center !important;
   line-height: 1.05 !important;
 }
-.pulse-day-btn .pulse-day-badge-top {
+.pulse-day-btn .pulse-exit-arrow-icon,
+.pulse-day-btn .pulse-exit-badge-wrap {
+  display: none !important;
+}
+.pulse-day-btn .pulse-day-badge-top,
+.pulse-day-btn .pulse-exit-badge-top {
   font-size: 0.54rem !important;
   font-weight: 800 !important;
   letter-spacing: 0.08em !important;
@@ -11122,7 +11351,8 @@ body.dark-mode .guest-bm-modal-footer {
   line-height: 1 !important;
   text-transform: uppercase !important;
 }
-.pulse-day-btn .pulse-day-badge-sub {
+.pulse-day-btn .pulse-day-badge-sub,
+.pulse-day-btn .pulse-exit-badge-sub {
   font-size: 0.68rem !important;
   font-weight: 800 !important;
   letter-spacing: 0.04em !important;
@@ -11139,6 +11369,56 @@ body.dark-mode .guest-bm-modal-footer {
   color: #ffffff !important;
 }
 
+/* Зрозуміліший стан «Вийти» на кнопці «ПУЛЬС ДНЯ» на /puls та у відкритій шторці */
+body.page-pulse #pulseDayBtn.active:hover,
+body.page-pulse #pulseDayBtn.active:focus-visible,
+body.page-pulse #pulseDayBtn.active:active,
+body.pulse-drawer-open #pulseDayBtn.active:hover,
+body.pulse-drawer-open #pulseDayBtn.active:focus-visible,
+body.pulse-drawer-open #pulseDayBtn.active:active {
+  background: rgba(239, 68, 68, 0.24) !important;
+  border-color: #f87171 !important;
+  box-shadow: 0 0 14px rgba(248, 113, 113, 0.65) !important;
+}
+body.page-pulse #pulseDayBtn.active:hover .pulse-ecg-icon,
+body.page-pulse #pulseDayBtn.active:focus-visible .pulse-ecg-icon,
+body.page-pulse #pulseDayBtn.active:active .pulse-ecg-icon,
+body.pulse-drawer-open #pulseDayBtn.active:hover .pulse-ecg-icon,
+body.pulse-drawer-open #pulseDayBtn.active:focus-visible .pulse-ecg-icon,
+body.pulse-drawer-open #pulseDayBtn.active:active .pulse-ecg-icon {
+  display: none !important;
+}
+body.page-pulse #pulseDayBtn.active:hover .pulse-exit-arrow-icon,
+body.page-pulse #pulseDayBtn.active:focus-visible .pulse-exit-arrow-icon,
+body.page-pulse #pulseDayBtn.active:active .pulse-exit-arrow-icon,
+body.pulse-drawer-open #pulseDayBtn.active:hover .pulse-exit-arrow-icon,
+body.pulse-drawer-open #pulseDayBtn.active:focus-visible .pulse-exit-arrow-icon,
+body.pulse-drawer-open #pulseDayBtn.active:active .pulse-exit-arrow-icon {
+  display: inline-flex !important;
+  font-size: 0.85rem;
+  color: #fecaca;
+}
+body.page-pulse #pulseDayBtn.active:hover .pulse-day-badge-wrap,
+body.page-pulse #pulseDayBtn.active:focus-visible .pulse-day-badge-wrap,
+body.page-pulse #pulseDayBtn.active:active .pulse-day-badge-wrap,
+body.pulse-drawer-open #pulseDayBtn.active:hover .pulse-day-badge-wrap,
+body.pulse-drawer-open #pulseDayBtn.active:focus-visible .pulse-day-badge-wrap,
+body.pulse-drawer-open #pulseDayBtn.active:active .pulse-day-badge-wrap {
+  display: none !important;
+}
+body.page-pulse #pulseDayBtn.active:hover .pulse-exit-badge-wrap,
+body.page-pulse #pulseDayBtn.active:focus-visible .pulse-exit-badge-wrap,
+body.page-pulse #pulseDayBtn.active:active .pulse-exit-badge-wrap,
+body.pulse-drawer-open #pulseDayBtn.active:hover .pulse-exit-badge-wrap,
+body.pulse-drawer-open #pulseDayBtn.active:focus-visible .pulse-exit-badge-wrap,
+body.pulse-drawer-open #pulseDayBtn.active:active .pulse-exit-badge-wrap {
+  display: inline-flex !important;
+}
+body.page-pulse #pulseDayBtn.active .pulse-exit-badge-top,
+body.pulse-drawer-open #pulseDayBtn.active .pulse-exit-badge-top {
+  color: #fecaca !important;
+}
+
 @media (max-width: 991.98px) {
   .pulse-day-btn {
     width: 32px !important;
@@ -11149,7 +11429,14 @@ body.dark-mode .guest-bm-modal-footer {
     gap: 0 !important;
     left: 50px !important;
   }
-  .pulse-day-btn .pulse-day-badge-wrap {
+  .pulse-day-btn .pulse-day-badge-wrap,
+  .pulse-day-btn .pulse-exit-badge-wrap,
+  body.page-pulse #pulseDayBtn.active:hover .pulse-exit-badge-wrap,
+  body.page-pulse #pulseDayBtn.active:focus-visible .pulse-exit-badge-wrap,
+  body.page-pulse #pulseDayBtn.active:active .pulse-exit-badge-wrap,
+  body.pulse-drawer-open #pulseDayBtn.active:hover .pulse-exit-badge-wrap,
+  body.pulse-drawer-open #pulseDayBtn.active:focus-visible .pulse-exit-badge-wrap,
+  body.pulse-drawer-open #pulseDayBtn.active:active .pulse-exit-badge-wrap {
     display: none !important;
   }
   .pulse-day-btn .pulse-ecg-icon {
@@ -13416,7 +13703,7 @@ body.dark-mode .pulse-news-tabs-wrap .pulse-rate-tab-btn.active {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 3px;
+  gap: 4px;
   width: auto;
   height: 23px;
   border-radius: 6px;
@@ -13424,7 +13711,7 @@ body.dark-mode .pulse-news-tabs-wrap .pulse-rate-tab-btn.active {
   background: rgba(239, 68, 68, 0.08);
   color: #b91c1c;
   cursor: pointer;
-  padding: 0 5px;
+  padding: 0 6px;
   white-space: nowrap;
   transition: all 0.15s ease;
   flex-shrink: 0;
@@ -15097,40 +15384,20 @@ body.dark-mode .pulse-w2-meteo-press-sig.is-red {
 .pulse-w2-meteo-kp-sig svg {
   display: block;
 }
-.pulse-w2-meteo-magnet-tip {
-  fill: rgba(148, 163, 184, 0.22);
-}
 body.dark-mode .pulse-w2-meteo-kp-sig {
   color: rgba(148, 163, 184, 0.30);
-}
-body.dark-mode .pulse-w2-meteo-magnet-tip {
-  fill: rgba(203, 213, 225, 0.18);
 }
 .pulse-w2-meteo-kp-sig.is-muted {
   color: rgba(148, 163, 184, 0.18);
 }
-.pulse-w2-meteo-kp-sig.is-muted .pulse-w2-meteo-magnet-tip {
-  fill: rgba(148, 163, 184, 0.12);
-}
 body.dark-mode .pulse-w2-meteo-kp-sig.is-muted {
   color: rgba(148, 163, 184, 0.16);
-}
-body.dark-mode .pulse-w2-meteo-kp-sig.is-muted .pulse-w2-meteo-magnet-tip {
-  fill: rgba(203, 213, 225, 0.11);
 }
 .pulse-w2-meteo-kp-sig.is-yellow {
   color: rgba(234, 179, 8, 1);
 }
-.pulse-w2-meteo-kp-sig.is-yellow .pulse-w2-meteo-magnet-tip,
-.pulse-w2-meteo-kp-sig.is-red .pulse-w2-meteo-magnet-tip {
-  fill: rgba(148, 163, 184, 0.72);
-}
 body.dark-mode .pulse-w2-meteo-kp-sig.is-yellow {
   color: rgba(253, 224, 71, 0.98);
-}
-body.dark-mode .pulse-w2-meteo-kp-sig.is-yellow .pulse-w2-meteo-magnet-tip,
-body.dark-mode .pulse-w2-meteo-kp-sig.is-red .pulse-w2-meteo-magnet-tip {
-  fill: rgba(203, 213, 225, 0.76);
 }
 .pulse-w2-meteo-kp-sig.is-red {
   color: rgba(216, 16, 54, 1);
@@ -16978,20 +17245,3 @@ body.dark-mode .pulse-w2-footer {
   align-items: center;
   gap: 4px;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
