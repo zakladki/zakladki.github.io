@@ -1398,18 +1398,30 @@ function initSeoSpoilerAutoScroll() {
 
       window.requestAnimationFrame(() => {
         const rect = details.getBoundingClientRect();
-        const bottomPadding = 16;
-        const topNavbarOffset = 64;
+        const footer = document.querySelector('footer.footer');
+        const navbar = document.querySelector('nav.navbar');
+
+        let fixedFooterHeight = 0;
+        if (footer && window.getComputedStyle(footer).position === 'fixed') {
+          fixedFooterHeight = footer.getBoundingClientRect().height || 0;
+        }
+
+        const fixedNavHeight = navbar && window.getComputedStyle(navbar).position === 'fixed'
+          ? (navbar.getBoundingClientRect().height || 42)
+          : 0;
+
+        const bottomPadding = fixedFooterHeight + 14;
+        const topNavbarOffset = fixedNavHeight + 12;
         const overflowBottom = rect.bottom - (window.innerHeight - bottomPadding);
 
-        if (overflowBottom <= 4) return;
+        if (overflowBottom <= 2) return;
 
-        // Якщо блок повністю влазить в екран - підкручуємо рівно настільки, щоб показати його повністю;
-        // якщо екран замалий - зупиняємо заголовок спойлера одразу під верхньою навігацією.
+        // Якщо блок повністю влазить у видиму область між хедером і фіксованим футером -
+        // прокручуємо рівно настільки, щоб показати його повністю; інакше - ставимо заголовок під хедером.
         const maxTopScroll = Math.max(0, rect.top - topNavbarOffset);
         const scrollDelta = Math.min(overflowBottom, maxTopScroll);
 
-        if (scrollDelta > 4) {
+        if (scrollDelta > 2) {
           window.scrollBy({
             top: scrollDelta,
             behavior: prefersReducedMotion ? 'auto' : 'smooth'
