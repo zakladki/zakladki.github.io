@@ -1,6 +1,16 @@
 *У файлі (CHANGELOG) ведеться хронологія змін, додавання ресурсів, покращень та виправлень на сайті.*
 
 ## [2026-11-21]
+- **Оновлення картки «Біржі DEX» у «Банкінгу» (`bank.html`)**:
+  - Додано позначення блокчейнів через крапку: *Uniswap · ETH*, *Jupiter · SOL*, *PancakeSwap · BNB*, *STON.fi · TON*, *1inch · Multi*.
+  - Додано 4 популярні DEX-біржі: *Raydium · SOL*, *DeDust.io · GRAM*, *Cetus · SUI*, *Hyperliquid · Perp*.
+- **Виправлення посилань, описів, переходів на HTTPS та оновлення `sitemap.xml` (`index.html`, `social.html`, `media.html`, `bank.html`, `market.html`, `programs.html`, `sitemap.xml`)**:
+  - **Медіа (`media.html`)**: виправлено підказку для *«NNMclub Збірки»* у картці «Музика (завантажити)» (замінено «програмного забезпечення» на «музичних збірок та дискографій»).
+  - **Soft (`programs.html`)**: виправлено описку *«Acestream Плеєр-онлайн»*, *Telegram* переведено на офіційну сторінку `telegram.org/apps`, *Viber* - на українську сторінку `/ua/download/`, а з посилання *Avira* прибрано Google tracking-параметр `?srsltid=...` (`avira.com/en/free-antivirus-windows`).
+  - **Головна (`index.html`)**: *Wargaming.net* оновлено на `transfer.wargaming.net/uk/`, *Poki.com* - на `poki.com/`, *Укрпошту* переведено на `https://`.
+  - **Банкінг (`bank.html`)**: *Ubki.ua* переведено на `/ua/`, *Tradingview.com* - на `www.tradingview.com`, *Neteller.com* - на `www.neteller.com/`, *Kurses.com.ua* - на `https://`; картку *«DEX-біржі»* перейменовано на *«Біржі DEX»*.
+  - **Ринок і Соціум (`market.html`, `social.html`)**: *Укрпошту* та *Пошту I.ua* переведено на `https://`.
+  - **SEO (`sitemap.xml`)**: актуалізовано дати `lastmod` для всіх 14 публічних сторінок на `2026-11-21`.
 - **Поповнення та балансування крипто-гаманців у «Банкінгу» (`bank.html`)**:
   - Уточнено тікери: *Keplr Wallet · ATOM*, *Klever Wallet · KLV*.
   - До картки «Гаманці: Мульти/Апаратні» додано: *Rabby Wallet*, *OKX Wallet*, *Trezor*.
