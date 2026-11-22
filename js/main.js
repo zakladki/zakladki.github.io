@@ -13310,7 +13310,7 @@ function detectNewsCategory(title, categories = []) {
   if (/(генштаб|зсу|фронт|наступ|окупант|бої|ппо|дрон|шахед|ракета|обстріл|сирськ|ворог|бойов|війн|штурм|втрат|армія|повітрян|вибух|боєприпас)/i.test(t)) {
     return 'war';
   }
-  if (/(нбу|банк|гривн|долар|курс|інфляц|бюджет|подат|єосел|бізнес|тариф|цін|ринок|експорт|імпорт|ввп|грош|облігац|пальн|кредит)/i.test(t)) {
+  if (/(нбу|банк|гривн|долар|євро|курс|інфляц|бюджет|подат|єосел|бізнес|тариф|цін|ринок|експорт|імпорт|ввп|грош|облігац|пальн|кредит|економі|енергет|електроенерг|знеструмл|відключенн|світл|мінфін|мвф|субсид|пенсі|зарплат|інвест|беб|завод|торгів|штраф|млрд|мільярд|грн)/i.test(t)) {
     return 'econ';
   }
   if (/(сша|трамп|єс|байден|європ|нато|польщ|німеччин|франц|оон|китай|іран|ізраїл|міжнародн|переговор|британ|вибор.*сша|туреччин)/i.test(t)) {
@@ -13319,14 +13319,18 @@ function detectNewsCategory(title, categories = []) {
   return 'pol';
 }
 
+function isTrivialPulseNews(title) {
+  if (!title || typeof title !== 'string') return true;
+  const t = title.toLowerCase();
+  const trivialPattern = /(шоубіз|зірк[аиі]|гороскоп|зодіак|модн|макіяж|манікюр|шкір[аи]|волос|зморшк|дієт|схудн|рецепт|страв[аи]|кулінар|кухн|пиріг|салат|грядк|город|садівниц|бур.ян|дача|побаченн|весілл|розлученн|блогер|співачк|співак|акторк|вбив.*(?:пес|собак|кіт|кошен|твари)|задушив|побив товариш|пиятик|застілл|астролог|таро|віщун|передбаченн|екстрасенс|секс|інтим|коханк|зрадив дружин|ясн[аи]|стоматолог|перукар|уявні друз|тривожність.*рак|психолог.*порад|погода.*(?:листопад|грудн|січн|лют)|дощ.*мороз.*погода|шви між плитк|копійчан)/i;
+  return trivialPattern.test(t);
+}
+
 function isSignificantPulseNews(title) {
-  if (!title || typeof title !== 'string') return false;
+  if (isTrivialPulseNews(title)) return false;
   const t = title.toLowerCase();
 
-  const trivialPattern = /(шоубіз|зірк[аиі]|гороскоп|зодіак|модн|макіяж|манікюр|шкір[аи]|волос|зморшк|дієт|схудн|рецепт|страв[аи]|кулінар|кухн|пиріг|салат|грядк|город|садівниц|бур.ян|дача|побаченн|весілл|розлученн|блогер|співачк|співак|акторк|вбив.*(?:пес|собак|кіт|кошен|твари)|задушив|побив товариш|пиятик|застілл|астролог|таро|віщун|передбаченн|екстрасенс|секс|інтим|коханк|зрадив дружин|ясн[аи]|стоматолог|перукар|уявні друз|тривожність.*рак|психолог.*порад|погода.*(?:листопад|грудн|січн|лют)|дощ.*мороз.*погода|шви між плитк|копійчан)/i;
-  if (trivialPattern.test(t)) return false;
-
-  const significancePattern = /(зсу|генштаб|фронт|сил[иа] оборон|ппо|дрон|шахед|ракет|обстріл|бої|наступ|штурм|ворогом|ворог|війн|сирськ|зеленськ|президент|уряд|кабмін|верховн.*рад|рада|ради|раду|радо|парламент|нардеп|законопроєкт|сбу|гур|набу|сап|дбр|прокуратур|суд|правоохорон|затриман|підозр|викрил|енергет|укренерго|електроенерг|відключенн|світл|пальн|нбу|банк|гривн|курс|інфляц|бюджет|податк|експорт|відбудов|сша|єс|євросоюз|нато|трамп|байден|санкці|переговор|оон|британі|польщ|німеччин|франці|дснс|надзвичайн|безпек|евакуац|міністер|політик|економік|міжнародн|кремль|путін|рф|росі|атак|руйнуван|загибл|поранен|дипломат|допомог|втрат|вибух|удар|мобілізац|військов|збро|впк|завод|нпз|порт|інфраструктур)/i;
+  const significancePattern = /(зсу|генштаб|фронт|сил[иа] оборон|ппо|дрон|шахед|ракет|обстріл|бої|наступ|штурм|ворогом|ворог|війн|сирськ|зеленськ|президент|уряд|кабмін|верховн.*рад|рада|ради|раду|радо|парламент|нардеп|законопроєкт|сбу|гур|набу|сап|дбр|прокуратур|суд|правоохорон|затриман|підозр|викрил|енергет|укренерго|електроенерг|відключенн|знеструмл|світл|пальн|нбу|банк|гривн|курс|долар|євро|інфляц|бюджет|податк|експорт|відбудов|мінфін|мвф|беб|сша|єс|євросоюз|нато|трамп|байден|санкці|переговор|оон|британі|польщ|німеччин|франці|дснс|надзвичайн|безпек|евакуац|міністер|політик|економік|міжнародн|кремль|путін|рф|росі|атак|руйнуван|загибл|поранен|дипломат|допомог|втрат|вибух|удар|мобілізац|військов|збро|впк|завод|нпз|порт|інфраструктур|грн|млрд)/i;
 
   return significancePattern.test(t);
 }
@@ -13413,7 +13417,7 @@ function updatePulseNewsLiveBadge(epochMs = Date.now()) {
 }
 
 async function loadPulseLiveNews(forceRefresh = false) {
-  const cacheKey = 'pulse_live_news_cache_v5';
+  const cacheKey = 'pulse_live_news_cache_v6';
   const now = Date.now();
 
   if (!forceRefresh) {
@@ -13433,7 +13437,7 @@ async function loadPulseLiveNews(forceRefresh = false) {
     { url: 'https://tsn.ua/rss/ukrayina', src: 'ТСН' },
     { url: 'https://feeds.bbci.co.uk/ukrainian/rss.xml', src: 'BBC' },
     { url: 'https://espreso.tv/rss', src: 'Еспресо' },
-    { url: 'https://suspilne.media/rss/news.xml', src: 'Суспільне' }
+    { url: 'https://www.epravda.com.ua/rss/', src: 'ЕП' }
   ];
 
   let fetchedItems = [];
@@ -13457,12 +13461,12 @@ async function loadPulseLiveNews(forceRefresh = false) {
     } catch (err) {}
   }
 
-  // 2. Резервний шлях: якщо /api/news недоступний (наприклад, при суто статичному хостингу)
+  // 2. Резервний шлях: якщо /api/news недоступний (наприклад, при суто статичному хостингу GitHub Pages)
   if (fetchedItems.length === 0) {
-    const timeSlice = Math.floor(now / (5 * 60 * 1000));
+    const rawNonTrivialItems = [];
     const fetchPromises = feeds.map(async (feed) => {
       try {
-        const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feed.url)}&_t=${timeSlice}`;
+        const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feed.url)}`;
         const resp = await fetch(apiUrl, { cache: 'no-cache' });
         if (!resp.ok) return;
         const data = await resp.json();
@@ -13471,7 +13475,8 @@ async function loadPulseLiveNews(forceRefresh = false) {
             const rawTitle = (it.title || '').trim();
             if (!rawTitle) return;
             const cleanTitle = rawTitle.replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&amp;/g, '&');
-            if (!isSignificantPulseNews(cleanTitle)) return;
+            if (isTrivialPulseNews(cleanTitle)) return;
+
             let parsedDate = null;
             if (it.pubDate) {
               const pStr = String(it.pubDate).trim();
@@ -13486,7 +13491,7 @@ async function loadPulseLiveNews(forceRefresh = false) {
             const rawDesc = (it.description || it.content || '').trim();
             const cleanDesc = rawDesc ? rawDesc.replace(/<[^>]+>/g, '').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&amp;/g, '&').replace(/\s+/g, ' ').trim().slice(0, 650) : '';
 
-            fetchedItems.push({
+            const itemObj = {
               id: `${feed.src}_${idx}_${timestamp}`,
               title: cleanTitle,
               desc: cleanDesc,
@@ -13495,7 +13500,12 @@ async function loadPulseLiveNews(forceRefresh = false) {
               priority: detectNewsPriority(cleanTitle),
               timestamp: timestamp,
               url: it.link || 'https://www.pravda.com.ua/'
-            });
+            };
+
+            rawNonTrivialItems.push(itemObj);
+            if (isSignificantPulseNews(cleanTitle)) {
+              fetchedItems.push(itemObj);
+            }
           });
         }
       } catch (e) {}
@@ -13504,6 +13514,10 @@ async function loadPulseLiveNews(forceRefresh = false) {
     try {
       await Promise.allSettled(fetchPromises);
     } catch (e) {}
+
+    if (fetchedItems.length < 18 && rawNonTrivialItems.length > fetchedItems.length) {
+      fetchedItems = rawNonTrivialItems;
+    }
   }
 
   if (fetchedItems.length > 0) {
