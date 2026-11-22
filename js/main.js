@@ -8904,15 +8904,6 @@ const PULSE_CITIES = [
   { name: 'Миколаїв', lat: 46.9750, lon: 31.9946 }
 ];
 
-window.pulseFinancePeriod = (() => {
-  try {
-    const saved = localStorage.getItem('pulse_finance_period');
-    return (saved === '7d' || saved === '30d' || saved === '24h') ? saved : '24h';
-  } catch (e) {
-    return '24h';
-  }
-})();
-
 let pulseRatesData = {
   USD: 41.50,
   EUR: 45.15,
@@ -13769,122 +13760,186 @@ function renderPulseDrawerLayout(container, options = {}) {
           <!-- 1. СІТКА 8 ФІАТНИХ ВАЛЮТ -->
           <div class="pulse-rates-grid" id="pulseFiatGrid">
             <div class="pulse-rate-item" data-kind="fiat" data-code="USD" data-label="Долар США (USD)">
-              <div class="pulse-rate-top-line">
-                <span class="pulse-rate-code">USD</span>
-                <span class="pulse-rate-diff up" id="pulseDiffUsd">▲</span>
+              <div class="pulse-rate-trends" aria-hidden="true">
+                <span class="pulse-trend-ind up" id="pulseDiffUsd1d"></span>
+                <span class="pulse-trend-ind up" id="pulseDiffUsd7d"></span>
+                <span class="pulse-trend-ind up" id="pulseDiffUsd30d"></span>
               </div>
-              <div class="pulse-rate-value" id="pulseRateUsd">41.<span class="pulse-decimal">50</span></div>
+              <div class="pulse-rate-main">
+                <span class="pulse-rate-code">USD</span>
+                <div class="pulse-rate-value" id="pulseRateUsd">41.<span class="pulse-decimal">50</span></div>
+              </div>
             </div>
             <div class="pulse-rate-item" data-kind="fiat" data-code="EUR" data-label="Євро (EUR)">
-              <div class="pulse-rate-top-line">
-                <span class="pulse-rate-code">EUR</span>
-                <span class="pulse-rate-diff up" id="pulseDiffEur">▲</span>
+              <div class="pulse-rate-trends" aria-hidden="true">
+                <span class="pulse-trend-ind up" id="pulseDiffEur1d"></span>
+                <span class="pulse-trend-ind up" id="pulseDiffEur7d"></span>
+                <span class="pulse-trend-ind up" id="pulseDiffEur30d"></span>
               </div>
-              <div class="pulse-rate-value" id="pulseRateEur">45.<span class="pulse-decimal">15</span></div>
+              <div class="pulse-rate-main">
+                <span class="pulse-rate-code">EUR</span>
+                <div class="pulse-rate-value" id="pulseRateEur">45.<span class="pulse-decimal">15</span></div>
+              </div>
             </div>
             <div class="pulse-rate-item" data-kind="fiat" data-code="PLN" data-label="Польський злотий (PLN)">
-              <div class="pulse-rate-top-line">
-                <span class="pulse-rate-code">PLN</span>
-                <span class="pulse-rate-diff down" id="pulseDiffPln">▼</span>
+              <div class="pulse-rate-trends" aria-hidden="true">
+                <span class="pulse-trend-ind down" id="pulseDiffPln1d"></span>
+                <span class="pulse-trend-ind up" id="pulseDiffPln7d"></span>
+                <span class="pulse-trend-ind up" id="pulseDiffPln30d"></span>
               </div>
-              <div class="pulse-rate-value" id="pulseRatePln">10.<span class="pulse-decimal">55</span></div>
+              <div class="pulse-rate-main">
+                <span class="pulse-rate-code">PLN</span>
+                <div class="pulse-rate-value" id="pulseRatePln">10.<span class="pulse-decimal">55</span></div>
+              </div>
             </div>
             <div class="pulse-rate-item" data-kind="fiat" data-code="GBP" data-label="Британський фунт (GBP)">
-              <div class="pulse-rate-top-line">
-                <span class="pulse-rate-code">GBP</span>
-                <span class="pulse-rate-diff up" id="pulseDiffGbp">▲</span>
+              <div class="pulse-rate-trends" aria-hidden="true">
+                <span class="pulse-trend-ind up" id="pulseDiffGbp1d"></span>
+                <span class="pulse-trend-ind up" id="pulseDiffGbp7d"></span>
+                <span class="pulse-trend-ind up" id="pulseDiffGbp30d"></span>
               </div>
-              <div class="pulse-rate-value" id="pulseRateGbp">53.<span class="pulse-decimal">90</span></div>
+              <div class="pulse-rate-main">
+                <span class="pulse-rate-code">GBP</span>
+                <div class="pulse-rate-value" id="pulseRateGbp">53.<span class="pulse-decimal">90</span></div>
+              </div>
             </div>
 
             <div class="pulse-rate-item" data-kind="fiat" data-code="CZK" data-label="Чеська крона (CZK)">
-              <div class="pulse-rate-top-line">
-                <span class="pulse-rate-code">CZK</span>
-                <span class="pulse-rate-diff up" id="pulseDiffCzk">▲</span>
+              <div class="pulse-rate-trends" aria-hidden="true">
+                <span class="pulse-trend-ind up" id="pulseDiffCzk1d"></span>
+                <span class="pulse-trend-ind up" id="pulseDiffCzk7d"></span>
+                <span class="pulse-trend-ind up" id="pulseDiffCzk30d"></span>
               </div>
-              <div class="pulse-rate-value" id="pulseRateCzk">1.<span class="pulse-decimal">78</span></div>
+              <div class="pulse-rate-main">
+                <span class="pulse-rate-code">CZK</span>
+                <div class="pulse-rate-value" id="pulseRateCzk">1.<span class="pulse-decimal">78</span></div>
+              </div>
             </div>
             <div class="pulse-rate-item" data-kind="fiat" data-code="CHF" data-label="Швейцарський франк (CHF)">
-              <div class="pulse-rate-top-line">
-                <span class="pulse-rate-code">CHF</span>
-                <span class="pulse-rate-diff up" id="pulseDiffChf">▲</span>
+              <div class="pulse-rate-trends" aria-hidden="true">
+                <span class="pulse-trend-ind up" id="pulseDiffChf1d"></span>
+                <span class="pulse-trend-ind up" id="pulseDiffChf7d"></span>
+                <span class="pulse-trend-ind up" id="pulseDiffChf30d"></span>
               </div>
-              <div class="pulse-rate-value" id="pulseRateChf">47.<span class="pulse-decimal">80</span></div>
+              <div class="pulse-rate-main">
+                <span class="pulse-rate-code">CHF</span>
+                <div class="pulse-rate-value" id="pulseRateChf">47.<span class="pulse-decimal">80</span></div>
+              </div>
             </div>
             <div class="pulse-rate-item" data-kind="fiat" data-code="CAD" data-label="Канадський долар (CAD)">
-              <div class="pulse-rate-top-line">
-                <span class="pulse-rate-code">CAD</span>
-                <span class="pulse-rate-diff down" id="pulseDiffCad">▼</span>
+              <div class="pulse-rate-trends" aria-hidden="true">
+                <span class="pulse-trend-ind down" id="pulseDiffCad1d"></span>
+                <span class="pulse-trend-ind down" id="pulseDiffCad7d"></span>
+                <span class="pulse-trend-ind up" id="pulseDiffCad30d"></span>
               </div>
-              <div class="pulse-rate-value" id="pulseRateCad">30.<span class="pulse-decimal">20</span></div>
+              <div class="pulse-rate-main">
+                <span class="pulse-rate-code">CAD</span>
+                <div class="pulse-rate-value" id="pulseRateCad">30.<span class="pulse-decimal">20</span></div>
+              </div>
             </div>
             <div class="pulse-rate-item" data-kind="fiat" data-code="CNY" data-label="Китайський юань (CNY)">
-              <div class="pulse-rate-top-line">
-                <span class="pulse-rate-code">CNY</span>
-                <span class="pulse-rate-diff up" id="pulseDiffCny">▲</span>
+              <div class="pulse-rate-trends" aria-hidden="true">
+                <span class="pulse-trend-ind up" id="pulseDiffCny1d"></span>
+                <span class="pulse-trend-ind up" id="pulseDiffCny7d"></span>
+                <span class="pulse-trend-ind up" id="pulseDiffCny30d"></span>
               </div>
-              <div class="pulse-rate-value" id="pulseRateCny">5.<span class="pulse-decimal">75</span></div>
+              <div class="pulse-rate-main">
+                <span class="pulse-rate-code">CNY</span>
+                <div class="pulse-rate-value" id="pulseRateCny">5.<span class="pulse-decimal">75</span></div>
+              </div>
             </div>
           </div>
 
           <!-- 2. СІТКА 8 КРИПТОВАЛЮТ -->
           <div class="pulse-rates-grid" id="pulseCryptoGrid" style="display: none;">
             <div class="pulse-rate-item" data-kind="crypto" data-code="BTC" data-label="Bitcoin (BTC)">
-              <div class="pulse-rate-top-line">
-                <span class="pulse-rate-code">BTC</span>
-                <span class="pulse-rate-diff up" id="pulseDiffBtc">▲</span>
+              <div class="pulse-rate-trends" aria-hidden="true">
+                <span class="pulse-trend-ind down" id="pulseDiffBtc1d"></span>
+                <span class="pulse-trend-ind up" id="pulseDiffBtc7d"></span>
+                <span class="pulse-trend-ind up" id="pulseDiffBtc30d"></span>
               </div>
-              <div class="pulse-rate-value" id="pulseRateBtc">68 450<span class="pulse-rate-curr">$</span></div>
+              <div class="pulse-rate-main">
+                <span class="pulse-rate-code">BTC</span>
+                <div class="pulse-rate-value" id="pulseRateBtc">68 450<span class="pulse-rate-curr">$</span></div>
+              </div>
             </div>
             <div class="pulse-rate-item" data-kind="crypto" data-code="ETH" data-label="Ethereum (ETH)">
-              <div class="pulse-rate-top-line">
-                <span class="pulse-rate-code">ETH</span>
-                <span class="pulse-rate-diff up" id="pulseDiffEth">▲</span>
+              <div class="pulse-rate-trends" aria-hidden="true">
+                <span class="pulse-trend-ind down" id="pulseDiffEth1d"></span>
+                <span class="pulse-trend-ind up" id="pulseDiffEth7d"></span>
+                <span class="pulse-trend-ind up" id="pulseDiffEth30d"></span>
               </div>
-              <div class="pulse-rate-value" id="pulseRateEth">2 520<span class="pulse-rate-curr">$</span></div>
+              <div class="pulse-rate-main">
+                <span class="pulse-rate-code">ETH</span>
+                <div class="pulse-rate-value" id="pulseRateEth">2 520<span class="pulse-rate-curr">$</span></div>
+              </div>
             </div>
             <div class="pulse-rate-item" data-kind="crypto" data-code="SOL" data-label="Solana (SOL)">
-              <div class="pulse-rate-top-line">
-                <span class="pulse-rate-code">SOL</span>
-                <span class="pulse-rate-diff up" id="pulseDiffSol">▲</span>
+              <div class="pulse-rate-trends" aria-hidden="true">
+                <span class="pulse-trend-ind down" id="pulseDiffSol1d"></span>
+                <span class="pulse-trend-ind up" id="pulseDiffSol7d"></span>
+                <span class="pulse-trend-ind up" id="pulseDiffSol30d"></span>
               </div>
-              <div class="pulse-rate-value" id="pulseRateSol">176.40<span class="pulse-rate-curr">$</span></div>
+              <div class="pulse-rate-main">
+                <span class="pulse-rate-code">SOL</span>
+                <div class="pulse-rate-value" id="pulseRateSol">176.40<span class="pulse-rate-curr">$</span></div>
+              </div>
             </div>
             <div class="pulse-rate-item" data-kind="crypto" data-code="BNB" data-label="BNB Chain (BNB)">
-              <div class="pulse-rate-top-line">
-                <span class="pulse-rate-code">BNB</span>
-                <span class="pulse-rate-diff down" id="pulseDiffBnb">▼</span>
+              <div class="pulse-rate-trends" aria-hidden="true">
+                <span class="pulse-trend-ind down" id="pulseDiffBnb1d"></span>
+                <span class="pulse-trend-ind up" id="pulseDiffBnb7d"></span>
+                <span class="pulse-trend-ind up" id="pulseDiffBnb30d"></span>
               </div>
-              <div class="pulse-rate-value" id="pulseRateBnb">594.20<span class="pulse-rate-curr">$</span></div>
+              <div class="pulse-rate-main">
+                <span class="pulse-rate-code">BNB</span>
+                <div class="pulse-rate-value" id="pulseRateBnb">594.20<span class="pulse-rate-curr">$</span></div>
+              </div>
             </div>
 
             <div class="pulse-rate-item" data-kind="crypto" data-code="GRAM" data-label="TON / Gram (GRAM)">
-              <div class="pulse-rate-top-line">
-                <span class="pulse-rate-code">GRAM</span>
-                <span class="pulse-rate-diff down" id="pulseDiffGram">▼</span>
+              <div class="pulse-rate-trends" aria-hidden="true">
+                <span class="pulse-trend-ind down" id="pulseDiffGram1d"></span>
+                <span class="pulse-trend-ind down" id="pulseDiffGram7d"></span>
+                <span class="pulse-trend-ind up" id="pulseDiffGram30d"></span>
               </div>
-              <div class="pulse-rate-value" id="pulseRateGram">1.03<span class="pulse-rate-curr">$</span></div>
+              <div class="pulse-rate-main">
+                <span class="pulse-rate-code">GRAM</span>
+                <div class="pulse-rate-value" id="pulseRateGram">1.03<span class="pulse-rate-curr">$</span></div>
+              </div>
             </div>
             <div class="pulse-rate-item" data-kind="crypto" data-code="XRP" data-label="Ripple (XRP)">
-              <div class="pulse-rate-top-line">
-                <span class="pulse-rate-code">XRP</span>
-                <span class="pulse-rate-diff up" id="pulseDiffXrp">▲</span>
+              <div class="pulse-rate-trends" aria-hidden="true">
+                <span class="pulse-trend-ind down" id="pulseDiffXrp1d"></span>
+                <span class="pulse-trend-ind up" id="pulseDiffXrp7d"></span>
+                <span class="pulse-trend-ind up" id="pulseDiffXrp30d"></span>
               </div>
-              <div class="pulse-rate-value" id="pulseRateXrp">0.535<span class="pulse-rate-curr">$</span></div>
+              <div class="pulse-rate-main">
+                <span class="pulse-rate-code">XRP</span>
+                <div class="pulse-rate-value" id="pulseRateXrp">0.535<span class="pulse-rate-curr">$</span></div>
+              </div>
             </div>
             <div class="pulse-rate-item" data-kind="crypto" data-code="LTC" data-label="Litecoin (LTC)">
-              <div class="pulse-rate-top-line">
-                <span class="pulse-rate-code">LTC</span>
-                <span class="pulse-rate-diff down" id="pulseDiffLtc">▼</span>
+              <div class="pulse-rate-trends" aria-hidden="true">
+                <span class="pulse-trend-ind up" id="pulseDiffLtc1d"></span>
+                <span class="pulse-trend-ind up" id="pulseDiffLtc7d"></span>
+                <span class="pulse-trend-ind up" id="pulseDiffLtc30d"></span>
               </div>
-              <div class="pulse-rate-value" id="pulseRateLtc">71.80<span class="pulse-rate-curr">$</span></div>
+              <div class="pulse-rate-main">
+                <span class="pulse-rate-code">LTC</span>
+                <div class="pulse-rate-value" id="pulseRateLtc">71.80<span class="pulse-rate-curr">$</span></div>
+              </div>
             </div>
             <div class="pulse-rate-item" data-kind="crypto" data-code="DOGE" data-label="Dogecoin (DOGE)">
-              <div class="pulse-rate-top-line">
-                <span class="pulse-rate-code">DOGE</span>
-                <span class="pulse-rate-diff up" id="pulseDiffDoge">▲</span>
+              <div class="pulse-rate-trends" aria-hidden="true">
+                <span class="pulse-trend-ind down" id="pulseDiffDoge1d"></span>
+                <span class="pulse-trend-ind up" id="pulseDiffDoge7d"></span>
+                <span class="pulse-trend-ind up" id="pulseDiffDoge30d"></span>
               </div>
-              <div class="pulse-rate-value" id="pulseRateDoge">0.142<span class="pulse-rate-curr">$</span></div>
+              <div class="pulse-rate-main">
+                <span class="pulse-rate-code">DOGE</span>
+                <div class="pulse-rate-value" id="pulseRateDoge">0.142<span class="pulse-rate-curr">$</span></div>
+              </div>
             </div>
           </div>
 
@@ -13893,11 +13948,9 @@ function renderPulseDrawerLayout(container, options = {}) {
               <i class="fas fa-university text-primary" id="pulseFinanceSourceIcon"></i>
               <span id="pulseFinanceSourceText">НБУ / Міжбанк • <span id="pulseFinanceDateNote">Оновлення щодня</span></span>
             </span>
-            <div class="pulse-rates-tab-group pulse-finance-period-group" id="pulseFinancePeriodGroup" role="group" aria-label="Період зміни курсу">
-              <button type="button" class="pulse-rate-tab-btn active" data-period="24h" title="Трикутники та градієнт показують зміну за 1 день (24 год)">1д</button>
-              <button type="button" class="pulse-rate-tab-btn" data-period="7d" title="Трикутники та градієнт показують зміну за 7 днів">7д</button>
-              <button type="button" class="pulse-rate-tab-btn" data-period="30d" title="Трикутники та градієнт показують зміну за 30 днів">30д</button>
-            </div>
+            <span class="pulse-finance-legend" title="Зліва на плитці зверху вниз: 1 день, 7 днів, 30 днів (градієнт знизу - тренд за 30 днів)">
+              <span class="pulse-finance-legend-dots" aria-hidden="true"><i></i><i></i><i></i></span>1д · 7д · 30д
+            </span>
           </div>
         </div>
 
@@ -14482,39 +14535,29 @@ function renderPulseDrawerLayout(container, options = {}) {
   const tabBtnCrypto = container.querySelector('#pulseTabBtnCrypto');
   const gridFiat = container.querySelector('#pulseFiatGrid');
   const gridCrypto = container.querySelector('#pulseCryptoGrid');
-  const periodGroup = container.querySelector('#pulseFinancePeriodGroup');
 
   // Перемикач вкладок Валюти / Крипта у Конвертері
   const convTabFiat = container.querySelector('#pulseConvTabFiat');
   const convTabCrypto = container.querySelector('#pulseConvTabCrypto');
 
-  const updatePulseFinanceFooterUI = (mode, period) => {
+  const updatePulseFinanceFooterUI = (mode) => {
     const isCrypto = mode === 'crypto';
-    const curPeriod = period || window.pulseFinancePeriod || '24h';
     const footerNote = container.querySelector('#pulseFinanceFooterNote');
     const sourceIcon = container.querySelector('#pulseFinanceSourceIcon');
     const sourceText = container.querySelector('#pulseFinanceSourceText');
-    const periodLabel = curPeriod === '30d' ? 'за 30д' : (curPeriod === '7d' ? 'за 7д' : 'за 1д');
-    const periodFull = curPeriod === '30d' ? 'місяць (30 днів)' : (curPeriod === '7d' ? 'тиждень (7 днів)' : '1 день (24 год)');
 
     if (sourceIcon) {
       sourceIcon.className = isCrypto ? 'fas fa-chart-line text-warning' : 'fas fa-university text-primary';
     }
     if (sourceText) {
-      if (isCrypto) {
-        sourceText.innerHTML = curPeriod === '24h'
-          ? `Binance / CoinGecko • <span id="pulseFinanceDateNote">Дані наживо</span>`
-          : `Binance / CoinGecko • <span id="pulseFinanceDateNote">Тренд ${periodLabel}</span>`;
-      } else {
-        sourceText.innerHTML = curPeriod === '24h'
-          ? `НБУ / Міжбанк • <span id="pulseFinanceDateNote">Оновлення щодня</span>`
-          : `НБУ / Міжбанк • <span id="pulseFinanceDateNote">Тренд ${periodLabel}</span>`;
-      }
+      sourceText.innerHTML = isCrypto
+        ? `Binance / CoinGecko • <span id="pulseFinanceDateNote">Дані наживо</span>`
+        : `НБУ / Міжбанк • <span id="pulseFinanceDateNote">Оновлення щодня</span>`;
     }
     if (footerNote) {
       footerNote.title = isCrypto
-        ? `Біржові котирування Binance та CoinGecko. Трикутники показують зміну за ${periodFull}.`
-        : `Офіційний курс НБУ. Трикутники показують зміну за ${periodFull}.`;
+        ? 'Біржові котирування Binance та CoinGecko. Зліва трикутники за 1д, 7д та 30д; градієнт знизу показує тренд за 30 днів.'
+        : 'Офіційний курс НБУ. Зліва трикутники за 1д, 7д та 30д; градієнт знизу показує тренд за 30 днів.';
     }
   };
 
@@ -14525,7 +14568,7 @@ function renderPulseDrawerLayout(container, options = {}) {
       tabBtnCrypto.classList.toggle('active', isCrypto);
       gridFiat.style.display = isCrypto ? 'none' : 'grid';
       gridCrypto.style.display = isCrypto ? 'grid' : 'none';
-      updatePulseFinanceFooterUI(isCrypto ? 'crypto' : 'fiat', window.pulseFinancePeriod);
+      updatePulseFinanceFooterUI(isCrypto ? 'crypto' : 'fiat');
       if (persist) {
         try { localStorage.setItem('pulse_finance_tab', isCrypto ? 'crypto' : 'fiat'); } catch (e) {}
       }
@@ -14545,35 +14588,12 @@ function renderPulseDrawerLayout(container, options = {}) {
     if (savedFinanceTab === 'crypto') {
       setTimeout(() => activateFinanceTab('crypto', true, false), 0);
     } else {
-      updatePulseFinanceFooterUI('fiat', window.pulseFinancePeriod);
+      updatePulseFinanceFooterUI('fiat');
     }
   }
 
-  if (periodGroup) {
-    const setPeriod = (newPeriod, persist = true) => {
-      const validPeriod = (newPeriod === '7d' || newPeriod === '30d' || newPeriod === '24h') ? newPeriod : '24h';
-      window.pulseFinancePeriod = validPeriod;
-      periodGroup.querySelectorAll('[data-period]').forEach(btn => {
-        btn.classList.toggle('active', btn.getAttribute('data-period') === validPeriod);
-      });
-      if (persist) {
-        try { localStorage.setItem('pulse_finance_period', validPeriod); } catch (e) {}
-      }
-      const isCryptoActive = tabBtnCrypto && tabBtnCrypto.classList.contains('active');
-      updatePulseFinanceFooterUI(isCryptoActive ? 'crypto' : 'fiat', validPeriod);
-      applyRatesToUI(pulseRatesData);
-      applyCryptoToUI(pulseCryptoData);
-    };
-
-    periodGroup.querySelectorAll('[data-period]').forEach(btn => {
-      btn.onclick = (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        setPeriod(btn.getAttribute('data-period'), true);
-      };
-    });
-    setPeriod(window.pulseFinancePeriod || '24h', false);
-  }
+  applyRatesToUI(pulseRatesData);
+  applyCryptoToUI(pulseCryptoData);
 
   // Кнопка ручного оновлення у картці «Фінанси»
   const financeRefreshBtn = container.querySelector('#pulseFinanceRefreshBtn');
@@ -14830,7 +14850,6 @@ function renderPulseDrawerLayout(container, options = {}) {
         const kind = tile.getAttribute('data-kind') || (tile.closest('#pulseCryptoGrid') ? 'crypto' : 'fiat');
         const code = (tile.getAttribute('data-code') || '').toUpperCase();
         const label = tile.getAttribute('data-label') || code;
-        const activePeriod = window.pulseFinancePeriod || '24h';
 
         let d24, d7, d30;
         if (kind === 'crypto') {
@@ -14864,12 +14883,11 @@ function renderPulseDrawerLayout(container, options = {}) {
           d30 = formatFiatWithPct(r[`diff30d${code}`], r[`pct30d${code}`]);
         }
 
-        const makeRow = (periodKey, name, info) => {
-          const activeCls = activePeriod === periodKey ? ' is-active' : '';
-          return `<div class="pft-row ${info.cls}${activeCls}"><span class="pft-arrow">${info.arrow}</span><span class="pft-label">${name}:</span><span class="pft-val">${info.text}</span></div>`;
+        const makeRow = (name, info) => {
+          return `<div class="pft-row ${info.cls}"><span class="pft-arrow">${info.arrow}</span><span class="pft-label">${name}:</span><span class="pft-val">${info.text}</span></div>`;
         };
 
-        return `<div class="pft-title">${label}</div><div class="pft-rows">${makeRow('24h', 'Доба (1д)', d24)}${makeRow('7d', 'Тиждень (7д)', d7)}${makeRow('30d', 'Місяць (30д)', d30)}</div><div class="pft-hint">Клік - підставити в Конвертер</div>`;
+        return `<div class="pft-title">${label}</div><div class="pft-rows">${makeRow('Доба (1д)', d24)}${makeRow('Тиждень (7д)', d7)}${makeRow('Місяць (30д)', d30)}</div><div class="pft-hint">Клік - підставити в Конвертер</div>`;
       };
 
       const positionFinanceTooltip = (tile) => {
@@ -15479,7 +15497,6 @@ function getFinancePeriodScale(baseDailyPct, activePeriod, valuesPct) {
 function applyCryptoToUI(cryptoData) {
   if (!cryptoData) return;
   pulseCryptoData = cryptoData;
-  const activePeriod = window.pulseFinancePeriod || '24h';
 
   const formatCryptoPriceHtml = (price) => {
     let numStr;
@@ -15494,43 +15511,47 @@ function applyCryptoToUI(cryptoData) {
   };
 
   const coinKeys = ['BTC', 'ETH', 'SOL', 'BNB', 'GRAM', 'XRP', 'LTC', 'DOGE'];
-  const getCoinDiffStr = (info) => {
-    if (!info) return '';
-    return activePeriod === '30d'
-      ? (info.diff30d || info.diff)
-      : (activePeriod === '7d' ? (info.diff7d || info.diff) : info.diff);
+  const parsePct = (rawStr) => {
+    if (!rawStr) return 0;
+    return parseFloat(String(rawStr).replace(',', '.').replace(/[^0-9.-]/g, '')) || 0;
   };
-  const allCryptoPcts = coinKeys.map(k => {
-    const d = String(getCoinDiffStr(pulseCryptoData[k]) || '');
-    return parseFloat(d.replace(',', '.').replace(/[^0-9.-]/g, '')) || 0;
+  const allCrypto30dPcts = coinKeys.map(k => {
+    const info = pulseCryptoData[k];
+    return info ? parsePct(info.diff30d || info.diff) : 0;
   });
-  const cryptoScale = getFinancePeriodScale(5.5, activePeriod, allCryptoPcts);
+  const crypto30dScale = getFinancePeriodScale(5.5, '30d', allCrypto30dPcts);
+
+  const setTrendClass = (el, rawStr) => {
+    if (!el) return { dir: 'flat', num: 0 };
+    if (rawStr === undefined || rawStr === null || rawStr === '') {
+      el.className = 'pulse-trend-ind flat';
+      return { dir: 'flat', num: 0 };
+    }
+    const diffStr = String(rawStr).trim();
+    const num = parseFloat(diffStr.replace(',', '.').replace(/[^0-9.-]/g, ''));
+    if (isNaN(num) || Math.abs(num) < 0.05) {
+      el.className = 'pulse-trend-ind flat';
+      return { dir: 'flat', num: 0 };
+    }
+    const isUp = num > 0 || diffStr.startsWith('+') || diffStr.startsWith('▲');
+    const dir = isUp ? 'up' : 'down';
+    el.className = `pulse-trend-ind ${dir}`;
+    return { dir, num };
+  };
 
   const updateCryptoItem = (code, info) => {
     if (!info) return;
     const elVal = document.getElementById(`pulseRate${code}`);
-    const elDiff = document.getElementById(`pulseDiff${code}`);
-    const tile = elDiff ? elDiff.closest('.pulse-rate-item') : (elVal ? elVal.closest('.pulse-rate-item') : null);
+    const el1d = document.getElementById(`pulseDiff${code}1d`);
+    const el7d = document.getElementById(`pulseDiff${code}7d`);
+    const el30d = document.getElementById(`pulseDiff${code}30d`);
+    const tile = (elVal || el1d) ? (elVal || el1d).closest('.pulse-rate-item') : null;
+
     if (elVal) elVal.innerHTML = formatCryptoPriceHtml(info.price);
-    const activeDiff = getCoinDiffStr(info);
-    if (elDiff && activeDiff) {
-      const diffStr = String(activeDiff).trim();
-      const num = parseFloat(diffStr.replace(',', '.').replace(/[^0-9.-]/g, ''));
-      if (isNaN(num) || Math.abs(num) < 0.05) {
-        elDiff.className = 'pulse-rate-diff flat';
-        elDiff.textContent = '•';
-        applyFinanceTileHeat(tile, 0, cryptoScale, 'flat');
-      } else {
-        const isUp = num > 0 || diffStr.startsWith('+') || diffStr.startsWith('▲');
-        const dir = isUp ? 'up' : 'down';
-        elDiff.className = `pulse-rate-diff ${dir}`;
-        elDiff.textContent = isUp ? '▲' : '▼';
-        applyFinanceTileHeat(tile, num, cryptoScale, dir);
-      }
-      elDiff.removeAttribute('title');
-    } else {
-      applyFinanceTileHeat(tile, 0, cryptoScale, 'flat');
-    }
+    setTrendClass(el1d, info.diff);
+    setTrendClass(el7d, info.diff7d);
+    const res30 = setTrendClass(el30d, info.diff30d || info.diff);
+    applyFinanceTileHeat(tile, res30.num, crypto30dScale, res30.dir);
   };
 
   updateCryptoItem('Btc', pulseCryptoData.BTC);
@@ -15550,15 +15571,14 @@ function applyCryptoToUI(cryptoData) {
 function applyRatesToUI(rates) {
   if (!rates) return;
   pulseRatesData = rates;
-  const activePeriod = window.pulseFinancePeriod || '24h';
 
-  const getFiatPctNum = (upperKey, val) => {
-    const diff = activePeriod === '30d'
+  const getFiatPctNum = (upperKey, val, periodKey) => {
+    const diff = periodKey === '30d'
       ? (rates[`diff30d${upperKey}`] ?? rates[`diff${upperKey}`])
-      : (activePeriod === '7d' ? (rates[`diff7d${upperKey}`] ?? rates[`diff${upperKey}`]) : rates[`diff${upperKey}`]);
-    const pctRaw = activePeriod === '30d'
+      : (periodKey === '7d' ? (rates[`diff7d${upperKey}`] ?? rates[`diff${upperKey}`]) : rates[`diff${upperKey}`]);
+    const pctRaw = periodKey === '30d'
       ? rates[`pct30d${upperKey}`]
-      : (activePeriod === '7d' ? rates[`pct7d${upperKey}`] : rates[`pct${upperKey}`]);
+      : (periodKey === '7d' ? rates[`pct7d${upperKey}`] : rates[`pct${upperKey}`]);
     let pctNum = pctRaw ? parseFloat(String(pctRaw).replace(',', '.').replace(/[^0-9.-]/g, '')) : NaN;
     if (isNaN(pctNum)) {
       const deltaNum = parseFloat(String(diff || '0').replace(',', '.').replace(/[^0-9.-]/g, '')) || 0;
@@ -15567,37 +15587,41 @@ function applyRatesToUI(rates) {
     }
     return pctNum;
   };
+
   const fiatKeys = ['USD', 'EUR', 'PLN', 'GBP', 'CZK', 'CHF', 'CAD', 'CNY'];
-  const allFiatPcts = fiatKeys.map(k => getFiatPctNum(k, rates[k]));
-  const fiatScale = getFinancePeriodScale(0.75, activePeriod, allFiatPcts);
+  const allFiat30dPcts = fiatKeys.map(k => getFiatPctNum(k, rates[k], '30d'));
+  const fiat30dScale = getFinancePeriodScale(0.75, '30d', allFiat30dPcts);
+
+  const setFiatTrendInd = (el, diffVal) => {
+    if (!el) return 'flat';
+    if (diffVal === undefined || diffVal === null || diffVal === '') {
+      el.className = 'pulse-trend-ind flat';
+      return 'flat';
+    }
+    const diffStr = String(diffVal).trim();
+    if (diffStr === '0.00' || diffStr === '0' || diffStr === '—') {
+      el.className = 'pulse-trend-ind flat';
+      return 'flat';
+    }
+    const isUp = diffStr.startsWith('+') || diffStr.startsWith('▲');
+    const dir = isUp ? 'up' : 'down';
+    el.className = `pulse-trend-ind ${dir}`;
+    return dir;
+  };
 
   const updateItem = (code, val, upperKey) => {
     const elVal = document.getElementById(`pulseRate${code}`);
-    const elDiff = document.getElementById(`pulseDiff${code}`);
-    const tile = elDiff ? elDiff.closest('.pulse-rate-item') : (elVal ? elVal.closest('.pulse-rate-item') : null);
-    if (elVal) elVal.innerHTML = formatDecimalsHtml(val, 2, false);
-    const diff = activePeriod === '30d'
-      ? (rates[`diff30d${upperKey}`] ?? rates[`diff${upperKey}`])
-      : (activePeriod === '7d' ? (rates[`diff7d${upperKey}`] ?? rates[`diff${upperKey}`]) : rates[`diff${upperKey}`]);
+    const el1d = document.getElementById(`pulseDiff${code}1d`);
+    const el7d = document.getElementById(`pulseDiff${code}7d`);
+    const el30d = document.getElementById(`pulseDiff${code}30d`);
+    const tile = (elVal || el1d) ? (elVal || el1d).closest('.pulse-rate-item') : null;
 
-    if (elDiff && diff !== undefined && diff !== null) {
-      const diffStr = String(diff).trim();
-      if (diffStr === '0.00' || diffStr === '0' || diffStr === '—') {
-        elDiff.className = 'pulse-rate-diff flat';
-        elDiff.textContent = '•';
-        applyFinanceTileHeat(tile, 0, fiatScale, 'flat');
-      } else {
-        const isUp = diffStr.startsWith('+') || diffStr.startsWith('▲');
-        const dir = isUp ? 'up' : 'down';
-        elDiff.className = `pulse-rate-diff ${dir}`;
-        elDiff.textContent = isUp ? '▲' : '▼';
-        const pctNum = getFiatPctNum(upperKey, val);
-        applyFinanceTileHeat(tile, pctNum, fiatScale, dir);
-      }
-      elDiff.removeAttribute('title');
-    } else {
-      applyFinanceTileHeat(tile, 0, fiatScale, 'flat');
-    }
+    if (elVal) elVal.innerHTML = formatDecimalsHtml(val, 2, false);
+    setFiatTrendInd(el1d, rates[`diff${upperKey}`]);
+    setFiatTrendInd(el7d, rates[`diff7d${upperKey}`]);
+    const dir30 = setFiatTrendInd(el30d, rates[`diff30d${upperKey}`] ?? rates[`diff${upperKey}`]);
+    const pct30 = getFiatPctNum(upperKey, val, '30d');
+    applyFinanceTileHeat(tile, pct30, fiat30dScale, dir30);
   };
 
   updateItem('Usd', rates.USD || 45.20, 'USD');

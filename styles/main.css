@@ -14379,7 +14379,7 @@ body.dark-mode .pulse-rates-row {
 .pulse-rate-item {
   height: 100%;
   min-height: 44px;
-  padding: 3px 2px 4px;
+  padding: 3px 4px 4px 6px;
   border-radius: 0;
   background-color: transparent;
   background-image: linear-gradient(to top, var(--rate-heat-color, transparent) 0%, transparent 56%);
@@ -14387,9 +14387,10 @@ body.dark-mode .pulse-rates-row {
   text-align: center;
   box-sizing: border-box;
   display: flex;
-  flex-direction: column;
-  justify-content: center;
+  flex-direction: row;
+  justify-content: flex-start;
   align-items: center;
+  gap: 4px;
   transition: background-color 0.15s ease;
   min-width: 0;
   cursor: pointer;
@@ -14432,14 +14433,53 @@ body.dark-mode .pulse-rate-item:hover {
   background-color: rgba(56, 189, 248, 0.12);
 }
 
-.pulse-rate-top-line {
+.pulse-rate-trends {
   display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  width: 7px;
+  height: 24px;
+  flex-shrink: 0;
+}
+.pulse-trend-ind {
+  display: block;
+  width: 6px;
+  height: 5px;
+  flex-shrink: 0;
+}
+.pulse-trend-ind.up {
+  background: #16a34a;
+  clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+}
+.pulse-trend-ind.down {
+  background: #dc2626;
+  clip-path: polygon(0% 0%, 100% 0%, 50% 100%);
+}
+.pulse-trend-ind.flat {
+  width: 3.5px;
+  height: 3.5px;
+  border-radius: 50%;
+  background: #94a3b8;
+  opacity: 0.72;
+}
+body.dark-mode .pulse-trend-ind.up {
+  background: #4ade80;
+}
+body.dark-mode .pulse-trend-ind.down {
+  background: #f87171;
+}
+body.dark-mode .pulse-trend-ind.flat {
+  background: #64748b;
+}
+
+.pulse-rate-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 3.5px;
-  width: 100%;
-  line-height: 1;
-  white-space: nowrap;
 }
 .pulse-rate-code {
   display: inline-flex;
@@ -14453,52 +14493,24 @@ body.dark-mode .pulse-rate-item:hover {
 body.dark-mode .pulse-rate-code {
   color: #cbd5e1;
 }
-.pulse-rate-diff {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.68rem;
-  font-weight: 700;
-  line-height: 1;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-.pulse-rate-diff.up,
-.pulse-rate-diff.down {
-  font-size: 0;
-  width: 7px;
-  height: 6px;
-  transform: translateY(-0.5px);
-}
-.pulse-rate-diff.up::before,
-.pulse-rate-diff.down::before {
-  content: '';
-  display: block;
-  width: 7px;
-  height: 5.5px;
-  background: currentColor;
-}
-.pulse-rate-diff.up::before {
-  clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
-}
-.pulse-rate-diff.down::before {
-  clip-path: polygon(0% 0%, 100% 0%, 50% 100%);
-}
-.pulse-rate-diff.up { color: #16a34a; }
-.pulse-rate-diff.down { color: #dc2626; }
-.pulse-rate-diff.flat {
-  color: #94a3b8;
-  transform: translateY(-0.5px);
-}
 
 .pulse-rate-value {
-  font-size: 0.80rem;
+  font-size: 0.79rem;
   font-weight: 600;
   color: #1e293b;
   line-height: 1.15;
   margin: 2px 0 0;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
+}
+@media (max-width: 480px) {
+  .pulse-rate-item {
+    padding: 3px 3px 4px 4.5px;
+    gap: 2.5px;
+  }
+  .pulse-rate-value {
+    font-size: 0.74rem;
+  }
 }
 .pulse-rate-value .pulse-decimal {
   font-weight: 400;
@@ -14863,21 +14875,39 @@ body.dark-mode .pulse-finance-footer {
   font-size: 0.62rem;
   opacity: 0.85;
 }
-.pulse-finance-period-group {
+.pulse-finance-legend {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   flex-shrink: 0;
   margin-left: auto;
-  height: 19px;
-  padding: 1px;
-  gap: 1px;
+  font-size: 0.60rem;
+  font-weight: 500;
+  color: #64748b;
+  opacity: 0.88;
+  white-space: nowrap;
+  cursor: help;
 }
-.pulse-finance-period-group .pulse-rate-tab-btn {
-  font-size: 0.63rem;
-  padding: 1px 5px;
-  height: 17px;
-  letter-spacing: 0.1px;
+body.dark-mode .pulse-finance-legend {
+  color: #94a3b8;
+}
+.pulse-finance-legend-dots {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  height: 10px;
+  width: 4px;
+}
+.pulse-finance-legend-dots i {
+  display: block;
+  width: 3px;
+  height: 2.5px;
+  background: currentColor;
+  clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
 }
 
-/* Багата спливаюча підказка (24г / 7д / 30д) для картки Фінанси */
+/* Багата спливаюча підказка (1д / 7д / 30д) для картки Фінанси */
 .pulse-finance-tooltip {
   position: fixed;
   z-index: 100050;
