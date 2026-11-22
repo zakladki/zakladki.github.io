@@ -12987,49 +12987,53 @@ function renderPulseEcoUI(data, region) {
   const dotNo2 = document.getElementById('pulseEcoDotNo2');
   const dotO3 = document.getElementById('pulseEcoDotO3');
   const statusBadge = document.getElementById('pulseEcoStatusBadge');
+  const ecoPanel = document.querySelector('#pulseCardEco .pulse-eco-unified-panel');
+
+  let radCls = 'green';
+  let aqiCls = 'green';
 
   if (radBadgeEl) {
-    let circle = '🟢';
-    let cls = 'green';
     let tooltip = 'Норма: радіаційний фон у межах природної безпеки (до 0.30 мкЗв/год)';
     if (data.radiation <= 0.20) {
-      circle = '🟢';
-      cls = 'green';
+      radCls = 'green';
       tooltip = 'Норма: радіаційний фон у межах природної безпеки (до 0.30 мкЗв/год)';
     } else if (data.radiation <= 0.30) {
-      circle = '🟡';
-      cls = 'yellow';
+      radCls = 'yellow';
       tooltip = 'Помірне: допустимий природний рівень (до 0.30 мкЗв/год)';
     } else {
-      circle = '🔴';
-      cls = 'red';
+      radCls = 'red';
       tooltip = 'Підвищений: увага, перевищення норми (понад 0.30 мкЗв/год)';
     }
-    radBadgeEl.className = `pulse-eco-metric-badge ${cls}`;
+    radBadgeEl.className = `pulse-eco-metric-badge ${radCls}`;
     radBadgeEl.title = tooltip;
-    radBadgeEl.innerHTML = `<span class="pulse-eco-badge-dot">${circle}</span> <span id="pulseEcoRadVal" class="pulse-eco-badge-val">${data.radiation.toFixed(2)}</span> <span class="pulse-eco-badge-unit">мкЗв/год</span>`;
+    radBadgeEl.innerHTML = `<span class="pulse-eco-badge-dot" aria-hidden="true"></span><span id="pulseEcoRadVal" class="pulse-eco-badge-val">${data.radiation.toFixed(2)}</span><span class="pulse-eco-badge-unit">мкЗв/год</span>`;
+    const radBox = radBadgeEl.closest('.pulse-eco-metric-box');
+    if (radBox) {
+      radBox.classList.remove('is-green', 'is-yellow', 'is-red');
+      radBox.classList.add(`is-${radCls}`);
+    }
   }
 
   if (aqiBadgeEl) {
-    let circle = '🟢';
-    let cls = 'green';
     let tooltip = 'Чисте: безпечне для дихання (до 50 AQI)';
     if (data.aqi <= 50) {
-      circle = '🟢';
-      cls = 'green';
+      aqiCls = 'green';
       tooltip = 'Чисте: якість повітря відмінна та безпечна (до 50 AQI)';
     } else if (data.aqi <= 100) {
-      circle = '🟡';
-      cls = 'yellow';
+      aqiCls = 'yellow';
       tooltip = 'Помірне: якість повітря прийнятна (AQI 51-100)';
     } else {
-      circle = '🔴';
-      cls = 'red';
+      aqiCls = 'red';
       tooltip = 'Забруднене: небезпечно для людей із захворюваннями дихальних шляхів (AQI 101+)';
     }
-    aqiBadgeEl.className = `pulse-eco-metric-badge ${cls}`;
+    aqiBadgeEl.className = `pulse-eco-metric-badge ${aqiCls}`;
     aqiBadgeEl.title = tooltip;
-    aqiBadgeEl.innerHTML = `<span class="pulse-eco-badge-dot">${circle}</span> <span id="pulseEcoAqiVal" class="pulse-eco-badge-val">AQI ${data.aqi}</span>`;
+    aqiBadgeEl.innerHTML = `<span class="pulse-eco-badge-dot" aria-hidden="true"></span><span id="pulseEcoAqiVal" class="pulse-eco-badge-val">AQI ${data.aqi}</span>`;
+    const aqiBox = aqiBadgeEl.closest('.pulse-eco-metric-box');
+    if (aqiBox) {
+      aqiBox.classList.remove('is-green', 'is-yellow', 'is-red');
+      aqiBox.classList.add(`is-${aqiCls}`);
+    }
   }
 
   if (statusBadge) {
@@ -13063,10 +13067,30 @@ function renderPulseEcoUI(data, region) {
   if (no2El) no2El.innerHTML = formatEcoDecimalNum(data.no2);
   if (o3El) o3El.innerHTML = formatEcoDecimalNum(data.o3);
 
-  if (dotPm25) dotPm25.className = `pulse-eco-pulse-dot ${getEcoMetricStatusClass('pm25', data.pm25)}`;
-  if (dotPm10) dotPm10.className = `pulse-eco-pulse-dot ${getEcoMetricStatusClass('pm10', data.pm10)}`;
-  if (dotNo2) dotNo2.className = `pulse-eco-pulse-dot ${getEcoMetricStatusClass('no2', data.no2)}`;
-  if (dotO3) dotO3.className = `pulse-eco-pulse-dot ${getEcoMetricStatusClass('o3', data.o3)}`;
+  const pm25Cls = getEcoMetricStatusClass('pm25', data.pm25);
+  const pm10Cls = getEcoMetricStatusClass('pm10', data.pm10);
+  const no2Cls = getEcoMetricStatusClass('no2', data.no2);
+  const o3Cls = getEcoMetricStatusClass('o3', data.o3);
+
+  const applyStripStatus = (dotEl, cls) => {
+    if (!dotEl) return;
+    dotEl.className = `pulse-eco-pulse-dot ${cls}`;
+    const itemEl = dotEl.closest('.pulse-eco-strip-item');
+    if (itemEl) {
+      itemEl.classList.remove('is-green', 'is-yellow', 'is-red');
+      itemEl.classList.add(`is-${cls}`);
+    }
+  };
+
+  applyStripStatus(dotPm25, pm25Cls);
+  applyStripStatus(dotPm10, pm10Cls);
+  applyStripStatus(dotNo2, no2Cls);
+  applyStripStatus(dotO3, o3Cls);
+
+  if (ecoPanel) {
+    const hasDanger = [radCls, aqiCls, pm25Cls, pm10Cls, no2Cls, o3Cls].includes('red');
+    ecoPanel.classList.toggle('has-danger', hasDanger);
+  }
 }
 
 // ==========================================================================
@@ -13689,7 +13713,7 @@ function renderPulseDrawerLayout(container, options = {}) {
                   <i class="fas fa-radiation text-warning"></i> Радіація
                 </div>
                 <div class="pulse-eco-metric-badge green" id="pulseEcoRadBadge" title="Норма: радіаційний фон у межах безпеки (до 0.30 мкЗв/год)">
-                  <span class="pulse-eco-badge-dot">🟢</span> <span id="pulseEcoRadVal" class="pulse-eco-badge-val">0.11</span> <span class="pulse-eco-badge-unit">мкЗв/год</span>
+                  <span class="pulse-eco-badge-dot" aria-hidden="true"></span><span id="pulseEcoRadVal" class="pulse-eco-badge-val">0.11</span><span class="pulse-eco-badge-unit">мкЗв/год</span>
                 </div>
               </div>
 
@@ -13698,7 +13722,7 @@ function renderPulseDrawerLayout(container, options = {}) {
                   <i class="fas fa-wind text-info"></i> Повітря (AQI)
                 </div>
                 <div class="pulse-eco-metric-badge green" id="pulseEcoAqiBadge" title="Чисте: безпечне для дихання (до 50 AQI)">
-                  <span class="pulse-eco-badge-dot">🟢</span> <span id="pulseEcoAqiVal" class="pulse-eco-badge-val">AQI 28</span>
+                  <span class="pulse-eco-badge-dot" aria-hidden="true"></span><span id="pulseEcoAqiVal" class="pulse-eco-badge-val">AQI 28</span>
                 </div>
               </div>
             </div>

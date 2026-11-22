@@ -13370,11 +13370,20 @@ body.dark-mode .pulse-geomag-footer-more a:hover {
   overflow: hidden;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
   margin-bottom: 0;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 body.dark-mode .pulse-eco-unified-panel {
   background: rgba(15, 23, 42, 0.45);
   border-color: #334155;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+.pulse-eco-unified-panel.has-danger {
+  border-color: rgba(220, 38, 38, 0.65);
+  box-shadow: 0 0 0 1px rgba(220, 38, 38, 0.16), 0 2px 6px rgba(220, 38, 38, 0.10);
+}
+body.dark-mode .pulse-eco-unified-panel.has-danger {
+  border-color: rgba(239, 68, 68, 0.72);
+  box-shadow: 0 0 0 1px rgba(239, 68, 68, 0.22), 0 2px 6px rgba(220, 38, 38, 0.22);
 }
 
 .pulse-eco-metrics-row {
@@ -13391,7 +13400,7 @@ body.dark-mode .pulse-eco-metrics-row {
   border-bottom: 1px solid #3b4b63;
 }
 .pulse-eco-metric-box {
-  padding: 5px 8px;
+  padding: 6px 8px;
   background: transparent;
   border: none;
   border-radius: 0;
@@ -13399,7 +13408,20 @@ body.dark-mode .pulse-eco-metrics-row {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 3px;
+  gap: 4px;
+  transition: background-color 0.2s ease;
+}
+.pulse-eco-metric-box.is-yellow {
+  background: rgba(245, 158, 11, 0.06);
+}
+body.dark-mode .pulse-eco-metric-box.is-yellow {
+  background: rgba(245, 158, 11, 0.10);
+}
+.pulse-eco-metric-box.is-red {
+  background: rgba(239, 68, 68, 0.11);
+}
+body.dark-mode .pulse-eco-metric-box.is-red {
+  background: rgba(220, 38, 38, 0.20);
 }
 .pulse-eco-metric-box:first-child {
   border-right: 1px solid #d5dfe9;
@@ -13413,12 +13435,26 @@ body.dark-mode .pulse-eco-metric-box:first-child {
   color: #64748b;
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
   line-height: 1.1;
   margin: 0;
 }
+.pulse-eco-metric-title i {
+  width: 14px;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
 body.dark-mode .pulse-eco-metric-title {
   color: #94a3b8;
+}
+.pulse-eco-metric-box.is-red .pulse-eco-metric-title {
+  color: #b91c1c;
+}
+body.dark-mode .pulse-eco-metric-box.is-red .pulse-eco-metric-title {
+  color: #fca5a5;
 }
 .pulse-eco-metric-val {
   font-size: 0.85rem;
@@ -13432,56 +13468,98 @@ body.dark-mode .pulse-eco-metric-val {
   color: #cbd5e1;
 }
 .pulse-eco-metric-badge {
-  font-size: 0.74rem;
-  font-weight: 700;
-  padding: 2.5px 6px;
+  font-size: 0.80rem;
+  font-weight: 600;
+  padding: 1px 0;
   border-radius: 5px;
   display: inline-flex;
-  align-items: center;
-  gap: 4px;
+  align-items: baseline;
+  gap: 6px;
   width: fit-content;
   cursor: help;
-  line-height: 1.2;
+  line-height: 1.05;
+  font-variant-numeric: tabular-nums;
 }
 .pulse-eco-metric-badge.green {
-  background: rgba(16, 185, 129, 0.15);
-  color: #059669;
+  background: transparent;
+  color: #1e293b;
 }
 body.dark-mode .pulse-eco-metric-badge.green {
-  background: rgba(16, 185, 129, 0.25);
-  color: #34d399;
+  background: transparent;
+  color: #f1f5f9;
 }
 .pulse-eco-metric-badge.yellow {
-  background: rgba(245, 158, 11, 0.18);
-  color: #d97706;
+  background: rgba(245, 158, 11, 0.16);
+  border: 1px solid rgba(245, 158, 11, 0.28);
+  padding: 2px 6px;
+  color: #b45309;
 }
 body.dark-mode .pulse-eco-metric-badge.yellow {
-  background: rgba(245, 158, 11, 0.28);
+  background: rgba(245, 158, 11, 0.22);
+  border-color: rgba(251, 191, 36, 0.32);
   color: #fbbf24;
 }
 .pulse-eco-metric-badge.red {
-  background: rgba(239, 68, 68, 0.2);
-  color: #dc2626;
+  background: #dc2626;
+  padding: 2px 7px;
+  color: #ffffff;
+  box-shadow: 0 1px 4px rgba(220, 38, 38, 0.34);
 }
 body.dark-mode .pulse-eco-metric-badge.red {
-  background: rgba(239, 68, 68, 0.3);
-  color: #f87171;
+  background: #dc2626;
+  color: #ffffff;
+  box-shadow: 0 1px 5px rgba(220, 38, 38, 0.45);
 }
 .pulse-eco-badge-dot {
-  font-size: 0.65rem;
-  line-height: 1;
-  display: inline-flex;
-  align-items: center;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: inline-block;
+  align-self: center;
+  margin: 0 3.5px;
+  background-color: #10b981;
+  box-shadow: 0 0 0 2.5px rgba(16, 185, 129, 0.16);
+}
+.pulse-eco-metric-badge.yellow .pulse-eco-badge-dot {
+  margin: 0 2px 0 0;
+  background-color: #f59e0b;
+  box-shadow: 0 0 0 2.5px rgba(245, 158, 11, 0.22);
+}
+.pulse-eco-metric-badge.red .pulse-eco-badge-dot {
+  margin: 0 2px 0 0;
+  background-color: #ffffff;
+  box-shadow: 0 0 0 2.5px rgba(255, 255, 255, 0.30);
 }
 .pulse-eco-badge-val {
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: -0.2px;
+  line-height: 1;
+  display: inline-block;
 }
 .pulse-eco-badge-unit {
-  font-size: 0.62rem;
-  font-weight: 600;
+  font-size: 0.66rem;
+  font-weight: 500;
+  color: #64748b;
   opacity: 0.85;
-  margin-left: 1px;
+  line-height: 1;
+  display: inline-block;
+  margin-left: -2px;
+}
+body.dark-mode .pulse-eco-badge-unit {
+  color: #94a3b8;
+}
+.pulse-eco-metric-badge.yellow .pulse-eco-badge-unit {
+  color: #b45309;
+  opacity: 0.92;
+}
+body.dark-mode .pulse-eco-metric-badge.yellow .pulse-eco-badge-unit {
+  color: #fcd34d;
+}
+.pulse-eco-metric-badge.red .pulse-eco-badge-unit,
+body.dark-mode .pulse-eco-metric-badge.red .pulse-eco-badge-unit {
+  color: rgba(255, 255, 255, 0.94);
+  opacity: 1;
 }
 
 .pulse-eco-ref-hint {
@@ -13521,20 +13599,33 @@ body.dark-mode .pulse-eco-strip {
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  gap: 3px;
-  padding: 0 4px;
+  gap: 5px;
+  padding: 0 3px;
   height: 100%;
   min-width: 0;
   cursor: help;
   white-space: nowrap;
   border-right: 1px solid #d5dfe9; /* Помітна делікатна роздільна лінія між колонками (2-а лінія точно збігається з лінією верхнього ряду на 50%) */
   box-sizing: border-box;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 .pulse-eco-strip-item:last-child {
   border-right: none;
 }
 body.dark-mode .pulse-eco-strip-item {
   border-right-color: #3b4b63;
+}
+.pulse-eco-strip-item.is-yellow {
+  background: rgba(245, 158, 11, 0.14);
+}
+body.dark-mode .pulse-eco-strip-item.is-yellow {
+  background: rgba(245, 158, 11, 0.20);
+}
+.pulse-eco-strip-item.is-red {
+  background: #dc2626;
+}
+body.dark-mode .pulse-eco-strip-item.is-red {
+  background: #dc2626;
 }
 .pulse-eco-strip-title {
   font-size: 0.67rem;
@@ -13547,13 +13638,25 @@ body.dark-mode .pulse-eco-strip-item {
 body.dark-mode .pulse-eco-strip-title {
   color: #94a3b8;
 }
+.pulse-eco-strip-item.is-yellow .pulse-eco-strip-title {
+  color: #92400e;
+  font-weight: 600;
+}
+body.dark-mode .pulse-eco-strip-item.is-yellow .pulse-eco-strip-title {
+  color: #fcd34d;
+}
+.pulse-eco-strip-item.is-red .pulse-eco-strip-title,
+body.dark-mode .pulse-eco-strip-item.is-red .pulse-eco-strip-title {
+  color: rgba(255, 255, 255, 0.94);
+  font-weight: 600;
+}
 .pulse-eco-pulse-dot {
   position: relative;
   width: 4px;
   height: 4px;
   border-radius: 50%;
   flex-shrink: 0;
-  margin: 0 0.5px;
+  margin: 0 1.5px;
 }
 .pulse-eco-pulse-dot::before {
   content: '';
@@ -13584,6 +13687,10 @@ body.dark-mode .pulse-eco-strip-title {
   background-color: #ef4444;
   box-shadow: 0 0 2px rgba(239, 68, 68, 0.58);
 }
+.pulse-eco-strip-item.is-red .pulse-eco-pulse-dot.red {
+  background-color: #ffffff;
+  box-shadow: 0 0 4px rgba(255, 255, 255, 0.85);
+}
 .pulse-eco-strip-val {
   font-size: 0.68rem;
   font-weight: 500;
@@ -13595,6 +13702,19 @@ body.dark-mode .pulse-eco-strip-title {
 }
 body.dark-mode .pulse-eco-strip-val {
   color: #f1f5f9;
+}
+.pulse-eco-strip-item.is-yellow .pulse-eco-strip-val,
+body.dark-mode .pulse-eco-strip-item.is-yellow .pulse-eco-strip-val {
+  color: #92400e;
+  font-weight: 600;
+}
+body.dark-mode .pulse-eco-strip-item.is-yellow .pulse-eco-strip-val {
+  color: #fde68a;
+}
+.pulse-eco-strip-item.is-red .pulse-eco-strip-val,
+body.dark-mode .pulse-eco-strip-item.is-red .pulse-eco-strip-val {
+  color: #ffffff;
+  font-weight: 700;
 }
 .pulse-eco-strip-val .pulse-eco-int {
   font-size: 0.68rem;
