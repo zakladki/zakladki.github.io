@@ -14381,8 +14381,7 @@ body.dark-mode .pulse-rates-row {
   min-height: 44px;
   padding: 3px 4px 4px 6px;
   border-radius: 0;
-  background-color: transparent;
-  background-image: linear-gradient(to top, var(--rate-heat-color, transparent) 0%, transparent 56%);
+  background: transparent;
   border: none;
   text-align: center;
   box-sizing: border-box;
@@ -14395,15 +14394,6 @@ body.dark-mode .pulse-rates-row {
   min-width: 0;
   cursor: pointer;
 }
-.pulse-rate-item.is-heat-up {
-  --rate-heat-color: rgba(22, 163, 74, var(--rate-heat-alpha, 0.08));
-}
-.pulse-rate-item.is-heat-down {
-  --rate-heat-color: rgba(220, 38, 38, var(--rate-heat-alpha, 0.08));
-}
-.pulse-rate-item.is-heat-flat {
-  --rate-heat-color: transparent;
-}
 .pulse-rate-item:not(:nth-child(4n)) {
   border-right: 1px solid #d5dfe9;
 }
@@ -14414,14 +14404,8 @@ body.dark-mode .pulse-rates-row {
   background-color: rgba(56, 189, 248, 0.09);
 }
 body.dark-mode .pulse-rate-item {
-  background-color: transparent;
+  background: transparent;
   border-color: #3b4b63;
-}
-body.dark-mode .pulse-rate-item.is-heat-up {
-  --rate-heat-color: rgba(74, 222, 128, var(--rate-heat-dark-alpha, 0.10));
-}
-body.dark-mode .pulse-rate-item.is-heat-down {
-  --rate-heat-color: rgba(248, 113, 113, var(--rate-heat-dark-alpha, 0.10));
 }
 body.dark-mode .pulse-rate-item:not(:nth-child(4n)) {
   border-right-color: #3b4b63;

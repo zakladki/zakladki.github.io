@@ -13948,7 +13948,7 @@ function renderPulseDrawerLayout(container, options = {}) {
               <i class="fas fa-university text-primary" id="pulseFinanceSourceIcon"></i>
               <span id="pulseFinanceSourceText">НБУ / Міжбанк • <span id="pulseFinanceDateNote">Оновлення щодня</span></span>
             </span>
-            <span class="pulse-finance-legend" title="Зліва на плитці зверху вниз: 1 день, 7 днів, 30 днів (градієнт знизу - тренд за 30 днів)">
+            <span class="pulse-finance-legend" title="Зліва на плитці зверху вниз: зміна курсу за 1 день, 7 днів та 30 днів">
               <span class="pulse-finance-legend-dots" aria-hidden="true"><i></i><i></i><i></i></span>1д · 7д · 30д
             </span>
           </div>
@@ -14556,8 +14556,8 @@ function renderPulseDrawerLayout(container, options = {}) {
     }
     if (footerNote) {
       footerNote.title = isCrypto
-        ? 'Біржові котирування Binance та CoinGecko. Зліва трикутники за 1д, 7д та 30д; градієнт знизу показує тренд за 30 днів.'
-        : 'Офіційний курс НБУ. Зліва трикутники за 1д, 7д та 30д; градієнт знизу показує тренд за 30 днів.';
+        ? 'Біржові котирування Binance та CoinGecko. Зліва на плитці трикутники за 1д, 7д та 30д.'
+        : 'Офіційний курс НБУ. Зліва на плитці трикутники за 1д, 7д та 30д.';
     }
   };
 
@@ -15468,32 +15468,6 @@ async function fetchLiveCryptoRates() {
   }
 }
 
-function applyFinanceTileHeat(tileEl, pctVal, maxScalePct, dir) {
-  if (!tileEl) return;
-  tileEl.classList.remove('is-heat-up', 'is-heat-down', 'is-heat-flat');
-  const absPct = Math.abs(Number(pctVal) || 0);
-  if (dir === 'flat' || isNaN(absPct) || absPct < 0.02) {
-    tileEl.classList.add('is-heat-flat');
-    tileEl.style.removeProperty('--rate-heat-alpha');
-    tileEl.style.removeProperty('--rate-heat-dark-alpha');
-    return;
-  }
-  const ratio = Math.min(1, absPct / (maxScalePct || 10));
-  const norm = Math.pow(ratio, 0.75);
-  const lightAlpha = (0.10 + norm * 0.20).toFixed(3);
-  const darkAlpha = (0.12 + norm * 0.22).toFixed(3);
-  tileEl.classList.add(dir === 'up' ? 'is-heat-up' : 'is-heat-down');
-  tileEl.style.setProperty('--rate-heat-alpha', lightAlpha);
-  tileEl.style.setProperty('--rate-heat-dark-alpha', darkAlpha);
-}
-
-function getFinancePeriodScale(baseDailyPct, activePeriod, valuesPct) {
-  const days = activePeriod === '30d' ? 30 : (activePeriod === '7d' ? 7 : 1);
-  const periodBaseline = baseDailyPct * Math.sqrt(days);
-  const maxInGrid = valuesPct.reduce((mx, v) => Math.max(mx, Math.abs(Number(v) || 0)), 0);
-  return Math.min(periodBaseline * 1.8, Math.max(periodBaseline, maxInGrid));
-}
-
 function applyCryptoToUI(cryptoData) {
   if (!cryptoData) return;
   pulseCryptoData = cryptoData;
@@ -15510,33 +15484,20 @@ function applyCryptoToUI(cryptoData) {
     return `${numStr}<span class="pulse-rate-curr">$</span>`;
   };
 
-  const coinKeys = ['BTC', 'ETH', 'SOL', 'BNB', 'GRAM', 'XRP', 'LTC', 'DOGE'];
-  const parsePct = (rawStr) => {
-    if (!rawStr) return 0;
-    return parseFloat(String(rawStr).replace(',', '.').replace(/[^0-9.-]/g, '')) || 0;
-  };
-  const allCrypto30dPcts = coinKeys.map(k => {
-    const info = pulseCryptoData[k];
-    return info ? parsePct(info.diff30d || info.diff) : 0;
-  });
-  const crypto30dScale = getFinancePeriodScale(5.5, '30d', allCrypto30dPcts);
-
   const setTrendClass = (el, rawStr) => {
-    if (!el) return { dir: 'flat', num: 0 };
+    if (!el) return;
     if (rawStr === undefined || rawStr === null || rawStr === '') {
       el.className = 'pulse-trend-ind flat';
-      return { dir: 'flat', num: 0 };
+      return;
     }
     const diffStr = String(rawStr).trim();
     const num = parseFloat(diffStr.replace(',', '.').replace(/[^0-9.-]/g, ''));
     if (isNaN(num) || Math.abs(num) < 0.05) {
       el.className = 'pulse-trend-ind flat';
-      return { dir: 'flat', num: 0 };
+      return;
     }
     const isUp = num > 0 || diffStr.startsWith('+') || diffStr.startsWith('▲');
-    const dir = isUp ? 'up' : 'down';
-    el.className = `pulse-trend-ind ${dir}`;
-    return { dir, num };
+    el.className = `pulse-trend-ind ${isUp ? 'up' : 'down'}`;
   };
 
   const updateCryptoItem = (code, info) => {
@@ -15545,13 +15506,11 @@ function applyCryptoToUI(cryptoData) {
     const el1d = document.getElementById(`pulseDiff${code}1d`);
     const el7d = document.getElementById(`pulseDiff${code}7d`);
     const el30d = document.getElementById(`pulseDiff${code}30d`);
-    const tile = (elVal || el1d) ? (elVal || el1d).closest('.pulse-rate-item') : null;
 
     if (elVal) elVal.innerHTML = formatCryptoPriceHtml(info.price);
     setTrendClass(el1d, info.diff);
     setTrendClass(el7d, info.diff7d);
-    const res30 = setTrendClass(el30d, info.diff30d || info.diff);
-    applyFinanceTileHeat(tile, res30.num, crypto30dScale, res30.dir);
+    setTrendClass(el30d, info.diff30d || info.diff);
   };
 
   updateCryptoItem('Btc', pulseCryptoData.BTC);
@@ -15572,41 +15531,19 @@ function applyRatesToUI(rates) {
   if (!rates) return;
   pulseRatesData = rates;
 
-  const getFiatPctNum = (upperKey, val, periodKey) => {
-    const diff = periodKey === '30d'
-      ? (rates[`diff30d${upperKey}`] ?? rates[`diff${upperKey}`])
-      : (periodKey === '7d' ? (rates[`diff7d${upperKey}`] ?? rates[`diff${upperKey}`]) : rates[`diff${upperKey}`]);
-    const pctRaw = periodKey === '30d'
-      ? rates[`pct30d${upperKey}`]
-      : (periodKey === '7d' ? rates[`pct7d${upperKey}`] : rates[`pct${upperKey}`]);
-    let pctNum = pctRaw ? parseFloat(String(pctRaw).replace(',', '.').replace(/[^0-9.-]/g, '')) : NaN;
-    if (isNaN(pctNum)) {
-      const deltaNum = parseFloat(String(diff || '0').replace(',', '.').replace(/[^0-9.-]/g, '')) || 0;
-      const baseVal = (Number(val) || 0) - deltaNum;
-      pctNum = baseVal > 0 ? (deltaNum / baseVal) * 100 : 0;
-    }
-    return pctNum;
-  };
-
-  const fiatKeys = ['USD', 'EUR', 'PLN', 'GBP', 'CZK', 'CHF', 'CAD', 'CNY'];
-  const allFiat30dPcts = fiatKeys.map(k => getFiatPctNum(k, rates[k], '30d'));
-  const fiat30dScale = getFinancePeriodScale(0.75, '30d', allFiat30dPcts);
-
   const setFiatTrendInd = (el, diffVal) => {
-    if (!el) return 'flat';
+    if (!el) return;
     if (diffVal === undefined || diffVal === null || diffVal === '') {
       el.className = 'pulse-trend-ind flat';
-      return 'flat';
+      return;
     }
     const diffStr = String(diffVal).trim();
     if (diffStr === '0.00' || diffStr === '0' || diffStr === '—') {
       el.className = 'pulse-trend-ind flat';
-      return 'flat';
+      return;
     }
     const isUp = diffStr.startsWith('+') || diffStr.startsWith('▲');
-    const dir = isUp ? 'up' : 'down';
-    el.className = `pulse-trend-ind ${dir}`;
-    return dir;
+    el.className = `pulse-trend-ind ${isUp ? 'up' : 'down'}`;
   };
 
   const updateItem = (code, val, upperKey) => {
@@ -15614,14 +15551,11 @@ function applyRatesToUI(rates) {
     const el1d = document.getElementById(`pulseDiff${code}1d`);
     const el7d = document.getElementById(`pulseDiff${code}7d`);
     const el30d = document.getElementById(`pulseDiff${code}30d`);
-    const tile = (elVal || el1d) ? (elVal || el1d).closest('.pulse-rate-item') : null;
 
     if (elVal) elVal.innerHTML = formatDecimalsHtml(val, 2, false);
     setFiatTrendInd(el1d, rates[`diff${upperKey}`]);
     setFiatTrendInd(el7d, rates[`diff7d${upperKey}`]);
-    const dir30 = setFiatTrendInd(el30d, rates[`diff30d${upperKey}`] ?? rates[`diff${upperKey}`]);
-    const pct30 = getFiatPctNum(upperKey, val, '30d');
-    applyFinanceTileHeat(tile, pct30, fiat30dScale, dir30);
+    setFiatTrendInd(el30d, rates[`diff30d${upperKey}`] ?? rates[`diff${upperKey}`]);
   };
 
   updateItem('Usd', rates.USD || 45.20, 'USD');
