@@ -16000,15 +16000,17 @@ body.dark-mode .pulse-w2-pop-marks {
   border-radius: 0;
   background: rgba(255, 255, 255, 0.76);
   border: 1px solid rgba(71, 85, 105, 0.68);
+  border-top: none;
   position: relative;
   overflow: hidden;
   box-sizing: border-box;
-  box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.06);
+  box-shadow: inset 0 -1px 2px rgba(15, 23, 42, 0.05);
   flex-shrink: 0;
 }
 body.dark-mode .pulse-w2-flask-glass {
   background: rgba(15, 23, 42, 0.48);
   border-color: rgba(148, 163, 184, 0.68);
+  border-top: none;
 }
 
 /* Шар 1 (задній, морозно-лазурний): очікувані добові опади */
