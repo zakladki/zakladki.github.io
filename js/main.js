@@ -11246,7 +11246,13 @@ function buildPulseWeatherTableHeadHtml(focusMetric = null, isDaysHourly = false
         <i class="fas fa-wind"></i>
       </th>
       <th class="pulse-w2-th-hum is-clickable${focusMetric === 'hum' ? ' is-lens-active' : ''}" onclick="window.togglePulseWeatherMetric('hum')" title="Середня вологість повітря на 8 днів (натисніть для детального режиму)">
-        <i class="fas fa-tint"></i>
+        <svg class="pulse-w2-hum-drops-icon" width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+          <path d="M3.1 2.0 C 3.1 2.0 4.55 3.9 4.55 4.85 A 1.45 1.45 0 1 1 1.65 4.85 C 1.65 3.9 3.1 2.0 3.1 2.0 Z" opacity="0.82"/>
+          <path d="M8.0 1.4 C 8.0 1.4 9.45 3.3 9.45 4.25 A 1.45 1.45 0 1 1 6.55 4.25 C 6.55 3.3 8.0 1.4 8.0 1.4 Z"/>
+          <path d="M12.9 2.0 C 12.9 2.0 14.35 3.9 14.35 4.85 A 1.45 1.45 0 1 1 11.45 4.85 C 11.45 3.9 12.9 2.0 12.9 2.0 Z" opacity="0.82"/>
+          <path d="M5.5 8.6 C 5.5 8.6 6.95 10.5 6.95 11.45 A 1.45 1.45 0 1 1 4.05 11.45 C 4.05 10.5 5.5 8.6 5.5 8.6 Z" opacity="0.92"/>
+          <path d="M10.5 8.6 C 10.5 8.6 11.95 10.5 11.95 11.45 A 1.45 1.45 0 1 1 9.05 11.45 C 9.05 10.5 10.5 8.6 10.5 8.6 Z" opacity="0.92"/>
+        </svg>
       </th>
       <th class="pulse-w2-th-press is-clickable${focusMetric === 'press' ? ' is-lens-active' : ''}" onclick="window.togglePulseWeatherMetric('press')" title="Атмосферний тиск на 8 днів (натисніть для детального режиму)">
         <i class="fas fa-tachometer-alt"></i>
@@ -11599,14 +11605,7 @@ function buildPulseWeatherDaysOverviewRowHtml(dayItem, activeTab = 0) {
           </div>
           <span class="pulse-w2-cell-icon">${dayItem.cond.icon}</span>
           <span class="pulse-w2-cell-precip ${dayItem.precipProbMax >= 50 ? 'high' : ''}">
-            <span class="pulse-w2-cell-precip-val">${dayItem.precipProbMax}</span>
-            <svg class="pulse-hour-precip-drops" width="8" height="8" viewBox="0 0 12 12" fill="currentColor" aria-hidden="true">
-              <path d="M2.2 1.2c-.3.6-.5 1.3-.4 1.8.1.6.6.9 1.1.8.6-.1.9-.6.8-1.2-.1-.5-.5-1.1-.9-1.5a.3.3 0 0 0-.6.1z" opacity="0.75"/>
-              <path d="M6.2 0.8c-.3.6-.5 1.3-.4 1.8.1.6.6.9 1.1.8.6-.1.9-.6.8-1.2-.1-.5-.5-1.1-.9-1.5a.3.3 0 0 0-.6.1z"/>
-              <path d="M10.2 1.2c-.3.6-.5 1.3-.4 1.8.1.6.6.9 1.1.8.6-.1.9-.6.8-1.2-.1-.5-.5-1.1-.9-1.5a.3.3 0 0 0-.6.1z" opacity="0.75"/>
-              <path d="M4.2 6.2c-.3.6-.5 1.3-.4 1.8.1.6.6.9 1.1.8.6-.1.9-.6.8-1.2-.1-.5-.5-1.1-.9-1.5a.3.3 0 0 0-.6.1z" opacity="0.85"/>
-              <path d="M8.2 6.2c-.3.6-.5 1.3-.4 1.8.1.6.6.9 1.1.8.6-.1.9-.6.8-1.2-.1-.5-.5-1.1-.9-1.5a.3.3 0 0 0-.6.1z" opacity="0.85"/>
-            </svg>
+            <span class="pulse-w2-cell-precip-val">${dayItem.precipProbMax}</span><span class="pulse-w2-precip-pct">%</span>
           </span>
         </div>
       </td>
@@ -11769,6 +11768,65 @@ window.openPulseWeatherDayFromLens = function(dayIndex) {
   window.setPulseWeatherTab(dayIndex, targetOffset);
 };
 
+window.hidePulseWeatherFlaskPopover = function() {
+  const pop = document.getElementById('pulseW2FloatingFlaskPopover');
+  if (pop) {
+    pop.classList.remove('is-visible');
+  }
+};
+
+window.showPulseWeatherFlaskPopover = function(wrapEl) {
+  if (!wrapEl) return;
+  const tpl = wrapEl.querySelector('.pulse-w2-flask-popover');
+  if (!tpl) return;
+
+  let pop = document.getElementById('pulseW2FloatingFlaskPopover');
+  if (!pop) {
+    pop = document.createElement('div');
+    pop.id = 'pulseW2FloatingFlaskPopover';
+    pop.className = 'pulse-w2-flask-popover is-floating';
+    pop.setAttribute('role', 'tooltip');
+    document.body.appendChild(pop);
+
+    if (!window._pulseFlaskPopScrollBound) {
+      window._pulseFlaskPopScrollBound = true;
+      window.addEventListener('scroll', window.hidePulseWeatherFlaskPopover, { passive: true, capture: true });
+      window.addEventListener('resize', window.hidePulseWeatherFlaskPopover, { passive: true });
+      window.addEventListener('blur', window.hidePulseWeatherFlaskPopover);
+    }
+  }
+
+  pop.innerHTML = tpl.innerHTML;
+  pop.classList.add('is-floating');
+  pop.classList.remove('is-visible');
+  pop.style.left = '-9999px';
+  pop.style.top = '-9999px';
+
+  const rect = wrapEl.getBoundingClientRect();
+  const popW = pop.offsetWidth || 190;
+  const popH = pop.offsetHeight || 72;
+  const vw = window.innerWidth || document.documentElement.clientWidth || 1024;
+  const vh = window.innerHeight || document.documentElement.clientHeight || 768;
+  const isRightSlot = !!(wrapEl.closest('.pulse-w2-tab.is-slot-right'));
+
+  let left = rect.right + 8;
+  if (isRightSlot || (left + popW > vw - 10)) {
+    const leftSide = rect.left - popW - 8;
+    if (leftSide >= 8) {
+      left = leftSide;
+    } else {
+      left = Math.max(8, Math.min(vw - popW - 8, rect.right + 8));
+    }
+  }
+
+  let top = Math.round(rect.top + (rect.height / 2) - (popH / 2));
+  top = Math.max(8, Math.min(vh - popH - 8, top));
+
+  pop.style.left = `${Math.round(left)}px`;
+  pop.style.top = `${Math.round(top)}px`;
+  pop.classList.add('is-visible');
+};
+
 function getPulseWeatherMaxTabOffset(data) {
   const daily = (data && data.daily && Array.isArray(data.daily.time)) ? data.daily.time : [];
   const totalDays = daily.length ? Math.min(8, daily.length) : 8;
@@ -11834,11 +11892,12 @@ function buildPulseWeatherTabsStripHtml(data, activeTab = 0, tabOffset = 0) {
     }
 
     let precipMm = 0;
+    let dayPrecipSlice = [];
     if (daily.precipitation_sum && typeof daily.precipitation_sum[d] === 'number') {
       precipMm = Math.round(daily.precipitation_sum[d] * 10) / 10;
     }
     if (hourly.precipitation && Array.isArray(hourly.precipitation)) {
-      const dayPrecipSlice = hourly.precipitation.slice(d * 24, (d + 1) * 24).filter(v => typeof v === 'number' && !isNaN(v));
+      dayPrecipSlice = hourly.precipitation.slice(d * 24, (d + 1) * 24).map(v => (typeof v === 'number' && !isNaN(v) ? v : 0));
       if (dayPrecipSlice.length > 0) {
         const hSum = Math.round(dayPrecipSlice.reduce((sum, v) => sum + v, 0) * 10) / 10;
         if (hSum > precipMm) {
@@ -11847,26 +11906,78 @@ function buildPulseWeatherTabsStripHtml(data, activeTab = 0, tabOffset = 0) {
       }
     }
 
-    const flaskFillPercent = precipMm > 0 ? Math.min(100, Math.max(8, Math.round((precipMm / 10) * 100))) : 0;
+    const forecastFillPercent = precipMm > 0 ? Math.min(100, Math.max(10, Math.round((precipMm / 10) * 100))) : 0;
+
+    // Для «Сьогодні» (d === 0) обчислюємо, скільки опадів уже випало до поточної години, а скільки ще попереду
+    let elapsedMm = 0;
+    let remainingMm = precipMm;
+    let elapsedFillPercent = 0;
+    let elapsedSharePct = 0;
+    let remainingSharePct = precipMm > 0 ? 100 : 0;
+
+    if (d === 0 && precipMm > 0 && dayPrecipSlice.length > 0) {
+      const curH = now.getHours();
+      const curMinFrac = now.getMinutes() / 60;
+      let rawElapsed = 0;
+      for (let h = 0; h < Math.min(curH, dayPrecipSlice.length); h++) {
+        rawElapsed += dayPrecipSlice[h];
+      }
+      if (curH < dayPrecipSlice.length) {
+        rawElapsed += dayPrecipSlice[curH] * curMinFrac;
+      }
+      elapsedMm = Math.min(precipMm, Math.round(rawElapsed * 10) / 10);
+      remainingMm = Math.max(0, Math.round((precipMm - elapsedMm) * 10) / 10);
+      elapsedSharePct = Math.min(100, Math.max(0, Math.round((elapsedMm / precipMm) * 100)));
+      remainingSharePct = Math.max(0, 100 - elapsedSharePct);
+
+      if (elapsedMm > 0) {
+        elapsedFillPercent = Math.min(forecastFillPercent, Math.max(4, Math.round(forecastFillPercent * (elapsedMm / precipMm))));
+        if (remainingMm > 0 && forecastFillPercent >= 12 && elapsedFillPercent >= forecastFillPercent - 3) {
+          elapsedFillPercent = forecastFillPercent - 4;
+        }
+      }
+    }
+
     const precipMmText = precipMm > 0 ? `${precipMm} мм` : '0 мм (без опадів)';
-    const flaskTooltip = `Добові опади (${tabTitle}): ${precipMmText}&#10;Середня ймовірність: ${dayAvgPrecip}%&#10;Шкала: 2.5 | 5.0 | 7.5 | 10 мм`;
+    const flaskTooltip = (d === 0 && precipMm > 0)
+      ? `Опади сьогодні: ${precipMm} мм&#10;Добові опади (прогноз): ${precipMm} мм&#10;Поточні (вже випало): ${elapsedMm} мм (${elapsedSharePct}%)&#10;Ще очікується: ${remainingMm} мм (${remainingSharePct}%)&#10;Шкала: 2 | 4 | 6 | 8 | 10 мм`
+      : `Добові опади (${tabTitle}): ${precipMmText}&#10;Середня ймовірність: ${dayAvgPrecip}%&#10;Шкала: 2 | 4 | 6 | 8 | 10 мм`;
     const isRightSlot = d === (clampedOffset + 2);
+
+    const flaskPopoverBody = (d === 0 && precipMm > 0)
+      ? `
+            <div class="pulse-w2-pop-title">Опади сьогодні: ${precipMm} мм</div>
+            <div class="pulse-w2-pop-row"><span class="pulse-w2-pop-dot is-forecast"></span>Добові опади (прогноз): <strong>${precipMm} мм</strong></div>
+            <div class="pulse-w2-pop-row"><span class="pulse-w2-pop-dot is-elapsed"></span>Поточні (випало): <strong>${elapsedMm} мм</strong> (${elapsedSharePct}%)</div>
+            <div class="pulse-w2-pop-row pulse-w2-pop-remaining">Попереду: <strong>${remainingMm} мм</strong> (${remainingSharePct}%)</div>
+            <div class="pulse-w2-pop-row pulse-w2-pop-marks">Ймовірність: ${dayAvgPrecip}% • Шкала: 2 | 4 | 6 | 8 | 10 мм</div>
+        `
+      : `
+            <div class="pulse-w2-pop-title">Добові опади (${tabTitle}): ${precipMmText}</div>
+            <div class="pulse-w2-pop-row">${precipMm > 0 ? `<span class="pulse-w2-pop-dot is-forecast"></span>Добові (прогноз): <strong>${precipMm} мм</strong> • Ймовірн.: ${dayAvgPrecip}%` : `Середня ймовірність: ${dayAvgPrecip}%`}</div>
+            <div class="pulse-w2-pop-row pulse-w2-pop-marks">Шкала: 2 | 4 | 6 | 8 | 10 мм</div>
+        `;
+
+    const clampedProb = Math.max(0, Math.min(100, dayAvgPrecip || 0));
+    const dropFillH = Math.round(((clampedProb / 100) * 16.5) * 100) / 100;
+    const dropFillY = Math.round((18.0 - dropFillH) * 100) / 100;
+    const dropClipId = `pulseW2TabDropClip${d}`;
 
     cardsHtml += `
       <button type="button" class="pulse-w2-tab ${d === activeTab ? 'active' : ''}${isRightSlot ? ' is-slot-right' : ''}" data-day-idx="${d}" onclick="window.setPulseWeatherTab(${d})" onmouseenter="this.classList.add('is-hovered')" onmouseleave="this.classList.remove('is-hovered')">
-        <div class="pulse-w2-flask-wrap" aria-label="${flaskTooltip}">
+        <div class="pulse-w2-flask-wrap" aria-label="${flaskTooltip}" onmouseenter="window.showPulseWeatherFlaskPopover(this)" onmouseleave="window.hidePulseWeatherFlaskPopover()">
           <div class="pulse-w2-flask-glass">
-            <div class="pulse-w2-flask-fill ${precipMm > 0 ? 'has-rain' : ''}" style="height: ${flaskFillPercent}%;"></div>
-            <div class="pulse-w2-flask-marks">
-              <span class="pulse-w2-flask-tick t25"></span>
-              <span class="pulse-w2-flask-tick t50"></span>
-              <span class="pulse-w2-flask-tick t75"></span>
-            </div>
+            <div class="pulse-w2-flask-forecast-fill ${precipMm > 0 ? 'has-rain' : ''}" style="height: ${forecastFillPercent}%;"></div>
+            <div class="pulse-w2-flask-elapsed-fill ${elapsedFillPercent > 0 ? 'has-rain' : ''}${elapsedFillPercent > 0 && elapsedFillPercent < forecastFillPercent ? ' is-partial' : ''}" style="height: ${elapsedFillPercent}%;"></div>
           </div>
-          <div class="pulse-w2-flask-popover">
-            <div class="pulse-w2-pop-title">Добові опади (${tabTitle}): ${precipMmText}</div>
-            <div class="pulse-w2-pop-row">Середня ймовірність: ${dayAvgPrecip}%</div>
-            <div class="pulse-w2-pop-row pulse-w2-pop-marks">Шкала: 2.5 | 5.0 | 7.5 | 10 мм</div>
+          <div class="pulse-w2-flask-marks" aria-hidden="true">
+            <span class="pulse-w2-flask-tick t20"></span>
+            <span class="pulse-w2-flask-tick t40"></span>
+            <span class="pulse-w2-flask-tick t60"></span>
+            <span class="pulse-w2-flask-tick t80"></span>
+          </div>
+          <div class="pulse-w2-flask-popover" aria-hidden="true">
+            ${flaskPopoverBody}
           </div>
         </div>
         <div class="pulse-w2-tab-header">
@@ -11875,14 +11986,21 @@ function buildPulseWeatherTabsStripHtml(data, activeTab = 0, tabOffset = 0) {
         </div>
         <div class="pulse-w2-tab-weather-row" title="${cond.label} • Добові опади: ${precipMmText} (ймовірність ${dayAvgPrecip}%)">
           <span class="pulse-w2-tab-icon">${cond.icon}</span>
-          <span class="pulse-w2-tab-precip ${dayAvgPrecip >= 50 ? 'high' : ''}" title="Середня ймовірність опадів за добу: ${dayAvgPrecip}%, очікується: ${precipMmText}">
-            <span class="pulse-w2-tab-precip-val">${dayAvgPrecip}</span>
-            <svg class="pulse-hour-precip-drops" width="8" height="8" viewBox="0 0 12 12" fill="currentColor" aria-hidden="true">
-              <path d="M2.2 1.2c-.3.6-.5 1.3-.4 1.8.1.6.6.9 1.1.8.6-.1.9-.6.8-1.2-.1-.5-.5-1.1-.9-1.5a.3.3 0 0 0-.6.1z" opacity="0.75"/>
-              <path d="M6.2 0.8c-.3.6-.5 1.3-.4 1.8.1.6.6.9 1.1.8.6-.1.9-.6.8-1.2-.1-.5-.5-1.1-.9-1.5a.3.3 0 0 0-.6.1z"/>
-              <path d="M10.2 1.2c-.3.6-.5 1.3-.4 1.8.1.6.6.9 1.1.8.6-.1.9-.6.8-1.2-.1-.5-.5-1.1-.9-1.5a.3.3 0 0 0-.6.1z" opacity="0.75"/>
-              <path d="M4.2 6.2c-.3.6-.5 1.3-.4 1.8.1.6.6.9 1.1.8.6-.1.9-.6.8-1.2-.1-.5-.5-1.1-.9-1.5a.3.3 0 0 0-.6.1z" opacity="0.85"/>
-              <path d="M8.2 6.2c-.3.6-.5 1.3-.4 1.8.1.6.6.9 1.1.8.6-.1.9-.6.8-1.2-.1-.5-.5-1.1-.9-1.5a.3.3 0 0 0-.6.1z" opacity="0.85"/>
+          <span class="pulse-w2-tab-drop ${clampedProb >= 50 ? 'high' : ''}${clampedProb === 0 ? ' is-empty' : ''}" title="Середня ймовірність опадів за добу: ${dayAvgPrecip}%, очікується: ${precipMmText}" aria-label="Ймовірність опадів: ${dayAvgPrecip}%">
+            <svg class="pulse-w2-tab-drop-svg" width="13" height="17" viewBox="0 0 16 20" aria-hidden="true">
+              <defs>
+                <clipPath id="${dropClipId}">
+                  <path d="M 8 1.5 C 8 1.5 13.5 8.6 13.5 12.5 A 5.5 5.5 0 1 1 2.5 12.5 C 2.5 8.6 8 1.5 8 1.5 Z"/>
+                </clipPath>
+              </defs>
+              <path class="pulse-w2-tab-drop-bg" d="M 8 1.5 C 8 1.5 13.5 8.6 13.5 12.5 A 5.5 5.5 0 1 1 2.5 12.5 C 2.5 8.6 8 1.5 8 1.5 Z"/>
+              ${clampedProb > 0 ? `
+                <g clip-path="url(#${dropClipId})">
+                  <rect class="pulse-w2-tab-drop-fill" x="1" y="${dropFillY}" width="14" height="${dropFillH + 1}" />
+                  ${clampedProb < 100 ? `<line class="pulse-w2-tab-drop-line" x1="1" y1="${dropFillY}" x2="15" y2="${dropFillY}" />` : ''}
+                </g>
+              ` : ''}
+              <path class="pulse-w2-tab-drop-outline" d="M 8 1.5 C 8 1.5 13.5 8.6 13.5 12.5 A 5.5 5.5 0 1 1 2.5 12.5 C 2.5 8.6 8 1.5 8 1.5 Z" fill="none"/>
             </svg>
           </span>
         </div>
@@ -11916,6 +12034,9 @@ function buildPulseWeatherTabsStripHtml(data, activeTab = 0, tabOffset = 0) {
 }
 
 window.shiftPulseWeatherTabs = function(step, ev) {
+  if (typeof window.hidePulseWeatherFlaskPopover === 'function') {
+    window.hidePulseWeatherFlaskPopover();
+  }
   if (ev) {
     ev.preventDefault();
     ev.stopPropagation();
@@ -11963,6 +12084,9 @@ window.shiftPulseWeatherTabs = function(step, ev) {
 };
 
 function renderPulseWeatherUI(data, city, updatedTime = '') {
+  if (typeof window.hidePulseWeatherFlaskPopover === 'function') {
+    window.hidePulseWeatherFlaskPopover();
+  }
   if (!window.pulseWeatherState) {
     window.pulseWeatherState = { activeTab: 0, tabOffset: 0 };
   }
@@ -12280,14 +12404,7 @@ function renderPulseWeatherUI(data, city, updatedTime = '') {
             </div>
             <span class="pulse-w2-cell-icon">${cond.icon}</span>
             <span class="pulse-w2-cell-precip ${precipVal >= 50 ? 'high' : ''}" title="${hourPrecipTooltip}">
-              <span class="pulse-w2-cell-precip-val">${precipVal}</span>
-              <svg class="pulse-hour-precip-drops" width="8" height="8" viewBox="0 0 12 12" fill="currentColor" aria-hidden="true">
-                <path d="M2.2 1.2c-.3.6-.5 1.3-.4 1.8.1.6.6.9 1.1.8.6-.1.9-.6.8-1.2-.1-.5-.5-1.1-.9-1.5a.3.3 0 0 0-.6.1z" opacity="0.75"/>
-                <path d="M6.2 0.8c-.3.6-.5 1.3-.4 1.8.1.6.6.9 1.1.8.6-.1.9-.6.8-1.2-.1-.5-.5-1.1-.9-1.5a.3.3 0 0 0-.6.1z"/>
-                <path d="M10.2 1.2c-.3.6-.5 1.3-.4 1.8.1.6.6.9 1.1.8.6-.1.9-.6.8-1.2-.1-.5-.5-1.1-.9-1.5a.3.3 0 0 0-.6.1z" opacity="0.75"/>
-                <path d="M4.2 6.2c-.3.6-.5 1.3-.4 1.8.1.6.6.9 1.1.8.6-.1.9-.6.8-1.2-.1-.5-.5-1.1-.9-1.5a.3.3 0 0 0-.6.1z" opacity="0.85"/>
-                <path d="M8.2 6.2c-.3.6-.5 1.3-.4 1.8.1.6.6.9 1.1.8.6-.1.9-.6.8-1.2-.1-.5-.5-1.1-.9-1.5a.3.3 0 0 0-.6.1z" opacity="0.85"/>
-              </svg>
+              <span class="pulse-w2-cell-precip-val">${precipVal}</span><span class="pulse-w2-precip-pct">%</span>
             </span>
           </div>
         </td>

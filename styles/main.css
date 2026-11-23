@@ -15808,7 +15808,7 @@ body.dark-mode .pulse-w2-tabs-nav-btn:disabled {
   border-left: 1px solid transparent !important;
   border-right: 1px solid transparent !important;
   border-radius: 0 !important;
-  padding: 5px 2px 4px !important;
+  padding: 5px 2px 7px !important;
   cursor: pointer;
   transition: background 0.15s ease, color 0.15s ease;
   color: var(--text-muted, #64748b);
@@ -15882,67 +15882,62 @@ body.dark-mode .pulse-w2-tab.active {
   margin-bottom: 2px;
 }
 
-/* 2. Вертикальна колба опадів (опадомір) ліворуч картки — абсолютно позиціонована */
+/* 2. Пряма колба опадів: світле скло + крижано-блакитний прогноз + соковитий океанський факт + зовнішні риски-засічки від грані */
 .pulse-w2-flask-wrap {
   position: absolute;
-  left: 3px;
-  bottom: 5.5px;
+  left: 4px;
+  bottom: 7.5px;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
+  gap: 0;
   height: 44px;
-  width: 8px;
+  width: 9px;
   flex-shrink: 0;
   cursor: help;
   z-index: 10;
   margin: 0;
   pointer-events: auto;
 }
-.pulse-w2-flask-wrap:hover {
-  z-index: 100 !important;
+.pulse-w2-flask-wrap .pulse-w2-flask-popover {
+  display: none !important;
 }
-/* Спливаюча витончена підказка при наведенні на колбу з ЖИРНИМ верхнім рядком */
+/* Спливаюча підказка (рендериться поверх усього документа у fixed-порталі без перекриттів і обрізань) */
 .pulse-w2-flask-popover {
-  position: absolute;
-  left: 14px;
-  top: 50%;
-  transform: translateY(-50%);
+  position: fixed;
   background: #ffffff;
   color: #1e293b;
   border: 1px solid #cbd5e1;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.22), 0 1px 3px rgba(0, 0, 0, 0.08);
-  border-radius: 6px;
-  padding: 5px 8px;
+  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.22), 0 2px 6px rgba(15, 23, 42, 0.10);
+  border-radius: 7px;
+  padding: 6px 9px;
   font-size: 0.68rem;
-  line-height: 1.35;
+  line-height: 1.38;
   white-space: nowrap;
   pointer-events: none;
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.12s ease, visibility 0.12s ease;
-  z-index: 99999 !important; /* Завжди поверх усього вмісту */
+  z-index: 999999 !important;
   text-align: left;
+  font-family: inherit;
 }
 body.dark-mode .pulse-w2-flask-popover {
   background: #0f172a;
   color: #f8fafc;
   border-color: #334155;
-  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.55);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.60);
 }
-.pulse-w2-flask-wrap:hover .pulse-w2-flask-popover {
+.pulse-w2-flask-popover.is-floating.is-visible {
   opacity: 1;
   visibility: visible;
 }
-.pulse-w2-tab.is-slot-right .pulse-w2-flask-popover {
-  left: auto;
-  right: -76px;
-}
 .pulse-w2-pop-title {
-  font-weight: 700 !important; /* Верхній рядок підказки жирним шрифтом */
+  font-weight: 700 !important;
   color: #0f172a;
-  font-size: 0.70rem;
-  margin-bottom: 2px;
+  font-size: 0.71rem;
+  margin-bottom: 3px;
 }
 body.dark-mode .pulse-w2-pop-title {
   color: #38bdf8;
@@ -15951,84 +15946,148 @@ body.dark-mode .pulse-w2-pop-title {
   font-size: 0.66rem;
   color: #475569;
   font-weight: 400;
+  display: flex;
+  align-items: center;
+  gap: 5px;
 }
 body.dark-mode .pulse-w2-pop-row {
   color: #cbd5e1;
 }
+.pulse-w2-pop-remaining {
+  padding-left: 13px;
+  color: #64748b;
+}
+body.dark-mode .pulse-w2-pop-remaining {
+  color: #94a3b8;
+}
+.pulse-w2-pop-dot {
+  display: inline-block;
+  width: 7px;
+  height: 9px;
+  border-radius: 0;
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+.pulse-w2-pop-dot.is-forecast {
+  background: linear-gradient(180deg, rgba(147, 197, 253, 0.38) 0%, rgba(96, 165, 250, 0.50) 100%);
+  border: 1px solid rgba(59, 130, 246, 0.45);
+  border-top: 1.5px solid #3b82f6;
+}
+body.dark-mode .pulse-w2-pop-dot.is-forecast {
+  background: linear-gradient(180deg, rgba(147, 197, 253, 0.30) 0%, rgba(96, 165, 250, 0.42) 100%);
+  border-color: rgba(96, 165, 250, 0.50);
+  border-top-color: #60a5fa;
+}
+.pulse-w2-pop-dot.is-elapsed {
+  background: linear-gradient(180deg, #0ea5e9 0%, #0369a1 100%);
+}
+body.dark-mode .pulse-w2-pop-dot.is-elapsed {
+  background: linear-gradient(180deg, #38bdf8 0%, #0284c7 100%);
+}
 .pulse-w2-pop-marks {
   color: #64748b;
   font-size: 0.62rem;
-  margin-top: 1.5px;
+  margin-top: 2px;
 }
 body.dark-mode .pulse-w2-pop-marks {
   color: #94a3b8;
 }
+
+/* Прямокутна скляна колба: світле прозоре скло, прямі кути зверху й знизу */
 .pulse-w2-flask-glass {
   width: 7px;
   height: 42px;
-  border-radius: 3.5px;
-  background: rgba(148, 163, 184, 0.20);
-  border: 1px solid rgba(148, 163, 184, 0.45);
+  border-radius: 0;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(100, 116, 139, 0.42);
   position: relative;
   overflow: hidden;
   box-sizing: border-box;
-  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.08);
+  box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.05);
+  flex-shrink: 0;
 }
 body.dark-mode .pulse-w2-flask-glass {
-  background: rgba(51, 65, 85, 0.45);
-  border-color: rgba(100, 116, 139, 0.55);
+  background: rgba(15, 23, 42, 0.46);
+  border-color: rgba(148, 163, 184, 0.45);
 }
-/* Рідина заповнює колбу на всю товщину без зазору, не створюючи враження звуження */
-.pulse-w2-flask-fill {
+
+/* Шар 1 (задній, морозно-лазурний): очікувані добові опади */
+.pulse-w2-flask-forecast-fill {
   position: absolute;
-  bottom: -1px;
-  left: -1px;
-  right: -1px;
-  width: calc(100% + 2px);
-  background: linear-gradient(180deg, #38bdf8 0%, #0284c7 100%);
-  border-radius: 2px 2px 3.25px 3.25px;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: transparent;
   transition: height 0.4s ease;
   box-sizing: border-box;
+  z-index: 1;
 }
-.pulse-w2-flask-fill.has-rain {
-  background: linear-gradient(180deg, #38bdf8 0%, #0284c7 100%);
-  box-shadow: inset 0 0 1px rgba(255, 255, 255, 0.6);
+.pulse-w2-flask-forecast-fill.has-rain {
+  background: linear-gradient(180deg, rgba(147, 197, 253, 0.34) 0%, rgba(96, 165, 250, 0.46) 100%);
+  border-top: 1.5px solid #3b82f6;
 }
-/* Поділки на скляній колбі за принципом 25% / 50% / 75% шкали (3 позначки) */
-.pulse-w2-flask-marks {
+body.dark-mode .pulse-w2-flask-forecast-fill.has-rain {
+  background: linear-gradient(180deg, rgba(147, 197, 253, 0.24) 0%, rgba(96, 165, 250, 0.34) 100%);
+  border-top-color: #60a5fa;
+}
+
+/* Шар 2 (передній, насичений океанський аква): поточні опади, що вже накопичились до цієї години */
+.pulse-w2-flask-elapsed-fill {
   position: absolute;
-  top: 0;
+  bottom: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
+  right: 0;
+  background: transparent;
+  transition: height 0.4s ease;
+  box-sizing: border-box;
+  z-index: 2;
+}
+.pulse-w2-flask-elapsed-fill.has-rain {
+  background: linear-gradient(180deg, #0ea5e9 0%, #0369a1 100%);
+  box-shadow: inset 0 0 1px rgba(255, 255, 255, 0.35);
+}
+.pulse-w2-flask-elapsed-fill.has-rain.is-partial {
+  border-top: 1.5px solid #e0f2fe;
+}
+body.dark-mode .pulse-w2-flask-elapsed-fill.has-rain {
+  background: linear-gradient(180deg, #38bdf8 0%, #0284c7 100%);
+}
+body.dark-mode .pulse-w2-flask-elapsed-fill.has-rain.is-partial {
+  border-top-color: #e0f2fe;
+}
+
+/* Зовнішні однакові маленькі риски-засічки впритул від правої грані колби (20% / 40% / 60% / 80% = крок 2 мм) */
+.pulse-w2-flask-marks {
+  position: relative;
+  width: 2px;
+  height: 42px;
+  flex-shrink: 0;
   pointer-events: none;
-  z-index: 3;
 }
 .pulse-w2-flask-tick {
   position: absolute;
-  right: 0;
+  left: 0;
+  width: 2px;
   height: 1px;
-  background: rgba(100, 116, 139, 0.6);
+  border-radius: 0 1px 1px 0;
+  transform: translateY(50%);
+  background: rgba(100, 116, 139, 0.60);
   pointer-events: none;
 }
 body.dark-mode .pulse-w2-flask-tick {
-  background: rgba(148, 163, 184, 0.65);
+  background: rgba(148, 163, 184, 0.64);
 }
-.pulse-w2-flask-tick.t25 {
-  bottom: 25%;
-  width: 2.2px;
+.pulse-w2-flask-tick.t20 {
+  bottom: 20%;
 }
-.pulse-w2-flask-tick.t50 {
-  bottom: 50%;
-  width: 3.5px; /* Середня поділка 50% виразніша та довша */
-  background: rgba(71, 85, 105, 0.75);
+.pulse-w2-flask-tick.t40 {
+  bottom: 40%;
 }
-body.dark-mode .pulse-w2-flask-tick.t50 {
-  background: rgba(203, 213, 225, 0.8);
+.pulse-w2-flask-tick.t60 {
+  bottom: 60%;
 }
-.pulse-w2-flask-tick.t75 {
-  bottom: 75%;
-  width: 2.2px;
+.pulse-w2-flask-tick.t80 {
+  bottom: 80%;
 }
 
 /* Міні-колбочка опадів для кожної строчки таблиці на межі між часом та хмаринками */
@@ -16273,9 +16332,9 @@ body.dark-mode .pulse-w2-tab-date {
 }
 .pulse-w2-tab-precip {
   display: inline-flex;
-  align-items: center;
-  gap: 1.5px;
-  font-size: 0.63rem;
+  align-items: baseline;
+  gap: 0.5px;
+  font-size: 0.64rem;
   font-weight: 400;
   color: #0284c7;
   line-height: 1;
@@ -16291,8 +16350,59 @@ body.dark-mode .pulse-w2-tab-precip {
 body.dark-mode .pulse-w2-tab-precip.high {
   color: #7dd3fc;
 }
-.pulse-w2-tab-precip .pulse-hour-precip-drops {
-  opacity: 0.85;
+.pulse-w2-precip-pct {
+  font-size: 0.86em;
+  opacity: 0.82;
+  font-weight: 400;
+}
+
+/* Крапля-рівень ймовірності опадів праворуч від хмарки у вкладках днів */
+.pulse-w2-tab-drop {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  line-height: 1;
+}
+.pulse-w2-tab-drop-svg {
+  display: block;
+  overflow: visible;
+}
+.pulse-w2-tab-drop-bg {
+  fill: rgba(255, 255, 255, 0.58);
+}
+body.dark-mode .pulse-w2-tab-drop-bg {
+  fill: rgba(15, 23, 42, 0.38);
+}
+.pulse-w2-tab-drop-fill {
+  fill: #38bdf8;
+  transition: y 0.35s ease, height 0.35s ease;
+}
+.pulse-w2-tab-drop.high .pulse-w2-tab-drop-fill {
+  fill: #0284c7;
+}
+body.dark-mode .pulse-w2-tab-drop-fill {
+  fill: #38bdf8;
+}
+body.dark-mode .pulse-w2-tab-drop.high .pulse-w2-tab-drop-fill {
+  fill: #0ea5e9;
+}
+.pulse-w2-tab-drop-line {
+  stroke: rgba(224, 242, 254, 0.90);
+  stroke-width: 0.9;
+}
+.pulse-w2-tab-drop-outline {
+  stroke: rgba(2, 132, 199, 0.42);
+  stroke-width: 0.85;
+}
+.pulse-w2-tab-drop.is-empty .pulse-w2-tab-drop-outline {
+  stroke: rgba(100, 116, 139, 0.34);
+}
+body.dark-mode .pulse-w2-tab-drop-outline {
+  stroke: rgba(56, 189, 248, 0.45);
+}
+body.dark-mode .pulse-w2-tab-drop.is-empty .pulse-w2-tab-drop-outline {
+  stroke: rgba(148, 163, 184, 0.34);
 }
 
 .pulse-w2-tab-temps {
@@ -16971,8 +17081,8 @@ body.dark-mode .pulse-w2-col-time {
 }
 .pulse-w2-cell-precip {
   display: inline-flex;
-  align-items: center;
-  gap: 1.5px;
+  align-items: baseline;
+  gap: 0.5px;
   font-size: 0.63rem;
   font-weight: 400;
   color: #0284c7;
@@ -16988,9 +17098,6 @@ body.dark-mode .pulse-w2-cell-precip {
 }
 body.dark-mode .pulse-w2-cell-precip.high {
   color: #7dd3fc;
-}
-.pulse-w2-cell-precip .pulse-hour-precip-drops {
-  opacity: 0.85;
 }
 
 /* Температура: формат "+1°/-3°" без пробілів (шапка та значення по центру) */
@@ -17076,6 +17183,10 @@ body.dark-mode .pulse-w2-wind-cell .pulse-hour-wind-arrow {
   width: 10.5%;
   text-align: center !important;
   padding: 4px 2px !important;
+}
+.pulse-w2-hum-drops-icon {
+  display: inline-block;
+  vertical-align: middle;
 }
 .pulse-w2-col-hum {
   width: 10.5%;
