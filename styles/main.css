@@ -15999,7 +15999,7 @@ body.dark-mode .pulse-w2-pop-marks {
   height: 42px;
   border-radius: 0;
   background: rgba(255, 255, 255, 0.72);
-  border: 1px solid rgba(100, 116, 139, 0.42);
+  border: 1px solid rgba(100, 116, 139, 0.46);
   position: relative;
   overflow: hidden;
   box-sizing: border-box;
@@ -16008,7 +16008,7 @@ body.dark-mode .pulse-w2-pop-marks {
 }
 body.dark-mode .pulse-w2-flask-glass {
   background: rgba(15, 23, 42, 0.46);
-  border-color: rgba(148, 163, 184, 0.45);
+  border-color: rgba(148, 163, 184, 0.48);
 }
 
 /* Шар 1 (задній, морозно-лазурний): очікувані добові опади */
@@ -16369,10 +16369,10 @@ body.dark-mode .pulse-w2-tab-precip.high {
   overflow: visible;
 }
 .pulse-w2-tab-drop-bg {
-  fill: rgba(255, 255, 255, 0.58);
+  fill: rgba(255, 255, 255, 0.72);
 }
 body.dark-mode .pulse-w2-tab-drop-bg {
-  fill: rgba(15, 23, 42, 0.38);
+  fill: rgba(15, 23, 42, 0.46);
 }
 .pulse-w2-tab-drop-fill {
   fill: #38bdf8;
@@ -16388,21 +16388,21 @@ body.dark-mode .pulse-w2-tab-drop.high .pulse-w2-tab-drop-fill {
   fill: #0ea5e9;
 }
 .pulse-w2-tab-drop-line {
-  stroke: rgba(224, 242, 254, 0.90);
-  stroke-width: 0.9;
+  stroke: rgba(224, 242, 254, 0.92);
+  stroke-width: 0.95;
 }
 .pulse-w2-tab-drop-outline {
-  stroke: rgba(2, 132, 199, 0.42);
-  stroke-width: 0.85;
+  stroke: rgba(100, 116, 139, 0.52);
+  stroke-width: 1;
 }
 .pulse-w2-tab-drop.is-empty .pulse-w2-tab-drop-outline {
-  stroke: rgba(100, 116, 139, 0.34);
+  stroke: rgba(100, 116, 139, 0.40);
 }
 body.dark-mode .pulse-w2-tab-drop-outline {
-  stroke: rgba(56, 189, 248, 0.45);
+  stroke: rgba(148, 163, 184, 0.52);
 }
 body.dark-mode .pulse-w2-tab-drop.is-empty .pulse-w2-tab-drop-outline {
-  stroke: rgba(148, 163, 184, 0.34);
+  stroke: rgba(148, 163, 184, 0.40);
 }
 
 .pulse-w2-tab-temps {

@@ -11264,11 +11264,44 @@ function buildPulseWeatherTableHeadHtml(focusMetric = null, isDaysHourly = false
   `;
 }
 
+function getPulseWeatherDayPrecipMm(daily, hourly, dayIdx) {
+  let precipMm = 0;
+  let dayPrecipSlice = [];
+  if (daily && daily.precipitation_sum && typeof daily.precipitation_sum[dayIdx] === 'number' && !isNaN(daily.precipitation_sum[dayIdx])) {
+    precipMm = Math.round(daily.precipitation_sum[dayIdx] * 10) / 10;
+  }
+  if (hourly && hourly.precipitation && Array.isArray(hourly.precipitation)) {
+    dayPrecipSlice = hourly.precipitation.slice(dayIdx * 24, (dayIdx + 1) * 24).map(v => (typeof v === 'number' && !isNaN(v) ? v : 0));
+    if (dayPrecipSlice.length > 0) {
+      const hSum = Math.round(dayPrecipSlice.reduce((sum, v) => sum + v, 0) * 10) / 10;
+      if (hSum > precipMm) {
+        precipMm = hSum;
+      }
+    }
+  }
+  return { precipMm, dayPrecipSlice };
+}
+
+function getPulseWeatherDailyPrecipScaleMm(daily, hourly, totalDays = 8) {
+  let maxDayMm = 0;
+  for (let d = 0; d < totalDays; d++) {
+    const { precipMm } = getPulseWeatherDayPrecipMm(daily, hourly, d);
+    if (precipMm > maxDayMm) {
+      maxDayMm = precipMm;
+    }
+  }
+  if (maxDayMm <= 10) return 10;
+  if (maxDayMm <= 20) return 20;
+  if (maxDayMm <= 30) return 30;
+  return Math.ceil(maxDayMm / 10) * 10;
+}
+
 function buildPulseWeatherDailyLensItems(data) {
   const daily = (data && data.daily) ? data.daily : {};
   const hourly = (data && data.hourly) ? data.hourly : {};
   const times = Array.isArray(daily.time) ? daily.time : [];
   const count = Math.min(8, times.length);
+  const dailyScaleMm = getPulseWeatherDailyPrecipScaleMm(daily, hourly, count);
   const daysShort = ['Нд', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
   const fullDayNames = ['Неділя', 'Понеділок', 'Вівторок', 'Середа', 'Четвер', "П'ятниця", 'Субота'];
   const monthsUkGen = ['січня', 'лютого', 'березня', 'квітня', 'травня', 'червня', 'липня', 'серпня', 'вересня', 'жовтня', 'листопада', 'грудня'];
@@ -11311,9 +11344,7 @@ function buildPulseWeatherDailyLensItems(data) {
     const precipProbMax = (daily.precipitation_probability_max && daily.precipitation_probability_max[d] !== undefined && daily.precipitation_probability_max[d] !== null)
       ? Math.round(daily.precipitation_probability_max[d])
       : 0;
-    const precipSum = (daily.precipitation_sum && daily.precipitation_sum[d] !== undefined && daily.precipitation_sum[d] !== null)
-      ? Math.round(daily.precipitation_sum[d] * 10) / 10
-      : 0;
+    const { precipMm: precipSum } = getPulseWeatherDayPrecipMm(daily, hourly, d);
 
     const tMin = (daily.temperature_2m_min && daily.temperature_2m_min[d] !== undefined) ? Math.round(daily.temperature_2m_min[d]) : 0;
     const tMax = (daily.temperature_2m_max && daily.temperature_2m_max[d] !== undefined) ? Math.round(daily.temperature_2m_max[d]) : 5;
@@ -11412,6 +11443,7 @@ function buildPulseWeatherDailyLensItems(data) {
       dayClearRatio,
       precipProbMax,
       precipSum,
+      dailyScaleMm,
       tMin,
       tMax,
       minSign: tMin > 0 ? '+' : '',
@@ -11550,11 +11582,10 @@ function buildPulseWeatherLensRowHtml(dayItem, focusMetric, weekMinTemp, weekMax
 }
 
 function buildPulseWeatherDaysOverviewRowHtml(dayItem, activeTab = 0) {
+  const dayScaleMax = dayItem.dailyScaleMm || 10;
   let dayFlaskFill = 0;
   if (dayItem.precipSum > 0) {
-    dayFlaskFill = Math.min(100, Math.max(15, Math.round((dayItem.precipSum / 8) * 100)));
-  } else if (dayItem.precipProbMax >= 40) {
-    dayFlaskFill = Math.round(dayItem.precipProbMax * 0.25);
+    dayFlaskFill = Math.min(100, Math.max(6, Math.round((dayItem.precipSum / dayScaleMax) * 100)));
   }
   const precipNote = dayItem.precipSum > 0 ? `${dayItem.precipSum} мм` : 'без опадів';
   const weatherTooltip = `${dayItem.fullDateLabel}: ${dayItem.cond.label} • Опади: ${precipNote} (${dayItem.precipProbMax}%)`;
@@ -11837,6 +11868,8 @@ function buildPulseWeatherTabsStripHtml(data, activeTab = 0, tabOffset = 0) {
   const hourly = (data && data.hourly) ? data.hourly : {};
   const daily = (data && data.daily) ? data.daily : {};
   const { totalDays, maxOffset } = getPulseWeatherMaxTabOffset(data);
+  const dailyScaleMm = getPulseWeatherDailyPrecipScaleMm(daily, hourly, totalDays);
+  const scaleTicksText = [1, 2, 3, 4, 5].map(n => Math.round((dailyScaleMm / 5) * n * 10) / 10).join(' | ') + ' мм';
   const clampedOffset = Math.max(0, Math.min(maxOffset, tabOffset || 0));
   const now = new Date();
 
@@ -11891,22 +11924,9 @@ function buildPulseWeatherTabsStripHtml(data, activeTab = 0, tabOffset = 0) {
       }
     }
 
-    let precipMm = 0;
-    let dayPrecipSlice = [];
-    if (daily.precipitation_sum && typeof daily.precipitation_sum[d] === 'number') {
-      precipMm = Math.round(daily.precipitation_sum[d] * 10) / 10;
-    }
-    if (hourly.precipitation && Array.isArray(hourly.precipitation)) {
-      dayPrecipSlice = hourly.precipitation.slice(d * 24, (d + 1) * 24).map(v => (typeof v === 'number' && !isNaN(v) ? v : 0));
-      if (dayPrecipSlice.length > 0) {
-        const hSum = Math.round(dayPrecipSlice.reduce((sum, v) => sum + v, 0) * 10) / 10;
-        if (hSum > precipMm) {
-          precipMm = hSum;
-        }
-      }
-    }
+    const { precipMm, dayPrecipSlice } = getPulseWeatherDayPrecipMm(daily, hourly, d);
 
-    const forecastFillPercent = precipMm > 0 ? Math.min(100, Math.max(10, Math.round((precipMm / 10) * 100))) : 0;
+    const forecastFillPercent = precipMm > 0 ? Math.min(100, Math.max(6, Math.round((precipMm / dailyScaleMm) * 100))) : 0;
 
     // Для «Сьогодні» (d === 0) обчислюємо, скільки опадів уже випало до поточної години, а скільки ще попереду
     let elapsedMm = 0;
@@ -11932,16 +11952,16 @@ function buildPulseWeatherTabsStripHtml(data, activeTab = 0, tabOffset = 0) {
 
       if (elapsedMm > 0) {
         elapsedFillPercent = Math.min(forecastFillPercent, Math.max(4, Math.round(forecastFillPercent * (elapsedMm / precipMm))));
-        if (remainingMm > 0 && forecastFillPercent >= 12 && elapsedFillPercent >= forecastFillPercent - 3) {
-          elapsedFillPercent = forecastFillPercent - 4;
+        if (remainingMm > 0 && forecastFillPercent >= 10 && elapsedFillPercent >= forecastFillPercent - 2) {
+          elapsedFillPercent = forecastFillPercent - 3;
         }
       }
     }
 
     const precipMmText = precipMm > 0 ? `${precipMm} мм` : '0 мм (без опадів)';
     const flaskTooltip = (d === 0 && precipMm > 0)
-      ? `Опади сьогодні: ${precipMm} мм&#10;Добові опади (прогноз): ${precipMm} мм&#10;Поточні (вже випало): ${elapsedMm} мм (${elapsedSharePct}%)&#10;Ще очікується: ${remainingMm} мм (${remainingSharePct}%)&#10;Шкала: 2 | 4 | 6 | 8 | 10 мм`
-      : `Добові опади (${tabTitle}): ${precipMmText}&#10;Середня ймовірність: ${dayAvgPrecip}%&#10;Шкала: 2 | 4 | 6 | 8 | 10 мм`;
+      ? `Опади сьогодні: ${precipMm} мм&#10;Добові опади (прогноз): ${precipMm} мм&#10;Поточні (вже випало): ${elapsedMm} мм (${elapsedSharePct}%)&#10;Ще очікується: ${remainingMm} мм (${remainingSharePct}%)&#10;Шкала: ${scaleTicksText}`
+      : `Добові опади (${tabTitle}): ${precipMmText}&#10;Середня ймовірність: ${dayAvgPrecip}%&#10;Шкала: ${scaleTicksText}`;
     const isRightSlot = d === (clampedOffset + 2);
 
     const flaskPopoverBody = (d === 0 && precipMm > 0)
@@ -11950,16 +11970,20 @@ function buildPulseWeatherTabsStripHtml(data, activeTab = 0, tabOffset = 0) {
             <div class="pulse-w2-pop-row"><span class="pulse-w2-pop-dot is-forecast"></span>Добові опади (прогноз): <strong>${precipMm} мм</strong></div>
             <div class="pulse-w2-pop-row"><span class="pulse-w2-pop-dot is-elapsed"></span>Поточні (випало): <strong>${elapsedMm} мм</strong> (${elapsedSharePct}%)</div>
             <div class="pulse-w2-pop-row pulse-w2-pop-remaining">Попереду: <strong>${remainingMm} мм</strong> (${remainingSharePct}%)</div>
-            <div class="pulse-w2-pop-row pulse-w2-pop-marks">Ймовірність: ${dayAvgPrecip}% • Шкала: 2 | 4 | 6 | 8 | 10 мм</div>
+            <div class="pulse-w2-pop-row pulse-w2-pop-marks">Ймовірність: ${dayAvgPrecip}% • Шкала: ${scaleTicksText}</div>
         `
       : `
             <div class="pulse-w2-pop-title">Добові опади (${tabTitle}): ${precipMmText}</div>
             <div class="pulse-w2-pop-row">${precipMm > 0 ? `<span class="pulse-w2-pop-dot is-forecast"></span>Добові (прогноз): <strong>${precipMm} мм</strong> • Ймовірн.: ${dayAvgPrecip}%` : `Середня ймовірність: ${dayAvgPrecip}%`}</div>
-            <div class="pulse-w2-pop-row pulse-w2-pop-marks">Шкала: 2 | 4 | 6 | 8 | 10 мм</div>
+            <div class="pulse-w2-pop-row pulse-w2-pop-marks">Шкала: ${scaleTicksText}</div>
         `;
 
+    // Вирівнюємо рівень заливки під реальну геометрію краплі (широке дно й вузький носик)
     const clampedProb = Math.max(0, Math.min(100, dayAvgPrecip || 0));
-    const dropFillH = Math.round(((clampedProb / 100) * 16.5) * 100) / 100;
+    const dropVisualRatio = clampedProb === 0
+      ? 0
+      : (clampedProb >= 100 ? 1 : Math.min(0.96, 0.08 + 0.92 * Math.pow(clampedProb / 100, 0.74)));
+    const dropFillH = Math.round((dropVisualRatio * 16.5) * 100) / 100;
     const dropFillY = Math.round((18.0 - dropFillH) * 100) / 100;
     const dropClipId = `pulseW2TabDropClip${d}`;
 
@@ -12383,58 +12407,13 @@ function renderPulseWeatherUI(data, city, updatedTime = '') {
       slotPrecipMm = hourlyPrecipMm;
     }
 
-    // Заповнення міні-колбочки (шкала від 0 до 2.5 мм за 3 год)
-    let rowFlaskFillPercent = 0;
-    if (slotPrecipMm > 0) {
-      rowFlaskFillPercent = Math.min(100, Math.max(15, Math.round((slotPrecipMm / 2.5) * 100)));
-    } else if (precipVal >= 40) {
-      rowFlaskFillPercent = Math.round(precipVal * 0.25);
-    }
-    const rowFlaskTooltip = `Опади (${hStr}): ${slotPrecipMm > 0 ? slotPrecipMm + ' мм' : 'без опадів'} • ймовірність: ${precipVal}%`;
-
-    const overviewRowHtml = `
-      <tr class="pulse-w2-row ${isCurrent ? 'pulse-w2-row-current' : ''}">
-        <td class="pulse-w2-col-time">
-          <span class="pulse-w2-time-val">${hStr}</span>
-        </td>
-        <td class="pulse-w2-col-weather" title="${cond.label} (${hourPrecipTooltip})">
-          <div class="pulse-w2-weather-cell">
-            <div class="pulse-w2-row-flask" title="${rowFlaskTooltip}">
-              <div class="pulse-w2-row-flask-fill ${rowFlaskFillPercent > 0 ? 'has-rain' : ''}" style="height: ${rowFlaskFillPercent}%;"></div>
-            </div>
-            <span class="pulse-w2-cell-icon">${cond.icon}</span>
-            <span class="pulse-w2-cell-precip ${precipVal >= 50 ? 'high' : ''}" title="${hourPrecipTooltip}">
-              <span class="pulse-w2-cell-precip-val">${precipVal}</span><span class="pulse-w2-precip-pct">%</span>
-            </span>
-          </div>
-        </td>
-        <td class="pulse-w2-col-temp" title="Температура: ${tSign}${tVal}°, відчувається: ${feelsSign}${feelsVal}°">
-          <span class="pulse-w2-temp-actual ${tClass}">${tSign}${tVal}°</span>/<span class="pulse-w2-temp-feels ${feelsClass}">${feelsSign}${feelsVal}°</span>
-        </td>
-        <td class="pulse-w2-col-wind ${hasGusts ? 'has-gusts' : ''} ${gustStorm ? 'storm' : ''}" title="${windCellTooltip}">
-          <div class="pulse-w2-wind-cell">
-            ${buildPulseWindArrowSvgHtml(windSpeed, windGust, windInfo.arrowDeg, windArrowClass, 19)}
-            ${windValHtml}
-          </div>
-        </td>
-        <td class="pulse-w2-col-hum" title="Вологість повітря: ${humVal}%">
-          <span class="pulse-w2-hum-num">${humVal}</span>
-        </td>
-        <td class="pulse-w2-col-press" title="Атмосферний тиск: ${pressVal} мм рт. ст. (${pressInfo.note})">
-          <span class="pulse-w2-press-badge ${pressInfo.colorClass}">${pressVal}</span>
-        </td>
-        <td class="pulse-w2-col-geomag" title="${kpTitle}">
-          <span class="pulse-w2-kp-badge ${kpColor}">${kpHtml}</span>
-        </td>
-      </tr>
-    `;
-
     daySlots.push({
       hStr,
       isCurrent,
       cond,
       precipVal,
       slotPrecipMm,
+      hourPrecipTooltip,
       tVal,
       feelsVal,
       tSign,
@@ -12446,17 +12425,69 @@ function renderPulseWeatherUI(data, city, updatedTime = '') {
       windInfo,
       windArrowClass,
       windCellTooltip,
+      windValHtml,
+      hasGusts,
+      gustStorm,
       humVal,
       pressVal,
       pressDelta,
+      pressInfo,
       pressLensInfo,
       kpVal,
       kpHtml,
       kpColor,
-      kpTitle,
-      overviewRowHtml
+      kpTitle
     });
   }
+
+  // Адаптивна шкала для погодинних міні-колб: мінімум 5 мм за 3 год або пік дня, без фальшивої заливки при 0 мм
+  const maxSlotMm = daySlots.reduce((m, s) => Math.max(m, s.slotPrecipMm || 0), 0);
+  const slotScaleMax = Math.max(5, Math.ceil(maxSlotMm));
+  daySlots.forEach((s) => {
+    const rowFlaskFillPercent = s.slotPrecipMm > 0
+      ? Math.min(100, Math.max(8, Math.round((s.slotPrecipMm / slotScaleMax) * 100)))
+      : 0;
+    const rowFlaskTooltip = s.slotPrecipMm > 0
+      ? `Опади (${s.hStr}): ${s.slotPrecipMm} мм (шкала до ${slotScaleMax} мм) • ймовірність: ${s.precipVal}%`
+      : `Опади (${s.hStr}): 0 мм (без опадів) • ймовірність: ${s.precipVal}%`;
+
+    s.overviewRowHtml = `
+      <tr class="pulse-w2-row ${s.isCurrent ? 'pulse-w2-row-current' : ''}">
+        <td class="pulse-w2-col-time">
+          <span class="pulse-w2-time-val">${s.hStr}</span>
+        </td>
+        <td class="pulse-w2-col-weather" title="${s.cond.label} (${s.hourPrecipTooltip})">
+          <div class="pulse-w2-weather-cell">
+            <div class="pulse-w2-row-flask" title="${rowFlaskTooltip}">
+              <div class="pulse-w2-row-flask-fill ${rowFlaskFillPercent > 0 ? 'has-rain' : ''}" style="height: ${rowFlaskFillPercent}%;"></div>
+            </div>
+            <span class="pulse-w2-cell-icon">${s.cond.icon}</span>
+            <span class="pulse-w2-cell-precip ${s.precipVal >= 50 ? 'high' : ''}" title="${s.hourPrecipTooltip}">
+              <span class="pulse-w2-cell-precip-val">${s.precipVal}</span><span class="pulse-w2-precip-pct">%</span>
+            </span>
+          </div>
+        </td>
+        <td class="pulse-w2-col-temp" title="Температура: ${s.tSign}${s.tVal}°, відчувається: ${s.feelsSign}${s.feelsVal}°">
+          <span class="pulse-w2-temp-actual ${s.tClass}">${s.tSign}${s.tVal}°</span>/<span class="pulse-w2-temp-feels ${s.feelsClass}">${s.feelsSign}${s.feelsVal}°</span>
+        </td>
+        <td class="pulse-w2-col-wind ${s.hasGusts ? 'has-gusts' : ''} ${s.gustStorm ? 'storm' : ''}" title="${s.windCellTooltip}">
+          <div class="pulse-w2-wind-cell">
+            ${buildPulseWindArrowSvgHtml(s.windSpeed, s.windGust, s.windInfo.arrowDeg, s.windArrowClass, 19)}
+            ${s.windValHtml}
+          </div>
+        </td>
+        <td class="pulse-w2-col-hum" title="Вологість повітря: ${s.humVal}%">
+          <span class="pulse-w2-hum-num">${s.humVal}</span>
+        </td>
+        <td class="pulse-w2-col-press" title="Атмосферний тиск: ${s.pressVal} мм рт. ст. (${s.pressInfo.note})">
+          <span class="pulse-w2-press-badge ${s.pressInfo.colorClass}">${s.pressVal}</span>
+        </td>
+        <td class="pulse-w2-col-geomag" title="${s.kpTitle}">
+          <span class="pulse-w2-kp-badge ${s.kpColor}">${s.kpHtml}</span>
+        </td>
+      </tr>
+    `;
+  });
 
   // Зведені показники доби для розширених слайдів 2-5
   const dailyMinTemp = (daily.temperature_2m_min && daily.temperature_2m_min[activeTab] !== undefined)
