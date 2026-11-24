@@ -15885,13 +15885,13 @@ body.dark-mode .pulse-w2-tab.active {
 .pulse-w2-flask-wrap {
   position: absolute;
   left: 5px;
-  bottom: 7.5px;
+  bottom: 8px;
   display: flex;
   flex-direction: column-reverse;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: stretch;
-  gap: 1.5px;
-  height: 42px;
+  gap: 2px;
+  height: 38px;
   width: 9px;
   flex-shrink: 0;
   cursor: help;
@@ -15969,24 +15969,22 @@ body.dark-mode .pulse-w2-pop-remaining {
 .pulse-w2-pop-dot {
   display: inline-block;
   width: 10px;
-  height: 3.5px;
-  border-radius: 1px;
+  height: 3px;
+  border-radius: 0;
   flex-shrink: 0;
   box-sizing: border-box;
 }
 .pulse-w2-pop-dot.is-forecast {
-  background: linear-gradient(90deg, #38bdf8 0%, #60a5fa 100%);
-  box-shadow: 0 0 0 0.5px rgba(2, 132, 199, 0.35);
+  background: #38bdf8;
 }
 body.dark-mode .pulse-w2-pop-dot.is-forecast {
-  background: linear-gradient(90deg, rgba(56, 189, 248, 0.48) 0%, rgba(96, 165, 250, 0.58) 100%);
-  box-shadow: 0 0 0 0.5px rgba(125, 211, 252, 0.45);
+  background: rgba(56, 189, 248, 0.45);
 }
 .pulse-w2-pop-dot.is-elapsed {
-  background: linear-gradient(90deg, #0369a1 0%, #0284c7 100%);
+  background: #0369a1;
 }
 body.dark-mode .pulse-w2-pop-dot.is-elapsed {
-  background: linear-gradient(90deg, #0ea5e9 0%, #38bdf8 100%);
+  background: #38bdf8;
 }
 .pulse-w2-pop-marks {
   color: #64748b;
@@ -16001,37 +15999,35 @@ body.dark-mode .pulse-w2-pop-marks {
 .pulse-w2-seg-bar {
   display: block;
   width: 100%;
-  height: 2.8px;
-  border-radius: 1px;
+  height: 2px;
+  border-radius: 0;
   box-sizing: border-box;
   flex-shrink: 0;
   transition: background 0.25s ease, opacity 0.25s ease;
 }
 .pulse-w2-seg-bar.is-empty {
-  background: rgba(100, 116, 139, 0.24);
+  background: rgba(100, 116, 139, 0.28);
 }
 body.dark-mode .pulse-w2-seg-bar.is-empty {
-  background: rgba(148, 163, 184, 0.26);
+  background: rgba(148, 163, 184, 0.28);
 }
 .pulse-w2-seg-bar.is-forecast {
-  background: linear-gradient(90deg, #38bdf8 0%, #60a5fa 100%);
-  box-shadow: 0 0 0 0.5px rgba(2, 132, 199, 0.35);
+  background: #38bdf8;
 }
 body.dark-mode .pulse-w2-seg-bar.is-forecast {
-  background: linear-gradient(90deg, rgba(56, 189, 248, 0.48) 0%, rgba(96, 165, 250, 0.58) 100%);
-  box-shadow: 0 0 0 0.5px rgba(125, 211, 252, 0.45);
+  background: rgba(56, 189, 248, 0.45);
 }
 .pulse-w2-seg-bar.is-elapsed {
-  background: linear-gradient(90deg, #0369a1 0%, #0284c7 100%);
+  background: #0369a1;
 }
 body.dark-mode .pulse-w2-seg-bar.is-elapsed {
-  background: linear-gradient(90deg, #0ea5e9 0%, #38bdf8 100%);
+  background: #38bdf8;
 }
 .pulse-w2-seg-bar.is-partial {
-  background: linear-gradient(90deg, #0369a1 0%, #0284c7 48%, #7dd3fc 52%, #7dd3fc 100%);
+  background: linear-gradient(90deg, #0369a1 0%, #0369a1 50%, #7dd3fc 50%, #7dd3fc 100%);
 }
 body.dark-mode .pulse-w2-seg-bar.is-partial {
-  background: linear-gradient(90deg, #38bdf8 0%, #38bdf8 48%, rgba(56, 189, 248, 0.40) 52%, rgba(56, 189, 248, 0.40) 100%);
+  background: linear-gradient(90deg, #38bdf8 0%, #38bdf8 50%, rgba(56, 189, 248, 0.40) 50%, rgba(56, 189, 248, 0.40) 100%);
 }
 
 /* Міні-колбочка опадів для кожної строчки таблиці на межі між часом та хмаринками */
