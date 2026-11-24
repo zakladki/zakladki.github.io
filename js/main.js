@@ -10063,6 +10063,19 @@ function getWindDirectionInfo(degrees) {
   return { dirName, code, deg, arrowDeg };
 }
 
+function getWmoSeverityRank(code) {
+  if (code >= 95) return 90;
+  if (code === 82 || code === 65 || code === 75 || code === 86) return 80;
+  if (code === 81 || code === 63 || code === 73 || code === 85) return 70;
+  if (code === 80 || code === 61 || code === 71 || code === 77) return 60;
+  if (code === 55 || code === 53 || code === 51) return 50;
+  if (code === 45 || code === 48) return 40;
+  if (code === 3) return 30;
+  if (code === 2) return 20;
+  if (code === 1) return 10;
+  return 0;
+}
+
 function getWeatherConditionInfo(code, isDay = 1, size = 18) {
   const item = WMO_WEATHER_MAP[code] || { label: 'хмарно', type: 'cloudy' };
   return {
@@ -11341,10 +11354,13 @@ function buildPulseWeatherDailyLensItems(data) {
     const fullDateLabel = `${fullDayNames[dt.getDay()]}, ${dt.getDate()} ${monthsUkGen[dt.getMonth()]}`;
 
     const rawWCode = (daily.weather_code && daily.weather_code[d] !== undefined) ? daily.weather_code[d] : 3;
-    const precipProbMax = (daily.precipitation_probability_max && daily.precipitation_probability_max[d] !== undefined && daily.precipitation_probability_max[d] !== null)
+    let precipProbMax = (daily.precipitation_probability_max && daily.precipitation_probability_max[d] !== undefined && daily.precipitation_probability_max[d] !== null)
       ? Math.round(daily.precipitation_probability_max[d])
       : 0;
     const { precipMm: precipSum } = getPulseWeatherDayPrecipMm(daily, hourly, d);
+    if (precipSum >= 0.1 && precipProbMax <= 0) {
+      precipProbMax = Math.min(85, Math.max(15, Math.round(precipSum * 20)));
+    }
 
     const tMin = (daily.temperature_2m_min && daily.temperature_2m_min[d] !== undefined) ? Math.round(daily.temperature_2m_min[d]) : 0;
     const tMax = (daily.temperature_2m_max && daily.temperature_2m_max[d] !== undefined) ? Math.round(daily.temperature_2m_max[d]) : 5;
@@ -11582,12 +11598,33 @@ function buildPulseWeatherLensRowHtml(dayItem, focusMetric, weekMinTemp, weekMax
 }
 
 function buildPulseWeatherDaysOverviewRowHtml(dayItem, activeTab = 0) {
-  const dayScaleMax = dayItem.dailyScaleMm || 10;
-  let dayFlaskFill = 0;
-  if (dayItem.precipSum > 0) {
-    dayFlaskFill = Math.min(100, Math.max(6, Math.round((dayItem.precipSum / dayScaleMax) * 100)));
+  let dayActiveSegs = 0;
+  let dayIntensityLabel = 'без опадів';
+  if (dayItem.precipSum >= 8) {
+    dayActiveSegs = 5;
+    dayIntensityLabel = 'сильні / злива';
+  } else if (dayItem.precipSum >= 3) {
+    dayActiveSegs = 4;
+    dayIntensityLabel = 'помірні-сильні';
+  } else if (dayItem.precipSum >= 1.2) {
+    dayActiveSegs = 3;
+    dayIntensityLabel = 'помірні';
+  } else if (dayItem.precipSum >= 0.4) {
+    dayActiveSegs = 2;
+    dayIntensityLabel = 'невеликі';
+  } else if (dayItem.precipSum > 0) {
+    dayActiveSegs = 1;
+    dayIntensityLabel = 'слабкі / сліди';
   }
-  const precipNote = dayItem.precipSum > 0 ? `${dayItem.precipSum} мм` : 'без опадів';
+  let dayIndicatorHtml = '<span class="pulse-w2-row-dry-mark"></span>';
+  if (dayActiveSegs > 0) {
+    dayIndicatorHtml = '';
+    for (let sg = 1; sg <= 5; sg++) {
+      const sgState = sg <= dayActiveSegs ? 'is-forecast' : 'is-empty';
+      dayIndicatorHtml += `<span class="pulse-w2-row-seg ${sgState}"></span>`;
+    }
+  }
+  const precipNote = dayItem.precipSum > 0 ? `${dayItem.precipSum} мм (${dayActiveSegs}/5 · ${dayIntensityLabel})` : 'без опадів';
   const weatherTooltip = `${dayItem.fullDateLabel}: ${dayItem.cond.label} • Опади: ${precipNote} (${dayItem.precipProbMax}%)`;
 
   const hasGusts = (dayItem.gustMax >= 8.5 && (dayItem.gustMax - dayItem.windMax >= 2.0));
@@ -11624,18 +11661,32 @@ function buildPulseWeatherDaysOverviewRowHtml(dayItem, activeTab = 0) {
   const isSelected = dayItem.dayIdx === activeTab;
   const drillHint = 'Натисніть, щоб відкрити погодинний прогноз цього дня під метеограмою';
 
+  const dailyScaleText = '5 поділок (доба): 0.1+ | 0.4+ | 1.2+ | 3+ | 8+ мм';
+  const dayPopoverBody = dayItem.precipSum > 0
+    ? `
+      <div class="pulse-w2-pop-title">Опади (${dayItem.fullDateLabel}): ${dayItem.precipSum} мм (${dayActiveSegs}/5 · ${dayIntensityLabel})</div>
+      <div class="pulse-w2-pop-row"><span class="pulse-w2-pop-dot is-forecast"></span>За добу (прогноз): <strong>${dayItem.precipSum} мм</strong> • Ймовірн.: <strong>${dayItem.precipProbMax}%</strong></div>
+      <div class="pulse-w2-pop-row pulse-w2-pop-marks">${dailyScaleText}</div>
+    `
+    : `
+      <div class="pulse-w2-pop-title">Опади (${dayItem.fullDateLabel}): 0 мм (без опадів)</div>
+      <div class="pulse-w2-pop-row">Макс. ймовірність: <strong>${dayItem.precipProbMax}%</strong></div>
+      <div class="pulse-w2-pop-row pulse-w2-pop-marks">${dailyScaleText}</div>
+    `;
+
   return `
     <tr class="pulse-w2-row is-drillable${isSelected ? ' pulse-w2-row-current' : ''}" onclick="window.selectPulseMeteogramDay(${dayItem.dayIdx})">
       <td class="pulse-w2-col-time" title="${dayItem.fullDateLabel} • ${drillHint}">
         <span class="pulse-w2-day-badge">${dayItem.dayBadge}</span>
       </td>
-      <td class="pulse-w2-col-weather" title="${weatherTooltip} • ${drillHint}">
+      <td class="pulse-w2-col-weather">
         <div class="pulse-w2-weather-cell">
-          <div class="pulse-w2-row-flask">
-            <div class="pulse-w2-row-flask-fill ${dayFlaskFill > 0 ? 'has-rain' : ''}" style="height: ${dayFlaskFill}%;"></div>
+          <div class="pulse-w2-row-flask${dayActiveSegs === 0 ? ' is-dry-minimal' : ''}" onmouseenter="window.showPulseWeatherFlaskPopover(this)" onmouseleave="window.hidePulseWeatherFlaskPopover()">
+            ${dayIndicatorHtml}
+            <div class="pulse-w2-flask-popover">${dayPopoverBody}</div>
           </div>
-          <span class="pulse-w2-cell-icon">${dayItem.cond.icon}</span>
-          <span class="pulse-w2-cell-precip ${dayItem.precipProbMax >= 50 ? 'high' : ''}">
+          <span class="pulse-w2-cell-icon" title="${weatherTooltip} • ${drillHint}">${dayItem.cond.icon}</span>
+          <span class="pulse-w2-cell-precip ${dayItem.precipProbMax >= 50 ? 'high' : (dayItem.precipProbMax <= 0 ? 'is-zero' : '')}" title="${weatherTooltip} • ${drillHint}">
             <span class="pulse-w2-cell-precip-val">${dayItem.precipProbMax}</span><span class="pulse-w2-precip-pct">%</span>
           </span>
         </div>
@@ -11924,6 +11975,9 @@ function buildPulseWeatherTabsStripHtml(data, activeTab = 0, tabOffset = 0) {
     }
 
     const { precipMm, dayPrecipSlice } = getPulseWeatherDayPrecipMm(daily, hourly, d);
+    if (precipMm >= 0.1 && dayAvgPrecip <= 0) {
+      dayAvgPrecip = Math.min(75, Math.max(8, Math.round(precipMm * 15)));
+    }
 
     // 10-рівнева нелінійна шкала інтенсивності (0.1 -> 12+ мм) для тонких горизонтальних рисочок
     let activeSegs = 0;
@@ -11982,32 +12036,17 @@ function buildPulseWeatherTabsStripHtml(data, activeTab = 0, tabOffset = 0) {
       remainingSharePct = Math.max(0, 100 - elapsedSharePct);
     }
 
-    let elapsedSegs = 0;
-    let partialSegIdx = 0;
-    if (d === 0 && activeSegs > 0 && elapsedMm > 0) {
-      if (elapsedMm >= precipMm - 0.05 || remainingMm <= 0) {
-        elapsedSegs = activeSegs;
-      } else {
-        const ratio = elapsedMm / precipMm;
-        if (activeSegs === 1) {
-          partialSegIdx = 1;
-        } else {
-          elapsedSegs = Math.max(1, Math.min(activeSegs - 1, Math.round(activeSegs * ratio)));
-        }
-      }
-    }
-
     let segsHtml = '';
     for (let s = 1; s <= 10; s++) {
-      let segState = 'is-empty';
-      if (s <= elapsedSegs) {
-        segState = 'is-elapsed';
-      } else if (s === partialSegIdx) {
-        segState = 'is-partial';
-      } else if (s <= activeSegs) {
-        segState = 'is-forecast';
-      }
+      const segState = s <= activeSegs ? 'is-forecast' : 'is-empty';
       segsHtml += `<span class="pulse-w2-seg-bar ${segState}"></span>`;
+    }
+
+    let nowMarkerHtml = '';
+    if (d === 0 && activeSegs > 0 && elapsedMm > 0) {
+      const activeTopPx = activeSegs * 4 - 2;
+      const markerBottomPx = Math.round((elapsedSharePct / 100) * Math.max(0, activeTopPx - 2));
+      nowMarkerHtml = `<span class="pulse-w2-now-marker" style="bottom: ${markerBottomPx}px;"></span>`;
     }
 
     const precipMmText = precipMm > 0 ? `${precipMm} мм` : '0 мм (без опадів)';
@@ -12020,7 +12059,7 @@ function buildPulseWeatherTabsStripHtml(data, activeTab = 0, tabOffset = 0) {
       ? `
             <div class="pulse-w2-pop-title">Опади сьогодні: ${precipMm} мм (${activeSegs}/10 · ${intensityLabel})</div>
             <div class="pulse-w2-pop-row"><span class="pulse-w2-pop-dot is-forecast"></span>Добові опади (прогноз): <strong>${precipMm} мм</strong></div>
-            <div class="pulse-w2-pop-row"><span class="pulse-w2-pop-dot is-elapsed"></span>Поточні (випало): <strong>${elapsedMm} мм</strong> (${elapsedSharePct}%)</div>
+            <div class="pulse-w2-pop-row"><span class="pulse-w2-pop-tick"></span>Поточні (випало): <strong>${elapsedMm} мм</strong> (${elapsedSharePct}%)</div>
             <div class="pulse-w2-pop-row pulse-w2-pop-remaining">Попереду: <strong>${remainingMm} мм</strong> (${remainingSharePct}%)</div>
             <div class="pulse-w2-pop-row pulse-w2-pop-marks">Ймовірність: ${dayAvgPrecip}% • ${segScaleText}</div>
         `
@@ -12039,7 +12078,7 @@ function buildPulseWeatherTabsStripHtml(data, activeTab = 0, tabOffset = 0) {
     cardsHtml += `
       <button type="button" class="pulse-w2-tab ${d === activeTab ? 'active' : ''}${isRightSlot ? ' is-slot-right' : ''}" data-day-idx="${d}" onclick="window.setPulseWeatherTab(${d})" onmouseenter="this.classList.add('is-hovered')" onmouseleave="this.classList.remove('is-hovered')">
         <div class="pulse-w2-flask-wrap ${activeSegs === 0 ? 'is-dry' : ''}" aria-label="${flaskTooltip}" onmouseenter="window.showPulseWeatherFlaskPopover(this)" onmouseleave="window.hidePulseWeatherFlaskPopover()">
-          ${segsHtml}
+          ${segsHtml}${nowMarkerHtml}
           <div class="pulse-w2-flask-popover" aria-hidden="true">
             ${flaskPopoverBody}
           </div>
@@ -12313,15 +12352,54 @@ function renderPulseWeatherUI(data, city, updatedTime = '') {
     const feelsVal = (hourly.apparent_temperature && hourly.apparent_temperature[idx] !== undefined)
       ? Math.round(hourly.apparent_temperature[idx])
       : tVal;
-    const wCode = (hourly.weather_code && hourly.weather_code[idx] !== undefined)
-      ? hourly.weather_code[idx]
-      : 3;
-    const precipVal = (hourly.precipitation_probability && hourly.precipitation_probability[idx] !== undefined)
+
+    // Узгодження за 3-годинним інтервалом [h, h+1, h+2]: піковий погодний код, макс. % ймовірності та сума опадів
+    let slotPrecipMm = 0;
+    let precipVal = (hourly.precipitation_probability && hourly.precipitation_probability[idx] !== undefined)
       ? hourly.precipitation_probability[idx]
       : 0;
-    const hourlyPrecipMm = (hourly.precipitation && hourly.precipitation[idx] !== undefined)
-      ? Math.round(hourly.precipitation[idx] * 10) / 10
-      : 0;
+    let wCode = (hourly.weather_code && hourly.weather_code[idx] !== undefined)
+      ? hourly.weather_code[idx]
+      : 3;
+    let bestWmoRank = getWmoSeverityRank(wCode);
+
+    for (let offset = 0; offset < 3; offset++) {
+      const slotIdx = idx + offset;
+      if (hourly.precipitation && Array.isArray(hourly.precipitation)) {
+        const pVal = hourly.precipitation[slotIdx];
+        if (typeof pVal === 'number' && !isNaN(pVal)) {
+          slotPrecipMm += pVal;
+        }
+      }
+      if (hourly.precipitation_probability && Array.isArray(hourly.precipitation_probability)) {
+        const probCandidate = hourly.precipitation_probability[slotIdx];
+        if (typeof probCandidate === 'number' && !isNaN(probCandidate) && probCandidate > precipVal) {
+          precipVal = probCandidate;
+        }
+      }
+      if (hourly.weather_code && Array.isArray(hourly.weather_code)) {
+        const codeCandidate = hourly.weather_code[slotIdx];
+        if (typeof codeCandidate === 'number' && !isNaN(codeCandidate)) {
+          const candRank = getWmoSeverityRank(codeCandidate);
+          if (candRank > bestWmoRank) {
+            bestWmoRank = candRank;
+            wCode = codeCandidate;
+          }
+        }
+      }
+    }
+    slotPrecipMm = Math.round(slotPrecipMm * 10) / 10;
+    let precipProbEstimated = false;
+    if (slotPrecipMm >= 0.1 && precipVal <= 0) {
+      precipProbEstimated = true;
+      precipVal = Math.min(85, Math.max(12, Math.round(slotPrecipMm * 40)));
+    }
+    if (slotPrecipMm >= 0.2 && bestWmoRank < 50) {
+      wCode = tVal <= 1 ? 71 : (slotPrecipMm >= 0.5 ? 61 : 51);
+    } else if (slotPrecipMm === 0 && precipVal < 15 && bestWmoRank >= 50) {
+      wCode = 3;
+    }
+
     const humVal = (hourly.relative_humidity_2m && hourly.relative_humidity_2m[idx] !== undefined)
       ? Math.round(hourly.relative_humidity_2m[idx])
       : 65;
@@ -12418,27 +12496,17 @@ function renderPulseWeatherUI(data, city, updatedTime = '') {
     dayTemps.push(tVal);
     dayGusts.push(windGust);
 
-    const hourPrecipTooltip = `Ймовірність опадів: ${precipVal}%${hourlyPrecipMm > 0 ? ` • Очікується: ${hourlyPrecipMm} мм` : ''}`;
-
-    // Сума опадів за 3-годинний слот для міні-колбочки в рядку таблиці
-    let slotPrecipMm = 0;
-    if (hourly.precipitation && Array.isArray(hourly.precipitation)) {
-      for (let offset = 0; offset < 3; offset++) {
-        const pVal = hourly.precipitation[idx + offset];
-        if (typeof pVal === 'number' && !isNaN(pVal)) {
-          slotPrecipMm += pVal;
-        }
-      }
-      slotPrecipMm = Math.round(slotPrecipMm * 10) / 10;
-    } else if (hourlyPrecipMm > 0) {
-      slotPrecipMm = hourlyPrecipMm;
-    }
+    const slotEndStr = `${h + 3}:00`;
+    const probSuffix = precipProbEstimated ? ' (оцінка за опадами)' : '';
+    const hourPrecipTooltip = `Інтервал ${hStr}-${slotEndStr} • макс. ймовірність: ${precipVal}%${probSuffix}${slotPrecipMm > 0 ? ` • опади: ${slotPrecipMm} мм` : ''}`;
 
     daySlots.push({
+      h,
       hStr,
       isCurrent,
       cond,
       precipVal,
+      precipProbEstimated,
       slotPrecipMm,
       hourPrecipTooltip,
       tVal,
@@ -12467,29 +12535,73 @@ function renderPulseWeatherUI(data, city, updatedTime = '') {
     });
   }
 
-  // Адаптивна шкала для погодинних міні-колб: мінімум 5 мм за 3 год або пік дня, без фальшивої заливки при 0 мм
-  const maxSlotMm = daySlots.reduce((m, s) => Math.max(m, s.slotPrecipMm || 0), 0);
-  const slotScaleMax = Math.max(5, Math.ceil(maxSlotMm));
+  // Варіант 3: мінімалізм - у сухих годинах тонка нейтральна риска, у дощових 5 чітких нелінійних рисочок (0.1+ | 0.4+ | 1.0+ | 2.5+ | 5+ мм)
+  const slotScaleText = '5 поділок (3 год): 0.1+ | 0.4+ | 1.0+ | 2.5+ | 5+ мм';
+  const curExactHour = curHourNow + (now.getMinutes() / 60);
   daySlots.forEach((s) => {
-    const rowFlaskFillPercent = s.slotPrecipMm > 0
-      ? Math.min(100, Math.max(8, Math.round((s.slotPrecipMm / slotScaleMax) * 100)))
-      : 0;
-    const rowFlaskTooltip = s.slotPrecipMm > 0
-      ? `Опади (${s.hStr}): ${s.slotPrecipMm} мм (шкала до ${slotScaleMax} мм) • ймовірність: ${s.precipVal}%`
-      : `Опади (${s.hStr}): 0 мм (без опадів) • ймовірність: ${s.precipVal}%`;
+    let rowActiveSegs = 0;
+    let rowIntensityLabel = 'без опадів';
+    if (s.slotPrecipMm >= 5) {
+      rowActiveSegs = 5;
+      rowIntensityLabel = 'злива / сильні';
+    } else if (s.slotPrecipMm >= 2.5) {
+      rowActiveSegs = 4;
+      rowIntensityLabel = 'сильні';
+    } else if (s.slotPrecipMm >= 1.0) {
+      rowActiveSegs = 3;
+      rowIntensityLabel = 'помірні';
+    } else if (s.slotPrecipMm >= 0.4) {
+      rowActiveSegs = 2;
+      rowIntensityLabel = 'невеликі';
+    } else if (s.slotPrecipMm > 0) {
+      rowActiveSegs = 1;
+      rowIntensityLabel = 'слабкі / сліди';
+    }
+
+    let rowIndicatorHtml = '<span class="pulse-w2-row-dry-mark"></span>';
+    if (rowActiveSegs > 0) {
+      rowIndicatorHtml = '';
+      for (let sg = 1; sg <= 5; sg++) {
+        const sgState = sg <= rowActiveSegs ? 'is-forecast' : 'is-empty';
+        rowIndicatorHtml += `<span class="pulse-w2-row-seg ${sgState}"></span>`;
+      }
+    }
+
+    const slotEndStr = `${s.h + 3}:00`;
+    const slotPeriodLabel = `${s.hStr}-${slotEndStr}`;
+    let slotStatusNote = '';
+    if (activeTab === 0 && s.slotPrecipMm > 0) {
+      if (s.h + 3 <= curExactHour) {
+        slotStatusNote = ' • інтервал минув';
+      } else if (s.isCurrent) {
+        slotStatusNote = ' • триває зараз';
+      }
+    }
+    const rowPopoverBody = s.slotPrecipMm > 0
+      ? `
+        <div class="pulse-w2-pop-title">Опади (${slotPeriodLabel}): ${s.slotPrecipMm} мм (${rowActiveSegs}/5 · ${rowIntensityLabel})</div>
+        <div class="pulse-w2-pop-row"><span class="pulse-w2-pop-dot is-forecast"></span>За 3 години: <strong>${s.slotPrecipMm} мм</strong> • Ймовірн.: <strong>${s.precipVal}%</strong>${slotStatusNote}</div>
+        <div class="pulse-w2-pop-row pulse-w2-pop-marks">${slotScaleText}</div>
+      `
+      : `
+        <div class="pulse-w2-pop-title">Опади (${slotPeriodLabel}): 0 мм (без опадів)</div>
+        <div class="pulse-w2-pop-row">Ймовірність опадів: <strong>${s.precipVal}%</strong></div>
+        <div class="pulse-w2-pop-row pulse-w2-pop-marks">${slotScaleText}</div>
+      `;
 
     s.overviewRowHtml = `
       <tr class="pulse-w2-row ${s.isCurrent ? 'pulse-w2-row-current' : ''}">
         <td class="pulse-w2-col-time">
           <span class="pulse-w2-time-val">${s.hStr}</span>
         </td>
-        <td class="pulse-w2-col-weather" title="${s.cond.label} (${s.hourPrecipTooltip})">
+        <td class="pulse-w2-col-weather">
           <div class="pulse-w2-weather-cell">
-            <div class="pulse-w2-row-flask" title="${rowFlaskTooltip}">
-              <div class="pulse-w2-row-flask-fill ${rowFlaskFillPercent > 0 ? 'has-rain' : ''}" style="height: ${rowFlaskFillPercent}%;"></div>
+            <div class="pulse-w2-row-flask${rowActiveSegs === 0 ? ' is-dry-minimal' : ''}" onmouseenter="window.showPulseWeatherFlaskPopover(this)" onmouseleave="window.hidePulseWeatherFlaskPopover()">
+              ${rowIndicatorHtml}
+              <div class="pulse-w2-flask-popover">${rowPopoverBody}</div>
             </div>
-            <span class="pulse-w2-cell-icon">${s.cond.icon}</span>
-            <span class="pulse-w2-cell-precip ${s.precipVal >= 50 ? 'high' : ''}" title="${s.hourPrecipTooltip}">
+            <span class="pulse-w2-cell-icon" title="${s.cond.label} (${s.hourPrecipTooltip})">${s.cond.icon}</span>
+            <span class="pulse-w2-cell-precip ${s.precipVal >= 50 ? 'high' : (s.precipVal <= 0 ? 'is-zero' : '')}" title="${s.hourPrecipTooltip}">
               <span class="pulse-w2-cell-precip-val">${s.precipVal}</span><span class="pulse-w2-precip-pct">%</span>
             </span>
           </div>
