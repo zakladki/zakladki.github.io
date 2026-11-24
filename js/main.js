@@ -11868,8 +11868,7 @@ function buildPulseWeatherTabsStripHtml(data, activeTab = 0, tabOffset = 0) {
   const hourly = (data && data.hourly) ? data.hourly : {};
   const daily = (data && data.daily) ? data.daily : {};
   const { totalDays, maxOffset } = getPulseWeatherMaxTabOffset(data);
-  const dailyScaleMm = getPulseWeatherDailyPrecipScaleMm(daily, hourly, totalDays);
-  const scaleTicksText = [1, 2, 3, 4, 5].map(n => Math.round((dailyScaleMm / 5) * n * 10) / 10).join(' | ') + ' мм';
+  const segScaleText = '10 поділок: 0.2 | 0.6 | 1.5 | 4 | 12+ мм';
   const clampedOffset = Math.max(0, Math.min(maxOffset, tabOffset || 0));
   const now = new Date();
 
@@ -11926,12 +11925,44 @@ function buildPulseWeatherTabsStripHtml(data, activeTab = 0, tabOffset = 0) {
 
     const { precipMm, dayPrecipSlice } = getPulseWeatherDayPrecipMm(daily, hourly, d);
 
-    const forecastFillPercent = precipMm > 0 ? Math.min(100, Math.max(6, Math.round((precipMm / dailyScaleMm) * 100))) : 0;
+    // 10-рівнева нелінійна шкала інтенсивності (0.1 -> 12+ мм) для тонких горизонтальних рисочок
+    let activeSegs = 0;
+    let intensityLabel = 'без опадів';
+    if (precipMm >= 12) {
+      activeSegs = 10;
+      intensityLabel = 'злива / сильні';
+    } else if (precipMm >= 8) {
+      activeSegs = 9;
+      intensityLabel = 'сильні';
+    } else if (precipMm >= 5) {
+      activeSegs = 8;
+      intensityLabel = 'сильні';
+    } else if (precipMm >= 3) {
+      activeSegs = 7;
+      intensityLabel = 'помірні';
+    } else if (precipMm >= 2) {
+      activeSegs = 6;
+      intensityLabel = 'помірні';
+    } else if (precipMm >= 1.2) {
+      activeSegs = 5;
+      intensityLabel = 'помірні';
+    } else if (precipMm >= 0.7) {
+      activeSegs = 4;
+      intensityLabel = 'невеликі';
+    } else if (precipMm >= 0.4) {
+      activeSegs = 3;
+      intensityLabel = 'невеликі';
+    } else if (precipMm >= 0.2) {
+      activeSegs = 2;
+      intensityLabel = 'слабкі';
+    } else if (precipMm > 0) {
+      activeSegs = 1;
+      intensityLabel = 'сліди / мряка';
+    }
 
     // Для «Сьогодні» (d === 0) обчислюємо, скільки опадів уже випало до поточної години, а скільки ще попереду
     let elapsedMm = 0;
     let remainingMm = precipMm;
-    let elapsedFillPercent = 0;
     let elapsedSharePct = 0;
     let remainingSharePct = precipMm > 0 ? 100 : 0;
 
@@ -11949,57 +11980,66 @@ function buildPulseWeatherTabsStripHtml(data, activeTab = 0, tabOffset = 0) {
       remainingMm = Math.max(0, Math.round((precipMm - elapsedMm) * 10) / 10);
       elapsedSharePct = Math.min(100, Math.max(0, Math.round((elapsedMm / precipMm) * 100)));
       remainingSharePct = Math.max(0, 100 - elapsedSharePct);
+    }
 
-      if (elapsedMm > 0) {
-        elapsedFillPercent = Math.min(forecastFillPercent, Math.max(4, Math.round(forecastFillPercent * (elapsedMm / precipMm))));
-        if (remainingMm > 0 && forecastFillPercent >= 10 && elapsedFillPercent >= forecastFillPercent - 2) {
-          elapsedFillPercent = forecastFillPercent - 3;
+    let elapsedSegs = 0;
+    let partialSegIdx = 0;
+    if (d === 0 && activeSegs > 0 && elapsedMm > 0) {
+      if (elapsedMm >= precipMm - 0.05 || remainingMm <= 0) {
+        elapsedSegs = activeSegs;
+      } else {
+        const ratio = elapsedMm / precipMm;
+        if (activeSegs === 1) {
+          partialSegIdx = 1;
+        } else {
+          elapsedSegs = Math.max(1, Math.min(activeSegs - 1, Math.round(activeSegs * ratio)));
         }
       }
     }
 
+    let segsHtml = '';
+    for (let s = 1; s <= 10; s++) {
+      let segState = 'is-empty';
+      if (s <= elapsedSegs) {
+        segState = 'is-elapsed';
+      } else if (s === partialSegIdx) {
+        segState = 'is-partial';
+      } else if (s <= activeSegs) {
+        segState = 'is-forecast';
+      }
+      segsHtml += `<span class="pulse-w2-seg-bar ${segState}"></span>`;
+    }
+
     const precipMmText = precipMm > 0 ? `${precipMm} мм` : '0 мм (без опадів)';
     const flaskTooltip = (d === 0 && precipMm > 0)
-      ? `Опади сьогодні: ${precipMm} мм&#10;Добові опади (прогноз): ${precipMm} мм&#10;Поточні (вже випало): ${elapsedMm} мм (${elapsedSharePct}%)&#10;Ще очікується: ${remainingMm} мм (${remainingSharePct}%)&#10;Шкала: ${scaleTicksText}`
-      : `Добові опади (${tabTitle}): ${precipMmText}&#10;Середня ймовірність: ${dayAvgPrecip}%&#10;Шкала: ${scaleTicksText}`;
+      ? `Опади сьогодні: ${precipMm} мм (${activeSegs}/10 · ${intensityLabel})&#10;Поточні (вже випало): ${elapsedMm} мм (${elapsedSharePct}%)&#10;Ще очікується: ${remainingMm} мм (${remainingSharePct}%)&#10;${segScaleText}`
+      : `Добові опади (${tabTitle}): ${precipMmText}${activeSegs > 0 ? ` (${activeSegs}/10 · ${intensityLabel})` : ''}&#10;Середня ймовірність: ${dayAvgPrecip}%&#10;${segScaleText}`;
     const isRightSlot = d === (clampedOffset + 2);
 
     const flaskPopoverBody = (d === 0 && precipMm > 0)
       ? `
-            <div class="pulse-w2-pop-title">Опади сьогодні: ${precipMm} мм</div>
+            <div class="pulse-w2-pop-title">Опади сьогодні: ${precipMm} мм (${activeSegs}/10 · ${intensityLabel})</div>
             <div class="pulse-w2-pop-row"><span class="pulse-w2-pop-dot is-forecast"></span>Добові опади (прогноз): <strong>${precipMm} мм</strong></div>
             <div class="pulse-w2-pop-row"><span class="pulse-w2-pop-dot is-elapsed"></span>Поточні (випало): <strong>${elapsedMm} мм</strong> (${elapsedSharePct}%)</div>
             <div class="pulse-w2-pop-row pulse-w2-pop-remaining">Попереду: <strong>${remainingMm} мм</strong> (${remainingSharePct}%)</div>
-            <div class="pulse-w2-pop-row pulse-w2-pop-marks">Ймовірність: ${dayAvgPrecip}% • Шкала: ${scaleTicksText}</div>
+            <div class="pulse-w2-pop-row pulse-w2-pop-marks">Ймовірність: ${dayAvgPrecip}% • ${segScaleText}</div>
         `
       : `
-            <div class="pulse-w2-pop-title">Добові опади (${tabTitle}): ${precipMmText}</div>
+            <div class="pulse-w2-pop-title">Добові опади (${tabTitle}): ${precipMmText}${activeSegs > 0 ? ` (${activeSegs}/10 · ${intensityLabel})` : ''}</div>
             <div class="pulse-w2-pop-row">${precipMm > 0 ? `<span class="pulse-w2-pop-dot is-forecast"></span>Добові (прогноз): <strong>${precipMm} мм</strong> • Ймовірн.: ${dayAvgPrecip}%` : `Середня ймовірність: ${dayAvgPrecip}%`}</div>
-            <div class="pulse-w2-pop-row pulse-w2-pop-marks">Шкала: ${scaleTicksText}</div>
+            <div class="pulse-w2-pop-row pulse-w2-pop-marks">${segScaleText}</div>
         `;
 
-    // Вирівнюємо рівень заливки під реальну геометрію краплі (широке дно й вузький носик)
     const clampedProb = Math.max(0, Math.min(100, dayAvgPrecip || 0));
-    const dropVisualRatio = clampedProb === 0
-      ? 0
-      : (clampedProb >= 100 ? 1 : Math.min(0.96, 0.08 + 0.92 * Math.pow(clampedProb / 100, 0.74)));
-    const dropFillH = Math.round((dropVisualRatio * 16.5) * 100) / 100;
-    const dropFillY = Math.round((18.0 - dropFillH) * 100) / 100;
-    const dropClipId = `pulseW2TabDropClip${d}`;
+    const mmCompactVal = precipMm >= 10 ? Math.round(precipMm) : precipMm;
+    const mmBadgeHtml = precipMm > 0
+      ? `<span class="pulse-w2-tab-mm-badge" title="Очікувані добові опади: ${precipMm} мм (${intensityLabel})">${mmCompactVal}</span>`
+      : '';
 
     cardsHtml += `
       <button type="button" class="pulse-w2-tab ${d === activeTab ? 'active' : ''}${isRightSlot ? ' is-slot-right' : ''}" data-day-idx="${d}" onclick="window.setPulseWeatherTab(${d})" onmouseenter="this.classList.add('is-hovered')" onmouseleave="this.classList.remove('is-hovered')">
-        <div class="pulse-w2-flask-wrap" aria-label="${flaskTooltip}" onmouseenter="window.showPulseWeatherFlaskPopover(this)" onmouseleave="window.hidePulseWeatherFlaskPopover()">
-          <div class="pulse-w2-flask-glass">
-            <div class="pulse-w2-flask-forecast-fill ${precipMm > 0 ? 'has-rain' : ''}" style="height: ${forecastFillPercent}%;"></div>
-            <div class="pulse-w2-flask-elapsed-fill ${elapsedFillPercent > 0 ? 'has-rain' : ''}${elapsedFillPercent > 0 && elapsedFillPercent < forecastFillPercent ? ' is-partial' : ''}" style="height: ${elapsedFillPercent}%;"></div>
-          </div>
-          <div class="pulse-w2-flask-marks" aria-hidden="true">
-            <span class="pulse-w2-flask-tick t20"></span>
-            <span class="pulse-w2-flask-tick t40"></span>
-            <span class="pulse-w2-flask-tick t60"></span>
-            <span class="pulse-w2-flask-tick t80"></span>
-          </div>
+        <div class="pulse-w2-flask-wrap ${activeSegs === 0 ? 'is-dry' : ''}" aria-label="${flaskTooltip}" onmouseenter="window.showPulseWeatherFlaskPopover(this)" onmouseleave="window.hidePulseWeatherFlaskPopover()">
+          ${segsHtml}
           <div class="pulse-w2-flask-popover" aria-hidden="true">
             ${flaskPopoverBody}
           </div>
@@ -12009,24 +12049,11 @@ function buildPulseWeatherTabsStripHtml(data, activeTab = 0, tabOffset = 0) {
           <span class="pulse-w2-tab-date">${dowLabel} • ${dayNum} ${monthLabel}</span>
         </div>
         <div class="pulse-w2-tab-weather-row" title="${cond.label} • Добові опади: ${precipMmText} (ймовірність ${dayAvgPrecip}%)">
-          <span class="pulse-w2-tab-icon">${cond.icon}</span>
-          <span class="pulse-w2-tab-drop ${clampedProb >= 50 ? 'high' : ''}${clampedProb === 0 ? ' is-empty' : ''}" title="Середня ймовірність опадів за добу: ${dayAvgPrecip}%, очікується: ${precipMmText}" aria-label="Ймовірність опадів: ${dayAvgPrecip}%">
-            <svg class="pulse-w2-tab-drop-svg" width="13" height="17" viewBox="0 0 16 20" aria-hidden="true">
-              <defs>
-                <clipPath id="${dropClipId}">
-                  <path d="M 8 1.5 C 8 1.5 13.5 8.6 13.5 12.5 A 5.5 5.5 0 1 1 2.5 12.5 C 2.5 8.6 8 1.5 8 1.5 Z"/>
-                </clipPath>
-              </defs>
-              <path class="pulse-w2-tab-drop-bg" d="M 8 1.5 C 8 1.5 13.5 8.6 13.5 12.5 A 5.5 5.5 0 1 1 2.5 12.5 C 2.5 8.6 8 1.5 8 1.5 Z"/>
-              ${clampedProb > 0 ? `
-                <g clip-path="url(#${dropClipId})">
-                  <rect class="pulse-w2-tab-drop-fill" x="1" y="${dropFillY}" width="14" height="${dropFillH + 1}" />
-                  ${clampedProb < 100 ? `<line class="pulse-w2-tab-drop-line" x1="1" y1="${dropFillY}" x2="15" y2="${dropFillY}" />` : ''}
-                </g>
-              ` : ''}
-              <path class="pulse-w2-tab-drop-outline" d="M 8 1.5 C 8 1.5 13.5 8.6 13.5 12.5 A 5.5 5.5 0 1 1 2.5 12.5 C 2.5 8.6 8 1.5 8 1.5 Z" fill="none"/>
-            </svg>
-          </span>
+          <div class="pulse-w2-tab-icon-wrap">
+            <span class="pulse-w2-tab-icon">${cond.icon}</span>
+            <span class="pulse-w2-tab-prob-badge ${clampedProb >= 50 ? 'high' : ''}${clampedProb === 0 ? ' is-zero' : ''}" title="Середня ймовірність опадів за добу: ${dayAvgPrecip}%, очікується: ${precipMmText}">${dayAvgPrecip}<span class="pulse-w2-tab-prob-pct">%</span></span>
+            ${mmBadgeHtml}
+          </div>
         </div>
         <div class="pulse-w2-tab-temps">
           <span class="${minClass}">${minSign}${minT}°</span>
