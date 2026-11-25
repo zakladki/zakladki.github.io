@@ -12049,31 +12049,28 @@ function buildPulseWeatherTabsStripHtml(data, activeTab = 0, tabOffset = 0) {
       nowMarkerHtml = `<span class="pulse-w2-now-marker" style="bottom: ${markerBottomPx}px;"></span>`;
     }
 
-    const precipMmText = precipMm > 0 ? `${precipMm} мм` : '0 мм (без опадів)';
+    const precipMmFixed = precipMm > 0 ? precipMm.toFixed(1) : '0';
+    const precipMmText = precipMm > 0 ? `${precipMmFixed} мм` : '0 мм (без опадів)';
     const flaskTooltip = (d === 0 && precipMm > 0)
-      ? `Опади сьогодні: ${precipMm} мм (${activeSegs}/10 · ${intensityLabel})&#10;Поточні (вже випало): ${elapsedMm} мм (${elapsedSharePct}%)&#10;Можливо (очікується): ${remainingMm} мм (${remainingSharePct}%)&#10;${segScaleText}`
+      ? `Опади сьогодні: ${precipMmFixed} мм (${activeSegs}/10 · ${intensityLabel})&#10;Поточні (вже випало): ${elapsedMm.toFixed(1)} мм (${elapsedSharePct}%)&#10;Можливо (очікується): ${remainingMm.toFixed(1)} мм (${remainingSharePct}%)&#10;${segScaleText}`
       : `Добові опади (${tabTitle}): ${precipMmText}${activeSegs > 0 ? ` (${activeSegs}/10 · ${intensityLabel})` : ''}&#10;Середня ймовірність: ${dayAvgPrecip}%&#10;${segScaleText}`;
     const isRightSlot = d === (clampedOffset + 2);
 
     const flaskPopoverBody = (d === 0 && precipMm > 0)
       ? `
-            <div class="pulse-w2-pop-title">Опади сьогодні: ${precipMm} мм (${activeSegs}/10 · ${intensityLabel})</div>
-            <div class="pulse-w2-pop-row"><span class="pulse-w2-pop-dot is-forecast"></span>Добові опади (прогноз): <strong>${precipMm} мм</strong></div>
-            <div class="pulse-w2-pop-row"><span class="pulse-w2-pop-tick"></span>Поточні (випало): <strong>${elapsedMm} мм</strong> (${elapsedSharePct}%)</div>
-            <div class="pulse-w2-pop-row pulse-w2-pop-remaining"><span class="pulse-w2-pop-spacer"></span>Можливо (очікується): <strong>${remainingMm} мм</strong> (${remainingSharePct}%)</div>
+            <div class="pulse-w2-pop-title">Опади сьогодні: ${precipMmFixed} мм (${activeSegs}/10 · ${intensityLabel})</div>
+            <div class="pulse-w2-pop-row"><span class="pulse-w2-pop-dot is-forecast"></span>Добові опади (прогноз): <strong>${precipMmFixed} мм</strong></div>
+            <div class="pulse-w2-pop-row"><span class="pulse-w2-pop-tick"></span>Поточні (випало): <strong>${elapsedMm.toFixed(1)} мм</strong> (${elapsedSharePct}%)</div>
+            <div class="pulse-w2-pop-row pulse-w2-pop-remaining"><span class="pulse-w2-pop-spacer"></span>Можливо (очікується): <strong>${remainingMm.toFixed(1)} мм</strong> (${remainingSharePct}%)</div>
             <div class="pulse-w2-pop-row pulse-w2-pop-marks">Ймовірність: ${dayAvgPrecip}% • ${segScaleText}</div>
         `
       : `
             <div class="pulse-w2-pop-title">Добові опади (${tabTitle}): ${precipMmText}${activeSegs > 0 ? ` (${activeSegs}/10 · ${intensityLabel})` : ''}</div>
-            <div class="pulse-w2-pop-row">${precipMm > 0 ? `<span class="pulse-w2-pop-dot is-forecast"></span>Добові (прогноз): <strong>${precipMm} мм</strong> • Ймовірн.: ${dayAvgPrecip}%` : `Середня ймовірність: ${dayAvgPrecip}%`}</div>
+            <div class="pulse-w2-pop-row">${precipMm > 0 ? `<span class="pulse-w2-pop-dot is-forecast"></span>Добові (прогноз): <strong>${precipMmFixed} мм</strong> • Ймовірн.: ${dayAvgPrecip}%` : `Середня ймовірність: ${dayAvgPrecip}%`}</div>
             <div class="pulse-w2-pop-row pulse-w2-pop-marks">${segScaleText}</div>
         `;
 
     const clampedProb = Math.max(0, Math.min(100, dayAvgPrecip || 0));
-    const mmCompactVal = precipMm >= 10 ? Math.round(precipMm) : precipMm;
-    const mmBadgeHtml = precipMm > 0
-      ? `<span class="pulse-w2-tab-mm-badge" title="Очікувані добові опади: ${precipMm} мм (${intensityLabel})">${mmCompactVal}</span>`
-      : '';
 
     cardsHtml += `
       <button type="button" class="pulse-w2-tab ${d === activeTab ? 'active' : ''}${isRightSlot ? ' is-slot-right' : ''}" data-day-idx="${d}" onclick="window.setPulseWeatherTab(${d})" onmouseenter="this.classList.add('is-hovered')" onmouseleave="this.classList.remove('is-hovered')">
@@ -12091,7 +12088,6 @@ function buildPulseWeatherTabsStripHtml(data, activeTab = 0, tabOffset = 0) {
           <div class="pulse-w2-tab-icon-wrap">
             <span class="pulse-w2-tab-icon">${cond.icon}</span>
             <span class="pulse-w2-tab-prob-badge ${clampedProb >= 50 ? 'high' : ''}${clampedProb === 0 ? ' is-zero' : ''}" title="Середня ймовірність опадів за добу: ${dayAvgPrecip}%, очікується: ${precipMmText}">${dayAvgPrecip}<span class="pulse-w2-tab-prob-pct">%</span></span>
-            ${mmBadgeHtml}
           </div>
         </div>
         <div class="pulse-w2-tab-temps">

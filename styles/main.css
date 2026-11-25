@@ -16354,7 +16354,7 @@ body.dark-mode .pulse-w2-tab.active .pulse-w2-tab-date {
 .pulse-w2-tab-prob-badge {
   position: absolute;
   left: calc(100% - 2px);
-  top: 2px;
+  top: 5px;
   display: inline-flex;
   align-items: baseline;
   white-space: nowrap;
@@ -16387,24 +16387,6 @@ body.dark-mode .pulse-w2-tab-prob-badge.is-zero {
   opacity: 0.85;
   font-weight: 500;
   margin-left: 0.5px;
-}
-.pulse-w2-tab-mm-badge {
-  position: absolute;
-  left: calc(100% - 2px);
-  bottom: 1px;
-  display: inline-flex;
-  align-items: baseline;
-  white-space: nowrap;
-  font-size: 0.62rem;
-  font-weight: 600;
-  line-height: 1;
-  color: #0369a1;
-  opacity: 1;
-  font-variant-numeric: tabular-nums;
-  pointer-events: none;
-}
-body.dark-mode .pulse-w2-tab-mm-badge {
-  color: #7dd3fc;
 }
 
 .pulse-w2-precip-pct {
