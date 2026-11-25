@@ -12051,7 +12051,7 @@ function buildPulseWeatherTabsStripHtml(data, activeTab = 0, tabOffset = 0) {
 
     const precipMmText = precipMm > 0 ? `${precipMm} мм` : '0 мм (без опадів)';
     const flaskTooltip = (d === 0 && precipMm > 0)
-      ? `Опади сьогодні: ${precipMm} мм (${activeSegs}/10 · ${intensityLabel})&#10;Поточні (вже випало): ${elapsedMm} мм (${elapsedSharePct}%)&#10;Ще очікується: ${remainingMm} мм (${remainingSharePct}%)&#10;${segScaleText}`
+      ? `Опади сьогодні: ${precipMm} мм (${activeSegs}/10 · ${intensityLabel})&#10;Поточні (вже випало): ${elapsedMm} мм (${elapsedSharePct}%)&#10;Можливо (очікується): ${remainingMm} мм (${remainingSharePct}%)&#10;${segScaleText}`
       : `Добові опади (${tabTitle}): ${precipMmText}${activeSegs > 0 ? ` (${activeSegs}/10 · ${intensityLabel})` : ''}&#10;Середня ймовірність: ${dayAvgPrecip}%&#10;${segScaleText}`;
     const isRightSlot = d === (clampedOffset + 2);
 
@@ -12060,7 +12060,7 @@ function buildPulseWeatherTabsStripHtml(data, activeTab = 0, tabOffset = 0) {
             <div class="pulse-w2-pop-title">Опади сьогодні: ${precipMm} мм (${activeSegs}/10 · ${intensityLabel})</div>
             <div class="pulse-w2-pop-row"><span class="pulse-w2-pop-dot is-forecast"></span>Добові опади (прогноз): <strong>${precipMm} мм</strong></div>
             <div class="pulse-w2-pop-row"><span class="pulse-w2-pop-tick"></span>Поточні (випало): <strong>${elapsedMm} мм</strong> (${elapsedSharePct}%)</div>
-            <div class="pulse-w2-pop-row pulse-w2-pop-remaining">Попереду: <strong>${remainingMm} мм</strong> (${remainingSharePct}%)</div>
+            <div class="pulse-w2-pop-row pulse-w2-pop-remaining"><span class="pulse-w2-pop-spacer"></span>Можливо (очікується): <strong>${remainingMm} мм</strong> (${remainingSharePct}%)</div>
             <div class="pulse-w2-pop-row pulse-w2-pop-marks">Ймовірність: ${dayAvgPrecip}% • ${segScaleText}</div>
         `
       : `

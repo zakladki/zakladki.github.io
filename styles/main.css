@@ -15955,13 +15955,12 @@ body.dark-mode .pulse-w2-pop-title {
   font-weight: 400;
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
 }
 body.dark-mode .pulse-w2-pop-row {
   color: #cbd5e1;
 }
 .pulse-w2-pop-remaining {
-  padding-left: 13px;
   color: #64748b;
 }
 body.dark-mode .pulse-w2-pop-remaining {
@@ -15970,7 +15969,7 @@ body.dark-mode .pulse-w2-pop-remaining {
 .pulse-w2-pop-dot {
   display: inline-block;
   width: 10px;
-  height: 3px;
+  height: 2px;
   border-radius: 0;
   flex-shrink: 0;
   box-sizing: border-box;
@@ -15988,21 +15987,33 @@ body.dark-mode .pulse-w2-pop-dot.is-elapsed {
   background: #38bdf8;
 }
 .pulse-w2-pop-tick {
-  display: inline-block;
-  width: 6px;
-  height: 2px;
-  margin: 0 2px;
-  border-radius: 0;
-  background: #0369a1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 10px;
+  height: 6px;
   flex-shrink: 0;
 }
-body.dark-mode .pulse-w2-pop-tick {
+.pulse-w2-pop-tick::after {
+  content: '';
+  width: 2px;
+  height: 2px;
+  border-radius: 0;
+  background: #0369a1;
+}
+body.dark-mode .pulse-w2-pop-tick::after {
   background: #f8fafc;
+}
+.pulse-w2-pop-spacer {
+  display: inline-block;
+  width: 10px;
+  height: 2px;
+  flex-shrink: 0;
 }
 .pulse-w2-now-marker {
   position: absolute;
-  left: 11px;
-  width: 3px;
+  left: -3px;
+  width: 2px;
   height: 2px;
   border-radius: 0;
   background: #0369a1;
