@@ -2743,6 +2743,43 @@ let adPromoState = {
   failedAttempts: 0,
   blockedUntil: 0
 };
+let activeAdDraftOrderId = null;
+let lastAdOrderSubmittedAt = 0;
+let lastAdOrderSignature = '';
+
+function autofillAdOrderContacts() {
+  if (typeof loadCachedUserProfile === 'function') {
+    loadCachedUserProfile();
+  }
+  const emailInput = document.getElementById('adContactEmail');
+  if (emailInput && !emailInput.value.trim() && currentUser && currentUser.email) {
+    emailInput.value = currentUser.email;
+  }
+  const tgInput = document.getElementById('adContactTg');
+  if (tgInput && !tgInput.value.trim() && userProfileSettings && userProfileSettings.telegram) {
+    tgInput.value = userProfileSettings.telegram;
+  }
+  const phoneInput = document.getElementById('adContactPhone');
+  if (phoneInput && !phoneInput.value.trim() && userProfileSettings && userProfileSettings.phone) {
+    phoneInput.value = userProfileSettings.phone;
+  }
+}
+
+function normalizeAdSiteUrl(rawUrl) {
+  const trimmed = (rawUrl || '').trim();
+  if (!trimmed) return '';
+  const withProtocol = /^https?:\/\//i.test(trimmed)
+    ? trimmed
+    : (/^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(trimmed) ? trimmed : 'https://' + trimmed);
+  try {
+    const parsed = new URL(withProtocol);
+    if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') return '';
+    if (!parsed.hostname || !parsed.hostname.includes('.')) return '';
+    return parsed.href;
+  } catch (e) {
+    return '';
+  }
+}
 
 function getCurrentSiteSection() {
   const activeLink = document.querySelector('.nav-link.active');
@@ -2764,7 +2801,7 @@ function getCurrentSiteSection() {
   if (path.includes('others.html')) return 'Інше';
   if (path.includes('ai.html')) return 'AI';
   if (path.includes('programs.html')) return 'Soft';
-  if (path.includes('bookmarks.html')) return 'Закладки';
+  if (path.includes('bookmarks.html')) return 'Головна';
   return 'Головна';
 }
 
@@ -3500,7 +3537,7 @@ function openAdOrderModal(opts = {}) {
             <!-- Кнопки швидких дій -->
             <div class="ad-action-btns-grid">
               <!-- 1. Надіслати в Telegram -->
-              <a href="#" id="adActionTgBtn" target="_blank" class="ad-action-btn ad-btn-tg">
+              <a href="#" id="adActionTgBtn" target="_blank" rel="noopener noreferrer" class="ad-action-btn ad-btn-tg">
                 <i class="fab fa-telegram-plane"></i> Надіслати в Telegram
               </a>
 
@@ -3509,7 +3546,12 @@ function openAdOrderModal(opts = {}) {
                 <i class="far fa-envelope"></i> Надіслати на Email
               </a>
 
-              <!-- 3. Змінити замовлення -->
+              <!-- 3. Скопіювати заявку -->
+              <button type="button" id="adActionCopyBtn" class="ad-action-btn ad-btn-copy-all">
+                <i class="far fa-copy"></i> Скопіювати текст заявки
+              </button>
+
+              <!-- 4. Змінити замовлення -->
               <button type="button" id="adActionBackBtn" class="ad-action-btn ad-btn-back">
                 <i class="fas fa-arrow-left"></i> Змінити замовлення
               </button>
@@ -3862,6 +3904,8 @@ function openAdOrderModal(opts = {}) {
   }
 
   // Скидання на Крок 1 при відкритті
+  activeAdDraftOrderId = null;
+  lastAdOrderSignature = '';
   document.getElementById('adStep1').style.display = 'block';
   document.getElementById('adStep2').style.display = 'none';
   document.getElementById('adFormError').style.display = 'none';
@@ -3878,8 +3922,9 @@ function openAdOrderModal(opts = {}) {
   const thematic2FieldsReset = document.getElementById('adThematic2FieldsBox');
   if (thematic2FieldsReset) thematic2FieldsReset.style.display = 'grid';
 
-  // Встановлення переданого розділу та картки
-  const initialSection = opts.section && SECTIONS_CATALOG[opts.section] ? opts.section : getCurrentSiteSection();
+  // Встановлення переданого розділу та картки (з безпечним фолбеком на 'Головна')
+  const rawSection = opts.section || getCurrentSiteSection();
+  const initialSection = SECTIONS_CATALOG[rawSection] ? rawSection : 'Головна';
   const secSelect = document.getElementById('adSectionSelect');
   secSelect.value = initialSection;
 
@@ -3907,13 +3952,7 @@ function openAdOrderModal(opts = {}) {
   updateLivePreview();
 
   renderAdAuthPromptBanner();
-
-  if (currentUser && currentUser.email) {
-    const emailInput = document.getElementById('adEmailInput');
-    if (emailInput && !emailInput.value) {
-      emailInput.value = currentUser.email;
-    }
-  }
+  autofillAdOrderContacts();
 
   backdrop.classList.add('show');
   document.body.style.overflow = 'hidden';
@@ -4276,7 +4315,7 @@ function recalcAdOrderPrice() {
 
 function submitAdOrder() {
   const name = document.getElementById('adSiteName').value.trim();
-  const url = document.getElementById('adSiteUrl').value.trim();
+  const rawUrl = document.getElementById('adSiteUrl').value.trim();
   const desc = document.getElementById('adSiteDesc').value.trim();
   const email = document.getElementById('adContactEmail').value.trim();
   const tg = document.getElementById('adContactTg').value.trim();
@@ -4291,19 +4330,22 @@ function submitAdOrder() {
     document.getElementById('adSiteName').focus();
     return;
   }
+  const url = normalizeAdSiteUrl(rawUrl);
   if (!url) {
-    errorEl.textContent = 'Будь ласка, вкажіть посилання на ваш ресурс (URL сайту або Telegram).';
+    errorEl.textContent = 'Будь ласка, вкажіть коректне посилання (наприклад, https://example.com або t.me/channel).';
     errorEl.style.display = 'block';
     document.getElementById('adSiteUrl').focus();
     return;
   }
+  document.getElementById('adSiteUrl').value = url;
+
   if (!desc) {
     errorEl.textContent = 'Будь ласка, додайте короткий опис вашого ресурсу (до 150 символів).';
     errorEl.style.display = 'block';
     document.getElementById('adSiteDesc').focus();
     return;
   }
-  if (!email || !email.includes('@')) {
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) {
     errorEl.textContent = 'Будь ласка, вкажіть коректний контактний E-Mail для зв\'язку.';
     errorEl.style.display = 'block';
     document.getElementById('adContactEmail').focus();
@@ -4335,65 +4377,56 @@ function submitAdOrder() {
 
   const termId = document.getElementById('adTermSelect').value;
   const paymentMethod = document.querySelector('input[name="adPaymentMethod"]:checked')?.value || 'mono';
-
   const pricing = recalcAdOrderPrice();
-  const orderId = generateAdOrderId();
+
+  const orderSignature = JSON.stringify({
+    name,
+    url,
+    desc,
+    email,
+    tg,
+    phone,
+    termId,
+    paymentMethod,
+    promo: adPromoState.appliedCode || '',
+    placements: placements.map(p => `${p.section}|${p.card}|${p.location}`)
+  });
+
+  const isEditingSameDraft = Boolean(activeAdDraftOrderId);
+  const isUnchangedDraft = isEditingSameDraft && orderSignature === lastAdOrderSignature;
+
+  if (!isEditingSameDraft) {
+    const nowMs = Date.now();
+    const cooldownLeft = Math.ceil((45000 - (nowMs - lastAdOrderSubmittedAt)) / 1000);
+    if (lastAdOrderSubmittedAt && cooldownLeft > 0) {
+      errorEl.textContent = `Зачекайте ${cooldownLeft} сек. перед оформленням нового замовлення.`;
+      errorEl.style.display = 'block';
+      return;
+    }
+  }
+
+  if (!isUnchangedDraft && !checkAndIncrementDailyActionLimit()) {
+    return;
+  }
+
+  const orderId = activeAdDraftOrderId || generateAdOrderId();
+  activeAdDraftOrderId = orderId;
+  lastAdOrderSignature = orderSignature;
+  if (!isEditingSameDraft) {
+    lastAdOrderSubmittedAt = Date.now();
+  }
 
   const primaryPlacement = placements[0];
-  const orderPayload = {
-    orderId,
-    timestamp: new Date().toISOString(),
-    siteName: name,
-    siteNameWithBadge: `${name} ${primaryPlacement.badge.icon}`,
-    badgeIcon: primaryPlacement.badge.icon,
-    badgeName: primaryPlacement.badge.name,
-    siteUrl: url,
-    siteDesc: desc,
-    placementsCount: placements.length,
-    placements: placements.map(p => ({
-      slot: p.slot,
-      type: p.type,
-      title: p.title,
-      section: p.section,
-      card: p.card,
-      location: p.locationLabel,
-      monthlyRate: p.monthlyRate,
-      badgeIcon: p.badge.icon
-    })),
-    term: pricing.termLabel,
-    months: pricing.months,
-    hasGuarantee: !!pricing.hasGuarantee,
-    promoCode: adPromoState.appliedCode || 'Немає',
-    paymentMethod,
-    totalUah: pricing.finalUah,
-    totalUsdt: pricing.finalUsdt,
-    clientEmail: email,
-    clientTg: tg || 'Не вказано',
-    clientPhone: phone || 'Не вказано'
-  };
 
-  // Збереження на сервері та локально
-  try {
-    if (isNodeApiAvailable()) {
-      fetch('/api/orders', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(orderPayload)
-      }).then(r => {
-        if (r && r.status === 404) window._staticHostingNoApi = true;
-      }).catch(() => {});
-    }
-    localStorage.setItem('topz_last_ad_order', JSON.stringify(orderPayload));
-  } catch (e) {}
-
-  // Заповнення Кроку 2
+  // Заповнення Кроку 2 (із безпечним екрануванням введених даних)
   document.getElementById('adSuccessOrderId').textContent = `#${orderId}`;
   document.getElementById('adRecNoteOrderId').textContent = `#${orderId}`;
-  document.getElementById('adRecSite').innerHTML = `<strong>${name} ${primaryPlacement.badge.icon}</strong>`;
+  document.getElementById('adRecSite').innerHTML = `<strong>${escapeHtml(name)} ${primaryPlacement.badge.icon}</strong>`;
 
   const recUrlEl = document.getElementById('adRecUrl');
   if (recUrlEl) {
-    recUrlEl.innerHTML = `<a href="${url}" target="_blank" class="ad-receipt-url-link">${url} <i class="fas fa-external-link-alt" style="font-size:0.75rem;"></i></a>`;
+    const safeUrlEsc = escapeHtml(url);
+    recUrlEl.innerHTML = `<a href="${safeUrlEsc}" target="_blank" rel="noopener noreferrer" class="ad-receipt-url-link">${safeUrlEsc} <i class="fas fa-external-link-alt" style="font-size:0.75rem;"></i></a>`;
   }
 
   const recDescRow = document.getElementById('adRecDescRow');
@@ -4409,11 +4442,11 @@ function submitAdOrder() {
   
   let recPlacementHtml = '';
   placements.forEach((p, idx) => {
-    recPlacementHtml += `<div class="ad-receipt-loc-line"><strong>${idx + 1}. ${p.badge.icon} ${p.section}:</strong> «${p.card}» (${p.locationLabel}) <span class="ad-receipt-loc-rate">[${p.monthlyRate} грн/міс]</span></div>`;
+    recPlacementHtml += `<div class="ad-receipt-loc-line"><strong>${idx + 1}. ${p.badge.icon} ${escapeHtml(p.section)}:</strong> «${escapeHtml(p.card)}» (${escapeHtml(p.locationLabel)}) <span class="ad-receipt-loc-rate">[${p.monthlyRate} грн/міс]</span></div>`;
   });
   document.getElementById('adRecPlacement').innerHTML = recPlacementHtml;
   
-  let recTermHtml = pricing.termLabel;
+  let recTermHtml = escapeHtml(pricing.termLabel);
   if (pricing.hasGuarantee) {
     recTermHtml += `<br><span class="badge bg-success text-white" style="font-size:0.75rem;"><i class="fas fa-shield-alt"></i> Гарантія: 1 зміна URL/назви на рік</span>`;
   }
@@ -4477,11 +4510,11 @@ ${placementTgText}
 
   // Посилання на Telegram
   const tgBtn = document.getElementById('adActionTgBtn');
-  tgBtn.href = `https://t.me/WeberSIS?text=${encodeURIComponent(orderSummaryText)}`;
+  if (tgBtn) tgBtn.href = `https://t.me/WeberSIS?text=${encodeURIComponent(orderSummaryText)}`;
 
   // Посилання на Email
   const emailBtn = document.getElementById('adActionEmailBtn');
-  emailBtn.href = `mailto:weber515sis@gmail.com?subject=${encodeURIComponent('Оплата замовлення #' + orderId)}&body=${encodeURIComponent(orderSummaryText)}`;
+  if (emailBtn) emailBtn.href = `mailto:weber515sis@gmail.com?subject=${encodeURIComponent('Оплата замовлення #' + orderId)}&body=${encodeURIComponent(orderSummaryText)}`;
 
   const orderData = {
     orderId,
@@ -4490,18 +4523,44 @@ ${placementTgText}
     desc,
     placements,
     pricing,
+    promoCode: adPromoState.appliedCode || '',
     paymentMethod,
     email,
     tg,
     phone,
-    orderSummaryText
+    orderSummaryText,
+    isUpdate: isEditingSameDraft && !isUnchangedDraft
   };
 
-  // Автоматичне збереження замовлення у Cloud Firestore базі даних
-  saveOrderToFirestore(orderData);
+  if (!isUnchangedDraft) {
+    try {
+      localStorage.setItem('topz_last_ad_order', JSON.stringify({
+        orderId,
+        timestamp: new Date().toISOString(),
+        siteName: name,
+        siteUrl: url,
+        siteDesc: desc,
+        placementsCount: placements.length,
+        placements,
+        term: pricing.termLabel,
+        months: pricing.months,
+        hasGuarantee: !!pricing.hasGuarantee,
+        promoCode: adPromoState.appliedCode || 'Немає',
+        paymentMethod,
+        totalUah: pricing.finalUah,
+        totalUsdt: pricing.finalUsdt,
+        clientEmail: email,
+        clientTg: tg || 'Не вказано',
+        clientPhone: phone || 'Не вказано'
+      }));
+    } catch (e) {}
 
-  // Миттєве сповіщення на Email адміністратора (weber515sis@gmail.com) та локальний сервер
-  sendOrderNotifications(orderData);
+    // Автоматичне збереження замовлення у Cloud Firestore базі даних
+    saveOrderToFirestore(orderData);
+
+    // Єдина централізована відправка на локальний сервер /api/orders та Email адміністратора
+    sendOrderNotifications(orderData);
+  }
 
   // Відображення блоку збереження замовлення у кабінет
   renderAdOrderClaimWrap(orderId);
@@ -4893,6 +4952,28 @@ function getDailyActionsCount() {
   return 0;
 }
 
+function setDailyActionsCount(newCount) {
+  const uid = currentUser ? currentUser.uid : 'guest';
+  const today = new Date().toISOString().slice(0, 10);
+  const key = `topz_daily_actions_${uid}`;
+  const safeCount = Math.max(0, Number(newCount) || 0);
+  try {
+    localStorage.setItem(key, JSON.stringify({ date: today, count: safeCount }));
+  } catch (e) {}
+  return safeCount;
+}
+
+function syncDailyActionsFromRemote(remoteDailyActions) {
+  if (!remoteDailyActions || typeof remoteDailyActions !== 'object') return;
+  const today = new Date().toISOString().slice(0, 10);
+  if (remoteDailyActions.date !== today || typeof remoteDailyActions.count !== 'number') return;
+  const localCount = getDailyActionsCount();
+  if (remoteDailyActions.count > localCount) {
+    setDailyActionsCount(remoteDailyActions.count);
+  }
+  updateDailyActionsCounters();
+}
+
 // Оновлення лічильників дій у всіх відкритих елементах інтерфейсу
 function updateDailyActionsCounters() {
   const count = getDailyActionsCount();
@@ -5054,6 +5135,9 @@ async function initFirebaseAuthAndDb() {
           firebaseDb.collection('users').doc(currentUser.uid).get().then(docSnap => {
             if (docSnap && docSnap.exists) {
               const uData = docSnap.data();
+              if (uData && uData.dailyActions) {
+                syncDailyActionsFromRemote(uData.dailyActions);
+              }
               if (uData && uData.fuelRegion) {
                 localStorage.setItem('user_fuel_region', uData.fuelRegion);
                 const regSelect = document.getElementById('pulseFuelRegionSelect');
@@ -5073,6 +5157,7 @@ async function initFirebaseAuthAndDb() {
             lastLoginAt: new Date().toISOString()
           }, { merge: true }).catch(() => {});
         }
+        updateDailyActionsCounters();
         const cabinetBackdrop = document.getElementById('userCabinetBackdrop');
         if (cabinetBackdrop && cabinetBackdrop.classList.contains('show')) {
           renderUserCabinetContent();
@@ -5185,8 +5270,6 @@ async function logoutUser() {
 
 // Збереження замовлення у базі Cloud Firestore
 async function saveOrderToFirestore(orderData) {
-  if (!checkAndIncrementDailyActionLimit()) return;
-
   await ensureFirebaseLoaded();
   if (!firebaseDb) {
     console.warn("Firestore недоступний, замовлення збережено локально.");
@@ -5194,7 +5277,8 @@ async function saveOrderToFirestore(orderData) {
   }
   try {
     const cleanId = orderData.orderId.replace('#', '').trim();
-    await firebaseDb.collection('orders').doc(cleanId).set({
+    const nowIso = new Date().toISOString();
+    const docPayload = {
       orderId: orderData.orderId,
       userId: currentUser ? currentUser.uid : null,
       userEmail: currentUser ? currentUser.email : (orderData.email || ''),
@@ -5211,6 +5295,7 @@ async function saveOrderToFirestore(orderData) {
         termLabel: orderData.pricing.termLabel,
         hasGuarantee: !!orderData.pricing.hasGuarantee
       },
+      promoCode: orderData.promoCode || '',
       paymentMethod: orderData.paymentMethod,
       contacts: {
         email: orderData.email || '',
@@ -5220,24 +5305,41 @@ async function saveOrderToFirestore(orderData) {
       status: 'pending', // pending, paid, active, completed, cancelled
       statusLabel: 'Очікує узгодження та оплати',
       orderSummaryText: orderData.orderSummaryText || '',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    });
+      updatedAt: nowIso
+    };
+    if (!orderData.isUpdate) {
+      docPayload.createdAt = nowIso;
+    }
+    await firebaseDb.collection('orders').doc(cleanId).set(docPayload, { merge: true });
     console.log("Замовлення збережено у Firestore:", cleanId);
   } catch (err) {
     console.warn("Не вдалося записати замовлення в Firestore:", err);
   }
 }
 
-// Миттєве сповіщення адміністратора про нове замовлення реклами
+// Миттєве сповіщення адміністратора про нове або оновлене замовлення реклами
 async function sendOrderNotifications(orderData) {
   // 1. Збереження замовлення на локальному сервері Node.js /api/orders (orders.json)
   try {
     if (isNodeApiAvailable()) {
+      const apiPayload = {
+        orderId: orderData.orderId,
+        siteName: orderData.name,
+        siteUrl: orderData.url,
+        siteDesc: orderData.desc || '',
+        placements: orderData.placements || [],
+        pricing: orderData.pricing,
+        promoCode: orderData.promoCode || '',
+        paymentMethod: orderData.paymentMethod,
+        email: orderData.email || '',
+        tg: orderData.tg || '',
+        phone: orderData.phone || '',
+        isUpdate: !!orderData.isUpdate
+      };
       fetch('/api/orders', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(orderData)
+        body: JSON.stringify(apiPayload)
       }).then(r => {
         if (r && r.status === 404) window._staticHostingNoApi = true;
       }).catch(() => {});
@@ -5248,20 +5350,20 @@ async function sendOrderNotifications(orderData) {
   try {
     const placementsList = (orderData.placements || []).map((p, i) => `${i + 1}. [${p.section}] ${p.card} (${p.locationLabel}) [${p.monthlyRate} грн/міс]`).join(' | ');
     const emailPayload = {
-      _subject: `🔔 Нове замовлення реклами #${orderData.orderId} (${orderData.pricing?.finalUah || 0} грн)`,
+      _subject: `${orderData.isUpdate ? '✏️ Оновлення замовлення' : '🔔 Нове замовлення реклами'} #${orderData.orderId} (${orderData.pricing?.finalUah || 0} грн)`,
       _captcha: 'false',
       _template: 'table',
       'Номер замовлення': orderData.orderId,
       'Назва сайту': orderData.name,
       'URL посилання': orderData.url,
-      'Опис сайту': orderData.desc || '—',
+      'Опис сайту': orderData.desc || '-',
       'Локації розміщення': placementsList,
-      'Термін розміщення': orderData.pricing?.termLabel || '—',
+      'Термін розміщення': orderData.pricing?.termLabel || '-',
       'До сплати': `${orderData.pricing?.finalUah || 0} грн (~ $${orderData.pricing?.finalUsdt || 0} USDT)`,
-      'Спосіб оплати': orderData.paymentMethod || '—',
-      'Email клієнта': orderData.email || (currentUser ? currentUser.email : '—'),
-      'Telegram клієнта': orderData.tg || '—',
-      'Телефон клієнта': orderData.phone || '—',
+      'Спосіб оплати': orderData.paymentMethod || '-',
+      'Email клієнта': orderData.email || (currentUser ? currentUser.email : '-'),
+      'Telegram клієнта': orderData.tg || '-',
+      'Телефон клієнта': orderData.phone || '-',
       'Час створення': new Date().toLocaleString('uk-UA', { timeZone: 'Europe/Kyiv' })
     };
 
@@ -5604,8 +5706,8 @@ function renderDashboardTab() {
           <div class="dash-metric-icon"><i class="fas fa-bolt"></i></div>
           <div class="dash-metric-data">
             <div class="dash-metric-value">${dailyActionsCount} <span class="dash-metric-unit" style="font-size: 0.8rem; font-weight: normal; color: var(--text-muted, #64748b);">/ ${DAILY_ACTION_LIMIT}</span></div>
-            <div class="dash-metric-label">Дій 0/100</div>
-            <div class="dash-metric-hint text-muted">Захисний ліміт: 100 операцій на день</div>
+            <div class="dash-metric-label">Дії за сьогодні</div>
+            <div class="dash-metric-hint text-muted">Захисний ліміт: ${DAILY_ACTION_LIMIT} операцій на день</div>
           </div>
         </div>
 
@@ -6006,6 +6108,10 @@ function renderSettingsTab() {
           await firebaseDb.collection('users').doc(currentUser.uid).set({
             profile: userProfileSettings,
             displayName: nameVal || currentUser.displayName || '',
+            dailyActions: {
+              date: new Date().toISOString().slice(0, 10),
+              count: getDailyActionsCount()
+            },
             updatedAt: new Date().toISOString()
           }, { merge: true });
         }
@@ -7018,6 +7124,10 @@ async function loadUserBookmarksData() {
         needsSyncBackToCloud = true;
       }
 
+      if (data.dailyActions && typeof data.dailyActions === 'object') {
+        syncDailyActionsFromRemote(data.dailyActions);
+      }
+
       if (data.profile && typeof data.profile === 'object') {
         userProfileSettings = { ...userProfileSettings, ...data.profile };
         try {
@@ -7060,6 +7170,10 @@ async function pushBookmarksToFirestore() {
       bookmarks: userBookmarksList,
       bookmarkCards: userBookmarkCards,
       bookmarkColumns: userBookmarkColumns,
+      dailyActions: {
+        date: new Date().toISOString().slice(0, 10),
+        count: getDailyActionsCount()
+      },
       updatedAt: new Date().toISOString()
     }, { merge: true });
   } catch (e) {
@@ -7141,7 +7255,6 @@ async function saveUserBookmarksData(options = {}) {
       sortReorderTimer = null;
     }
     pendingSortAction = false;
-    checkAndIncrementDailyActionLimit();
   }
 
   if (options && options.debounceCloud) {
@@ -8756,13 +8869,14 @@ function renderAdAuthPromptBanner() {
 
   if (currentUser) {
     const avatarSrc = currentUser.photoURL || 'https://www.gravatar.com/avatar/?d=mp';
+    const safeUserLabel = escapeHtml(currentUser.displayName || currentUser.email || '');
     container.innerHTML = `
       <div class="ad-auth-banner logged-in">
         <div class="ad-auth-banner-info">
           <img src="${avatarSrc}" class="ad-auth-banner-avatar" alt="Avatar" referrerpolicy="no-referrer">
           <div>
             <div class="ad-auth-banner-title">
-              Ви увійшли як: <strong>${currentUser.displayName || currentUser.email}</strong>
+              Ви увійшли як: <strong>${safeUserLabel}</strong>
             </div>
             <div class="ad-auth-banner-sub">
               <i class="fas fa-check-circle text-success me-1"></i> Замовлення буде автоматично збережено у вашому <a href="javascript:void(0)" onclick="openUserCabinetModal('orders')">Особистому кабінеті</a>.
@@ -8799,12 +8913,10 @@ function renderAdAuthPromptBanner() {
       btn.onclick = async () => {
         await loginWithGoogle();
         renderAdAuthPromptBanner();
-        if (currentUser && currentUser.email) {
-          const emailInput = document.getElementById('adEmailInput');
-          if (emailInput && !emailInput.value) {
-            emailInput.value = currentUser.email;
-          }
+        if (typeof loadUserBookmarksData === 'function' && currentUser) {
+          await loadUserBookmarksData();
         }
+        autofillAdOrderContacts();
       };
     }
   }
@@ -9985,7 +10097,7 @@ const WMO_WEATHER_MAP = {
   80: { label: 'короткочасний дощ', type: 'rain' },
   81: { label: 'злива', type: 'rain' },
   82: { label: 'сильна злива', type: 'rain' },
-  85: { label: 'снігова злива', type: 'snow' },
+  85: { label: 'короткочасний сніг', type: 'snow' },
   86: { label: 'сніговий шквал', type: 'snow' },
   95: { label: 'гроза', type: 'thunder' },
   96: { label: 'гроза з градом', type: 'thunder' },
@@ -11360,6 +11472,8 @@ function buildPulseWeatherDailyLensItems(data) {
     const { precipMm: precipSum } = getPulseWeatherDayPrecipMm(daily, hourly, d);
     if (precipSum >= 0.1 && precipProbMax <= 0) {
       precipProbMax = Math.min(85, Math.max(15, Math.round(precipSum * 20)));
+    } else if (precipSum >= 0.3 && precipProbMax < 15) {
+      precipProbMax = Math.min(85, Math.max(15, Math.round(precipSum * 25)));
     }
 
     const tMin = (daily.temperature_2m_min && daily.temperature_2m_min[d] !== undefined) ? Math.round(daily.temperature_2m_min[d]) : 0;
@@ -11503,7 +11617,9 @@ function buildPulseWeatherLensRowHtml(dayItem, focusMetric, weekMinTemp, weekMax
     valHtml = `${dayItem.cond.icon}<span class="pulse-w2-lens-num${dayItem.precipProbMax >= 50 ? ' is-accent' : ''}">${dayItem.precipProbMax}%</span>`;
     pct = Math.max(dayItem.precipProbMax, dayItem.precipSum > 0 ? 18 : 4);
     barTone = (dayItem.precipProbMax >= 60 || dayItem.precipSum >= 2.5) ? 'tone-blue-strong' : 'tone-blue';
-    statusHtml = dayItem.precipSum > 0 ? `${dayItem.precipSum} мм · ${dayItem.cond.label}` : dayItem.cond.label;
+    statusHtml = dayItem.precipSum > 0
+      ? `<span class="pulse-w2-lens-status-main">${dayItem.precipSum.toFixed(1)} мм</span><span class="pulse-w2-lens-status-sub">${dayItem.cond.label}</span>`
+      : dayItem.cond.label;
     statusTone = dayItem.precipSum > 0 ? 'tone-blue' : '';
     rowTitle = `${dayItem.fullDateLabel}: ${dayItem.cond.label} • Макс. ймовірність: ${dayItem.precipProbMax}%${dayItem.precipSum > 0 ? ` • Опади за добу: ${dayItem.precipSum} мм` : ' • без опадів'}`;
   } else if (focusMetric === 'temp') {
@@ -11538,7 +11654,7 @@ function buildPulseWeatherLensRowHtml(dayItem, focusMetric, weekMinTemp, weekMax
     pct = Math.max(8, Math.min(100, Math.round(((dayItem.avgPress - 730) / 45) * 100)));
     barTone = dayItem.pressInfo.colorClass === 'red' ? 'tone-red' : (dayItem.pressInfo.colorClass === 'yellow' ? 'tone-amber' : 'tone-green');
     if (d !== null && Math.abs(d) >= 5) {
-      statusHtml = d > 0 ? `Ріст +${d}` : `Спад ${d}`;
+      statusHtml = d > 0 ? 'Різкий ріст' : 'Різкий спад';
       statusTone = 'tone-red';
     } else if (dayItem.avgPress < 750) {
       statusHtml = 'Знижений';
@@ -11977,6 +12093,8 @@ function buildPulseWeatherTabsStripHtml(data, activeTab = 0, tabOffset = 0) {
     const { precipMm, dayPrecipSlice } = getPulseWeatherDayPrecipMm(daily, hourly, d);
     if (precipMm >= 0.1 && dayAvgPrecip <= 0) {
       dayAvgPrecip = Math.min(75, Math.max(8, Math.round(precipMm * 15)));
+    } else if (precipMm >= 0.3 && dayAvgPrecip < 10) {
+      dayAvgPrecip = Math.min(75, Math.max(12, Math.round(precipMm * 18)));
     }
 
     // 10-рівнева нелінійна шкала інтенсивності (0.1 -> 12+ мм) для тонких горизонтальних рисочок
@@ -12389,6 +12507,9 @@ function renderPulseWeatherUI(data, city, updatedTime = '') {
     if (slotPrecipMm >= 0.1 && precipVal <= 0) {
       precipProbEstimated = true;
       precipVal = Math.min(85, Math.max(12, Math.round(slotPrecipMm * 40)));
+    } else if (slotPrecipMm >= 0.3 && precipVal < 15) {
+      precipProbEstimated = true;
+      precipVal = Math.min(85, Math.max(15, Math.round(slotPrecipMm * 32)));
     }
     if (slotPrecipMm >= 0.2 && bestWmoRank < 50) {
       wCode = tVal <= 1 ? 71 : (slotPrecipMm >= 0.5 ? 61 : 51);

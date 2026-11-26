@@ -13,30 +13,112 @@ const PORT = 3000;
 
 app.use(express.json());
 
+// Per-IP in-memory rate limit for order submissions
+const orderRateLimitMap = new Map();
+const ORDER_RATE_WINDOW_MS = 10 * 60 * 1000;
+const ORDER_RATE_MAX_REQUESTS = 5;
+
+function isOrderRateLimited(ip) {
+  const now = Date.now();
+  const prev = orderRateLimitMap.get(ip) || [];
+  const recent = prev.filter(ts => now - ts < ORDER_RATE_WINDOW_MS);
+  if (recent.length >= ORDER_RATE_MAX_REQUESTS) {
+    orderRateLimitMap.set(ip, recent);
+    return true;
+  }
+  recent.push(now);
+  orderRateLimitMap.set(ip, recent);
+  if (orderRateLimitMap.size > 1000) {
+    for (const [key, list] of orderRateLimitMap.entries()) {
+      if (list.every(ts => now - ts >= ORDER_RATE_WINDOW_MS)) {
+        orderRateLimitMap.delete(key);
+      }
+    }
+  }
+  return false;
+}
+
 // API route to safely store ad placement orders
 app.post('/api/orders', (req, res) => {
   try {
-    const orderData = req.body;
-    if (!orderData || !orderData.orderId) {
+    const clientIp = (req.headers['x-forwarded-for'] || req.socket?.remoteAddress || 'unknown').toString().split(',')[0].trim();
+    if (isOrderRateLimited(clientIp)) {
+      return res.status(429).json({ error: 'Забагато запитів на оформлення замовлень. Спробуйте пізніше.' });
+    }
+
+    const body = req.body;
+    if (!body || typeof body !== 'object' || Array.isArray(body)) {
       return res.status(400).json({ error: 'Недійсні дані замовлення' });
     }
+
+    const orderId = typeof body.orderId === 'string' ? body.orderId.trim().slice(0, 40) : '';
+    const siteName = typeof body.siteName === 'string'
+      ? body.siteName.trim().slice(0, 80)
+      : (typeof body.name === 'string' ? body.name.trim().slice(0, 80) : '');
+    const siteUrl = typeof body.siteUrl === 'string'
+      ? body.siteUrl.trim().slice(0, 300)
+      : (typeof body.url === 'string' ? body.url.trim().slice(0, 300) : '');
+    const email = typeof body.email === 'string'
+      ? body.email.trim().slice(0, 120)
+      : (typeof body.clientEmail === 'string' ? body.clientEmail.trim().slice(0, 120) : '');
+
+    if (!orderId || !/^[A-Za-z0-9#-]{4,40}$/.test(orderId) || !siteName || !siteUrl || !email.includes('@')) {
+      return res.status(400).json({ error: 'Недійсні або неповні дані замовлення' });
+    }
+
+    let safeUrl = '';
+    try {
+      const parsed = new URL(siteUrl);
+      if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
+        safeUrl = parsed.href;
+      }
+    } catch (e) {}
+    if (!safeUrl) {
+      return res.status(400).json({ error: 'Недійсне посилання ресурсу' });
+    }
+
+    const sanitizedOrder = {
+      orderId,
+      siteName,
+      siteUrl: safeUrl,
+      siteDesc: typeof body.siteDesc === 'string' ? body.siteDesc.trim().slice(0, 300) : '',
+      placements: Array.isArray(body.placements) ? body.placements.slice(0, 4) : [],
+      pricing: body.pricing && typeof body.pricing === 'object' ? {
+        finalUah: Number(body.pricing.finalUah) || 0,
+        finalUsdt: String(body.pricing.finalUsdt || '0'),
+        termMonths: Number(body.pricing.termMonths) || 1,
+        termLabel: typeof body.pricing.termLabel === 'string' ? body.pricing.termLabel.slice(0, 100) : ''
+      } : null,
+      promoCode: typeof body.promoCode === 'string' ? body.promoCode.trim().slice(0, 32) : '',
+      paymentMethod: typeof body.paymentMethod === 'string' ? body.paymentMethod.trim().slice(0, 30) : '',
+      email,
+      tg: typeof body.tg === 'string' ? body.tg.trim().slice(0, 80) : '',
+      phone: typeof body.phone === 'string' ? body.phone.trim().slice(0, 40) : '',
+      receivedAt: new Date().toISOString()
+    };
+
     const ordersFilePath = path.join(__dirname, 'orders.json');
     let orders = [];
     if (fs.existsSync(ordersFilePath)) {
       try {
         const fileContent = fs.readFileSync(ordersFilePath, 'utf8');
         orders = JSON.parse(fileContent);
+        if (!Array.isArray(orders)) orders = [];
       } catch (e) {
         orders = [];
       }
     }
-    orders.unshift({
-      ...orderData,
-      receivedAt: new Date().toISOString()
-    });
+
+    const existingIndex = orders.findIndex(o => o && o.orderId === orderId);
+    if (existingIndex !== -1) {
+      orders[existingIndex] = { ...orders[existingIndex], ...sanitizedOrder, updatedAt: new Date().toISOString() };
+    } else {
+      orders.unshift(sanitizedOrder);
+    }
+
     if (orders.length > 500) orders = orders.slice(0, 500);
     fs.writeFileSync(ordersFilePath, JSON.stringify(orders, null, 2), 'utf8');
-    return res.json({ success: true, orderId: orderData.orderId });
+    return res.json({ success: true, orderId });
   } catch (err) {
     console.error('Error saving order:', err);
     return res.status(500).json({ error: 'Помилка збереження замовлення на сервері' });

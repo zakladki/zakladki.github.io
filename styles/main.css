@@ -16805,7 +16805,7 @@ body.dark-mode .pulse-w2-th-row th.is-lens-active {
   width: 100%;
 }
 .pulse-w2-lens-grid.is-weather {
-  grid-template-columns: 54px 1fr 94px;
+  grid-template-columns: 54px 1fr 106px;
 }
 .pulse-w2-lens-val {
   display: inline-flex;
@@ -16902,7 +16902,31 @@ body.dark-mode .pulse-w2-lens-bar-track {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+.pulse-w2-lens-grid.is-weather .pulse-w2-lens-status {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  text-align: left;
+  white-space: normal;
+  line-height: 1.05;
+  gap: 1px;
+}
+.pulse-w2-lens-status-main {
+  font-weight: 700;
+  line-height: 1.05;
+}
+.pulse-w2-lens-status-sub {
+  font-size: 0.59rem;
+  font-weight: 500;
+  opacity: 0.88;
+  line-height: 1.05;
+  color: #475569;
+}
 body.dark-mode .pulse-w2-lens-status {
+  color: #94a3b8;
+}
+body.dark-mode .pulse-w2-lens-status-sub {
   color: #94a3b8;
 }
 .pulse-w2-lens-status.tone-green {
