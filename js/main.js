@@ -5694,51 +5694,61 @@ function renderDashboardTab() {
       <!-- Сітка карток показників (Метрики) -->
       <div class="cabinet-dash-metrics-grid">
         <div class="cabinet-dash-metric-card metric-points">
-          <div class="dash-metric-icon"><i class="fas fa-coins"></i></div>
-          <div class="dash-metric-data">
+          <div class="dash-metric-top">
+            <div class="dash-metric-icon"><i class="fas fa-coins"></i></div>
             <div class="dash-metric-value">0 <span class="dash-metric-unit">балів</span></div>
+          </div>
+          <div class="dash-metric-data">
             <div class="dash-metric-label">Бали активності</div>
             <div class="dash-metric-hint text-warning"><i class="fas fa-clock me-1"></i>Система нарахування незабаром</div>
           </div>
         </div>
 
         <div class="cabinet-dash-metric-card metric-daily-actions">
-          <div class="dash-metric-icon"><i class="fas fa-bolt"></i></div>
+          <div class="dash-metric-top">
+            <div class="dash-metric-icon"><i class="fas fa-bolt"></i></div>
+            <div class="dash-metric-value">${dailyActionsCount} <span class="dash-metric-unit">/ ${DAILY_ACTION_LIMIT}</span></div>
+          </div>
           <div class="dash-metric-data">
-            <div class="dash-metric-value">${dailyActionsCount} <span class="dash-metric-unit" style="font-size: 0.8rem; font-weight: normal; color: var(--text-muted, #64748b);">/ ${DAILY_ACTION_LIMIT}</span></div>
             <div class="dash-metric-label">Дії за сьогодні</div>
             <div class="dash-metric-hint text-muted">Захисний ліміт: ${DAILY_ACTION_LIMIT} операцій на день</div>
           </div>
         </div>
 
         <div class="cabinet-dash-metric-card metric-folders">
-          <div class="dash-metric-icon"><i class="fas fa-folder-open"></i></div>
+          <div class="dash-metric-top">
+            <div class="dash-metric-icon"><i class="fas fa-folder-open"></i></div>
+            <div class="dash-metric-value">${cardsCount} <span class="dash-metric-unit">/ ${MAX_USER_CARDS}</span></div>
+          </div>
           <div class="dash-metric-data">
-            <div class="dash-metric-value">${cardsCount} <span class="dash-metric-unit" style="font-size: 0.8rem; font-weight: normal; color: var(--text-muted, #64748b);">/ ${MAX_USER_CARDS}</span></div>
             <div class="dash-metric-label">Тематичні папки</div>
             <div class="dash-metric-hint text-muted">Ліміт: до ${MAX_USER_CARDS} карток</div>
           </div>
         </div>
 
         <div class="cabinet-dash-metric-card metric-bookmarks">
-          <div class="dash-metric-icon"><i class="fas fa-globe"></i></div>
+          <div class="dash-metric-top">
+            <div class="dash-metric-icon"><i class="fas fa-globe"></i></div>
+            <div class="dash-metric-value">${bookmarksCount} <span class="dash-metric-unit">/ ${MAX_USER_BOOKMARKS}</span></div>
+          </div>
           <div class="dash-metric-data">
-            <div class="dash-metric-value">${bookmarksCount} <span class="dash-metric-unit" style="font-size: 0.8rem; font-weight: normal; color: var(--text-muted, #64748b);">/ ${MAX_USER_BOOKMARKS}</span></div>
             <div class="dash-metric-label">Збережені сайти</div>
             <div class="dash-metric-hint text-muted">Ліміт: до ${MAX_USER_BOOKMARKS} сайтів</div>
           </div>
         </div>
 
         <div class="cabinet-dash-metric-card metric-cloud">
-          <div class="dash-metric-icon" ${currentUser && dailyActionsCount >= DAILY_ACTION_LIMIT ? 'style="background: rgba(239, 68, 68, 0.14); color: #dc2626;"' : ''}>
-            <i class="${currentUser && dailyActionsCount >= DAILY_ACTION_LIMIT ? 'fas fa-exclamation-triangle text-danger' : (currentUser ? 'fas fa-shield-alt text-success' : 'fas fa-cloud-upload-alt text-muted')}"></i>
-          </div>
-          <div class="dash-metric-data">
+          <div class="dash-metric-top">
+            <div class="dash-metric-icon" ${currentUser && dailyActionsCount >= DAILY_ACTION_LIMIT ? 'style="background: rgba(239, 68, 68, 0.14); color: #dc2626;"' : ''}>
+              <i class="${currentUser && dailyActionsCount >= DAILY_ACTION_LIMIT ? 'fas fa-exclamation-triangle text-danger' : (currentUser ? 'fas fa-shield-alt text-success' : 'fas fa-cloud-upload-alt text-muted')}"></i>
+            </div>
             <div class="dash-metric-value ${currentUser && dailyActionsCount >= DAILY_ACTION_LIMIT ? 'text-danger font-weight-bold' : (currentUser ? 'text-success' : 'text-secondary')}">
               ${currentUser && dailyActionsCount >= DAILY_ACTION_LIMIT ? 'Не активна (ліміт)' : (currentUser ? 'Активна' : 'Локально')}
             </div>
+          </div>
+          <div class="dash-metric-data">
             <div class="dash-metric-label">Хмарна синхронізація</div>
-            <div class="dash-metric-hint ${currentUser && dailyActionsCount >= DAILY_ACTION_LIMIT ? 'text-danger' : 'text-muted'}">
+            <div class="dash-metric-hint ${currentUser && dailyActionsCount >= DAILY_ACTION_LIMIT ? 'text-danger' : 'text-muted'}" title="${currentUser ? escapeHtml(currentUser.email || '') : ''}">
               ${currentUser && dailyActionsCount >= DAILY_ACTION_LIMIT ? 'Денний ліміт 100/100 вичерпано (відновиться завтра)' : (currentUser ? escapeHtml(currentUser.email) : 'Увійдіть для синхронізації')}
             </div>
           </div>

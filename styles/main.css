@@ -9741,18 +9741,20 @@ body.dark-mode .cabinet-dash-banner-desc {
 
 .cabinet-dash-metrics-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 10px;
 }
 
 .cabinet-dash-metric-card {
   background: var(--card-bg, #ffffff);
   border: 1px solid var(--border-color, #e2e8f0);
   border-radius: 10px;
-  padding: 14px 16px;
+  padding: 11px 13px;
   display: flex;
-  align-items: center;
-  gap: 14px;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 7px;
+  min-width: 0;
   box-shadow: 0 2px 6px -1px rgba(0, 0, 0, 0.05), 0 1px 3px -1px rgba(0, 0, 0, 0.03);
   transition: transform 0.18s ease, box-shadow 0.18s ease;
 }
@@ -9765,14 +9767,21 @@ body.dark-mode .cabinet-dash-metric-card {
   border-color: var(--border-color, #334155);
 }
 
+.dash-metric-top {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+}
+
 .dash-metric-icon {
-  width: 44px;
-  height: 44px;
-  border-radius: 10px;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.25rem;
+  font-size: 0.92rem;
   flex-shrink: 0;
 }
 .metric-points .dash-metric-icon {
@@ -9802,35 +9811,56 @@ body.dark-mode .metric-daily-actions .dash-metric-icon {
 
 .dash-metric-data {
   min-width: 0;
-  flex: 1;
+  width: 100%;
 }
 .dash-metric-value {
-  font-size: 1.22rem;
+  font-size: 1.12rem;
   font-weight: 800;
   color: var(--text-main, #0f172a);
-  line-height: 1.2;
+  line-height: 1.15;
+  min-width: 0;
 }
 body.dark-mode .dash-metric-value {
   color: #f8fafc;
 }
 .dash-metric-unit {
-  font-size: 0.8rem;
-  font-weight: 600;
+  font-size: 0.78rem;
+  font-weight: 500;
   color: var(--text-muted, #64748b);
 }
 .dash-metric-label {
-  font-size: 0.8rem;
+  font-size: 0.81rem;
   font-weight: 700;
   color: var(--text-main, #334155);
-  margin-top: 2px;
+  line-height: 1.2;
 }
 body.dark-mode .dash-metric-label {
   color: #cbd5e1;
 }
 .dash-metric-hint {
-  font-size: 0.7rem;
+  font-size: 0.71rem;
   margin-top: 2px;
-  line-height: 1.2;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+.metric-cloud .dash-metric-hint {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 576px) {
+  .cabinet-dash-metrics-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+  .cabinet-dash-metric-card {
+    padding: 9px 10px;
+    gap: 5px;
+  }
+  .cabinet-dash-metric-card.metric-cloud {
+    grid-column: 1 / -1;
+  }
 }
 
 .cabinet-dash-section {
