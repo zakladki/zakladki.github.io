@@ -270,6 +270,12 @@
     "card": "Навчання, Мови, Текст"
   },
   {
+    "name": "Google Labs",
+    "url": "https://labs.google/",
+    "desc": "Google Labs - офіційний портал експериментальних AI-інструментів та нових технологій від Google.",
+    "card": "Каталоги сервісів ШІ"
+  },
+  {
     "name": "There's An AI For That",
     "url": "https://theresanaiforthat.com/",
     "desc": "Найбільша база нейромереж та сервісів штучного інтелекту під будь-які завдання.",
