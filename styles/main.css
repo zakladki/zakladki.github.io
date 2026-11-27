@@ -4952,11 +4952,23 @@ body.dark-mode .ad-payment-option.active {
   line-height: 1.25;
 }
 .ad-payment-name-icon {
-  font-size: 1rem;
+  font-size: 0.95rem;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+}
+.ad-payment-icon-mono {
+  color: #1e293b;
+}
+body.dark-mode .ad-payment-icon-mono {
+  color: #e2e8f0;
+}
+.ad-payment-icon-privat {
+  color: #16a34a;
+}
+body.dark-mode .ad-payment-icon-privat {
+  color: #4ade80;
 }
 body.dark-mode .ad-payment-name {
   color: #f8fafc;

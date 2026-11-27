@@ -2603,7 +2603,7 @@ function topFunction() {
 const AD_CONFIG = {
   basePriceUah: 100,           // Єдина базова величина для всіх розрахунків (БВ = 100 грн/міс)
   commercialSections: ["Ринок", "Магазини", "Банкінг", "AI"], // Комерційні розділи
-  usdRate: 41.5,               // Орієнтовний курс перерахунку для еквівалента USDT
+  usdRate: 45.0,               // Орієнтовний курс перерахунку (синхронізується з живим курсом НБУ)
   cryptoDiscountPercent: 10,   // Постійна знижка 10% при оплаті криптовалютою
   
   // Множники вартості згідно з правилами та зонами сайту (БВ = 100 грн/міс)
@@ -3010,7 +3010,8 @@ function calculateAdPricing(termId, paymentMethod) {
     cryptoDiscountAmount = Math.round(costAfterPromo * (AD_CONFIG.cryptoDiscountPercent / 100));
   }
   const finalUah = costAfterPromo - cryptoDiscountAmount;
-  const finalUsdt = (finalUah / AD_CONFIG.usdRate).toFixed(2);
+  const liveUsdRate = getLiveAdUsdRate();
+  const finalUsdt = (finalUah / liveUsdRate).toFixed(2);
 
   const hasVip = placements.some(p => p.isVip);
 
@@ -3032,6 +3033,60 @@ function calculateAdPricing(termId, paymentMethod) {
     finalUah,
     finalUsdt
   };
+}
+
+let adNbuUsdSyncPromise = null;
+let adNbuUsdSyncedAt = 0;
+
+function getLiveAdUsdRate() {
+  if (typeof pulseRatesData !== 'undefined' && pulseRatesData) {
+    const liveUsd = Number(pulseRatesData.USD);
+    if (adNbuUsdSyncedAt > 0 && Number.isFinite(liveUsd) && liveUsd > 20) {
+      return liveUsd;
+    }
+  }
+  try {
+    const cached = JSON.parse(localStorage.getItem('pulse_day_cache_v4') || '{}');
+    const cachedUsd = cached && cached.rates && Number(cached.rates.USD);
+    if (Number.isFinite(cachedUsd) && cachedUsd > 20) {
+      AD_CONFIG.usdRate = cachedUsd;
+      if (typeof pulseRatesData !== 'undefined' && pulseRatesData) {
+        pulseRatesData.USD = cachedUsd;
+      }
+      return cachedUsd;
+    }
+  } catch (e) {}
+  if (typeof pulseRatesData !== 'undefined' && pulseRatesData && Number(pulseRatesData.USD) > 20 && Number(pulseRatesData.USD) !== 41.50) {
+    return Number(pulseRatesData.USD);
+  }
+  return AD_CONFIG.usdRate || 45.0;
+}
+
+function syncAdOrderLiveUsdRate() {
+  const now = Date.now();
+  if (adNbuUsdSyncedAt && (now - adNbuUsdSyncedAt) < 3600000) return;
+  if (adNbuUsdSyncPromise) return;
+  adNbuUsdSyncPromise = fetch('https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?valcode=USD&json')
+    .then(r => (r.ok ? r.json() : null))
+    .then(data => {
+      const item = Array.isArray(data) ? data.find(i => i.cc === 'USD') : null;
+      const rate = item && typeof item.rate === 'number' ? Number(item.rate.toFixed(2)) : 0;
+      if (rate > 20) {
+        AD_CONFIG.usdRate = rate;
+        if (typeof pulseRatesData !== 'undefined' && pulseRatesData) {
+          pulseRatesData.USD = rate;
+        }
+        adNbuUsdSyncedAt = Date.now();
+        const step1 = document.getElementById('adStep1');
+        if (step1 && step1.style.display !== 'none') {
+          recalcAdOrderPrice();
+        }
+      }
+    })
+    .catch(() => {})
+    .finally(() => {
+      adNbuUsdSyncPromise = null;
+    });
 }
 
 function openAdOrderModal(opts = {}) {
@@ -3058,7 +3113,7 @@ function openAdOrderModal(opts = {}) {
 
             <!-- Пояснення черги 6 місць -->
             <div class="ad-badge-rule-box">
-              <i class="fas fa-info-circle me-1"></i> <strong>Правило черги та розміщення:</strong> В одній картці допускається до 6 рекламних місць. Перше замовлення займає верхню позицію в обраній зоні, послідуючі - нижчі рядки. Діє автоматичне просування вгору після завершення терміну попереднього партнера.
+              <i class="fas fa-info-circle me-1"></i> <strong>Правило черги та розміщення:</strong> В одній картці допускається до 6 рекламних місць. Перше замовлення займає верхню позицію в обраній зоні, наступні - нижчі рядки. Діє автоматичне просування вгору після завершення терміну попереднього партнера.
             </div>
 
             <!-- БЛОК 1: Локація на сайті -->
@@ -3286,7 +3341,7 @@ function openAdOrderModal(opts = {}) {
                   <input type="radio" name="adPaymentMethod" value="mono" checked>
                   <div class="ad-payment-text">
                     <div class="ad-payment-name">
-                      <span class="ad-payment-name-icon" style="color: #1e293b;">⚫</span>
+                      <span class="ad-payment-name-icon ad-payment-icon-mono"><i class="fas fa-credit-card"></i></span>
                       <span>Монобанк</span>
                     </div>
                     <div class="ad-payment-sub">Банка / Apple & Google Pay</div>
@@ -3297,7 +3352,7 @@ function openAdOrderModal(opts = {}) {
                   <input type="radio" name="adPaymentMethod" value="privat">
                   <div class="ad-payment-text">
                     <div class="ad-payment-name">
-                      <span class="ad-payment-name-icon" style="color: #16a34a;">🟢</span>
+                      <span class="ad-payment-name-icon ad-payment-icon-privat"><i class="fas fa-university"></i></span>
                       <span>ПриватБанк</span>
                     </div>
                     <div class="ad-payment-sub">Конверт / Приват24</div>
@@ -3427,7 +3482,7 @@ function openAdOrderModal(opts = {}) {
             </details>
 
             <div class="ad-terms-agreement-note">
-              <i class="fas fa-shield-alt text-success me-1"></i> Натискаючи кнопку нижче, ви погоджуєтеся з <a href="javascript:void(0)" id="adToggleRulesBtn" class="ad-terms-link">Регламентом розміщення та модерації</a>.
+              <i class="fas fa-shield-alt text-success me-1"></i> Натискаючи кнопку нижче, ви приймаєте <a href="javascript:void(0)" id="adToggleRulesBtn" class="ad-terms-link">ці умови</a>.
             </div>
 
             <!-- ПЛАВАЮЧИЙ БАР ВАРТОСТІ (ВНИЗУ ВІКНА) -->
@@ -3949,6 +4004,7 @@ function openAdOrderModal(opts = {}) {
   updatePartnerAddon(1);
   updateThematicAddon(1);
   recalcAdOrderPrice();
+  syncAdOrderLiveUsdRate();
   updateLivePreview();
 
   renderAdAuthPromptBanner();
@@ -15820,6 +15876,10 @@ async function fetchLiveNbuRates() {
       diffCNY: cny.diff, diff7dCNY: cny.diff7d, diff30dCNY: cny.diff30d, pctCNY: cny.pct, pct7dCNY: cny.pct7d, pct30dCNY: cny.pct30d
     };
     pulseRatesData = rates;
+    if (rates && typeof rates.USD === 'number' && rates.USD > 20) {
+      AD_CONFIG.usdRate = rates.USD;
+      adNbuUsdSyncedAt = Date.now();
+    }
     return rates;
   } catch (e) {
     return pulseRatesData;
