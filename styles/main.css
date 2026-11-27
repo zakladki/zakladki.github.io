@@ -11513,6 +11513,7 @@ body.pulse-drawer-open #pulseDayBtn.active .pulse-exit-badge-top {
   max-height: calc(100vh - 42px);
   max-height: calc(100dvh - 42px);
   overflow-y: auto;
+  overflow-x: hidden;
   z-index: 998;
   transform: translateY(-115%);
   opacity: 0;
@@ -11570,6 +11571,7 @@ body.dark-mode .pulse-drawer-header {
   display: flex;
   align-items: center;
   gap: 8px;
+  min-width: 0;
 }
 .pulse-drawer-title {
   margin: 0;
@@ -11579,6 +11581,8 @@ body.dark-mode .pulse-drawer-header {
   display: flex;
   align-items: center;
   gap: 6px;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 body.dark-mode .pulse-drawer-title {
   color: #38bdf8;
@@ -11606,6 +11610,9 @@ body.dark-mode .pulse-drawer-date-bullet {
   font-size: 0.75rem;
   color: #64748b;
   display: inline-block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 body.dark-mode .pulse-drawer-tagline {
   color: #94a3b8;
@@ -11615,16 +11622,20 @@ body.dark-mode .pulse-drawer-tagline {
   display: flex;
   align-items: center;
   gap: 8px;
+  flex-shrink: 0;
 }
 .pulse-drawer-btns-row {
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  flex-shrink: 0;
 }
 .pulse-last-updated {
   font-size: 0.72rem;
   color: #64748b;
   margin-right: 4px;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 body.dark-mode .pulse-last-updated {
   color: #94a3b8;
@@ -11642,6 +11653,8 @@ body.dark-mode .pulse-last-updated {
   display: inline-flex;
   align-items: center;
   gap: 5px;
+  white-space: nowrap;
+  flex-shrink: 0;
   transition: all 0.15s ease;
 }
 .pulse-ctrl-btn:hover {
@@ -11797,6 +11810,22 @@ body.page-pulse .bottom-multiplex-container {
     padding: 8px 6px 14px;
   }
 }
+@media (max-width: 979.98px) {
+  .pulse-drawer-tagline {
+    display: none;
+  }
+}
+@media (max-width: 749.98px) and (min-width: 630px) {
+  .pulse-fullscreen-btn:not(.pulse-exit-fullscreen-btn) {
+    width: 28px;
+    min-width: 28px;
+    padding: 0;
+    justify-content: center;
+  }
+  .pulse-fullscreen-btn:not(.pulse-exit-fullscreen-btn) span {
+    display: none;
+  }
+}
 @media (max-width: 629.98px) {
   .pulse-day-drawer {
     max-height: calc(100vh - 42px);
@@ -11814,16 +11843,22 @@ body.page-pulse .bottom-multiplex-container {
     padding: 6px 5px 16px;
   }
   .pulse-drawer-header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-rows: auto auto;
+    align-items: center;
+    column-gap: 8px;
+    row-gap: 3px;
     padding: 6px 8px 7px;
-    align-items: flex-start;
   }
-  .pulse-drawer-title-group {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 1px;
+  .pulse-drawer-title-group,
+  .pulse-drawer-controls {
+    display: contents;
   }
   .pulse-drawer-title {
+    grid-column: 1;
+    grid-row: 1;
+    justify-self: start;
     font-size: 0.90rem;
     line-height: 1.15;
   }
@@ -11831,9 +11866,12 @@ body.page-pulse .bottom-multiplex-container {
     display: none;
   }
   .pulse-drawer-date {
+    grid-column: 1;
+    grid-row: 2;
+    justify-self: start;
     font-size: 0.72rem;
     color: #475569;
-    line-height: 1.2;
+    line-height: 1.15;
     padding-left: 24px;
   }
   body.dark-mode .pulse-drawer-date {
@@ -11842,13 +11880,10 @@ body.page-pulse .bottom-multiplex-container {
   .pulse-drawer-tagline {
     display: none;
   }
-  .pulse-drawer-controls {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 3px;
-  }
   .pulse-drawer-btns-row {
+    grid-column: 2;
+    grid-row: 1;
+    justify-self: end;
     display: flex;
     align-items: center;
     gap: 5px;
@@ -11868,11 +11903,25 @@ body.page-pulse .bottom-multiplex-container {
     display: none;
   }
   .pulse-last-updated {
-    font-size: 0.67rem;
+    grid-column: 2;
+    grid-row: 2;
+    justify-self: end;
+    font-size: 0.68rem;
     color: #64748b;
     margin: 0;
     text-align: right;
     line-height: 1.15;
+  }
+}
+@media (max-width: 359.98px) {
+  #btnPulseRefresh {
+    width: 26px;
+    min-width: 26px;
+    padding: 0;
+    justify-content: center;
+  }
+  #btnPulseRefresh span {
+    display: none;
   }
 }
 
@@ -16247,20 +16296,17 @@ body.dark-mode .pulse-w2-col-wind.has-gusts .pulse-wind-val-box {
   animation: pulseWindCycle 6s infinite ease-in-out;
 }
 @keyframes pulseWindCycle {
-  0%, 46% {
+  0%, 44% {
     transform: translateY(0);
     opacity: 1;
   }
-  48%, 51% {
-    opacity: 0;
-  }
-  53%, 96% {
+  50%, 94% {
     transform: translateY(-16px);
     opacity: 1;
   }
-  98%, 100% {
-    opacity: 0;
+  100% {
     transform: translateY(0);
+    opacity: 1;
   }
 }
 .pulse-wind-line {
